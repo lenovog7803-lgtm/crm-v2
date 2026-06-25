@@ -9,6 +9,7 @@ body { font-family: Manrope, sans-serif; background: #EDEFF3; -webkit-font-smoot
 @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 @keyframes floatA { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(3%,4%) scale(1.08);} }
 @keyframes floatB { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-4%,3%) scale(1.1);} }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 .card {
   background: rgba(255,255,255,0.6);

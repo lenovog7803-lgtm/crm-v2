@@ -89,12 +89,18 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
   const [order, setOrder] = useState(null)
   const [loading, setLoading] = useState(true)
   const [payLoading, setPayLoading] = useState(null)
+  const [docsRefreshing, setDocsRefreshing] = useState(false)
 
   useEffect(() => {
     if (!orderId) return
     setLoading(true)
     getOrder(orderId).then(setOrder).catch(console.error).finally(() => setLoading(false))
   }, [orderId])
+
+  const refreshDocs = () => {
+    setDocsRefreshing(true)
+    getOrder(orderId).then(setOrder).catch(console.error).finally(() => setDocsRefreshing(false))
+  }
 
   if (loading) return <div style={{ padding: 60, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>
   if (!order) return <div style={{ padding: 60, textAlign: 'center', color: '#A6AEB8' }}>Заявка не найдена</div>
@@ -429,7 +435,30 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
 
           {/* Documents */}
           <div className="card" style={{ padding: '20px' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', marginBottom: 14 }}>ДОКУМЕНТЫ</div>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', flex: 1 }}>ДОКУМЕНТЫ</div>
+              <button
+                onClick={refreshDocs}
+                title="Обновить ссылки на документы"
+                style={{
+                  width: 30, height: 30, borderRadius: 9, border: 'none', cursor: 'pointer',
+                  background: 'rgba(19,102,240,0.08)', color: '#1366F0',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'background 0.15s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(19,102,240,0.16)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(19,102,240,0.08)'}
+              >
+                <svg
+                  width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ animation: docsRefreshing ? 'spin 0.8s linear infinite' : 'none' }}
+                >
+                  <polyline points="23 4 23 10 17 10" />
+                  <polyline points="1 20 1 14 7 14" />
+                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                </svg>
+              </button>
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
                 { label: `Заявка-договор ${order.order_number || ''}`, color: '#1366F0', bg: 'rgba(19,102,240,0.1)', url: order.doc_url_client },
@@ -440,7 +469,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none',
                     padding: '10px 12px', borderRadius: 12, background: doc.bg,
-                    cursor: doc.url ? 'pointer' : 'default', opacity: doc.url ? 1 : 0.5,
+                    cursor: doc.url ? 'pointer' : 'default', opacity: doc.url ? 1 : 0.4,
                   }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={doc.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -448,6 +477,12 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                     <polyline points="14 2 14 8 20 8" />
                   </svg>
                   <span style={{ fontSize: 13, fontWeight: 600, color: doc.color }}>{doc.label}</span>
+                  {doc.url && (
+                    <svg style={{ marginLeft: 'auto' }} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={doc.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                      <polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
+                    </svg>
+                  )}
                 </a>
               ))}
             </div>
