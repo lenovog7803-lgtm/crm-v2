@@ -11,7 +11,7 @@ function Row({ label, value, mono }) {
   )
 }
 
-export default function ClientDetail({ clientId, onBack, onDelete }) {
+export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }) {
   const [client, setClient] = useState(null)
   const [clientOrders, setClientOrders] = useState([])
   const [loading, setLoading] = useState(true)
@@ -111,21 +111,40 @@ export default function ClientDetail({ clientId, onBack, onDelete }) {
           {clientOrders.length === 0 ? (
             <div style={{ color: '#A6AEB8', fontSize: 13, padding: '12px 0' }}>Нет заявок</div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {clientOrders.slice(0, 10).map(o => (
-                <div key={o.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
-                  <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {clientOrders.slice(0, 15).map(o => (
+                <div
+                  key={o.id}
+                  onClick={() => onOpenOrder && onOpenOrder(o.id)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '10px 10px', borderRadius: 10,
+                    borderBottom: '1px solid rgba(14,23,38,0.05)',
+                    cursor: onOpenOrder ? 'pointer' : 'default',
+                    transition: 'background 0.12s',
+                  }}
+                  onMouseEnter={e => { if (onOpenOrder) e.currentTarget.style.background = 'rgba(19,102,240,0.05)' }}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontFamily: 'JetBrains Mono', fontSize: 12, color: '#1366F0', fontWeight: 600 }}>{o.order_number || o.id}</div>
-                    <div style={{ fontSize: 12.5, color: '#5A6573', marginTop: 1 }}>
+                    <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {o.route_from && o.route_to ? `${o.route_from} → ${o.route_to}` : '—'}
                     </div>
                   </div>
-                  <div style={{ fontWeight: 700, fontSize: 13, color: '#0E1726' }}>{(o.client_rate || 0).toLocaleString('ru-RU')} BYN</div>
+                  <div style={{ fontFamily: 'JetBrains Mono', fontWeight: 700, fontSize: 13, color: '#0E1726', flexShrink: 0 }}>
+                    {(o.client_rate || 0).toLocaleString('ru-RU')} Br
+                  </div>
                   <span style={{
-                    padding: '2px 8px', borderRadius: 6,
+                    padding: '2px 8px', borderRadius: 6, flexShrink: 0,
                     background: statusBg(o.status), color: statusColor(o.status),
                     fontSize: 11, fontWeight: 600,
                   }}>{statusLabel(o.status)}</span>
+                  {onOpenOrder && (
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A6AEB8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                      <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                  )}
                 </div>
               ))}
             </div>
