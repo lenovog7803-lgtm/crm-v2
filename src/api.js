@@ -53,7 +53,7 @@ export const deleteCarrier = (id) => req(`/carriers/${id}`, { method: 'DELETE' }
 // Tasks
 export const getTasks = () => req('/tasks');
 export const createTask = (data) => req('/tasks', { method: 'POST', body: JSON.stringify(data) });
-export const updateTask = (id, data) => req(`/tasks/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const updateTask = (id, data) => req(`/tasks/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const deleteTask = (id) => req(`/tasks/${id}`, { method: 'DELETE' });
 
 // Leads
