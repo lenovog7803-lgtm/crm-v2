@@ -42,6 +42,8 @@ function MainApp() {
   const [paymentModalKind, setPaymentModalKind] = useState('income')
 
   // Refresh triggers — increment to tell the component to re-fetch
+  const [dashboardPeriod, setDashboardPeriod] = useState('month')
+
   const [ordersKey, setOrdersKey] = useState(0)
   const [tasksKey, setTasksKey] = useState(0)
   const [clientsKey, setClientsKey] = useState(0)
@@ -95,9 +97,9 @@ function MainApp() {
         />
 
         <main className="app-main">
-          <Topbar page={page} onSignOut={signOut} />
+          <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} />
           <div className="scroll-area" key={page}>
-            {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} />}
+            {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} />}
 
             {page === 'orders' && (
               <Orders

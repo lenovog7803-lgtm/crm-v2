@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 const PAGE_META = {
-  dashboard: { title: 'Дашборд', subtitle: 'Обзор за текущий месяц' },
+  dashboard: { title: 'Дашборд', subtitle: 'Обзор бизнеса' },
   orders: { title: 'Заявки', subtitle: 'Управление грузоперевозками' },
   'order-detail': { title: 'Заявка', subtitle: 'Детали перевозки' },
   finance: { title: 'Финансы', subtitle: 'Платежи и расчёты' },
@@ -13,12 +13,18 @@ const PAGE_META = {
   leads: { title: 'База обзвона', subtitle: 'Лиды и потенциальные клиенты' },
 }
 
-const PERIODS = ['Текущий месяц', 'Прошлый месяц', 'Квартал', 'Год']
+const PERIOD_OPTIONS = [
+  { label: 'Текущий месяц', id: 'month' },
+  { label: 'Прошлый месяц', id: 'last_month' },
+  { label: 'Квартал', id: 'quarter' },
+  { label: 'Год', id: 'year' },
+  { label: 'Всё время', id: 'all' },
+]
 
-export default function Topbar({ page, onSignOut }) {
-  const [period, setPeriod] = useState('Текущий месяц')
+export default function Topbar({ page, onSignOut, period = 'month', onPeriodChange }) {
   const [search, setSearch] = useState('')
   const meta = PAGE_META[page] || { title: page, subtitle: '' }
+  const currentOption = PERIOD_OPTIONS.find(o => o.id === period) || PERIOD_OPTIONS[0]
 
   return (
     <div style={{
@@ -59,20 +65,22 @@ export default function Topbar({ page, onSignOut }) {
         />
       </div>
 
-      {/* Period */}
-      <select
-        value={period}
-        onChange={e => setPeriod(e.target.value)}
-        style={{
-          height: 38, padding: '0 12px', borderRadius: 11,
-          border: '1px solid rgba(14,23,38,0.12)',
-          background: 'rgba(255,255,255,0.7)',
-          fontFamily: 'Manrope', fontSize: 13, color: '#0E1726',
-          outline: 'none', cursor: 'pointer',
-        }}
-      >
-        {PERIODS.map(p => <option key={p}>{p}</option>)}
-      </select>
+      {/* Period — only on dashboard */}
+      {page === 'dashboard' && (
+        <select
+          value={period}
+          onChange={e => onPeriodChange && onPeriodChange(e.target.value)}
+          style={{
+            height: 38, padding: '0 12px', borderRadius: 11,
+            border: '1px solid rgba(14,23,38,0.12)',
+            background: 'rgba(255,255,255,0.7)',
+            fontFamily: 'Manrope', fontSize: 13, fontWeight: 600, color: '#0E1726',
+            outline: 'none', cursor: 'pointer',
+          }}
+        >
+          {PERIOD_OPTIONS.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+        </select>
+      )}
 
       {/* Bell */}
       <button style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', color: '#5A6573', padding: 6, borderRadius: 10 }}>

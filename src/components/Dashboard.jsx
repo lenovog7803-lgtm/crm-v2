@@ -85,11 +85,11 @@ function calcStats(orders, period, apiData) {
   })
   const topDebtors = Object.values(debtorMap).sort((a, b) => b.amt - a.amt).slice(0, 6)
 
-  // Override with API data if available
-  const activeOrders = apiData?.active_orders ?? active
-  const deliveredOrders = apiData?.delivered_orders ?? done
-  const clientsCount = apiData?.clients_count ?? 0
-  const carriersCount = apiData?.carriers_count ?? 0
+  // Prefer locally computed counts (from all fetched orders) — API often returns 0 for these
+  const activeOrders = active || apiData?.active_orders || 0
+  const deliveredOrders = done || apiData?.delivered_orders || 0
+  const clientsCount = apiData?.clients_count || 0
+  const carriersCount = apiData?.carriers_count || 0
 
   return {
     revenue, cost, margin,
@@ -369,12 +369,10 @@ function DebtModal({ title, orders, onClose, onOpenOrder }) {
   )
 }
 
-export default function Dashboard({ onNav, onOpenOrder }) {
+export default function Dashboard({ onNav, onOpenOrder, period = 'month' }) {
   const [allOrders, setAllOrders] = useState([])
   const [apiData, setApiData] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [period, setPeriod] = useState('month')
-  const [availableMonths, setAvailableMonths] = useState([])
   const [showDebtors, setShowDebtors] = useState(false)
   const [showCarrierDebt, setShowCarrierDebt] = useState(false)
 
@@ -383,28 +381,14 @@ export default function Dashboard({ onNav, onOpenOrder }) {
     getOrders({ limit: 2000 }).then(r => {
       const arr = Array.isArray(r) ? r : (r?.orders || r?.data || [])
       setAllOrders(arr)
-      const months = [...new Set(arr.map(o => (o.load_date || '').slice(0, 7)).filter(m => /^\d{4}-\d{2}$/.test(m)))].sort().reverse()
-      setAvailableMonths(months)
     }).catch(() => {})
   }, [])
 
-  // Fetch API dashboard
+  // Fetch API dashboard when period changes
   useEffect(() => {
     setLoading(true)
     getDashboard(period).then(d => setApiData(d)).catch(() => setApiData(null)).finally(() => setLoading(false))
   }, [period])
-
-  const stats = calcStats(allOrders, period, apiData)
-  const chart = buildChartData(allOrders, period)
-  const todayIdx = chart.mode === 'days' ? Math.min(new Date().getDate() - 1, chart.current.length - 1) : chart.current.length - 1
-
-  // Period selector options
-  const now = new Date()
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-  const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-  const lastMonthKey = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, '0')}`
-  const fixedValues = new Set(['month', 'last_month', 'quarter', 'year', 'all', currentMonthKey, lastMonthKey])
-  const monthOptions = availableMonths.filter(m => !fixedValues.has(m)).map(m => ({ value: m, label: fmtMonthLabel(m) }))
 
   const { revenue, cost, margin, clientDebt, carrierDebt, active, done, clientsCount, carriersCount,
     topClients, topByMargin, topDebtors, debtorOrders, carrierDebtOrders } = stats
@@ -413,31 +397,6 @@ export default function Dashboard({ onNav, onOpenOrder }) {
 
   return (
     <div style={{ padding: '0 2px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-
-      {/* Period selector */}
-      <div className="card" style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ fontSize: 12, color: '#A6AEB8', fontWeight: 600, letterSpacing: '0.06em' }}>ПЕРИОД</span>
-        <select
-          value={period}
-          onChange={e => setPeriod(e.target.value)}
-          style={{
-            height: 36, padding: '0 28px 0 12px', borderRadius: 10,
-            border: '1px solid rgba(14,23,38,0.12)',
-            background: 'rgba(255,255,255,0.8)',
-            fontFamily: 'Manrope', fontSize: 13, fontWeight: 600, color: '#0E1726',
-            outline: 'none', cursor: 'pointer', minWidth: 180, appearance: 'auto',
-          }}
-        >
-          <option value="month">Этот месяц</option>
-          <option value="last_month">Прошлый месяц</option>
-          <option value="quarter">Квартал</option>
-          <option value="year">Год</option>
-          <option value="all">Всё время</option>
-          {monthOptions.length > 0 && <option disabled>──────────────</option>}
-          {monthOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
-        {loading && <span style={{ fontSize: 12, color: '#A6AEB8' }}>Загрузка...</span>}
-      </div>
 
       {/* Hero row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 1fr', gap: 16 }}>
