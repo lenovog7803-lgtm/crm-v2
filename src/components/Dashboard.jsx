@@ -390,6 +390,10 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month' }) {
     getDashboard(period).then(d => setApiData(d)).catch(() => setApiData(null)).finally(() => setLoading(false))
   }, [period])
 
+  const stats = calcStats(allOrders, period, apiData)
+  const chart = buildChartData(allOrders, period)
+  const todayIdx = chart.mode === 'days' ? Math.min(new Date().getDate() - 1, chart.current.length - 1) : chart.current.length - 1
+
   const { revenue, cost, margin, clientDebt, carrierDebt, active, done, clientsCount, carriersCount,
     topClients, topByMargin, topDebtors, debtorOrders, carrierDebtOrders } = stats
 
