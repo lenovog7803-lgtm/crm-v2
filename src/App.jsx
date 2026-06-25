@@ -44,6 +44,17 @@ function MainApp() {
   const [search, setSearch] = useState('')
   const [overdueItems, setOverdueItems] = useState([])
 
+  // Refresh triggers — increment to tell the component to re-fetch
+  const [dashboardPeriod, setDashboardPeriod] = useState('month')
+  const [availableMonths, setAvailableMonths] = useState([])
+
+  const [ordersKey, setOrdersKey] = useState(0)
+  const [tasksKey, setTasksKey] = useState(0)
+  const [clientsKey, setClientsKey] = useState(0)
+  const [carriersKey, setCarriersKey] = useState(0)
+  const [financeKey, setFinanceKey] = useState(0)
+  const [leadsKey, setLeadsKey] = useState(0)
+
   useEffect(() => {
     const today = new Date().toISOString().slice(0, 10)
     Promise.all([
@@ -59,17 +70,6 @@ function MainApp() {
       setOverdueItems([...overdueOrders, ...overdueTasks].sort((a, b) => a.date.localeCompare(b.date)))
     })
   }, [ordersKey, tasksKey])
-
-  // Refresh triggers — increment to tell the component to re-fetch
-  const [dashboardPeriod, setDashboardPeriod] = useState('month')
-  const [availableMonths, setAvailableMonths] = useState([])
-
-  const [ordersKey, setOrdersKey] = useState(0)
-  const [tasksKey, setTasksKey] = useState(0)
-  const [clientsKey, setClientsKey] = useState(0)
-  const [carriersKey, setCarriersKey] = useState(0)
-  const [financeKey, setFinanceKey] = useState(0)
-  const [leadsKey, setLeadsKey] = useState(0)
 
   // Sidebar counts from dashboard
   const [counts, setCounts] = useState({ activeOrders: 0, pendingTasks: 0, clientsCount: 0, carriersCount: 0, newLeads: 0 })
