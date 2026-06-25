@@ -194,7 +194,7 @@ export default function Leads({ refreshKey, search = '' }) {
       {loading && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>}
 
       {/* Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {filtered.map(lead => {
           const [avA, avB] = getGradient(lead.name || '')
           const callCount = (lead.call_notes || []).length
