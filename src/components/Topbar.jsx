@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 const PAGE_META = {
   dashboard: { title: 'Дашборд', subtitle: 'Обзор бизнеса' },
@@ -28,8 +28,7 @@ const fmtMonth = m => {
   return `${MONTH_RU[parseInt(mo) - 1]} ${y}`
 }
 
-export default function Topbar({ page, onSignOut, period = 'month', onPeriodChange, availableMonths = [] }) {
-  const [search, setSearch] = useState('')
+export default function Topbar({ page, onSignOut, period = 'month', onPeriodChange, availableMonths = [], search = '', onSearchChange }) {
   const meta = PAGE_META[page] || { title: page, subtitle: '' }
 
   const fixedIds = new Set(['month', 'last_month', 'quarter', 'year', 'all'])
@@ -61,7 +60,7 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
         </svg>
         <input
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={e => onSearchChange && onSearchChange(e.target.value)}
           placeholder="Поиск..."
           style={{
             width: '100%', paddingLeft: 34, paddingRight: 12,

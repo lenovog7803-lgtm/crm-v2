@@ -9,7 +9,7 @@ const DOC_FILTER_OPTIONS = [
   { key: 'docs_from_carrier_received', label: 'Получены от перевозчика' },
 ]
 
-export default function Orders({ onOpenOrder, onAddOrder, refreshKey }) {
+export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '' }) {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState('all')
@@ -61,6 +61,17 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey }) {
   if (payFilter === 'clientUnpaid') filtered = filtered.filter(o => !o.client_paid)
   if (payFilter === 'carrierUnpaid') filtered = filtered.filter(o => !o.carrier_paid)
   if (docFilters.length > 0) filtered = filtered.filter(o => docFilters.every(f => o[f]))
+  if (search) {
+    const q = search.toLowerCase()
+    filtered = filtered.filter(o =>
+      (o.order_number && String(o.order_number).toLowerCase().includes(q)) ||
+      (o.client_name && o.client_name.toLowerCase().includes(q)) ||
+      (o.carrier_name && o.carrier_name.toLowerCase().includes(q)) ||
+      (o.route_from && o.route_from.toLowerCase().includes(q)) ||
+      (o.route_to && o.route_to.toLowerCase().includes(q)) ||
+      (o.cargo && o.cargo.toLowerCase().includes(q))
+    )
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>

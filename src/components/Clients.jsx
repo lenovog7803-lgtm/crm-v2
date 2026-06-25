@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { getClients, deleteClient as apiDelete } from '../api'
 import { initials, getGradient } from '../utils'
 
-export default function Clients({ onOpenClient, onAdd, refreshKey }) {
+export default function Clients({ onOpenClient, onAdd, refreshKey, search = '' }) {
   const [clients, setClients] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -20,11 +20,23 @@ export default function Clients({ onOpenClient, onAdd, refreshKey }) {
     setClients(prev => prev.filter(c => c.id !== id))
   }
 
+  let visible = clients
+  if (search) {
+    const q = search.toLowerCase()
+    visible = clients.filter(c =>
+      (c.name && c.name.toLowerCase().includes(q)) ||
+      (c.contact_person && c.contact_person.toLowerCase().includes(q)) ||
+      (c.phone && c.phone.includes(search)) ||
+      (c.inn && c.inn.includes(search)) ||
+      (c.email && c.email.toLowerCase().includes(q))
+    )
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>
-          Всего клиентов: <span style={{ color: '#1366F0' }}>{clients.length}</span>
+          {search ? `Найдено: ${visible.length}` : `Всего клиентов: `}{!search && <span style={{ color: '#1366F0' }}>{clients.length}</span>}
         </div>
         <div style={{ flex: 1 }} />
         <button className="btn-primary" onClick={onAdd}>
@@ -37,7 +49,7 @@ export default function Clients({ onOpenClient, onAdd, refreshKey }) {
 
       {loading && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-        {clients.map(client => {
+        {visible.map(client => {
           const [avA, avB] = getGradient(client.name || '')
           const contact = client.contact_person || client.contact || ''
           const inn = client.inn || client.unp || ''

@@ -34,11 +34,10 @@ const inputStyle = {
 }
 const labelStyle = { fontSize: 12, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.05em', marginBottom: 6, display: 'block' }
 
-export default function Leads({ refreshKey }) {
+export default function Leads({ refreshKey, search = '' }) {
   const [leads, setLeads] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
-  const [search, setSearch] = useState('')
   const [industryFilter, setIndustryFilter] = useState('')
   const [editLead, setEditLead] = useState(null)
   const [noteText, setNoteText] = useState('')
@@ -190,13 +189,6 @@ export default function Leads({ refreshKey }) {
           </select>
         )}
 
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Поиск..."
-          className="form-input"
-          style={{ height: 34, padding: '0 12px', fontSize: 12.5, minWidth: 180 }}
-        />
       </div>
 
       {loading && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>}

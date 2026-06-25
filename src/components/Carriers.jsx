@@ -10,7 +10,7 @@ function StarIcon() {
   )
 }
 
-export default function Carriers({ onOpenCarrier, onAdd, refreshKey }) {
+export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = '' }) {
   const [carriers, setCarriers] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -28,11 +28,24 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey }) {
     setCarriers(prev => prev.filter(c => c.id !== id))
   }
 
+  let visible = carriers
+  if (search) {
+    const q = search.toLowerCase()
+    visible = carriers.filter(c =>
+      (c.company_name && c.company_name.toLowerCase().includes(q)) ||
+      (c.name && c.name.toLowerCase().includes(q)) ||
+      (c.driver_name && c.driver_name.toLowerCase().includes(q)) ||
+      (c.plate && c.plate.toLowerCase().includes(q)) ||
+      (c.phone && c.phone.includes(search)) ||
+      (c.inn && c.inn.includes(search))
+    )
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>
-          Всего перевозчиков: <span style={{ color: '#1366F0' }}>{carriers.length}</span>
+          {search ? `Найдено: ${visible.length}` : <>Всего перевозчиков: <span style={{ color: '#1366F0' }}>{carriers.length}</span></>}
         </div>
         <div style={{ flex: 1 }} />
         <button className="btn-primary" onClick={onAdd}>
@@ -45,7 +58,7 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey }) {
 
       {loading && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-        {carriers.map(carrier => {
+        {visible.map(carrier => {
           const name = carrier.company_name || carrier.name || '—'
           const driver = carrier.driver_name || carrier.driver || ''
           const cap = carrier.capacity_tons ? carrier.capacity_tons + ' т' : (carrier.cap || '—')

@@ -41,6 +41,8 @@ function MainApp() {
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [paymentModalKind, setPaymentModalKind] = useState('income')
 
+  const [search, setSearch] = useState('')
+
   // Refresh triggers — increment to tell the component to re-fetch
   const [dashboardPeriod, setDashboardPeriod] = useState('month')
   const [availableMonths, setAvailableMonths] = useState([])
@@ -68,12 +70,13 @@ function MainApp() {
   }, [ordersKey, clientsKey, carriersKey])
 
   // Navigation
-  const openOrder = id => { setSelectedOrderId(id); setPage('order-detail') }
-  const openClient = id => { setSelectedClientId(id); setPage('client-detail') }
-  const openCarrier = id => { setSelectedCarrierId(id); setPage('carrier-detail') }
+  const openOrder = id => { setSelectedOrderId(id); setPage('order-detail'); setSearch('') }
+  const openClient = id => { setSelectedClientId(id); setPage('client-detail'); setSearch('') }
+  const openCarrier = id => { setSelectedCarrierId(id); setPage('carrier-detail'); setSearch('') }
 
   const handleNav = key => {
     setPage(key)
+    setSearch('')
   }
 
   const openPaymentModal = kind => {
@@ -98,7 +101,7 @@ function MainApp() {
         />
 
         <main className="app-main">
-          <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} />
+          <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={setSearch} />
           <div className="scroll-area" key={page}>
             {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} onMonthsLoaded={setAvailableMonths} />}
 
@@ -107,6 +110,7 @@ function MainApp() {
                 onOpenOrder={openOrder}
                 onAddOrder={() => setShowOrderModal(true)}
                 refreshKey={ordersKey}
+                search={search}
               />
             )}
             {page === 'order-detail' && (
@@ -130,6 +134,7 @@ function MainApp() {
               <Tasks
                 onAdd={() => setShowTaskModal(true)}
                 refreshKey={tasksKey}
+                search={search}
               />
             )}
 
@@ -138,6 +143,7 @@ function MainApp() {
                 onOpenClient={openClient}
                 onAdd={() => setShowClientModal(true)}
                 refreshKey={clientsKey}
+                search={search}
               />
             )}
             {page === 'client-detail' && (
@@ -154,6 +160,7 @@ function MainApp() {
                 onOpenCarrier={openCarrier}
                 onAdd={() => setShowCarrierModal(true)}
                 refreshKey={carriersKey}
+                search={search}
               />
             )}
             {page === 'carrier-detail' && (
@@ -165,7 +172,7 @@ function MainApp() {
               />
             )}
 
-            {page === 'leads' && <Leads refreshKey={leadsKey} />}
+            {page === 'leads' && <Leads refreshKey={leadsKey} search={search} />}
           </div>
         </main>
       </div>

@@ -13,7 +13,7 @@ const inputStyle = {
 }
 const labelStyle = { fontSize: 12, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.05em', marginBottom: 6, display: 'block' }
 
-export default function Tasks({ onAdd, refreshKey }) {
+export default function Tasks({ onAdd, refreshKey, search = '' }) {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
@@ -28,12 +28,10 @@ export default function Tasks({ onAdd, refreshKey }) {
       .finally(() => setLoading(false))
   }, [refreshKey])
 
-  const handleToggle = async task => {
+  const handleToggle = (task) => {
     const newStatus = task.status === 'done' ? 'pending' : 'done'
-    try {
-      await apiUpdate(task.id, { status: newStatus })
-      setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: newStatus } : t))
-    } catch (e) { console.error(e) }
+    setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: newStatus } : t))
+    apiUpdate(task.id, { status: newStatus }).catch(console.error)
   }
 
   const handleDelete = async id => {
@@ -72,6 +70,13 @@ export default function Tasks({ onAdd, refreshKey }) {
   let filtered = [...tasks]
   if (filter === 'active') filtered = filtered.filter(t => t.status !== 'done')
   if (filter === 'done') filtered = filtered.filter(t => t.status === 'done')
+  if (search) {
+    const q = search.toLowerCase()
+    filtered = filtered.filter(t =>
+      (t.title && t.title.toLowerCase().includes(q)) ||
+      (t.description && t.description.toLowerCase().includes(q))
+    )
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
