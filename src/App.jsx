@@ -3,7 +3,7 @@ import './index.css'
 
 import { AuthProvider, useAuth } from './AuthContext'
 import Login from './pages/Login'
-import { getDashboard } from './api'
+import { getDashboard, getOrders, getTasks } from './api'
 
 import Sidebar from './components/Sidebar'
 import Topbar from './components/Topbar'
@@ -42,6 +42,23 @@ function MainApp() {
   const [paymentModalKind, setPaymentModalKind] = useState('income')
 
   const [search, setSearch] = useState('')
+  const [overdueItems, setOverdueItems] = useState([])
+
+  useEffect(() => {
+    const today = new Date().toISOString().slice(0, 10)
+    Promise.all([
+      getOrders({ limit: 500 }).catch(() => []),
+      getTasks().catch(() => []),
+    ]).then(([orders, tasks]) => {
+      const overdueOrders = (Array.isArray(orders) ? orders : [])
+        .filter(o => o.unload_date && o.unload_date < today && o.status !== 'done' && o.status !== 'cancelled')
+        .map(o => ({ type: 'order', id: o.id, label: `Заявка ${o.order_number || o.id}: ${o.route_from || ''} → ${o.route_to || ''}`, date: o.unload_date }))
+      const overdueTasks = (Array.isArray(tasks) ? tasks : [])
+        .filter(t => t.due_date && t.due_date < today && t.status !== 'done')
+        .map(t => ({ type: 'task', id: t.id, label: t.title || t.description || 'Задача', date: t.due_date }))
+      setOverdueItems([...overdueOrders, ...overdueTasks].sort((a, b) => a.date.localeCompare(b.date)))
+    })
+  }, [ordersKey, tasksKey])
 
   // Refresh triggers — increment to tell the component to re-fetch
   const [dashboardPeriod, setDashboardPeriod] = useState('month')
@@ -101,7 +118,7 @@ function MainApp() {
         />
 
         <main className="app-main">
-          <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={setSearch} />
+          <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={setSearch} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} />
           <div className="scroll-area" key={page}>
             {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} onMonthsLoaded={setAvailableMonths} />}
 

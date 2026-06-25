@@ -49,6 +49,46 @@ function SectionTitle({ title }) {
   )
 }
 
+function ComboSelect({ value, onTextChange, onSelect, items, placeholder, labelFn }) {
+  const [show, setShow] = useState(false)
+  const matches = value.length >= 1
+    ? items.filter(i => labelFn(i).toLowerCase().includes(value.toLowerCase())).slice(0, 8)
+    : items.slice(0, 8)
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <input
+        value={value}
+        onChange={e => { onTextChange(e.target.value); setShow(true) }}
+        onFocus={() => setShow(true)}
+        onBlur={() => setTimeout(() => setShow(false), 150)}
+        placeholder={placeholder}
+        style={iStyle}
+      />
+      {show && matches.length > 0 && (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 200,
+          background: 'rgba(255,255,255,0.98)', backdropFilter: 'blur(20px)',
+          borderRadius: 12, border: '1px solid rgba(255,255,255,0.85)',
+          boxShadow: '0 16px 40px rgba(20,30,55,0.15)', overflow: 'hidden', marginTop: 4,
+        }}>
+          {matches.map(item => (
+            <div
+              key={item.id}
+              onMouseDown={() => { onSelect(item); setShow(false) }}
+              style={{ padding: '10px 14px', fontSize: 13, color: '#0E1726', cursor: 'pointer', borderBottom: '1px solid rgba(14,23,38,0.05)', transition: 'background 0.1s' }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(19,102,240,0.07)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              {labelFn(item)}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function CityInput({ value, onChange, placeholder }) {
   const [suggestions, setSuggestions] = useState([])
   const [show, setShow] = useState(false)
@@ -122,28 +162,18 @@ export default function CreateOrderModal({ onClose, onSuccess }) {
 
   const upd = (k, v) => setForm(p => ({ ...p, [k]: v }))
 
-  const handleCarrierChange = carrierId => {
-    const carrier = carriers.find(c => c.id === carrierId)
-    if (carrier) {
-      const vehicleInfo = [carrier.plate, carrier.vehicle_type, carrier.driver_name, carrier.phone].filter(Boolean).join(', ')
-      setForm(p => ({
-        ...p,
-        carrier_id: carrierId,
-        carrier_name: carrier.company_name || carrier.name || '',
-        vehicle_info: vehicleInfo || p.vehicle_info,
-      }))
-    } else {
-      upd('carrier_id', carrierId)
-    }
-  }
-
-  const handleClientChange = clientId => {
-    const client = clients.find(c => c.id === clientId)
+  const handleCarrierSelect = carrier => {
+    const vehicleInfo = [carrier.plate, carrier.vehicle_type, carrier.driver_name, carrier.phone].filter(Boolean).join(', ')
     setForm(p => ({
       ...p,
-      client_id: clientId,
-      client_name: client?.name || '',
+      carrier_id: carrier.id,
+      carrier_name: carrier.company_name || carrier.name || '',
+      vehicle_info: vehicleInfo || p.vehicle_info,
     }))
+  }
+
+  const handleClientSelect = client => {
+    setForm(p => ({ ...p, client_id: client.id, client_name: client.name || '' }))
   }
 
   const margin = form.client_rate && form.carrier_rate
@@ -199,16 +229,24 @@ export default function CreateOrderModal({ onClose, onSuccess }) {
           <SectionTitle title="СТОРОНЫ" />
           <Grid2>
             <Field label="КЛИЕНТ">
-              <select value={form.client_id} onChange={e => handleClientChange(e.target.value)} style={iStyle}>
-                <option value="">Выбрать клиента...</option>
-                {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
+              <ComboSelect
+                value={form.client_name}
+                onTextChange={v => upd('client_name', v)}
+                onSelect={handleClientSelect}
+                items={clients}
+                placeholder="Введите или выберите клиента..."
+                labelFn={c => c.name || ''}
+              />
             </Field>
             <Field label="ПЕРЕВОЗЧИК">
-              <select value={form.carrier_id} onChange={e => handleCarrierChange(e.target.value)} style={iStyle}>
-                <option value="">Выбрать перевозчика...</option>
-                {carriers.map(c => <option key={c.id} value={c.id}>{c.company_name || c.name}</option>)}
-              </select>
+              <ComboSelect
+                value={form.carrier_name}
+                onTextChange={v => upd('carrier_name', v)}
+                onSelect={handleCarrierSelect}
+                items={carriers}
+                placeholder="Введите или выберите перевозчика..."
+                labelFn={c => c.company_name || c.name || ''}
+              />
             </Field>
           </Grid2>
         </div>

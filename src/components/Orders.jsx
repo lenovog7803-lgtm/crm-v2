@@ -56,6 +56,9 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
     { key: 'cancelled', label: 'Отменено' },
   ]
 
+  const today = new Date().toISOString().slice(0, 10)
+  const isOverdue = o => o.unload_date && o.unload_date < today && o.status !== 'done' && o.status !== 'cancelled'
+
   let filtered = [...orders]
   if (statusFilter !== 'all') filtered = filtered.filter(o => o.status === statusFilter)
   if (payFilter === 'clientUnpaid') filtered = filtered.filter(o => !o.client_paid)
@@ -177,6 +180,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           const marginPct = order.client_rate > 0 ? Math.round(margin / order.client_rate * 100) : 0
           const route = order.route_from && order.route_to ? `${order.route_from} → ${order.route_to}` : (order.route || '—')
           const [avA, avB] = getGradient(order.client_name || '')
+          const overdue = isOverdue(order)
           return (
             <div
               key={order.id}
@@ -185,9 +189,11 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 padding: '14px 20px',
                 borderBottom: i < filtered.length - 1 ? '1px solid rgba(14,23,38,0.05)' : 'none',
                 alignItems: 'center', cursor: 'pointer', transition: 'background 0.12s',
+                background: overdue ? 'rgba(200,25,35,0.05)' : 'transparent',
+                borderLeft: overdue ? '3px solid rgba(200,25,35,0.5)' : '3px solid transparent',
               }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.02)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              onMouseEnter={e => e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.08)' : 'rgba(14,23,38,0.02)'}
+              onMouseLeave={e => e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.05)' : 'transparent'}
               onClick={() => onOpenOrder(order.id)}
             >
               <div>
