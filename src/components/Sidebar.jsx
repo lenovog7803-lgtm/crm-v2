@@ -155,14 +155,14 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts }) {
               key={item.key}
               onClick={() => onNav(item.key)}
               style={{
-                height: 48,
+                height: 44,
                 borderRadius: 12,
                 border: 'none',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 12,
-                padding: expanded ? '0 12px' : '0',
+                gap: 10,
+                padding: '0 10px',
                 justifyContent: expanded ? 'flex-start' : 'center',
                 background: active ? 'rgba(19,102,240,0.1)' : 'transparent',
                 color: active ? '#1366F0' : '#5A6573',
@@ -172,12 +172,13 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts }) {
                 transition: 'all 0.15s',
                 whiteSpace: 'nowrap',
                 position: 'relative',
+                textAlign: 'left',
               }}
               onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'rgba(14,23,38,0.05)' }}
               onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent' }}
             >
-              <span style={{ flexShrink: 0 }}>{item.icon}</span>
-              {expanded && <span style={{ flex: 1 }}>{item.label}</span>}
+              <span style={{ flexShrink: 0, width: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{item.icon}</span>
+              {expanded && <span style={{ flex: 1, textAlign: 'left' }}>{item.label}</span>}
               {expanded && badgeVal > 0 && (
                 <span style={{
                   background: '#1366F0', color: '#fff', borderRadius: 99,
