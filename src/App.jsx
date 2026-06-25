@@ -85,7 +85,7 @@ function MainApp() {
     }).catch(() => {})
     getTasks().then(tasks => {
       if (Array.isArray(tasks)) {
-        const pending = tasks.filter(t => t.status !== 'done').length
+        const pending = tasks.filter(t => t.status === 'pending').length
         setCounts(c => ({ ...c, pendingTasks: pending }))
       }
     }).catch(() => {})
