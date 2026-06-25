@@ -205,6 +205,7 @@ export default function CreateOrderModal({ onClose, onSuccess }) {
         carrier_rate: form.carrier_rate ? Number(form.carrier_rate) : 0,
         payment_days: form.payment_days ? Number(form.payment_days) : 20,
         vehicle_info: form.vehicle_info || undefined,
+        driver_name: form.vehicle_info || undefined,
         cargo: form.cargo || undefined,
         weight_tons: form.weight_tons ? Number(form.weight_tons) : undefined,
         load_date: form.load_date || undefined,
