@@ -133,7 +133,6 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
         {expanded && (
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 15, color: '#0E1726', letterSpacing: '-0.01em', whiteSpace: 'nowrap' }}>А2 Group</div>
-            <div style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.12em', color: '#A6AEB8', marginTop: 1 }}>ГРУЗОПЕРЕВОЗКИ</div>
           </div>
         )}
         {expanded && (

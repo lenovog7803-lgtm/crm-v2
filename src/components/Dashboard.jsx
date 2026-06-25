@@ -401,6 +401,13 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
   const { revenue, cost, margin, clientDebt, carrierDebt, active, done, clientsCount, carriersCount,
     topClients, topByMargin, topDebtors, debtorOrders, carrierDebtOrders } = stats
 
+  const prevPeriodKey = getPrevPeriod(period)
+  const prevStats = prevPeriodKey ? calcStats(allOrders, prevPeriodKey, null) : null
+  const marginDiff = prevStats && prevStats.margin !== 0
+    ? Math.round(((margin - prevStats.margin) / Math.abs(prevStats.margin)) * 100)
+    : null
+  const marginUp = marginDiff !== null && marginDiff >= 0
+
   const netProfit = margin * 0.85
 
   return (
@@ -416,7 +423,22 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           position: 'relative', overflow: 'hidden',
         }}>
           <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'rgba(19,102,240,0.15)' }} />
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.45)', marginBottom: 6 }}>МАРЖА</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.45)' }}>МАРЖА</div>
+            {marginDiff !== null && (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 3,
+                padding: '2px 8px', borderRadius: 20,
+                background: marginUp ? 'rgba(91,232,155,0.18)' : 'rgba(200,25,35,0.22)',
+                fontSize: 11, fontWeight: 700,
+                color: marginUp ? '#5BE89B' : '#FF6B7A',
+              }}>
+                <span>{marginUp ? '▲' : '▼'}</span>
+                <span>{Math.abs(marginDiff)}%</span>
+                <span style={{ fontWeight: 400, opacity: 0.75, fontSize: 10 }}>vs пред.</span>
+              </div>
+            )}
+          </div>
           <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 40, letterSpacing: '-0.03em', lineHeight: 1 }}>
             {margin.toLocaleString('ru-RU')}
           </div>
