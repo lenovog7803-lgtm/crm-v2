@@ -97,7 +97,7 @@ function MainApp() {
         <main className="app-main">
           <Topbar page={page} onSignOut={signOut} />
           <div className="scroll-area" key={page}>
-            {page === 'dashboard' && <Dashboard onNav={handleNav} />}
+            {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} />}
 
             {page === 'orders' && (
               <Orders
