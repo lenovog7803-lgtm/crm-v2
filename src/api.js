@@ -33,7 +33,7 @@ export const getDashboardGoals = (period) => req(`/dashboard/goals?period=${peri
 export const getOrders = (params = {}) => req('/orders?' + new URLSearchParams(params));
 export const getOrder = (id) => req(`/orders/${id}`);
 export const createOrder = (data) => req('/orders', { method: 'POST', body: JSON.stringify(data) });
-export const updateOrder = (id, data) => req(`/orders/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const updateOrder = (id, data) => req(`/orders/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const deleteOrder = (id) => req(`/orders/${id}`, { method: 'DELETE' });
 
 // Clients

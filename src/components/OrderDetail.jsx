@@ -235,24 +235,34 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
           onClick={handleSave}
           disabled={!isDirty || saving}
           style={{
-            padding: '9px 20px', borderRadius: 12, border: 'none', cursor: isDirty ? 'pointer' : 'not-allowed',
-            background: savedOk ? 'rgba(30,158,90,0.15)' : isDirty ? '#1366F0' : 'rgba(14,23,38,0.06)',
-            color: savedOk ? '#1E9E5A' : isDirty ? '#fff' : '#A6AEB8',
-            fontFamily: 'Manrope', fontWeight: 700, fontSize: 13,
-            display: 'flex', alignItems: 'center', gap: 6,
-            transition: 'all 0.2s',
+            padding: '11px 26px', borderRadius: 16, cursor: isDirty ? 'pointer' : 'default',
+            border: `1px solid ${savedOk ? 'rgba(30,158,90,0.35)' : isDirty ? 'rgba(19,102,240,0.35)' : 'rgba(255,255,255,0.2)'}`,
+            background: savedOk
+              ? 'rgba(30,158,90,0.15)'
+              : isDirty
+                ? 'rgba(19,102,240,0.15)'
+                : 'rgba(255,255,255,0.07)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            boxShadow: isDirty
+              ? 'inset 0 1px 0 rgba(255,255,255,0.4), 0 8px 28px rgba(19,102,240,0.18)'
+              : 'inset 0 1px 0 rgba(255,255,255,0.15)',
+            color: savedOk ? '#1E9E5A' : isDirty ? '#1366F0' : '#A6AEB8',
+            fontFamily: 'Manrope', fontWeight: 700, fontSize: 14,
+            display: 'flex', alignItems: 'center', gap: 7,
+            transition: 'all 0.25s',
           }}
         >
           {savedOk ? (
             <>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
               Сохранено
             </>
           ) : saving ? 'Сохранение...' : (
             <>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
               </svg>
               Сохранить
