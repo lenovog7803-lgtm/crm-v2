@@ -73,19 +73,23 @@ function MainApp() {
   }, [ordersKey, tasksKey])
 
   // Sidebar counts from dashboard
-  const [counts, setCounts] = useState({ activeOrders: 0, pendingTasks: 0, clientsCount: 0, carriersCount: 0, newLeads: 0 })
+  const [counts, setCounts] = useState({ newOrders: 0, pendingTasks: 0, newLeads: 0 })
 
   useEffect(() => {
-    getDashboard('month').then(d => {
+    getDashboard('all').then(d => {
       setCounts({
-        activeOrders: d.active_orders || 0,
+        newOrders: d.status_breakdown?.new || 0,
         pendingTasks: 0,
-        clientsCount: d.clients_count || 0,
-        carriersCount: d.carriers_count || 0,
         newLeads: d.new_leads || 0,
       })
     }).catch(() => {})
-  }, [ordersKey, clientsKey, carriersKey])
+    getTasks().then(tasks => {
+      if (Array.isArray(tasks)) {
+        const pending = tasks.filter(t => t.status !== 'done').length
+        setCounts(c => ({ ...c, pendingTasks: pending }))
+      }
+    }).catch(() => {})
+  }, [ordersKey, tasksKey])
 
   // Navigation
   const openOrder = id => { setSelectedOrderId(id); setPage('order-detail'); setSearch('') }
@@ -116,6 +120,7 @@ function MainApp() {
           onNav={handleNav}
           onToggle={() => setSidebarExpanded(e => !e)}
           counts={counts}
+          onSignOut={signOut}
         />
 
         <main className="app-main">

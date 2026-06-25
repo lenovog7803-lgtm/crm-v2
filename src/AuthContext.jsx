@@ -10,7 +10,8 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const t = getToken();
     if (t) {
-      setUser({ token: t });
+      const saved = localStorage.getItem('crm_user');
+      setUser(saved ? { token: t, user: JSON.parse(saved) } : { token: t });
     }
     setLoading(false);
   }, []);
@@ -18,11 +19,13 @@ export function AuthProvider({ children }) {
   const signIn = async (username, password) => {
     const data = await apiLogin(username, password);
     setToken(data.token);
+    if (data.user) localStorage.setItem('crm_user', JSON.stringify(data.user));
     setUser({ token: data.token, ...data });
   };
 
   const signOut = () => {
     setToken('');
+    localStorage.removeItem('crm_user');
     setUser(null);
   };
 
