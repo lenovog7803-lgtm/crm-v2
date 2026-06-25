@@ -1,12 +1,22 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getOrders, deleteOrder as apiDelete } from '../api'
 import { initials, statusLabel, statusColor, statusBg, getGradient } from '../utils'
+
+const DOC_FILTER_OPTIONS = [
+  { key: 'docs_to_client_sent', label: 'Отправлены клиенту' },
+  { key: 'docs_from_client_received', label: 'Получены от клиента' },
+  { key: 'docs_to_carrier_sent', label: 'Отправлены перевозчику' },
+  { key: 'docs_from_carrier_received', label: 'Получены от перевозчика' },
+]
 
 export default function Orders({ onOpenOrder, onAddOrder, refreshKey }) {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState('all')
   const [payFilter, setPayFilter] = useState(null)
+  const [docFilters, setDocFilters] = useState([])
+  const [showDocFilter, setShowDocFilter] = useState(false)
+  const docBtnRef = useRef(null)
 
   useEffect(() => {
     setLoading(true)
@@ -16,10 +26,26 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey }) {
       .finally(() => setLoading(false))
   }, [refreshKey])
 
+  // Close doc filter on outside click
+  useEffect(() => {
+    if (!showDocFilter) return
+    const handler = e => {
+      if (docBtnRef.current && !docBtnRef.current.contains(e.target)) {
+        setShowDocFilter(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [showDocFilter])
+
   const handleDelete = async (e, id) => {
     e.stopPropagation()
     await apiDelete(id).catch(console.error)
     setOrders(prev => prev.filter(o => o.id !== id))
+  }
+
+  const toggleDocFilter = key => {
+    setDocFilters(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key])
   }
 
   const statusChips = [
@@ -34,6 +60,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey }) {
   if (statusFilter !== 'all') filtered = filtered.filter(o => o.status === statusFilter)
   if (payFilter === 'clientUnpaid') filtered = filtered.filter(o => !o.client_paid)
   if (payFilter === 'carrierUnpaid') filtered = filtered.filter(o => !o.carrier_paid)
+  if (docFilters.length > 0) filtered = filtered.filter(o => docFilters.every(f => o[f]))
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -61,10 +88,63 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey }) {
           background: payFilter === 'carrierUnpaid' ? 'rgba(124,58,237,0.15)' : 'rgba(14,23,38,0.06)',
           color: payFilter === 'carrierUnpaid' ? '#7C3AED' : '#5A6573',
         }}>Не оплачено перевозчику</button>
+
         <div style={{ flex: 1 }} />
+
+        {/* Doc filter */}
+        <div ref={docBtnRef} style={{ position: 'relative' }}>
+          <button onClick={() => setShowDocFilter(v => !v)} style={{
+            padding: '7px 14px', borderRadius: 12, cursor: 'pointer',
+            fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
+            background: docFilters.length > 0 ? 'rgba(19,102,240,0.12)' : 'rgba(14,23,38,0.06)',
+            color: docFilters.length > 0 ? '#1366F0' : '#5A6573',
+            border: docFilters.length > 0 ? '1px solid rgba(19,102,240,0.3)' : '1px solid transparent',
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+            </svg>
+            Документы {docFilters.length > 0 && `(${docFilters.length})`}
+          </button>
+          {showDocFilter && (
+            <div style={{
+              position: 'absolute', top: '100%', right: 0, marginTop: 6,
+              background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(20px)',
+              borderRadius: 16, padding: '8px 4px',
+              border: '1px solid rgba(255,255,255,0.9)',
+              boxShadow: '0 20px 60px rgba(20,30,55,0.15)', zIndex: 50, minWidth: 250,
+            }}>
+              {DOC_FILTER_OPTIONS.map(f => (
+                <label key={f.key} style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '9px 14px', cursor: 'pointer', borderRadius: 10,
+                  fontSize: 13, fontWeight: 600, color: '#0E1726',
+                  background: docFilters.includes(f.key) ? 'rgba(19,102,240,0.07)' : 'transparent',
+                  transition: 'background 0.12s',
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={docFilters.includes(f.key)}
+                    onChange={() => toggleDocFilter(f.key)}
+                    style={{ accentColor: '#1366F0', width: 15, height: 15 }}
+                  />
+                  {f.label}
+                </label>
+              ))}
+              {docFilters.length > 0 && (
+                <button onClick={() => setDocFilters([])} style={{
+                  width: '100%', padding: '8px 14px', border: 'none', cursor: 'pointer',
+                  background: 'rgba(200,25,35,0.07)', color: '#C81923',
+                  fontFamily: 'Manrope', fontSize: 12, fontWeight: 600, borderRadius: 10, marginTop: 4,
+                }}>Сбросить фильтр</button>
+              )}
+            </div>
+          )}
+        </div>
+
         <button className="btn-primary" onClick={onAddOrder}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
           </svg>
           Новая заявка
         </button>
@@ -153,7 +233,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey }) {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+                    <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4h6v2" />
                   </svg>
                 </button>
                 <button onClick={e => { e.stopPropagation(); onOpenOrder(order.id) }} style={{
@@ -162,7 +242,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey }) {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="9 18 15 12 9 6"/>
+                    <polyline points="9 18 15 12 9 6" />
                   </svg>
                 </button>
               </div>

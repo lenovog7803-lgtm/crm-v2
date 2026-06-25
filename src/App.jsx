@@ -111,6 +111,8 @@ function MainApp() {
                 orderId={selectedOrderId}
                 onBack={() => setPage('orders')}
                 onDelete={() => { setOrdersKey(k => k + 1) }}
+                onOpenClient={id => openClient(id)}
+                onOpenCarrier={id => openCarrier(id)}
               />
             )}
 
