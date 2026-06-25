@@ -55,6 +55,8 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
       boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 4px 16px -8px rgba(20,30,55,0.12)',
       marginBottom: 0,
       flexShrink: 0,
+      position: 'relative',
+      zIndex: 100,
     }}>
       <div style={{ flex: 1 }}>
         <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726', letterSpacing: '-0.02em' }}>{meta.title}</div>
@@ -123,7 +125,7 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
         </button>
         {bellOpen && (
           <div style={{
-            position: 'absolute', top: 'calc(100% + 10px)', right: 0, zIndex: 300,
+            position: 'absolute', top: 'calc(100% + 10px)', right: 0, zIndex: 9999,
             background: 'rgba(255,255,255,0.98)', backdropFilter: 'blur(24px)',
             borderRadius: 18, border: '1px solid rgba(255,255,255,0.9)',
             boxShadow: '0 20px 60px rgba(20,30,55,0.18)',

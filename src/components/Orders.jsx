@@ -78,7 +78,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+      <div className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', position: 'relative', zIndex: 10 }}>
         <div style={{ display: 'flex', gap: 6 }}>
           {statusChips.map(c => (
             <button key={c.key} onClick={() => setStatusFilter(c.key)} style={{
@@ -126,7 +126,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
               background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(20px)',
               borderRadius: 16, padding: '8px 4px',
               border: '1px solid rgba(255,255,255,0.9)',
-              boxShadow: '0 20px 60px rgba(20,30,55,0.15)', zIndex: 50, minWidth: 250,
+              boxShadow: '0 20px 60px rgba(20,30,55,0.15)', zIndex: 9999, minWidth: 250,
             }}>
               {DOC_FILTER_OPTIONS.map(f => (
                 <label key={f.key} style={{
