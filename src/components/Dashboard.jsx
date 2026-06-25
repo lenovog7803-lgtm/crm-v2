@@ -369,7 +369,7 @@ function DebtModal({ title, orders, onClose, onOpenOrder }) {
   )
 }
 
-export default function Dashboard({ onNav, onOpenOrder, period = 'month' }) {
+export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMonthsLoaded }) {
   const [allOrders, setAllOrders] = useState([])
   const [apiData, setApiData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -381,6 +381,10 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month' }) {
     getOrders({ limit: 2000 }).then(r => {
       const arr = Array.isArray(r) ? r : (r?.orders || r?.data || [])
       setAllOrders(arr)
+      const months = [...new Set(
+        arr.map(o => (o.load_date || o.unload_date || '').slice(0, 7)).filter(m => /^\d{4}-\d{2}$/.test(m))
+      )].sort().reverse()
+      onMonthsLoaded && onMonthsLoaded(months)
     }).catch(() => {})
   }, [])
 

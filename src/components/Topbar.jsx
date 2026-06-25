@@ -21,10 +21,19 @@ const PERIOD_OPTIONS = [
   { label: 'Всё время', id: 'all' },
 ]
 
-export default function Topbar({ page, onSignOut, period = 'month', onPeriodChange }) {
+const MONTH_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
+const fmtMonth = m => {
+  if (!m) return m
+  const [y, mo] = m.split('-')
+  return `${MONTH_RU[parseInt(mo) - 1]} ${y}`
+}
+
+export default function Topbar({ page, onSignOut, period = 'month', onPeriodChange, availableMonths = [] }) {
   const [search, setSearch] = useState('')
   const meta = PAGE_META[page] || { title: page, subtitle: '' }
-  const currentOption = PERIOD_OPTIONS.find(o => o.id === period) || PERIOD_OPTIONS[0]
+
+  const fixedIds = new Set(['month', 'last_month', 'quarter', 'year', 'all'])
+  const extraMonths = availableMonths.filter(m => !fixedIds.has(m))
 
   return (
     <div style={{
@@ -79,6 +88,8 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
           }}
         >
           {PERIOD_OPTIONS.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+          {extraMonths.length > 0 && <option disabled>──────────</option>}
+          {extraMonths.map(m => <option key={m} value={m}>{fmtMonth(m)}</option>)}
         </select>
       )}
 
