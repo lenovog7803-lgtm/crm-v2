@@ -343,52 +343,6 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
             </div>
           </div>
 
-          {/* Editable fields */}
-          <div className="card" style={{ padding: '20px 20px' }}>
-            <SLabel>ДЕТАЛИ (автосохранение)</SLabel>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <div>
-                  <FieldLabel>АДРЕС ЗАГРУЗКИ</FieldLabel>
-                  <input defaultValue={order.loading_address || ''} onBlur={e => handleFieldBlur('loading_address', e.target.value)}
-                    placeholder="Адрес загрузки" style={iStyle} />
-                </div>
-                <div>
-                  <FieldLabel>АДРЕС ВЫГРУЗКИ</FieldLabel>
-                  <input defaultValue={order.unloading_address || ''} onBlur={e => handleFieldBlur('unloading_address', e.target.value)}
-                    placeholder="Адрес выгрузки" style={iStyle} />
-                </div>
-              </div>
-              <div>
-                <FieldLabel>ТС И ВОДИТЕЛЬ</FieldLabel>
-                <input defaultValue={order.vehicle_info || ''} onBlur={e => handleFieldBlur('vehicle_info', e.target.value)}
-                  placeholder="Номер ТС, марка, водитель, телефон" style={iStyle} />
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
-                <div>
-                  <FieldLabel>СРОК ОПЛАТЫ (ДНЕЙ)</FieldLabel>
-                  <input type="number" defaultValue={order.payment_days || ''} onBlur={e => handleFieldBlur('payment_days', e.target.value ? Number(e.target.value) : null)}
-                    placeholder="20" style={iStyle} />
-                </div>
-                <div>
-                  <FieldLabel>ДАТА ЗАГРУЗКИ</FieldLabel>
-                  <input type="date" defaultValue={order.load_date || ''} onBlur={e => handleFieldBlur('load_date', e.target.value)}
-                    style={iStyle} />
-                </div>
-                <div>
-                  <FieldLabel>ДАТА ВЫГРУЗКИ</FieldLabel>
-                  <input type="date" defaultValue={order.unload_date || ''} onBlur={e => handleFieldBlur('unload_date', e.target.value)}
-                    style={iStyle} />
-                </div>
-              </div>
-              <div>
-                <FieldLabel>ПРИМЕЧАНИЯ</FieldLabel>
-                <textarea defaultValue={order.notes || ''} onBlur={e => handleFieldBlur('notes', e.target.value)}
-                  placeholder="Дополнительная информация..."
-                  style={{ ...iStyle, height: 68, padding: '8px 12px', resize: 'vertical' }} />
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* RIGHT COLUMN */}
