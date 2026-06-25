@@ -13,7 +13,7 @@ const fmtMonthLabel = m => {
 function filterByPeriod(orders, period) {
   const now = new Date()
   return orders.filter(o => {
-    const raw = o.load_date || o.unload_date || o.created_at
+    const raw = o.unload_date || o.load_date || o.created_at
     if (!raw) return period === 'all'
     const d = new Date(raw)
     if (isNaN(d)) return period === 'all'

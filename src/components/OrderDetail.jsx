@@ -223,6 +223,11 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
         <span style={{ fontFamily: 'JetBrains Mono', fontWeight: 600, fontSize: 15, color: '#1366F0' }}>
           {order.order_number || `#${order.id}`}
         </span>
+        {order.created_at && (
+          <span style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 500 }}>
+            создана {new Date(order.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </span>
+        )}
         <span style={{
           padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700,
           background: curStatus.bg, color: curStatus.color,
