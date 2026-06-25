@@ -90,10 +90,15 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
   const [loading, setLoading] = useState(true)
   const [payLoading, setPayLoading] = useState(null)
   const [docsRefreshing, setDocsRefreshing] = useState(false)
+  const [draft, setDraft] = useState({})
+  const [saving, setSaving] = useState(false)
+  const [savedOk, setSavedOk] = useState(false)
+  const [saveErr, setSaveErr] = useState(false)
 
   useEffect(() => {
     if (!orderId) return
     setLoading(true)
+    setDraft({})
     getOrder(orderId).then(setOrder).catch(console.error).finally(() => setLoading(false))
   }, [orderId])
 
@@ -105,32 +110,47 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
   if (loading) return <div style={{ padding: 60, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>
   if (!order) return <div style={{ padding: 60, textAlign: 'center', color: '#A6AEB8' }}>Заявка не найдена</div>
 
-  const clientRate = order.client_rate || 0
-  const carrierRate = order.carrier_rate || 0
+  const view = { ...order, ...draft }
+  const isDirty = Object.keys(draft).length > 0
+
+  const clientRate = view.client_rate || 0
+  const carrierRate = view.carrier_rate || 0
   const margin = clientRate - carrierRate
   const marginPct = clientRate > 0 ? Math.round(margin / clientRate * 100) : 0
-  const route = order.route_from && order.route_to ? `${order.route_from} → ${order.route_to}` : (order.route_from || order.route_to || '—')
+  const route = view.route_from && view.route_to ? `${view.route_from} → ${view.route_to}` : (view.route_from || view.route_to || '—')
 
-  // Optimistic update: change UI immediately, then sync to API
-  const patch = (fields) => {
-    setOrder(prev => ({ ...prev, ...fields }))
-    apiUpdate(order.id, fields).catch(console.error)
-  }
-
-  const handleFieldBlur = (field, value) => {
-    if (String(order[field] || '') === String(value || '')) return
-    patch({ [field]: value })
+  const handleSave = async () => {
+    if (!isDirty || saving) return
+    setSaving(true)
+    setSaveErr(false)
+    try {
+      await apiUpdate(order.id, draft)
+      setOrder(prev => ({ ...prev, ...draft }))
+      setDraft({})
+      setSavedOk(true)
+      setTimeout(() => setSavedOk(false), 2500)
+    } catch (e) {
+      console.error(e)
+      setSaveErr(true)
+      setTimeout(() => setSaveErr(false), 3000)
+    }
+    setSaving(false)
   }
 
   const handleStatusChange = (newStatus) => {
-    patch({ status: newStatus })
+    setDraft(d => ({ ...d, status: newStatus }))
   }
 
   const handleDocToggle = (key) => {
     const dateKey = key + '_date'
-    const newVal = !order[key]
+    const current = draft[key] !== undefined ? draft[key] : order[key]
+    const newVal = !current
     const now = new Date().toISOString()
-    patch({ [key]: newVal, [dateKey]: newVal ? now : null })
+    setDraft(d => ({ ...d, [key]: newVal, [dateKey]: newVal ? now : null }))
+  }
+
+  const handleFieldChange = (field, value) => {
+    setDraft(d => ({ ...d, [field]: value }))
   }
 
   const handlePayment = async type => {
@@ -183,7 +203,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
 
   const [avAc, avBc] = getGradient(order.client_name || '')
   const [avAr, avBr] = getGradient(order.carrier_name || '')
-  const curStatus = STATUSES.find(s => s.id === order.status) || STATUSES[0]
+  const curStatus = STATUSES.find(s => s.id === view.status) || STATUSES[0]
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -202,7 +222,43 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
           padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700,
           background: curStatus.bg, color: curStatus.color,
         }}>{curStatus.label}</span>
+        {isDirty && (
+          <span style={{ fontSize: 11.5, fontWeight: 600, color: '#D97706', padding: '3px 10px', borderRadius: 8, background: 'rgba(217,119,6,0.1)' }}>
+            Есть изменения
+          </span>
+        )}
         <div style={{ flex: 1 }} />
+        {saveErr && (
+          <span style={{ fontSize: 12, color: '#C81923', fontWeight: 600 }}>Ошибка сохранения</span>
+        )}
+        <button
+          onClick={handleSave}
+          disabled={!isDirty || saving}
+          style={{
+            padding: '9px 20px', borderRadius: 12, border: 'none', cursor: isDirty ? 'pointer' : 'not-allowed',
+            background: savedOk ? 'rgba(30,158,90,0.15)' : isDirty ? '#1366F0' : 'rgba(14,23,38,0.06)',
+            color: savedOk ? '#1E9E5A' : isDirty ? '#fff' : '#A6AEB8',
+            fontFamily: 'Manrope', fontWeight: 700, fontSize: 13,
+            display: 'flex', alignItems: 'center', gap: 6,
+            transition: 'all 0.2s',
+          }}
+        >
+          {savedOk ? (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Сохранено
+            </>
+          ) : saving ? 'Сохранение...' : (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+              </svg>
+              Сохранить
+            </>
+          )}
+        </button>
         <button onClick={handleDelete} style={{
           padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
           background: 'rgba(200,25,35,0.1)', color: '#C81923',
@@ -230,19 +286,19 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
             <div style={{ display: 'flex', gap: 20, marginTop: 18 }}>
               <div>
                 <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Груз</div>
-                <div style={{ fontWeight: 600, fontSize: 13 }}>{order.cargo || '—'}</div>
+                <div style={{ fontWeight: 600, fontSize: 13 }}>{view.cargo || '—'}</div>
               </div>
               <div>
                 <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Вес</div>
-                <div style={{ fontWeight: 600, fontSize: 13 }}>{order.weight_tons ? order.weight_tons + ' т' : '—'}</div>
+                <div style={{ fontWeight: 600, fontSize: 13 }}>{view.weight_tons ? view.weight_tons + ' т' : '—'}</div>
               </div>
               <div>
                 <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Загрузка</div>
-                <div style={{ fontWeight: 600, fontSize: 13 }}>{order.load_date || '—'}</div>
+                <div style={{ fontWeight: 600, fontSize: 13 }}>{view.load_date || '—'}</div>
               </div>
               <div>
                 <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Выгрузка</div>
-                <div style={{ fontWeight: 600, fontSize: 13 }}>{order.unload_date || '—'}</div>
+                <div style={{ fontWeight: 600, fontSize: 13 }}>{view.unload_date || '—'}</div>
               </div>
             </div>
             <div style={{ display: 'flex', gap: 24, marginTop: 22, paddingTop: 18, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
@@ -274,13 +330,13 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                   style={{
                     padding: '8px 18px', borderRadius: 20, cursor: 'pointer',
                     fontSize: 13, fontWeight: 600,
-                    background: order.status === s.id ? s.bg : 'rgba(14,23,38,0.04)',
-                    color: order.status === s.id ? s.color : '#8A93A0',
-                    border: `1.5px solid ${order.status === s.id ? s.color + '50' : 'rgba(14,23,38,0.08)'}`,
+                    background: view.status === s.id ? s.bg : 'rgba(14,23,38,0.04)',
+                    color: view.status === s.id ? s.color : '#8A93A0',
+                    border: `1.5px solid ${view.status === s.id ? s.color + '50' : 'rgba(14,23,38,0.08)'}`,
                     transition: 'all 0.2s',
                   }}
-                  onMouseEnter={e => { if (order.status !== s.id) { e.currentTarget.style.background = s.bg; e.currentTarget.style.color = s.color } }}
-                  onMouseLeave={e => { if (order.status !== s.id) { e.currentTarget.style.background = 'rgba(14,23,38,0.04)'; e.currentTarget.style.color = '#8A93A0' } }}
+                  onMouseEnter={e => { if (view.status !== s.id) { e.currentTarget.style.background = s.bg; e.currentTarget.style.color = s.color } }}
+                  onMouseLeave={e => { if (view.status !== s.id) { e.currentTarget.style.background = 'rgba(14,23,38,0.04)'; e.currentTarget.style.color = '#8A93A0' } }}
                 >
                   {s.label}
                 </div>
@@ -302,8 +358,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
             <SLabel>ДОКУМЕНТООБОРОТ</SLabel>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {DOC_STEPS.map(step => {
-                const isDone = !!order[step.key]
-                const date = order[step.key + '_date']
+                const isDone = !!view[step.key]
+                const date = view[step.key + '_date']
                 return (
                   <div
                     key={step.key}
