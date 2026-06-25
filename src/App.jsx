@@ -17,6 +17,7 @@ import ClientDetail from './components/ClientDetail'
 import Carriers from './components/Carriers'
 import CarrierDetail from './components/CarrierDetail'
 import Leads from './components/Leads'
+import Trash from './components/Trash'
 
 import CreateOrderModal from './components/CreateOrderModal'
 import CreateTaskModal from './components/CreateTaskModal'
@@ -118,7 +119,7 @@ function MainApp() {
         />
 
         <main className="app-main">
-          <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={setSearch} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} />
+          <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={setSearch} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} />
           <div className="scroll-area" key={page}>
             {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} onMonthsLoaded={setAvailableMonths} />}
 
@@ -137,6 +138,7 @@ function MainApp() {
                 onDelete={() => { setOrdersKey(k => k + 1) }}
                 onOpenClient={id => openClient(id)}
                 onOpenCarrier={id => openCarrier(id)}
+                onOpenOrder={id => openOrder(id)}
               />
             )}
 
@@ -190,6 +192,7 @@ function MainApp() {
             )}
 
             {page === 'leads' && <Leads refreshKey={leadsKey} search={search} />}
+            {page === 'trash' && <Trash />}
           </div>
         </main>
       </div>

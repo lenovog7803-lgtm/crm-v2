@@ -28,7 +28,7 @@ const fmtMonth = m => {
   return `${MONTH_RU[parseInt(mo) - 1]} ${y}`
 }
 
-export default function Topbar({ page, onSignOut, period = 'month', onPeriodChange, availableMonths = [], search = '', onSearchChange, overdueItems = [], onOpenOrder }) {
+export default function Topbar({ page, onSignOut, period = 'month', onPeriodChange, availableMonths = [], search = '', onSearchChange, overdueItems = [], onOpenOrder, onNav }) {
   const meta = PAGE_META[page] || { title: page, subtitle: '' }
   const [bellOpen, setBellOpen] = useState(false)
   const bellRef = useRef(null)
@@ -102,6 +102,19 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
           {extraMonths.map(m => <option key={m} value={m}>{fmtMonth(m)}</option>)}
         </select>
       )}
+
+      {/* Trash */}
+      <button
+        onClick={() => onNav && onNav('trash')}
+        title="Корзина"
+        style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', color: '#5A6573', padding: 6, borderRadius: 10 }}
+        onMouseEnter={e => e.currentTarget.style.color = '#C81923'}
+        onMouseLeave={e => e.currentTarget.style.color = '#5A6573'}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+        </svg>
+      </button>
 
       {/* Bell */}
       <div ref={bellRef} style={{ position: 'relative' }}>

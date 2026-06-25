@@ -90,3 +90,10 @@ export const createCalendarEvent = (data) => req('/google/calendar/event', { met
 
 // Google Sheets sync
 export const syncToSheets = () => req('/sheets/sync', { method: 'POST' });
+
+// Trash
+export const getTrash = () => req('/trash');
+export const restoreTrash = (collection, itemId) => req(`/trash/restore/${collection}/${itemId}`, { method: 'POST' });
+
+// Duplicate order
+export const duplicateOrder = (orderId) => req(`/orders/${orderId}/duplicate`, { method: 'POST' });

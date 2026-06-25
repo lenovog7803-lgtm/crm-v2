@@ -138,6 +138,9 @@ function CityInput({ value, onChange, placeholder }) {
 }
 
 export default function CreateOrderModal({ onClose, onSuccess }) {
+  const handleClose = () => {
+    if (window.confirm('Закрыть форму? Несохранённые данные будут потеряны.')) onClose()
+  }
   const [clients, setClients] = useState([])
   const [carriers, setCarriers] = useState([])
   const [form, setForm] = useState({
@@ -220,8 +223,8 @@ export default function CreateOrderModal({ onClose, onSuccess }) {
   }
 
   return (
-    <ModalOverlay onClose={onClose}>
-      <ModalHeader title="Новая заявка" onClose={onClose} />
+    <ModalOverlay onClose={handleClose}>
+      <ModalHeader title="Новая заявка" onClose={handleClose} />
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
         {/* 1. Стороны */}
@@ -348,7 +351,7 @@ export default function CreateOrderModal({ onClose, onSuccess }) {
         {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center' }}>{error}</div>}
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <button type="button" className="btn-ghost" onClick={onClose} style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+          <button type="button" className="btn-ghost" onClick={handleClose} style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button type="submit" className="btn-primary" disabled={loading} style={{ flex: 2, justifyContent: 'center' }}>
             {loading ? 'Создание...' : 'Создать заявку →'}
           </button>

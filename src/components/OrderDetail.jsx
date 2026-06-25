@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, createPaymentIn, createPaymentOut } from '../api'
+import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, createPaymentIn, createPaymentOut, duplicateOrder as apiDuplicate } from '../api'
 import { fmtMoney, initials, getGradient } from '../utils'
 
 const STATUSES = [
@@ -85,7 +85,7 @@ function PaymentButton({ type, order, onClick }) {
   )
 }
 
-export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, onOpenCarrier }) {
+export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, onOpenCarrier, onOpenOrder }) {
   const [order, setOrder] = useState(null)
   const [loading, setLoading] = useState(true)
   const [payLoading, setPayLoading] = useState(null)
@@ -201,6 +201,16 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     onBack()
   }
 
+  const [duplicating, setDuplicating] = useState(false)
+  const handleDuplicate = async () => {
+    setDuplicating(true)
+    try {
+      const newOrder = await apiDuplicate(order.id)
+      if (newOrder?.id && onOpenOrder) onOpenOrder(newOrder.id)
+    } catch (e) { console.error(e) }
+    setDuplicating(false)
+  }
+
   const [avAc, avBc] = getGradient(order.client_name || '')
   const [avAr, avBr] = getGradient(order.carrier_name || '')
   const curStatus = STATUSES.find(s => s.id === view.status) || STATUSES[0]
@@ -268,6 +278,17 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
               Сохранить
             </>
           )}
+        </button>
+        <button onClick={handleDuplicate} disabled={duplicating} style={{
+          padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
+          background: 'rgba(19,102,240,0.08)', color: '#1366F0',
+          fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
+          display: 'flex', alignItems: 'center', gap: 6,
+        }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          {duplicating ? '...' : 'Дублировать'}
         </button>
         <button onClick={handleDelete} style={{
           padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
