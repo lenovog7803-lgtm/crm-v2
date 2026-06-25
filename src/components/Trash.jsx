@@ -44,10 +44,16 @@ function daysLeft(deletedAt) {
 }
 
 function itemTitle(item) {
-  return item.order_number
-    ? `Заявка №${item.order_number}`
-    : item.client_name || item.carrier_name || item.company_name || item.name
-    || item.title || item.description || item.id
+  if (item._collection === 'orders') {
+    const num = item.order_number ? `${item.order_number}` : `#${String(item.id).slice(-6).toUpperCase()}`
+    const route = item.route_from && item.route_to ? ` · ${item.route_from} → ${item.route_to}` : ''
+    const client = item.client_name ? ` · ${item.client_name}` : ''
+    return `Заявка ${num}${route || client}`
+  }
+  if (item._collection === 'tasks') return item.title || item.description || 'Задача'
+  if (item._collection === 'clients') return item.company_name || item.name || item.client_name || 'Клиент'
+  if (item._collection === 'carriers') return item.company_name || item.name || item.carrier_name || 'Перевозчик'
+  return item.name || item.title || item.description || item.company_name || item.id
 }
 
 export default function Trash() {

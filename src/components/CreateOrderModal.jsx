@@ -137,23 +137,30 @@ function CityInput({ value, onChange, placeholder }) {
   )
 }
 
-export default function CreateOrderModal({ onClose, onSuccess }) {
+export default function CreateOrderModal({ onClose, onSuccess, initialData }) {
   const handleClose = () => {
     if (window.confirm('Закрыть форму? Несохранённые данные будут потеряны.')) onClose()
   }
   const [clients, setClients] = useState([])
   const [carriers, setCarriers] = useState([])
   const [form, setForm] = useState({
-    client_id: '', client_name: '',
-    carrier_id: '', carrier_name: '',
-    route_from: '', route_to: '',
-    route_from_address: '', route_to_address: '',
-    load_date: '', unload_date: '',
-    client_rate: '', carrier_rate: '',
-    payment_days: '20',
-    vehicle_info: '',
-    cargo: '', weight_tons: '',
-    notes: '',
+    client_id: initialData?.client_id || '',
+    client_name: initialData?.client_name || '',
+    carrier_id: initialData?.carrier_id || '',
+    carrier_name: initialData?.carrier_name || '',
+    route_from: initialData?.route_from || '',
+    route_to: initialData?.route_to || '',
+    route_from_address: initialData?.route_from_address || '',
+    route_to_address: initialData?.route_to_address || '',
+    load_date: '',
+    unload_date: '',
+    client_rate: initialData?.client_rate ? String(initialData.client_rate) : '',
+    carrier_rate: initialData?.carrier_rate ? String(initialData.carrier_rate) : '',
+    payment_days: initialData?.payment_days ? String(initialData.payment_days) : '20',
+    vehicle_info: initialData?.vehicle_info || '',
+    cargo: initialData?.cargo || '',
+    weight_tons: initialData?.weight_tons ? String(initialData.weight_tons) : '',
+    notes: initialData?.notes || '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, createPaymentIn, createPaymentOut, duplicateOrder as apiDuplicate } from '../api'
+import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, createPaymentIn, createPaymentOut } from '../api'
 import { fmtMoney, initials, getGradient } from '../utils'
 
 const STATUSES = [
@@ -85,7 +85,7 @@ function PaymentButton({ type, order, onClick }) {
   )
 }
 
-export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, onOpenCarrier, onOpenOrder }) {
+export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, onOpenCarrier, onOpenOrder, onDuplicate }) {
   const [order, setOrder] = useState(null)
   const [loading, setLoading] = useState(true)
   const [payLoading, setPayLoading] = useState(null)
@@ -202,13 +202,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     onBack()
   }
 
-  const handleDuplicate = async () => {
-    setDuplicating(true)
-    try {
-      const newOrder = await apiDuplicate(order.id)
-      if (newOrder?.id && onOpenOrder) onOpenOrder(newOrder.id)
-    } catch (e) { console.error(e) }
-    setDuplicating(false)
+  const handleDuplicate = () => {
+    if (onDuplicate) onDuplicate(order)
   }
 
   const [avAc, avBc] = getGradient(order.client_name || '')

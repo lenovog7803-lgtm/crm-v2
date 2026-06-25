@@ -36,6 +36,7 @@ function MainApp() {
 
   // Modal visibility
   const [showOrderModal, setShowOrderModal] = useState(false)
+  const [duplicateData, setDuplicateData] = useState(null)
   const [showTaskModal, setShowTaskModal] = useState(false)
   const [showClientModal, setShowClientModal] = useState(false)
   const [showCarrierModal, setShowCarrierModal] = useState(false)
@@ -144,6 +145,7 @@ function MainApp() {
                 onOpenClient={id => openClient(id)}
                 onOpenCarrier={id => openCarrier(id)}
                 onOpenOrder={id => openOrder(id)}
+                onDuplicate={orderData => { setDuplicateData(orderData); setShowOrderModal(true) }}
               />
             )}
 
@@ -205,8 +207,9 @@ function MainApp() {
       {/* Modals */}
       {showOrderModal && (
         <CreateOrderModal
-          onClose={() => setShowOrderModal(false)}
-          onSuccess={() => { setShowOrderModal(false); setOrdersKey(k => k + 1) }}
+          onClose={() => { setShowOrderModal(false); setDuplicateData(null) }}
+          onSuccess={() => { setShowOrderModal(false); setDuplicateData(null); setOrdersKey(k => k + 1) }}
+          initialData={duplicateData}
         />
       )}
       {showTaskModal && (
