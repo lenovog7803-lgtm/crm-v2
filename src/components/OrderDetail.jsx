@@ -105,27 +105,26 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
   const marginPct = clientRate > 0 ? Math.round(margin / clientRate * 100) : 0
   const route = order.route_from && order.route_to ? `${order.route_from} → ${order.route_to}` : (order.route_from || order.route_to || '—')
 
-  const patch = async fields => {
-    try {
-      const res = await apiUpdate(order.id, fields)
-      setOrder(prev => ({ ...prev, ...fields, ...(res || {}) }))
-    } catch (e) { console.error(e) }
+  // Optimistic update: change UI immediately, then sync to API
+  const patch = (fields) => {
+    setOrder(prev => ({ ...prev, ...fields }))
+    apiUpdate(order.id, fields).catch(console.error)
   }
 
-  const handleFieldBlur = async (field, value) => {
+  const handleFieldBlur = (field, value) => {
     if (String(order[field] || '') === String(value || '')) return
-    await patch({ [field]: value })
+    patch({ [field]: value })
   }
 
-  const handleStatusChange = async newStatus => {
-    await patch({ status: newStatus })
+  const handleStatusChange = (newStatus) => {
+    patch({ status: newStatus })
   }
 
-  const handleDocToggle = async key => {
+  const handleDocToggle = (key) => {
     const dateKey = key + '_date'
     const newVal = !order[key]
     const now = new Date().toISOString()
-    await patch({ [key]: newVal, [dateKey]: newVal ? now : null })
+    patch({ [key]: newVal, [dateKey]: newVal ? now : null })
   }
 
   const handlePayment = async type => {
@@ -137,34 +136,35 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     const newVal = !order[paidField]
     const updated = { [paidField]: newVal, [dateField]: newVal ? now : null }
 
+    // Optimistic UI update first
+    setOrder(prev => ({ ...prev, ...updated }))
     setPayLoading(type)
-    try {
-      await apiUpdate(order.id, updated)
-      setOrder(prev => ({ ...prev, ...updated }))
-      if (newVal) {
-        if (type === 'client') {
-          await createPaymentIn({
-            client_id: order.client_id,
-            client_name: order.client_name,
-            amount: order[rateField],
-            date: now.slice(0, 10),
-            order_id: order.id,
-            order_number: order.order_number,
-            description: `Оплата по заявке ${order.order_number || order.id}`,
-          }).catch(console.error)
-        } else {
-          await createPaymentOut({
-            carrier_id: order.carrier_id,
-            carrier_name: order.carrier_name,
-            amount: order[rateField],
-            date: now.slice(0, 10),
-            order_id: order.id,
-            order_number: order.order_number,
-            description: `Оплата перевозчику по заявке ${order.order_number || order.id}`,
-          }).catch(console.error)
-        }
+
+    apiUpdate(order.id, updated).catch(console.error)
+
+    if (newVal) {
+      if (type === 'client') {
+        createPaymentIn({
+          client_id: order.client_id,
+          client_name: order.client_name,
+          amount: order[rateField],
+          date: now.slice(0, 10),
+          order_id: order.id,
+          order_number: order.order_number,
+          description: `Оплата по заявке ${order.order_number || order.id}`,
+        }).catch(console.error)
+      } else {
+        createPaymentOut({
+          carrier_id: order.carrier_id,
+          carrier_name: order.carrier_name,
+          amount: order[rateField],
+          date: now.slice(0, 10),
+          order_id: order.id,
+          order_number: order.order_number,
+          description: `Оплата перевозчику по заявке ${order.order_number || order.id}`,
+        }).catch(console.error)
       }
-    } catch (e) { console.error(e) }
+    }
     setPayLoading(null)
   }
 
