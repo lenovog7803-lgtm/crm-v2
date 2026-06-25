@@ -94,6 +94,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
   const [saving, setSaving] = useState(false)
   const [savedOk, setSavedOk] = useState(false)
   const [saveErr, setSaveErr] = useState(false)
+  const [duplicating, setDuplicating] = useState(false)
 
   useEffect(() => {
     if (!orderId) return
@@ -201,7 +202,6 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     onBack()
   }
 
-  const [duplicating, setDuplicating] = useState(false)
   const handleDuplicate = async () => {
     setDuplicating(true)
     try {
