@@ -108,7 +108,7 @@ export default function CreateOrderModal({ onClose, onSuccess }) {
     load_date: '', unload_date: '',
     client_rate: '', carrier_rate: '',
     payment_days: '20',
-    vehicle_plate: '', vehicle_type: '', driver_name: '', driver_phone: '',
+    vehicle_info: '',
     cargo: '', weight_tons: '',
     notes: '',
   })
@@ -125,14 +125,12 @@ export default function CreateOrderModal({ onClose, onSuccess }) {
   const handleCarrierChange = carrierId => {
     const carrier = carriers.find(c => c.id === carrierId)
     if (carrier) {
+      const vehicleInfo = [carrier.plate, carrier.vehicle_type, carrier.driver_name, carrier.phone].filter(Boolean).join(', ')
       setForm(p => ({
         ...p,
         carrier_id: carrierId,
         carrier_name: carrier.company_name || carrier.name || '',
-        vehicle_plate: carrier.plate || p.vehicle_plate,
-        vehicle_type: carrier.vehicle_type || p.vehicle_type,
-        driver_name: carrier.driver_name || p.driver_name,
-        driver_phone: carrier.phone || p.driver_phone,
+        vehicle_info: vehicleInfo || p.vehicle_info,
       }))
     } else {
       upd('carrier_id', carrierId)
@@ -173,10 +171,7 @@ export default function CreateOrderModal({ onClose, onSuccess }) {
         client_rate: form.client_rate ? Number(form.client_rate) : 0,
         carrier_rate: form.carrier_rate ? Number(form.carrier_rate) : 0,
         payment_days: form.payment_days ? Number(form.payment_days) : 20,
-        vehicle_plate: form.vehicle_plate || undefined,
-        vehicle_type: form.vehicle_type || undefined,
-        driver_name: form.driver_name || undefined,
-        driver_phone: form.driver_phone || undefined,
+        vehicle_info: form.vehicle_info || undefined,
         cargo: form.cargo || undefined,
         weight_tons: form.weight_tons ? Number(form.weight_tons) : undefined,
         load_date: form.load_date || undefined,
@@ -288,26 +283,10 @@ export default function CreateOrderModal({ onClose, onSuccess }) {
         {/* 5. ТС и водитель */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <SectionTitle title="ТС И ВОДИТЕЛЬ" />
-          <Grid2>
-            <Field label="ГОС. НОМЕР ТС">
-              <input value={form.vehicle_plate} onChange={e => upd('vehicle_plate', e.target.value)}
-                placeholder="А000АА77" style={iStyle} />
-            </Field>
-            <Field label="ТИП ТС">
-              <input value={form.vehicle_type} onChange={e => upd('vehicle_type', e.target.value)}
-                placeholder="Газель, Еврофура..." style={iStyle} />
-            </Field>
-          </Grid2>
-          <Grid2>
-            <Field label="ФИО ВОДИТЕЛЯ">
-              <input value={form.driver_name} onChange={e => upd('driver_name', e.target.value)}
-                placeholder="Иванов Иван Иванович" style={iStyle} />
-            </Field>
-            <Field label="ТЕЛЕФОН ВОДИТЕЛЯ">
-              <input value={form.driver_phone} onChange={e => upd('driver_phone', e.target.value)}
-                placeholder="+375291234567" style={iStyle} />
-            </Field>
-          </Grid2>
+          <Field label="ТС И ВОДИТЕЛЬ (номер, тип, ФИО, телефон)">
+            <input value={form.vehicle_info} onChange={e => upd('vehicle_info', e.target.value)}
+              placeholder="А000АА77, Газель, Иванов Иван, +375291234567" style={iStyle} />
+          </Field>
           <Grid2>
             <Field label="ГРУЗ">
               <input value={form.cargo} onChange={e => upd('cargo', e.target.value)}
