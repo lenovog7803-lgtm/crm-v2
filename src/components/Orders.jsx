@@ -227,7 +227,10 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
               ) : <div style={{ color: '#A6AEB8', fontSize: 13 }}>—</div>}
               <div>
                 <div style={{ fontWeight: 700, fontSize: 13.5, color: '#0E1726' }}>{margin.toLocaleString('ru-RU')} BYN</div>
-                <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 1 }}>{marginPct}%</div>
+                <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>{marginPct}%</div>
+                <div style={{ fontSize: 10.5, color: '#C4CAD4', marginTop: 2, lineHeight: 1.4 }}>
+                  {order.client_rate ? order.client_rate.toLocaleString('ru-RU') : '—'} / {order.carrier_rate ? order.carrier_rate.toLocaleString('ru-RU') : '—'}
+                </div>
               </div>
               <div style={{ display: 'flex', gap: 5 }} onClick={e => e.stopPropagation()}>
                 <span style={{
