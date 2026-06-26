@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 const PAGE_META = {
   dashboard: { title: 'Дашборд', subtitle: 'Обзор бизнеса' },
@@ -31,7 +32,9 @@ const fmtMonth = m => {
 export default function Topbar({ page, onSignOut, period = 'month', onPeriodChange, availableMonths = [], search = '', onSearchChange, overdueItems = [], onOpenOrder, onNav }) {
   const meta = PAGE_META[page] || { title: page, subtitle: '' }
   const [bellOpen, setBellOpen] = useState(false)
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const bellRef = useRef(null)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     if (!bellOpen) return
@@ -58,12 +61,43 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
       position: 'relative',
       zIndex: 100,
     }}>
+      {/* Mobile search expanded */}
+      {isMobile && mobileSearchOpen ? (
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <input
+            autoFocus
+            value={search}
+            onChange={e => onSearchChange && onSearchChange(e.target.value)}
+            placeholder="Поиск..."
+            style={{
+              flex: 1, paddingLeft: 12, paddingRight: 12,
+              height: 38, borderRadius: 11,
+              border: '1px solid rgba(14,23,38,0.12)',
+              background: 'rgba(255,255,255,0.7)',
+              fontFamily: 'Manrope', fontSize: 14, color: '#0E1726', outline: 'none',
+            }}
+          />
+          <button onClick={() => { setMobileSearchOpen(false); onSearchChange && onSearchChange('') }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8A93A0', padding: 4, fontSize: 13, fontFamily: 'Manrope', fontWeight: 600 }}>
+            Отмена
+          </button>
+        </div>
+      ) : (
+        <>
       <div style={{ flex: 1 }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726', letterSpacing: '-0.02em' }}>{meta.title}</div>
-        <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 1 }}>{meta.subtitle}</div>
+        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: isMobile ? 16 : 18, color: '#0E1726', letterSpacing: '-0.02em' }}>{meta.title}</div>
+        {!isMobile && <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 1 }}>{meta.subtitle}</div>}
       </div>
 
-      {/* Search */}
+      {/* Mobile search icon */}
+      {isMobile && (
+        <button onClick={() => setMobileSearchOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5A6573', padding: 6, display: 'flex' }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+      )}
+
+      {/* Search — desktop */}
       <div className="topbar-search" style={{ position: 'relative', width: 300 }}>
         <svg style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: '#A6AEB8' }} width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="11" cy="11" r="8"/>
@@ -208,6 +242,8 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
             <line x1="21" y1="12" x2="9" y2="12"/>
           </svg>
         </button>
+      )}
+      </>
       )}
     </div>
   )

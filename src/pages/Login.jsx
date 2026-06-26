@@ -33,11 +33,11 @@ export default function Login() {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>Логин</div>
-            <input value={login} onChange={e => setLogin(e.target.value)} placeholder="egor_dir" style={{ width: '100%', padding: '12px 14px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', background: 'rgba(255,255,255,0.8)', fontSize: 14, color: '#0E1726', outline: 'none', boxSizing: 'border-box' }} />
+            <input value={login} onChange={e => setLogin(e.target.value)} style={{ width: '100%', padding: '12px 14px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', background: 'rgba(255,255,255,0.8)', fontSize: 14, color: '#0E1726', outline: 'none', boxSizing: 'border-box' }} />
           </div>
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>Пароль</div>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" style={{ width: '100%', padding: '12px 14px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', background: 'rgba(255,255,255,0.8)', fontSize: 14, color: '#0E1726', outline: 'none', boxSizing: 'border-box' }} />
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} style={{ width: '100%', padding: '12px 14px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', background: 'rgba(255,255,255,0.8)', fontSize: 14, color: '#0E1726', outline: 'none', boxSizing: 'border-box' }} />
           </div>
           {error && <div style={{ fontSize: 12, color: '#E0473B', textAlign: 'center' }}>{error}</div>}
           <button type="submit" disabled={loading} style={{ padding: '13px', borderRadius: 12, border: 'none', background: '#1366F0', color: '#fff', fontFamily: 'Manrope', fontSize: 14, fontWeight: 700, cursor: 'pointer', marginTop: 8 }}>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { getOrders, deleteOrder as apiDelete } from '../api'
 import { initials, statusLabel, statusColor, statusBg, getGradient } from '../utils'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 const DOC_FILTER_OPTIONS = [
   { key: 'docs_to_client_sent', label: 'Отправлены клиенту' },
@@ -17,6 +18,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   const [docFilters, setDocFilters] = useState([])
   const [showDocFilter, setShowDocFilter] = useState(false)
   const docBtnRef = useRef(null)
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     setLoading(true)
@@ -79,34 +81,35 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', position: 'relative', zIndex: 10 }}>
-        <div style={{ display: 'flex', gap: 6 }}>
+      {/* Filter bar — horizontal scroll on mobile */}
+      <div className="card" style={{ padding: isMobile ? '10px 12px' : '14px 16px', position: 'relative', zIndex: 10, overflow: 'hidden' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflowX: 'auto', overflowY: 'visible', paddingBottom: 2, scrollbarWidth: 'none' }}>
           {statusChips.map(c => (
             <button key={c.key} onClick={() => setStatusFilter(c.key)} style={{
-              padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer',
+              padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer', flexShrink: 0,
               fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
               background: statusFilter === c.key ? '#0E1726' : 'rgba(14,23,38,0.06)',
               color: statusFilter === c.key ? '#fff' : '#5A6573', transition: 'all 0.15s',
             }}>{c.label}</button>
           ))}
-        </div>
-        <div style={{ width: 1, height: 24, background: 'rgba(14,23,38,0.1)', margin: '0 2px' }} />
-        <button onClick={() => setPayFilter(payFilter === 'clientUnpaid' ? null : 'clientUnpaid')} style={{
-          padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer',
-          fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
-          background: payFilter === 'clientUnpaid' ? 'rgba(30,158,90,0.15)' : 'rgba(14,23,38,0.06)',
-          color: payFilter === 'clientUnpaid' ? '#1E9E5A' : '#5A6573',
-        }}>Не оплачено клиентом</button>
-        <button onClick={() => setPayFilter(payFilter === 'carrierUnpaid' ? null : 'carrierUnpaid')} style={{
-          padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer',
-          fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
-          background: payFilter === 'carrierUnpaid' ? 'rgba(124,58,237,0.15)' : 'rgba(14,23,38,0.06)',
-          color: payFilter === 'carrierUnpaid' ? '#7C3AED' : '#5A6573',
-        }}>Не оплачено перевозчику</button>
-        <div style={{ flex: 1 }} />
+          <div style={{ width: 1, height: 20, background: 'rgba(14,23,38,0.1)', flexShrink: 0 }} />
+          <button onClick={() => setPayFilter(payFilter === 'clientUnpaid' ? null : 'clientUnpaid')} style={{
+            padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer', flexShrink: 0,
+            fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
+            background: payFilter === 'clientUnpaid' ? 'rgba(30,158,90,0.15)' : 'rgba(14,23,38,0.06)',
+            color: payFilter === 'clientUnpaid' ? '#1E9E5A' : '#5A6573',
+          }}>Не оплачено клиентом</button>
+          <button onClick={() => setPayFilter(payFilter === 'carrierUnpaid' ? null : 'carrierUnpaid')} style={{
+            padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer', flexShrink: 0,
+            fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
+            background: payFilter === 'carrierUnpaid' ? 'rgba(124,58,237,0.15)' : 'rgba(14,23,38,0.06)',
+            color: payFilter === 'carrierUnpaid' ? '#7C3AED' : '#5A6573',
+          }}>Не оплачено перевозчику</button>
 
-        {/* Doc filter */}
-        <div ref={docBtnRef} style={{ position: 'relative' }}>
+          <div style={{ flex: '0 0 auto', width: 1, height: 20, background: 'rgba(14,23,38,0.1)' }} />
+
+          {/* Doc filter */}
+          <div ref={docBtnRef} style={{ position: 'relative', flexShrink: 0 }}>
           <button onClick={() => setShowDocFilter(v => !v)} style={{
             padding: '7px 14px', borderRadius: 12, cursor: 'pointer',
             fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
@@ -156,7 +159,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           )}
         </div>
 
-        {/* Долг перевозчику */}
+          {/* Долг перевозчику */}
         <button onClick={() => setPayFilter(payFilter === 'debt' ? null : 'debt')} title="Долг перевозчику: клиент оплатил, перевозчику нет" style={{
           width: 34, height: 34, borderRadius: 11, border: 'none', cursor: 'pointer', flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -192,7 +195,68 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
             <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
           </svg>
         </button>
+        </div>
       </div>
+
+      {/* Mobile: card list */}
+      {isMobile ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {loading && <div className="card" style={{ padding: 32, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>}
+          {!loading && filtered.map(order => {
+            const margin = (order.client_rate || 0) - (order.carrier_rate || 0)
+            const marginPct = order.client_rate > 0 ? Math.round(margin / order.client_rate * 100) : 0
+            const route = order.route_from && order.route_to ? `${order.route_from} → ${order.route_to}` : (order.route || '—')
+            const overdue = isOverdue(order)
+            return (
+              <div key={order.id} className="card" onClick={() => onOpenOrder(order.id)} style={{
+                padding: '14px 16px', cursor: 'pointer',
+                borderLeft: overdue ? '3px solid rgba(200,25,35,0.6)' : '3px solid transparent',
+                background: overdue ? 'rgba(200,25,35,0.04)' : 'rgba(255,255,255,0.6)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontFamily: 'JetBrains Mono', fontWeight: 600, fontSize: 13, color: '#1366F0' }}>
+                      {order.order_number || order.id}
+                    </span>
+                    <span style={{
+                      padding: '2px 8px', borderRadius: 6,
+                      background: statusBg(order.status), color: statusColor(order.status),
+                      fontSize: 11, fontWeight: 600,
+                    }}>{statusLabel(order.status)}</span>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontWeight: 700, fontSize: 14, color: '#0E1726' }}>{margin.toLocaleString('ru-RU')}</div>
+                    <div style={{ fontSize: 11, color: '#A6AEB8' }}>{marginPct}%</div>
+                  </div>
+                </div>
+                <div style={{ fontSize: 13.5, fontWeight: 600, color: '#0E1726', marginBottom: 4 }}>{route}</div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ fontSize: 12, color: '#8A93A0' }}>
+                    {order.client_name || '—'}{order.load_date ? ` · ${order.load_date}` : ''}
+                  </div>
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    <span style={{
+                      width: 24, height: 24, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 10, fontWeight: 700,
+                      background: order.client_paid ? 'rgba(30,158,90,0.15)' : 'rgba(14,23,38,0.07)',
+                      color: order.client_paid ? '#1E9E5A' : '#A6AEB8',
+                    }}>К</span>
+                    <span style={{
+                      width: 24, height: 24, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 10, fontWeight: 700,
+                      background: order.carrier_paid ? 'rgba(124,58,237,0.15)' : 'rgba(14,23,38,0.07)',
+                      color: order.carrier_paid ? '#7C3AED' : '#A6AEB8',
+                    }}>П</span>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+          {!loading && filtered.length === 0 && (
+            <div className="card" style={{ padding: '40px', textAlign: 'center', color: '#A6AEB8', fontSize: 14 }}>Нет заявок</div>
+          )}
+        </div>
+      ) : (
 
       <div className="card" style={{ overflow: 'hidden' }}>
         <div style={{
@@ -303,6 +367,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           <div style={{ padding: '40px', textAlign: 'center', color: '#A6AEB8', fontSize: 14 }}>Нет заявок</div>
         )}
       </div>
+      )}
     </div>
   )
 }
