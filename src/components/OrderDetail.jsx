@@ -498,8 +498,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                   {order.carrier_phone && <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 2 }}>{order.carrier_phone}</div>}
                 </div>
               </div>
-              {(order.vehicle_plate || order.vehicle_type || order.driver_name || order.driver_phone || order.vehicle_info) && (
-                <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {(order.vehicle_plate || order.vehicle_type || order.driver_name || order.driver_phone) && (
+                <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {(order.vehicle_plate || order.vehicle_type) && (
                     <div style={{ padding: '7px 12px', borderRadius: 10, background: 'rgba(14,23,38,0.04)', fontSize: 12, color: '#5A6573', fontFamily: 'JetBrains Mono' }}>
                       {[order.vehicle_plate, order.vehicle_type].filter(Boolean).join(' · ')}
