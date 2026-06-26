@@ -2,9 +2,16 @@ import { useState } from 'react'
 import { ModalOverlay, ModalHeader } from './Modal'
 import { createCarrier } from '../api'
 
+const sectionLabel = {
+  fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: '#A6AEB8',
+  paddingBottom: 8, borderBottom: '1px solid rgba(14,23,38,0.07)', marginBottom: 4,
+}
+
 export default function AddCarrierModal({ onClose, onSuccess }) {
   const [form, setForm] = useState({
     company_name: '', driver_name: '', phone: '', unp: '',
+    legal_address: '', postal_address: '',
+    bank_name: '', bank_account: '', bank_bic: '', bank_iban: '',
     capacity_tons: '', vehicle_type: '', plate: '', regions: '',
   })
   const [loading, setLoading] = useState(false)
@@ -32,47 +39,92 @@ export default function AddCarrierModal({ onClose, onSuccess }) {
   return (
     <ModalOverlay onClose={onClose}>
       <ModalHeader title="Добавить перевозчика" onClose={onClose} />
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <div className="form-field">
-          <label className="form-label">НАИМЕНОВАНИЕ</label>
-          <input className="form-input" placeholder="ИП Иванов / ООО «ТрансЛайн»" value={form.company_name} onChange={e => set('company_name', e.target.value)} required />
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+        {/* Основное */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={sectionLabel}>ОСНОВНОЕ</div>
           <div className="form-field">
-            <label className="form-label">ВОДИТЕЛЬ</label>
-            <input className="form-input" placeholder="Фамилия И.О." value={form.driver_name} onChange={e => set('driver_name', e.target.value)} />
+            <label className="form-label">НАИМЕНОВАНИЕ</label>
+            <input className="form-input" placeholder="ИП Иванов / ООО «ТрансЛайн»" value={form.company_name} onChange={e => set('company_name', e.target.value)} required />
           </div>
-          <div className="form-field">
-            <label className="form-label">ТЕЛЕФОН</label>
-            <input className="form-input" placeholder="+375 29 000-00-00" value={form.phone} onChange={e => set('phone', e.target.value)} />
-          </div>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <div className="form-field">
-            <label className="form-label">УНП</label>
-            <input className="form-input" placeholder="100000000" value={form.unp} onChange={e => set('unp', e.target.value)} />
-          </div>
-          <div className="form-field">
-            <label className="form-label">ГРУЗОПОДЪЁМНОСТЬ (т)</label>
-            <input className="form-input" type="number" placeholder="20" value={form.capacity_tons} onChange={e => set('capacity_tons', e.target.value)} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="form-field">
+              <label className="form-label">ВОДИТЕЛЬ</label>
+              <input className="form-input" placeholder="Фамилия И.О." value={form.driver_name} onChange={e => set('driver_name', e.target.value)} />
+            </div>
+            <div className="form-field">
+              <label className="form-label">ТЕЛЕФОН</label>
+              <input className="form-input" placeholder="+375 29 000-00-00" value={form.phone} onChange={e => set('phone', e.target.value)} />
+            </div>
           </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <div className="form-field">
-            <label className="form-label">ТИП ТС</label>
-            <input className="form-input" placeholder="Тент / Реф / Контейнер" value={form.vehicle_type} onChange={e => set('vehicle_type', e.target.value)} />
+
+        {/* Реквизиты */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={sectionLabel}>РЕКВИЗИТЫ</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="form-field">
+              <label className="form-label">УНП</label>
+              <input className="form-input" placeholder="100000000" value={form.unp} onChange={e => set('unp', e.target.value)} />
+            </div>
           </div>
           <div className="form-field">
-            <label className="form-label">НОМЕР ТС</label>
-            <input className="form-input" placeholder="АВ 1234-7" value={form.plate} onChange={e => set('plate', e.target.value)} />
+            <label className="form-label">ЮРИДИЧЕСКИЙ АДРЕС</label>
+            <input className="form-input" placeholder="220000, г. Минск, ул. Ленина, д. 1" value={form.legal_address} onChange={e => set('legal_address', e.target.value)} />
+          </div>
+          <div className="form-field">
+            <label className="form-label">ПОЧТОВЫЙ АДРЕС</label>
+            <input className="form-input" placeholder="220000, г. Минск, ул. Ленина, д. 1" value={form.postal_address} onChange={e => set('postal_address', e.target.value)} />
           </div>
         </div>
-        <div className="form-field">
-          <label className="form-label">РЕГИОНЫ РАБОТЫ</label>
-          <input className="form-input" placeholder="РБ, РФ, ЕС" value={form.regions} onChange={e => set('regions', e.target.value)} />
+
+        {/* Банковские реквизиты */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={sectionLabel}>БАНКОВСКИЕ РЕКВИЗИТЫ</div>
+          <div className="form-field">
+            <label className="form-label">БАНК</label>
+            <input className="form-input" placeholder="ОАО «АСБ Беларусбанк»" value={form.bank_name} onChange={e => set('bank_name', e.target.value)} />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="form-field">
+              <label className="form-label">Р/С (СЧЁТ)</label>
+              <input className="form-input" placeholder="BY12 BAPB 3012 1234 5678 9000 0000" value={form.bank_account} onChange={e => set('bank_account', e.target.value)} />
+            </div>
+            <div className="form-field">
+              <label className="form-label">БИК</label>
+              <input className="form-input" placeholder="BAPBBY2X" value={form.bank_bic} onChange={e => set('bank_bic', e.target.value)} />
+            </div>
+          </div>
         </div>
+
+        {/* ТС */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={sectionLabel}>ТРАНСПОРТ</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="form-field">
+              <label className="form-label">ТИП ТС</label>
+              <input className="form-input" placeholder="Тент / Реф / Контейнер" value={form.vehicle_type} onChange={e => set('vehicle_type', e.target.value)} />
+            </div>
+            <div className="form-field">
+              <label className="form-label">НОМЕР ТС</label>
+              <input className="form-input" placeholder="АВ 1234-7" value={form.plate} onChange={e => set('plate', e.target.value)} />
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="form-field">
+              <label className="form-label">ГРУЗОПОДЪЁМНОСТЬ (т)</label>
+              <input className="form-input" type="number" placeholder="20" value={form.capacity_tons} onChange={e => set('capacity_tons', e.target.value)} />
+            </div>
+            <div className="form-field">
+              <label className="form-label">РЕГИОНЫ РАБОТЫ</label>
+              <input className="form-input" placeholder="РБ, РФ, ЕС" value={form.regions} onChange={e => set('regions', e.target.value)} />
+            </div>
+          </div>
+        </div>
+
         {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center' }}>{error}</div>}
-        <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+        <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
           <button type="button" className="btn-ghost" onClick={onClose} style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button type="submit" className="btn-primary" disabled={loading} style={{ flex: 2, justifyContent: 'center' }}>
             {loading ? 'Сохранение...' : 'Добавить перевозчика'}

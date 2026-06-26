@@ -102,7 +102,8 @@ export default function CarrierDetail({ carrierId, onBack, onDelete, onOpenOrder
         <div className="card" style={{ padding: '20px 22px' }}>
           <div className="section-label" style={{ marginBottom: 10 }}>ИНФОРМАЦИЯ</div>
           <Row label="УНП" value={carrier.unp} mono />
-          <Row label="Адрес" value={carrier.address || carrier.legal_address} />
+          <Row label="Юр. адрес" value={carrier.legal_address || carrier.address} />
+          <Row label="Почтовый адрес" value={carrier.postal_address} />
           <Row label="Грузоподъёмность" value={cap} />
           <Row label="Тип ТС" value={carrier.vehicle_type} />
           <Row label="Номер ТС" value={carrier.plate} mono />
@@ -114,7 +115,7 @@ export default function CarrierDetail({ carrierId, onBack, onDelete, onOpenOrder
           <div className="section-label" style={{ marginBottom: 10 }}>БАНКОВСКИЕ РЕКВИЗИТЫ</div>
           <Row label="Банк" value={carrier.bank_name || carrier.bank} />
           <Row label="Р/С" value={carrier.bank_account || carrier.rs} mono />
-          <Row label="БИК" value={carrier.bank_bik || carrier.bik} mono />
+          <Row label="БИК" value={carrier.bank_bic || carrier.bank_bik || carrier.bik} mono />
           {carrier.email && <Row label="Email" value={carrier.email} />}
           {carrier.notes && <Row label="Примечания" value={carrier.notes} />}
         </div>
