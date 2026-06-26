@@ -103,3 +103,4 @@ export const restoreTrash = (collection, itemId) => req(`/trash/restore/${collec
 
 // Duplicate order
 export const duplicateOrder = (orderId) => req(`/orders/${orderId}/duplicate`, { method: 'POST' });
+export const syncOrderDocUrls = (orderId) => req(`/orders/${orderId}/sync_doc_urls`, { method: 'POST' });

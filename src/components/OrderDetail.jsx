@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, createPaymentIn, createPaymentOut } from '../api'
+import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, createPaymentIn, createPaymentOut, syncOrderDocUrls } from '../api'
 import { fmtMoney, initials, getGradient } from '../utils'
 
 const STATUSES = [
@@ -105,7 +105,11 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
 
   const refreshDocs = () => {
     setDocsRefreshing(true)
-    getOrder(orderId).then(setOrder).catch(console.error).finally(() => setDocsRefreshing(false))
+    syncOrderDocUrls(orderId)
+      .catch(console.error)
+      .finally(() => {
+        getOrder(orderId).then(setOrder).catch(console.error).finally(() => setDocsRefreshing(false))
+      })
   }
 
   if (loading) return <div style={{ padding: 60, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>
