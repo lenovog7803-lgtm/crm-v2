@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ModalOverlay, ModalHeader } from './Modal'
-import { createOrder, getClients, getCarriers, getToken, syncToSheets } from '../api'
+import { createOrder, updateOrder, getClients, getCarriers, getToken, syncToSheets } from '../api'
 
 const POPULAR_CITIES = [
   'Минск', 'Брест', 'Гродно', 'Гомель', 'Могилёв', 'Витебск', 'Бобруйск',
@@ -137,7 +137,8 @@ function CityInput({ value, onChange, placeholder }) {
   )
 }
 
-export default function CreateOrderModal({ onClose, onSuccess, initialData }) {
+export default function CreateOrderModal({ onClose, onSuccess, initialData, editOrderId }) {
+  const isEdit = Boolean(editOrderId)
   const handleClose = () => {
     if (window.confirm('Закрыть форму? Несохранённые данные будут потеряны.')) onClose()
   }
@@ -152,8 +153,8 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData }) {
     route_to: initialData?.route_to || '',
     route_from_address: initialData?.route_from_address || '',
     route_to_address: initialData?.route_to_address || '',
-    load_date: '',
-    unload_date: '',
+    load_date: isEdit ? (initialData?.load_date || '') : '',
+    unload_date: isEdit ? (initialData?.unload_date || '') : '',
     client_rate: initialData?.client_rate ? String(initialData.client_rate) : '',
     carrier_rate: initialData?.carrier_rate ? String(initialData.carrier_rate) : '',
     payment_days: initialData?.payment_days ? String(initialData.payment_days) : '20',
@@ -199,7 +200,7 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData }) {
     setLoading(true)
     setError('')
     try {
-      await createOrder({
+      const payload = {
         route_from: form.route_from,
         route_to: form.route_to,
         route_from_address: form.route_from_address || undefined,
@@ -218,13 +219,16 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData }) {
         load_date: form.load_date || undefined,
         unload_date: form.unload_date || undefined,
         notes: form.notes || undefined,
-        status: 'new',
-      })
-      // Fire-and-forget Sheets sync
+      }
+      if (isEdit) {
+        await updateOrder(editOrderId, payload)
+      } else {
+        await createOrder({ ...payload, status: 'new' })
+      }
       syncToSheets().catch(() => {})
       onSuccess()
     } catch (e) {
-      setError('Ошибка при создании заявки')
+      setError(isEdit ? 'Ошибка при сохранении' : 'Ошибка при создании заявки')
       console.error(e)
     }
     setLoading(false)
@@ -232,7 +236,7 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData }) {
 
   return (
     <ModalOverlay onClose={handleClose}>
-      <ModalHeader title="Новая заявка" onClose={handleClose} />
+      <ModalHeader title={isEdit ? 'Редактировать заявку' : 'Новая заявка'} onClose={handleClose} />
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
         {/* 1. Стороны */}
