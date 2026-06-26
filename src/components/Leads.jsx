@@ -34,6 +34,8 @@ const inputStyle = {
 }
 const labelStyle = { fontSize: 12, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.05em', marginBottom: 6, display: 'block' }
 
+const PAGE_SIZE = 80
+
 export default function Leads({ refreshKey, search = '' }) {
   const [leads, setLeads] = useState([])
   const [loading, setLoading] = useState(true)
@@ -43,14 +45,17 @@ export default function Leads({ refreshKey, search = '' }) {
   const [noteText, setNoteText] = useState('')
   const [saving, setSaving] = useState(false)
   const [noteLoading, setNoteLoading] = useState(false)
+  const [page, setPage] = useState(1)
 
   useEffect(() => {
     setLoading(true)
-    getLeads({ limit: 500 })
+    getLeads({ limit: 3000 })
       .then(r => setLeads(Array.isArray(r) ? r : (r.items || [])))
       .catch(console.error)
       .finally(() => setLoading(false))
   }, [refreshKey])
+
+  useEffect(() => { setPage(1) }, [filter, industryFilter, search])
 
   const setStatus = async (lead, status) => {
     try {
@@ -128,6 +133,8 @@ export default function Leads({ refreshKey, search = '' }) {
     (l.phone || '').includes(search) ||
     (l.industry || '').toLowerCase().includes(search.toLowerCase())
   )
+  const totalFiltered = filtered.length
+  const visible = filtered.slice(0, page * PAGE_SIZE)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -195,7 +202,7 @@ export default function Leads({ refreshKey, search = '' }) {
 
       {/* Cards */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {filtered.map(lead => {
+        {visible.map(lead => {
           const [avA, avB] = getGradient(lead.name || '')
           const callCount = (lead.call_notes || []).length
           const statusKey = lead.status || 'new'
@@ -288,6 +295,15 @@ export default function Leads({ refreshKey, search = '' }) {
       </div>
       {!loading && filtered.length === 0 && (
         <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Нет лидов</div>
+      )}
+      {!loading && visible.length < totalFiltered && (
+        <button onClick={() => setPage(p => p + 1)} style={{
+          margin: '8px 0 20px', width: '100%', height: 44, borderRadius: 13,
+          border: '1px solid rgba(14,23,38,0.12)', background: 'transparent',
+          cursor: 'pointer', fontFamily: 'Manrope', fontSize: 14, fontWeight: 600, color: '#5A6573',
+        }}>
+          Загрузить ещё ({totalFiltered - visible.length} из {totalFiltered})
+        </button>
       )}
 
       {/* Edit modal */}
