@@ -63,6 +63,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   if (statusFilter !== 'all') filtered = filtered.filter(o => o.status === statusFilter)
   if (payFilter === 'clientUnpaid') filtered = filtered.filter(o => !o.client_paid)
   if (payFilter === 'carrierUnpaid') filtered = filtered.filter(o => !o.carrier_paid)
+  if (payFilter === 'debt') filtered = filtered.filter(o => o.client_paid && !o.carrier_paid)
   if (docFilters.length > 0) filtered = filtered.filter(o => docFilters.every(f => o[f]))
   if (search) {
     const q = search.toLowerCase()
@@ -102,6 +103,12 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           background: payFilter === 'carrierUnpaid' ? 'rgba(124,58,237,0.15)' : 'rgba(14,23,38,0.06)',
           color: payFilter === 'carrierUnpaid' ? '#7C3AED' : '#5A6573',
         }}>Не оплачено перевозчику</button>
+        <button onClick={() => setPayFilter(payFilter === 'debt' ? null : 'debt')} style={{
+          padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer',
+          fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
+          background: payFilter === 'debt' ? 'rgba(217,119,6,0.15)' : 'rgba(14,23,38,0.06)',
+          color: payFilter === 'debt' ? '#D97706' : '#5A6573',
+        }}>Долг перевозчику</button>
 
         <div style={{ flex: 1 }} />
 
