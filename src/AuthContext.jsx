@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { login as apiLogin, setToken, getToken } from './api';
+import { login as apiLogin, setToken, getToken, pingServer } from './api';
 
 const AuthContext = createContext(null);
 
@@ -8,6 +8,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    pingServer(); // wake Render immediately
     const t = getToken();
     if (t) {
       const saved = localStorage.getItem('crm_user');

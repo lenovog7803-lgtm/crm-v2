@@ -369,24 +369,32 @@ function DebtModal({ title, orders, onClose, onOpenOrder }) {
   )
 }
 
-export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMonthsLoaded }) {
-  const [allOrders, setAllOrders] = useState([])
+export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMonthsLoaded, preloadedOrders }) {
+  const [allOrders, setAllOrders] = useState(preloadedOrders || [])
   const [apiData, setApiData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showDebtors, setShowDebtors] = useState(false)
   const [showCarrierDebt, setShowCarrierDebt] = useState(false)
 
-  // Load all orders once
+  // Use preloaded orders if available, otherwise fetch
   useEffect(() => {
-    getOrders({ limit: 2000 }).then(r => {
-      const arr = Array.isArray(r) ? r : (r?.orders || r?.data || [])
-      setAllOrders(arr)
+    if (preloadedOrders && preloadedOrders.length > 0) {
+      setAllOrders(preloadedOrders)
       const months = [...new Set(
-        arr.map(o => (o.load_date || o.unload_date || '').slice(0, 7)).filter(m => /^\d{4}-\d{2}$/.test(m))
+        preloadedOrders.map(o => (o.unload_date || o.load_date || '').slice(0, 7)).filter(m => /^\d{4}-\d{2}$/.test(m))
       )].sort().reverse()
       onMonthsLoaded && onMonthsLoaded(months)
-    }).catch(() => {})
-  }, [])
+    } else {
+      getOrders({ limit: 2000 }).then(r => {
+        const arr = Array.isArray(r) ? r : (r?.orders || r?.data || [])
+        setAllOrders(arr)
+        const months = [...new Set(
+          arr.map(o => (o.unload_date || o.load_date || '').slice(0, 7)).filter(m => /^\d{4}-\d{2}$/.test(m))
+        )].sort().reverse()
+        onMonthsLoaded && onMonthsLoaded(months)
+      }).catch(() => {})
+    }
+  }, [preloadedOrders])
 
   // Fetch API dashboard when period changes
   useEffect(() => {

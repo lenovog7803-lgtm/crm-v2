@@ -1,4 +1,10 @@
 const BASE = import.meta.env.VITE_API_URL || 'https://logistics-crm-backend.onrender.com/api';
+const ROOT = BASE.replace('/api', '');
+
+// Wake up Render on app start (free tier sleeps after 15 min)
+export function pingServer() {
+  fetch(ROOT + '/health').catch(() => {});
+}
 
 let token = localStorage.getItem('crm_token') || '';
 

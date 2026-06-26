@@ -57,38 +57,32 @@ function MainApp() {
   const [financeKey, setFinanceKey] = useState(0)
   const [leadsKey, setLeadsKey] = useState(0)
 
+  const [allOrders, setAllOrders] = useState([])
+  const [counts, setCounts] = useState({ newOrders: 0, pendingTasks: 0, newLeads: 0 })
+
   useEffect(() => {
     const today = new Date().toISOString().slice(0, 10)
     Promise.all([
-      getOrders({ limit: 500 }).catch(() => []),
+      getOrders({ limit: 2000 }).catch(() => []),
       getTasks().catch(() => []),
-    ]).then(([orders, tasks]) => {
-      const overdueOrders = (Array.isArray(orders) ? orders : [])
+    ]).then(([ordersRaw, tasks]) => {
+      const orders = Array.isArray(ordersRaw) ? ordersRaw : (ordersRaw?.orders || [])
+      setAllOrders(orders)
+
+      const overdueOrders = orders
         .filter(o => o.unload_date && o.unload_date < today && o.status !== 'done' && o.status !== 'cancelled')
         .map(o => ({ type: 'order', id: o.id, label: `Заявка ${o.order_number || o.id}: ${o.route_from || ''} → ${o.route_to || ''}`, date: o.unload_date }))
       const overdueTasks = (Array.isArray(tasks) ? tasks : [])
         .filter(t => t.due_date && t.due_date < today && t.status !== 'done')
         .map(t => ({ type: 'task', id: t.id, label: t.title || t.description || 'Задача', date: t.due_date }))
       setOverdueItems([...overdueOrders, ...overdueTasks].sort((a, b) => a.date.localeCompare(b.date)))
+
+      const newOrders = orders.filter(o => o.status === 'new').length
+      const pendingTasks = (Array.isArray(tasks) ? tasks : []).filter(t => t.status === 'pending').length
+      setCounts(c => ({ ...c, newOrders, pendingTasks }))
     })
-  }, [ordersKey, tasksKey])
-
-  // Sidebar counts from dashboard
-  const [counts, setCounts] = useState({ newOrders: 0, pendingTasks: 0, newLeads: 0 })
-
-  useEffect(() => {
     getDashboard('all').then(d => {
-      setCounts({
-        newOrders: d.status_breakdown?.new || 0,
-        pendingTasks: 0,
-        newLeads: d.new_leads || 0,
-      })
-    }).catch(() => {})
-    getTasks().then(tasks => {
-      if (Array.isArray(tasks)) {
-        const pending = tasks.filter(t => t.status === 'pending').length
-        setCounts(c => ({ ...c, pendingTasks: pending }))
-      }
+      setCounts(c => ({ ...c, newLeads: d.new_leads || 0 }))
     }).catch(() => {})
   }, [ordersKey, tasksKey])
 
@@ -127,7 +121,7 @@ function MainApp() {
         <main className="app-main">
           <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={setSearch} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} />
           <div className="scroll-area" key={page}>
-            {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} onMonthsLoaded={setAvailableMonths} />}
+            {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} onMonthsLoaded={setAvailableMonths} preloadedOrders={allOrders} />}
 
             {page === 'orders' && (
               <Orders
