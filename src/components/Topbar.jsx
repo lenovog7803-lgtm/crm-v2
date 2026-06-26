@@ -64,7 +64,7 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
       </div>
 
       {/* Search */}
-      <div style={{ position: 'relative', width: 300 }}>
+      <div className="topbar-search" style={{ position: 'relative', width: 300 }}>
         <svg style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: '#A6AEB8' }} width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="11" cy="11" r="8"/>
           <line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -87,6 +87,7 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
       {/* Period — only on dashboard */}
       {page === 'dashboard' && (
         <select
+          className="topbar-period"
           value={period}
           onChange={e => onPeriodChange && onPeriodChange(e.target.value)}
           style={{
@@ -105,6 +106,7 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
 
       {/* Trash */}
       <button
+        className="topbar-trash"
         onClick={() => onNav && onNav('trash')}
         title="Корзина"
         style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', color: '#5A6573', padding: 6, borderRadius: 10 }}
@@ -195,7 +197,7 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
 
       {/* Sign out */}
       {onSignOut && (
-        <button onClick={onSignOut} title="Выйти" style={{
+        <button className="topbar-signout" onClick={onSignOut} title="Выйти" style={{
           background: 'rgba(14,23,38,0.06)', border: 'none', cursor: 'pointer',
           color: '#8A93A0', padding: 8, borderRadius: 10,
           display: 'flex', alignItems: 'center', justifyContent: 'center',

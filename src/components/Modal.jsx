@@ -3,20 +3,21 @@ import React from 'react'
 export function ModalOverlay({ onClose, children }) {
   return (
     <div
+      className="modal-overlay"
       style={{
         position: 'fixed', inset: 0,
         background: 'rgba(14,23,38,0.4)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
-        zIndex: 100,
+        zIndex: 1000,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: 24,
         animation: 'rise 0.2s ease both',
       }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div style={{
-        background: 'rgba(255,255,255,0.95)',
+      <div className="modal-panel" style={{
+        background: 'rgba(255,255,255,0.97)',
         backdropFilter: 'blur(24px) saturate(180%)',
         borderRadius: 24,
         padding: 32,

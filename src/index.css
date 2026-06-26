@@ -125,3 +125,62 @@ body { font-family: Manrope, sans-serif; background: #EDEFF3; -webkit-font-smoot
   padding: 16px 0 16px 0;
   animation: rise 0.3s ease both;
 }
+
+/* Mobile nav hidden on desktop */
+.mobile-nav { display: none !important; }
+
+/* ── Mobile ─────────────────────────────────── */
+@media (max-width: 768px) {
+  .mobile-nav { display: flex !important; }
+  .app-frame {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .desktop-sidebar {
+    display: none !important;
+  }
+
+  .scroll-area {
+    padding: 8px 0 76px;
+  }
+
+  /* grids → single column */
+  .detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .dashboard-stat-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .dashboard-big-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* topbar: hide non-essential */
+  .topbar-search { display: none !important; }
+  .topbar-period { display: none !important; }
+  .topbar-signout { display: none !important; }
+  .topbar-trash { display: none !important; }
+
+  /* modals → bottom sheet */
+  .modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+  .modal-panel {
+    border-radius: 24px 24px 0 0 !important;
+    max-height: 92dvh !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 24px 20px 32px !important;
+  }
+
+  /* orders filter wrap */
+  .orders-filter-bar {
+    flex-wrap: wrap;
+    gap: 6px !important;
+  }
+
+  /* cards full width */
+  .card { border-radius: 16px; }
+}

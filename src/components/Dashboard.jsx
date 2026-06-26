@@ -422,7 +422,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
     <div style={{ padding: '0 2px', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
       {/* Hero row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 1fr', gap: 16 }}>
+      <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 1fr', gap: 16 }}>
         {/* Dark: margin */}
         <div style={{
           background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)',
@@ -509,7 +509,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       </div>
 
       {/* KPI strip */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+      <div className="dashboard-stat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
         {[
           { label: 'Активных заявок', value: active, color: '#1366F0', bg: 'rgba(19,102,240,0.08)' },
           { label: 'Доставлено', value: done, color: '#1E9E5A', bg: 'rgba(30,158,90,0.08)' },
@@ -550,7 +550,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       </div>
 
       {/* Bottom 3-col */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+      <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
         {/* Top clients */}
         <div className="card" style={{ padding: '20px 20px' }}>
           <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 4 }}>Топ клиентов</div>

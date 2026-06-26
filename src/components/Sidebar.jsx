@@ -104,7 +104,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   const userInitials = initials(userName)
 
   return (
-    <aside style={{
+    <aside className="desktop-sidebar" style={{
       width: expanded ? 240 : 68,
       minWidth: expanded ? 240 : 68,
       transition: 'width 0.2s ease, min-width 0.2s ease',

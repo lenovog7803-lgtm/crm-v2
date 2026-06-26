@@ -24,6 +24,7 @@ import CreateTaskModal from './components/CreateTaskModal'
 import AddClientModal from './components/AddClientModal'
 import AddCarrierModal from './components/AddCarrierModal'
 import PaymentModal from './components/PaymentModal'
+import MobileNav from './components/MobileNav'
 
 function MainApp() {
   const { signOut } = useAuth()
@@ -199,6 +200,8 @@ function MainApp() {
           </div>
         </main>
       </div>
+
+      <MobileNav page={page} onNav={handleNav} counts={counts} />
 
       {/* Modals */}
       {showOrderModal && (

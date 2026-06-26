@@ -320,7 +320,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 16, alignItems: 'start' }}>
+      <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 16, alignItems: 'start' }}>
         {/* LEFT COLUMN */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {/* Hero dark card */}

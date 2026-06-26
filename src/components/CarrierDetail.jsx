@@ -98,7 +98,7 @@ export default function CarrierDetail({ carrierId, onBack, onDelete, onOpenOrder
         )}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+      <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
         <div className="card" style={{ padding: '20px 22px' }}>
           <div className="section-label" style={{ marginBottom: 10 }}>ИНФОРМАЦИЯ</div>
           <Row label="УНП" value={carrier.unp} mono />
