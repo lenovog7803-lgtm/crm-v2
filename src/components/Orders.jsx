@@ -103,13 +103,6 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           background: payFilter === 'carrierUnpaid' ? 'rgba(124,58,237,0.15)' : 'rgba(14,23,38,0.06)',
           color: payFilter === 'carrierUnpaid' ? '#7C3AED' : '#5A6573',
         }}>Не оплачено перевозчику</button>
-        <button onClick={() => setPayFilter(payFilter === 'debt' ? null : 'debt')} style={{
-          padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer',
-          fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
-          background: payFilter === 'debt' ? 'rgba(217,119,6,0.15)' : 'rgba(14,23,38,0.06)',
-          color: payFilter === 'debt' ? '#D97706' : '#5A6573',
-        }}>Долг перевозчику</button>
-
         <div style={{ flex: 1 }} />
 
         {/* Doc filter */}
@@ -163,11 +156,41 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           )}
         </div>
 
-        <button className="btn-primary" onClick={onAddOrder}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        {/* Долг перевозчику */}
+        <button onClick={() => setPayFilter(payFilter === 'debt' ? null : 'debt')} title="Долг перевозчику: клиент оплатил, перевозчику нет" style={{
+          width: 34, height: 34, borderRadius: 11, border: 'none', cursor: 'pointer', flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: payFilter === 'debt'
+            ? 'rgba(217,119,6,0.18)'
+            : 'rgba(255,255,255,0.55)',
+          backdropFilter: 'blur(12px) saturate(160%)',
+          boxShadow: payFilter === 'debt'
+            ? '0 0 0 1.5px rgba(217,119,6,0.45), inset 0 1px 0 rgba(255,255,255,0.4)'
+            : '0 1px 3px rgba(14,23,38,0.1), inset 0 1px 0 rgba(255,255,255,0.7)',
+          color: payFilter === 'debt' ? '#D97706' : '#8A93A0',
+          transition: 'all 0.2s',
+        }}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+          </svg>
+        </button>
+
+        {/* Новая заявка — liquid glass + */}
+        <button onClick={onAddOrder} title="Новая заявка" style={{
+          width: 34, height: 34, borderRadius: 11, border: 'none', cursor: 'pointer', flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(19,102,240,0.12)',
+          backdropFilter: 'blur(12px) saturate(160%)',
+          boxShadow: '0 1px 3px rgba(14,23,38,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
+          color: '#1366F0',
+          transition: 'all 0.2s',
+        }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(19,102,240,0.22)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(19,102,240,0.25), inset 0 1px 0 rgba(255,255,255,0.5)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(19,102,240,0.12)'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(14,23,38,0.1), inset 0 1px 0 rgba(255,255,255,0.5)' }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round">
             <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          Новая заявка
         </button>
       </div>
 
