@@ -101,21 +101,23 @@ export default function CarrierDetail({ carrierId, onBack, onDelete, onOpenOrder
       <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
         <div className="card" style={{ padding: '20px 22px' }}>
           <div className="section-label" style={{ marginBottom: 10 }}>ИНФОРМАЦИЯ</div>
-          <Row label="УНП" value={carrier.unp} mono />
-          <Row label="Юр. адрес" value={carrier.legal_address || carrier.address} />
+          <Row label="УНП" value={carrier.unp || carrier.inn} mono />
+          <Row label="Директор" value={carrier.director} />
+          <Row label="Основание" value={carrier.basis} />
+          <Row label="Юр. адрес" value={carrier.address || carrier.legal_address} />
           <Row label="Почтовый адрес" value={carrier.postal_address} />
           <Row label="Грузоподъёмность" value={cap} />
           <Row label="Тип ТС" value={carrier.vehicle_type} />
-          <Row label="Номер ТС" value={carrier.plate} mono />
+          <Row label="Номер ТС" value={carrier.plate && !/^\d+\.?\d*$/.test(carrier.plate) ? carrier.plate : null} mono />
           <Row label="Регионы" value={carrier.regions} />
           <Row label="Груз" value={carrier.cargo_types} />
         </div>
 
         <div className="card" style={{ padding: '20px 22px' }}>
           <div className="section-label" style={{ marginBottom: 10 }}>БАНКОВСКИЕ РЕКВИЗИТЫ</div>
-          <Row label="Банк" value={carrier.bank_name || carrier.bank} />
-          <Row label="Р/С" value={carrier.bank_account || carrier.rs} mono />
-          <Row label="БИК" value={carrier.bank_bic || carrier.bank_bik || carrier.bik} mono />
+          <Row label="Банк" value={carrier.bank || carrier.bank_name} />
+          <Row label="Р/С" value={carrier.rs || carrier.bank_account} mono />
+          <Row label="БИК" value={carrier.bik || carrier.bank_bik || carrier.bank_bic} mono />
           {carrier.email && <Row label="Email" value={carrier.email} />}
           {carrier.notes && <Row label="Примечания" value={carrier.notes} />}
         </div>
