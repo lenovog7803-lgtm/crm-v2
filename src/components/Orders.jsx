@@ -17,9 +17,11 @@ const DOC_FILTER_OPTIONS = [
 export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '' }) {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [payFilter, setPayFilter] = useState(null)
-  const [docFilters, setDocFilters] = useState([])
+  const [statusFilter, setStatusFilter] = useState(() => localStorage.getItem('orders_statusFilter') || 'all')
+  const [payFilter, setPayFilter] = useState(() => localStorage.getItem('orders_payFilter') || null)
+  const [docFilters, setDocFilters] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('orders_docFilters') || '[]') } catch { return [] }
+  })
   const [showDocFilter, setShowDocFilter] = useState(false)
   const isMobile = useIsMobile()
 
@@ -31,6 +33,9 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
       .finally(() => setLoading(false))
   }, [refreshKey])
 
+  useEffect(() => { localStorage.setItem('orders_statusFilter', statusFilter) }, [statusFilter])
+  useEffect(() => { localStorage.setItem('orders_payFilter', payFilter || '') }, [payFilter])
+  useEffect(() => { localStorage.setItem('orders_docFilters', JSON.stringify(docFilters)) }, [docFilters])
 
   const handleDelete = async (e, id) => {
     e.stopPropagation()
