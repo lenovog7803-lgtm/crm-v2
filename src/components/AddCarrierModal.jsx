@@ -10,8 +10,9 @@ const sectionLabel = {
 export default function AddCarrierModal({ onClose, onSuccess }) {
   const [form, setForm] = useState({
     company_name: '', driver_name: '', phone: '', unp: '',
-    legal_address: '', postal_address: '',
-    bank_name: '', bank_account: '', bank_bic: '', bank_iban: '',
+    director: '', basis: 'Устава',
+    address: '', postal_address: '',
+    bank: '', rs: '', bik: '',
     capacity_tons: '', vehicle_type: '', plate: '', regions: '',
   })
   const [loading, setLoading] = useState(false)
@@ -68,10 +69,21 @@ export default function AddCarrierModal({ onClose, onSuccess }) {
               <label className="form-label">УНП</label>
               <input className="form-input" placeholder="100000000" value={form.unp} onChange={e => set('unp', e.target.value)} />
             </div>
+            <div className="form-field">
+              <label className="form-label">ОСНОВАНИЕ</label>
+              <select className="form-input" value={form.basis} onChange={e => set('basis', e.target.value)}>
+                <option value="Устава">Устава</option>
+                <option value="Свидетельства о гос. регистрации">Свидетельства о гос. регистрации</option>
+              </select>
+            </div>
+          </div>
+          <div className="form-field">
+            <label className="form-label">ДИРЕКТОР</label>
+            <input className="form-input" placeholder="Иванов Иван Иванович" value={form.director} onChange={e => set('director', e.target.value)} />
           </div>
           <div className="form-field">
             <label className="form-label">ЮРИДИЧЕСКИЙ АДРЕС</label>
-            <input className="form-input" placeholder="220000, г. Минск, ул. Ленина, д. 1" value={form.legal_address} onChange={e => set('legal_address', e.target.value)} />
+            <input className="form-input" placeholder="220000, г. Минск, ул. Ленина, д. 1" value={form.address} onChange={e => set('address', e.target.value)} />
           </div>
           <div className="form-field">
             <label className="form-label">ПОЧТОВЫЙ АДРЕС</label>
@@ -84,16 +96,16 @@ export default function AddCarrierModal({ onClose, onSuccess }) {
           <div style={sectionLabel}>БАНКОВСКИЕ РЕКВИЗИТЫ</div>
           <div className="form-field">
             <label className="form-label">БАНК</label>
-            <input className="form-input" placeholder="ОАО «АСБ Беларусбанк»" value={form.bank_name} onChange={e => set('bank_name', e.target.value)} />
+            <input className="form-input" placeholder="ОАО «АСБ Беларусбанк»" value={form.bank} onChange={e => set('bank', e.target.value)} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div className="form-field">
-              <label className="form-label">Р/С (СЧЁТ)</label>
-              <input className="form-input" placeholder="BY12 BAPB 3012 1234 5678 9000 0000" value={form.bank_account} onChange={e => set('bank_account', e.target.value)} />
+              <label className="form-label">Р/С</label>
+              <input className="form-input" placeholder="BY12 BAPB 3012 1234 5678 9000 0000" value={form.rs} onChange={e => set('rs', e.target.value)} />
             </div>
             <div className="form-field">
               <label className="form-label">БИК</label>
-              <input className="form-input" placeholder="BAPBBY2X" value={form.bank_bic} onChange={e => set('bank_bic', e.target.value)} />
+              <input className="form-input" placeholder="BAPBBY2X" value={form.bik} onChange={e => set('bik', e.target.value)} />
             </div>
           </div>
         </div>
