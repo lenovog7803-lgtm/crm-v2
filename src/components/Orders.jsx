@@ -174,7 +174,6 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           </div>
         )}
       </div>
-      </div>
 
       {/* Mobile: iOS-style grouped list */}
       {isMobile ? (
