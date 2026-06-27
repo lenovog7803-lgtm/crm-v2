@@ -418,8 +418,10 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
 
   const netProfit = margin * 0.85
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+
   return (
-    <div style={{ padding: '0 2px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={{ padding: isMobile ? 0 : '0 2px', display: 'flex', flexDirection: 'column', gap: isMobile ? 10 : 16 }}>
 
       {/* Hero row */}
       <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 1fr', gap: 16 }}>

@@ -198,62 +198,75 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
         </div>
       </div>
 
-      {/* Mobile: card list */}
+      {/* Mobile: iOS-style grouped list */}
       {isMobile ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {loading && <div className="card" style={{ padding: 32, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>}
-          {!loading && filtered.map(order => {
-            const margin = (order.client_rate || 0) - (order.carrier_rate || 0)
-            const marginPct = order.client_rate > 0 ? Math.round(margin / order.client_rate * 100) : 0
-            const route = order.route_from && order.route_to ? `${order.route_from} → ${order.route_to}` : (order.route || '—')
-            const overdue = isOverdue(order)
-            return (
-              <div key={order.id} className="card" onClick={() => onOpenOrder(order.id)} style={{
-                padding: '14px 16px', cursor: 'pointer',
-                borderLeft: overdue ? '3px solid rgba(200,25,35,0.6)' : '3px solid transparent',
-                background: overdue ? 'rgba(200,25,35,0.04)' : 'rgba(255,255,255,0.6)',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontFamily: 'JetBrains Mono', fontWeight: 600, fontSize: 13, color: '#1366F0' }}>
-                      {order.order_number || order.id}
-                    </span>
-                    <span style={{
-                      padding: '2px 8px', borderRadius: 6,
-                      background: statusBg(order.status), color: statusColor(order.status),
-                      fontSize: 11, fontWeight: 600,
-                    }}>{statusLabel(order.status)}</span>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontWeight: 700, fontSize: 14, color: '#0E1726' }}>{margin.toLocaleString('ru-RU')}</div>
-                    <div style={{ fontSize: 11, color: '#A6AEB8' }}>{marginPct}%</div>
-                  </div>
-                </div>
-                <div style={{ fontSize: 13.5, fontWeight: 600, color: '#0E1726', marginBottom: 4 }}>{route}</div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ fontSize: 12, color: '#8A93A0' }}>
-                    {order.client_name || '—'}{order.load_date ? ` · ${order.load_date}` : ''}
-                  </div>
-                  <div style={{ display: 'flex', gap: 4 }}>
-                    <span style={{
-                      width: 24, height: 24, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 10, fontWeight: 700,
-                      background: order.client_paid ? 'rgba(30,158,90,0.15)' : 'rgba(14,23,38,0.07)',
-                      color: order.client_paid ? '#1E9E5A' : '#A6AEB8',
-                    }}>К</span>
-                    <span style={{
-                      width: 24, height: 24, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 10, fontWeight: 700,
-                      background: order.carrier_paid ? 'rgba(124,58,237,0.15)' : 'rgba(14,23,38,0.07)',
-                      color: order.carrier_paid ? '#7C3AED' : '#A6AEB8',
-                    }}>П</span>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {loading && (
+            <div style={{ padding: 40, textAlign: 'center', color: '#8E8E93', fontSize: 14 }}>Загрузка...</div>
+          )}
           {!loading && filtered.length === 0 && (
-            <div className="card" style={{ padding: '40px', textAlign: 'center', color: '#A6AEB8', fontSize: 14 }}>Нет заявок</div>
+            <div style={{ padding: 40, textAlign: 'center', color: '#8E8E93', fontSize: 14 }}>Нет заявок</div>
+          )}
+          {!loading && (
+            <div className="card" style={{ overflow: 'hidden', padding: 0 }}>
+              {filtered.map((order, i) => {
+                const margin = (order.client_rate || 0) - (order.carrier_rate || 0)
+                const route = order.route_from && order.route_to ? `${order.route_from} → ${order.route_to}` : (order.route || '—')
+                const overdue = isOverdue(order)
+                return (
+                  <div
+                    key={order.id}
+                    onClick={() => onOpenOrder(order.id)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12,
+                      padding: '13px 16px',
+                      borderBottom: i < filtered.length - 1 ? '0.5px solid rgba(14,23,38,0.1)' : 'none',
+                      background: overdue ? 'rgba(200,25,35,0.03)' : 'transparent',
+                      cursor: 'pointer',
+                      WebkitTapHighlightColor: 'rgba(14,23,38,0.06)',
+                    }}
+                    onTouchStart={e => e.currentTarget.style.background = 'rgba(14,23,38,0.05)'}
+                    onTouchEnd={e => e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.03)' : 'transparent'}
+                  >
+                    {/* Status dot */}
+                    <div style={{
+                      width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
+                      background: statusColor(order.status),
+                      boxShadow: `0 0 0 3px ${statusBg(order.status)}`,
+                    }} />
+                    {/* Main info */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                        <span style={{ fontFamily: 'JetBrains Mono', fontWeight: 600, fontSize: 13, color: '#1366F0' }}>
+                          {order.order_number || order.id}
+                        </span>
+                        {overdue && <span style={{ fontSize: 10, color: '#C81923', fontWeight: 700 }}>ПРОСРОЧЕНО</span>}
+                      </div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: '#0E1726', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{route}</div>
+                      <div style={{ fontSize: 12, color: '#8E8E93' }}>
+                        {order.client_name || '—'}
+                        {order.load_date ? ` · ${order.load_date}` : ''}
+                      </div>
+                    </div>
+                    {/* Right: margin + chevron */}
+                    <div style={{ flexShrink: 0, textAlign: 'right', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: margin < 0 ? '#C81923' : '#0E1726' }}>
+                          {margin.toLocaleString('ru-RU')}
+                        </div>
+                        <div style={{ display: 'flex', gap: 3, justifyContent: 'flex-end', marginTop: 3 }}>
+                          <span style={{ width: 18, height: 18, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, background: order.client_paid ? 'rgba(30,158,90,0.15)' : 'rgba(14,23,38,0.07)', color: order.client_paid ? '#1E9E5A' : '#C4CAD4' }}>К</span>
+                          <span style={{ width: 18, height: 18, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, background: order.carrier_paid ? 'rgba(124,58,237,0.15)' : 'rgba(14,23,38,0.07)', color: order.carrier_paid ? '#7C3AED' : '#C4CAD4' }}>П</span>
+                        </div>
+                      </div>
+                      <svg width="8" height="13" viewBox="0 0 8 13" fill="none">
+                        <path d="M1 1.5L6.5 7L1 12.5" stroke="#C4CAD4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           )}
         </div>
       ) : (

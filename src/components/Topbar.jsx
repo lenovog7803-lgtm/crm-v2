@@ -47,7 +47,7 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
   const extraMonths = availableMonths.filter(m => !fixedIds.has(m))
 
   return (
-    <div style={{
+    <div className="topbar-mobile" style={{
       display: 'flex', alignItems: 'center', gap: 16,
       padding: '14px 20px',
       background: 'rgba(255,255,255,0.55)',
