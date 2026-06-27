@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, createPaymentIn, createPaymentOut, syncOrderDocUrls } from '../api'
+import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, createPaymentIn, createPaymentOut, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct } from '../api'
 import { fmtMoney, initials, getGradient } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 
@@ -92,6 +92,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
   const [loading, setLoading] = useState(true)
   const [payLoading, setPayLoading] = useState(null)
   const [docsRefreshing, setDocsRefreshing] = useState(false)
+  const [docLoading, setDocLoading] = useState({})
   const [draft, setDraft] = useState({})
   const [saving, setSaving] = useState(false)
   const [savedOk, setSavedOk] = useState(false)
@@ -112,6 +113,29 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
       .finally(() => {
         getOrder(orderId).then(setOrder).catch(console.error).finally(() => setDocsRefreshing(false))
       })
+  }
+
+  const handleGenerate = async (type) => {
+    console.log('[DOC] Generating type:', type, 'for order:', orderId)
+    setDocLoading(prev => ({ ...prev, [type]: true }))
+    try {
+      const fn = type === 'client' ? generateClientDoc : type === 'carrier' ? generateCarrierDoc : generateAct
+      const result = await fn(orderId)
+      console.log('[DOC] Result:', result)
+      const url = result?.url || result?.doc_url || result?.link
+      if (url) {
+        const field = type === 'client' ? 'doc_url_client' : type === 'carrier' ? 'doc_url_carrier' : 'doc_url_act'
+        setOrder(prev => ({ ...prev, [field]: url }))
+        window.open(url, '_blank')
+      } else {
+        console.error('[DOC] No URL in result:', result)
+        alert('Документ создан, но URL не получен')
+      }
+    } catch (e) {
+      console.error('[DOC] Error:', e)
+      alert('Ошибка генерации: ' + (e.message || e))
+    }
+    setDocLoading(prev => ({ ...prev, [type]: false }))
   }
 
   if (loading) return <div style={{ padding: 60, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>
@@ -593,29 +617,54 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
-                { label: `Заявка-договор ${order.order_number || ''}`, color: '#1366F0', bg: 'rgba(19,102,240,0.1)', url: order.doc_url_client },
-                { label: 'Акт выполненных работ', color: '#1E9E5A', bg: 'rgba(30,158,90,0.1)', url: order.doc_url_act },
-                { label: 'Заявка перевозчику', color: '#D97706', bg: 'rgba(217,119,6,0.1)', url: order.doc_url_carrier },
+                { type: 'client',  label: `Заявка-договор ${order.order_number || ''}`, color: '#1366F0', bg: 'rgba(19,102,240,0.1)', url: order.doc_url_client },
+                { type: 'act',     label: 'Акт выполненных работ',  color: '#1E9E5A', bg: 'rgba(30,158,90,0.1)',  url: order.doc_url_act },
+                { type: 'carrier', label: 'Заявка перевозчику',     color: '#D97706', bg: 'rgba(217,119,6,0.1)', url: order.doc_url_carrier },
               ].map(doc => (
-                <a key={doc.label} href={doc.url || '#'} target={doc.url ? '_blank' : undefined} rel="noopener noreferrer"
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none',
-                    padding: '10px 12px', borderRadius: 12, background: doc.bg,
-                    cursor: doc.url ? 'pointer' : 'default', opacity: doc.url ? 1 : 0.4,
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={doc.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
-                  </svg>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: doc.color }}>{doc.label}</span>
-                  {doc.url && (
-                    <svg style={{ marginLeft: 'auto' }} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={doc.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                      <polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
+                <div key={doc.type} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <a href={doc.url || '#'} target={doc.url ? '_blank' : undefined} rel="noopener noreferrer"
+                    style={{
+                      flex: 1, display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none',
+                      padding: '10px 12px', borderRadius: 12, background: doc.bg,
+                      cursor: doc.url ? 'pointer' : 'default', opacity: doc.url ? 1 : 0.5,
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={doc.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
                     </svg>
-                  )}
-                </a>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: doc.color, flex: 1 }}>{doc.label}</span>
+                    {doc.url && (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={doc.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                        <polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
+                      </svg>
+                    )}
+                  </a>
+                  <button
+                    onClick={() => handleGenerate(doc.type)}
+                    disabled={!!docLoading[doc.type]}
+                    title={doc.url ? 'Перегенерировать' : 'Создать документ'}
+                    style={{
+                      flexShrink: 0, height: 38, padding: '0 12px', borderRadius: 11, border: 'none',
+                      cursor: docLoading[doc.type] ? 'wait' : 'pointer',
+                      background: doc.bg, color: doc.color,
+                      fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 700,
+                      display: 'flex', alignItems: 'center', gap: 5,
+                    }}
+                  >
+                    {docLoading[doc.type] ? (
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: 'spin 0.8s linear infinite' }}>
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                      </svg>
+                    ) : (
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                      </svg>
+                    )}
+                    {doc.url ? 'Пересоздать' : 'Создать'}
+                  </button>
+                </div>
               ))}
             </div>
           </div>
