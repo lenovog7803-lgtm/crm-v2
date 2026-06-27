@@ -37,25 +37,6 @@ const TYPE_ICONS = {
   ),
 }
 
-function daysLeft(deletedAt) {
-  if (!deletedAt) return 30
-  const ms = 30 * 24 * 60 * 60 * 1000 - (Date.now() - new Date(deletedAt).getTime())
-  return Math.max(0, Math.ceil(ms / (24 * 60 * 60 * 1000)))
-}
-
-function itemTitle(item) {
-  if (item._collection === 'orders') {
-    const num = item.order_number ? `${item.order_number}` : `#${String(item.id).slice(-6).toUpperCase()}`
-    const route = item.route_from && item.route_to ? ` · ${item.route_from} → ${item.route_to}` : ''
-    const client = item.client_name ? ` · ${item.client_name}` : ''
-    return `Заявка ${num}${route || client}`
-  }
-  if (item._collection === 'tasks') return item.title || item.description || 'Задача'
-  if (item._collection === 'clients') return item.company_name || item.name || item.client_name || 'Клиент'
-  if (item._collection === 'carriers') return item.company_name || item.name || item.carrier_name || 'Перевозчик'
-  return item.name || item.title || item.description || item.company_name || item.id
-}
-
 export default function Trash() {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -70,14 +51,14 @@ export default function Trash() {
   const handleRestore = async (item) => {
     setRestoring(item.id)
     try {
-      await restoreTrash(item._collection, item.id)
+      await restoreTrash(item.collection, item.id)
       setItems(prev => prev.filter(i => i.id !== item.id))
     } catch (e) { console.error(e) }
     setRestoring(null)
   }
 
-  const filtered = filter === 'all' ? items : items.filter(i => i._collection === filter)
-  const counts = items.reduce((acc, i) => { acc[i._collection] = (acc[i._collection] || 0) + 1; return acc }, {})
+  const filtered = filter === 'all' ? items : items.filter(i => i.collection === filter)
+  const counts = items.reduce((acc, i) => { acc[i.collection] = (acc[i.collection] || 0) + 1; return acc }, {})
 
   const chipStyle = (k) => ({
     padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer',
@@ -122,7 +103,7 @@ export default function Trash() {
           </div>
         )}
         {!loading && filtered.map((item, i) => {
-          const days = daysLeft(item.deleted_at)
+          const days = item.days_left ?? 30
           const urgent = days <= 3
           return (
             <div key={item.id} style={{
@@ -134,14 +115,14 @@ export default function Trash() {
                 background: 'rgba(200,25,35,0.08)', color: '#C81923',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                {TYPE_ICONS[item._collection] || TYPE_ICONS.tasks}
+                {TYPE_ICONS[item.collection] || TYPE_ICONS.tasks}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13.5, fontWeight: 600, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {itemTitle(item)}
+                  {item.label || item.id}
                 </div>
                 <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 2 }}>
-                  {TYPE_LABELS[item._collection] || item._collection}
+                  {TYPE_LABELS[item.collection] || item.collection}
                   {item.deleted_at && ` · Удалено ${new Date(item.deleted_at).toLocaleDateString('ru-RU')}`}
                 </div>
               </div>
