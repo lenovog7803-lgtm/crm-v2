@@ -60,14 +60,14 @@ export const deleteOrder = (id) => req(`/orders/${id}`, { method: 'DELETE' });
 export const getClients = (search) => req('/clients' + (search ? `?search=${search}` : ''));
 export const getClient = (id) => req(`/clients/${id}`);
 export const createClient = (data) => req('/clients', { method: 'POST', body: JSON.stringify(data) });
-export const updateClient = (id, data) => req(`/clients/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const updateClient = (id, data) => req(`/clients/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const deleteClient = (id) => req(`/clients/${id}`, { method: 'DELETE' });
 
 // Carriers
 export const getCarriers = (search) => req('/carriers' + (search ? `?search=${search}` : ''));
 export const getCarrier = (id) => req(`/carriers/${id}`);
 export const createCarrier = (data) => req('/carriers', { method: 'POST', body: JSON.stringify(data) });
-export const updateCarrier = (id, data) => req(`/carriers/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const updateCarrier = (id, data) => req(`/carriers/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const deleteCarrier = (id) => req(`/carriers/${id}`, { method: 'DELETE' });
 
 // Tasks
