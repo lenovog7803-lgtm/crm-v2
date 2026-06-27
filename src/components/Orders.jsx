@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { getOrders, deleteOrder as apiDelete } from '../api'
 import { initials, statusLabel, statusColor, statusBg, getGradient } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
@@ -17,8 +17,6 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   const [payFilter, setPayFilter] = useState(null)
   const [docFilters, setDocFilters] = useState([])
   const [showDocFilter, setShowDocFilter] = useState(false)
-  const [docDropPos, setDocDropPos] = useState(null)
-  const docBtnRef = useRef(null)
   const isMobile = useIsMobile()
 
   useEffect(() => {
@@ -29,17 +27,6 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
       .finally(() => setLoading(false))
   }, [refreshKey])
 
-  // Close doc filter on outside click
-  useEffect(() => {
-    if (!showDocFilter) return
-    const handler = e => {
-      if (docBtnRef.current && !docBtnRef.current.contains(e.target)) {
-        setShowDocFilter(false)
-      }
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [showDocFilter])
 
   const handleDelete = async (e, id) => {
     e.stopPropagation()
@@ -82,9 +69,10 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      {/* Filter bar — horizontal scroll on mobile */}
-      <div className="card" style={{ padding: isMobile ? '10px 12px' : '14px 16px', position: 'relative', zIndex: 10, overflow: 'hidden' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflowX: 'auto', overflowY: 'visible', paddingBottom: 2, scrollbarWidth: 'none' }}>
+      {/* Filter bar */}
+      <div className="card" style={{ padding: isMobile ? '10px 12px' : '14px 16px' }}>
+        {/* Scrollable filter row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
           {statusChips.map(c => (
             <button key={c.key} onClick={() => setStatusFilter(c.key)} style={{
               padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer', flexShrink: 0,
@@ -106,22 +94,12 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
             background: payFilter === 'carrierUnpaid' ? 'rgba(124,58,237,0.15)' : 'rgba(14,23,38,0.06)',
             color: payFilter === 'carrierUnpaid' ? '#7C3AED' : '#5A6573',
           }}>Не оплачено перевозчику</button>
-
-          <div style={{ flex: '0 0 auto', width: 1, height: 20, background: 'rgba(14,23,38,0.1)' }} />
-
-          {/* Doc filter */}
-          <div ref={docBtnRef} style={{ flexShrink: 0 }}>
-          <button onClick={() => {
-            if (!showDocFilter && docBtnRef.current) {
-              const r = docBtnRef.current.getBoundingClientRect()
-              const left = Math.min(r.left, window.innerWidth - 260)
-              setDocDropPos({ top: r.bottom + 6, left: Math.max(left, 8) })
-            }
-            setShowDocFilter(v => !v)
-          }} style={{
-            padding: '7px 14px', borderRadius: 12, cursor: 'pointer',
+          <div style={{ width: 1, height: 20, background: 'rgba(14,23,38,0.1)', flexShrink: 0 }} />
+          {/* Doc filter toggle button */}
+          <button onClick={() => setShowDocFilter(v => !v)} style={{
+            padding: '6px 14px', borderRadius: 12, cursor: 'pointer', flexShrink: 0,
             fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
-            background: docFilters.length > 0 ? 'rgba(19,102,240,0.12)' : 'rgba(14,23,38,0.06)',
+            background: docFilters.length > 0 ? 'rgba(19,102,240,0.12)' : showDocFilter ? 'rgba(14,23,38,0.1)' : 'rgba(14,23,38,0.06)',
             color: docFilters.length > 0 ? '#1366F0' : '#5A6573',
             border: docFilters.length > 0 ? '1px solid rgba(19,102,240,0.3)' : '1px solid transparent',
             display: 'flex', alignItems: 'center', gap: 6,
@@ -131,82 +109,71 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
             </svg>
             Документы {docFilters.length > 0 && `(${docFilters.length})`}
           </button>
-          {showDocFilter && (
-            <div style={{
-              position: 'fixed',
-              top: docDropPos?.top ?? 100,
-              left: docDropPos?.left ?? 8,
-              background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              borderRadius: 16, padding: '8px 4px',
-              border: '1px solid rgba(255,255,255,0.9)',
-              boxShadow: '0 20px 60px rgba(20,30,55,0.15)', zIndex: 9999, minWidth: 250,
-            }}>
-              {DOC_FILTER_OPTIONS.map(f => (
-                <label key={f.key} style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  padding: '9px 14px', cursor: 'pointer', borderRadius: 10,
-                  fontSize: 13, fontWeight: 600, color: '#0E1726',
-                  background: docFilters.includes(f.key) ? 'rgba(19,102,240,0.07)' : 'transparent',
-                  transition: 'background 0.12s',
-                }}>
-                  <input
-                    type="checkbox"
-                    checked={docFilters.includes(f.key)}
-                    onChange={() => toggleDocFilter(f.key)}
-                    style={{ accentColor: '#1366F0', width: 15, height: 15 }}
-                  />
-                  {f.label}
-                </label>
-              ))}
-              {docFilters.length > 0 && (
-                <button onClick={() => setDocFilters([])} style={{
-                  width: '100%', padding: '8px 14px', border: 'none', cursor: 'pointer',
-                  background: 'rgba(200,25,35,0.07)', color: '#C81923',
-                  fontFamily: 'Manrope', fontSize: 12, fontWeight: 600, borderRadius: 10, marginTop: 4,
-                }}>Сбросить фильтр</button>
-              )}
-            </div>
-          )}
-        </div>
-
           {/* Долг перевозчику */}
-        <button onClick={() => setPayFilter(payFilter === 'debt' ? null : 'debt')} title="Долг перевозчику: клиент оплатил, перевозчику нет" style={{
-          width: 34, height: 34, borderRadius: 11, border: 'none', cursor: 'pointer', flexShrink: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: payFilter === 'debt'
-            ? 'rgba(217,119,6,0.18)'
-            : 'rgba(255,255,255,0.55)',
-          backdropFilter: 'blur(12px) saturate(160%)',
-          boxShadow: payFilter === 'debt'
-            ? '0 0 0 1.5px rgba(217,119,6,0.45), inset 0 1px 0 rgba(255,255,255,0.4)'
-            : '0 1px 3px rgba(14,23,38,0.1), inset 0 1px 0 rgba(255,255,255,0.7)',
-          color: payFilter === 'debt' ? '#D97706' : '#8A93A0',
-          transition: 'all 0.2s',
-        }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
-          </svg>
-        </button>
-
-        {/* Новая заявка — liquid glass + */}
-        <button onClick={onAddOrder} title="Новая заявка" style={{
-          width: 34, height: 34, borderRadius: 11, border: 'none', cursor: 'pointer', flexShrink: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: 'rgba(19,102,240,0.12)',
-          backdropFilter: 'blur(12px) saturate(160%)',
-          boxShadow: '0 1px 3px rgba(14,23,38,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
-          color: '#1366F0',
-          transition: 'all 0.2s',
-        }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(19,102,240,0.22)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(19,102,240,0.25), inset 0 1px 0 rgba(255,255,255,0.5)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(19,102,240,0.12)'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(14,23,38,0.1), inset 0 1px 0 rgba(255,255,255,0.5)' }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round">
-            <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-        </button>
+          <button onClick={() => setPayFilter(payFilter === 'debt' ? null : 'debt')} title="Долг перевозчику" style={{
+            width: 34, height: 34, borderRadius: 11, border: 'none', cursor: 'pointer', flexShrink: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: payFilter === 'debt' ? 'rgba(217,119,6,0.18)' : 'rgba(255,255,255,0.55)',
+            backdropFilter: 'blur(12px) saturate(160%)',
+            boxShadow: payFilter === 'debt' ? '0 0 0 1.5px rgba(217,119,6,0.45), inset 0 1px 0 rgba(255,255,255,0.4)' : '0 1px 3px rgba(14,23,38,0.1), inset 0 1px 0 rgba(255,255,255,0.7)',
+            color: payFilter === 'debt' ? '#D97706' : '#8A93A0', transition: 'all 0.2s',
+          }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+            </svg>
+          </button>
+          {/* Новая заявка */}
+          <button onClick={onAddOrder} title="Новая заявка" style={{
+            width: 34, height: 34, borderRadius: 11, border: 'none', cursor: 'pointer', flexShrink: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(19,102,240,0.12)', backdropFilter: 'blur(12px) saturate(160%)',
+            boxShadow: '0 1px 3px rgba(14,23,38,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
+            color: '#1366F0', transition: 'all 0.2s',
+          }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(19,102,240,0.22)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(19,102,240,0.12)' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round">
+              <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
         </div>
+
+        {/* Doc filter panel — inline below, no positioning */}
+        {showDocFilter && (
+          <div style={{
+            marginTop: 10, paddingTop: 10,
+            borderTop: '1px solid rgba(14,23,38,0.07)',
+            display: 'flex', flexDirection: 'column', gap: 2,
+          }}>
+            {DOC_FILTER_OPTIONS.map(f => (
+              <label key={f.key} style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '8px 10px', cursor: 'pointer', borderRadius: 10,
+                fontSize: 13, fontWeight: 500, color: '#0E1726',
+                background: docFilters.includes(f.key) ? 'rgba(19,102,240,0.07)' : 'transparent',
+                transition: 'background 0.12s',
+              }}>
+                <input
+                  type="checkbox"
+                  checked={docFilters.includes(f.key)}
+                  onChange={() => toggleDocFilter(f.key)}
+                  style={{ accentColor: '#1366F0', width: 15, height: 15, flexShrink: 0 }}
+                />
+                {f.label}
+              </label>
+            ))}
+            {docFilters.length > 0 && (
+              <button onClick={() => { setDocFilters([]); setShowDocFilter(false) }} style={{
+                padding: '7px 10px', border: 'none', cursor: 'pointer', marginTop: 2,
+                background: 'rgba(200,25,35,0.07)', color: '#C81923',
+                fontFamily: 'Manrope', fontSize: 12, fontWeight: 600, borderRadius: 10,
+                textAlign: 'left',
+              }}>Сбросить фильтр</button>
+            )}
+          </div>
+        )}
+      </div>
       </div>
 
       {/* Mobile: iOS-style grouped list */}
