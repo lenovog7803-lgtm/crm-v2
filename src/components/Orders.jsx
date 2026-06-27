@@ -17,6 +17,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   const [payFilter, setPayFilter] = useState(null)
   const [docFilters, setDocFilters] = useState([])
   const [showDocFilter, setShowDocFilter] = useState(false)
+  const [docDropPos, setDocDropPos] = useState(null)
   const docBtnRef = useRef(null)
   const isMobile = useIsMobile()
 
@@ -110,7 +111,13 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
 
           {/* Doc filter */}
           <div ref={docBtnRef} style={{ position: 'relative', flexShrink: 0 }}>
-          <button onClick={() => setShowDocFilter(v => !v)} style={{
+          <button onClick={() => {
+            if (!showDocFilter && isMobile && docBtnRef.current) {
+              const r = docBtnRef.current.getBoundingClientRect()
+              setDocDropPos({ top: r.bottom + 6, right: window.innerWidth - r.right })
+            }
+            setShowDocFilter(v => !v)
+          }} style={{
             padding: '7px 14px', borderRadius: 12, cursor: 'pointer',
             fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
             background: docFilters.length > 0 ? 'rgba(19,102,240,0.12)' : 'rgba(14,23,38,0.06)',
@@ -125,8 +132,12 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           </button>
           {showDocFilter && (
             <div style={{
-              position: 'absolute', top: '100%', right: 0, marginTop: 6,
+              position: isMobile ? 'fixed' : 'absolute',
+              top: isMobile ? (docDropPos?.top ?? 100) : '100%',
+              right: isMobile ? (docDropPos?.right ?? 16) : 0,
+              marginTop: isMobile ? 0 : 6,
               background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
               borderRadius: 16, padding: '8px 4px',
               border: '1px solid rgba(255,255,255,0.9)',
               boxShadow: '0 20px 60px rgba(20,30,55,0.15)', zIndex: 9999, minWidth: 250,
