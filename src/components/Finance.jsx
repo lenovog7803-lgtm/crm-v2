@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { getOrders, getClients, getCarriers, generateReconciliation, getReconciliationHistory } from '../api'
 import { fmtMoney, initials, getGradient } from '../utils'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 export default function Finance({ onAddPayment, refreshKey }) {
+  const isMobile = useIsMobile()
   const [orders, setOrders] = useState([])
   const [clients, setClients] = useState([])
   const [carriers, setCarriers] = useState([])
@@ -91,48 +93,51 @@ export default function Finance({ onAddPayment, refreshKey }) {
   const iStyle = { height: 36, padding: '0 10px', fontSize: 13, borderRadius: 10, border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)', fontFamily: 'Manrope', color: '#0E1726', outline: 'none' }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 10 : 16 }}>
       {/* Summary */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: 16 }}>
-        <div style={{ background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)', borderRadius: 22, padding: '26px 28px', color: '#fff', boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)' }}>
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.4)', marginBottom: 8 }}>ЧИСТАЯ ПРИБЫЛЬ</div>
-          <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 38, letterSpacing: '-0.03em', lineHeight: 1 }}>{netProfit.toLocaleString('ru-RU')}</div>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.4fr 1fr 1fr', gap: isMobile ? 10 : 16 }}>
+        <div style={{ background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)', borderRadius: 22, padding: isMobile ? '18px 18px' : '26px 28px', color: '#fff', boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)' }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.4)', marginBottom: isMobile ? 4 : 8 }}>ЧИСТАЯ ПРИБЫЛЬ</div>
+          <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 30 : 38, letterSpacing: '-0.03em', lineHeight: 1 }}>{netProfit.toLocaleString('ru-RU')}</div>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>BYN</div>
-          <div style={{ display: 'flex', gap: 24, marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ display: 'flex', gap: isMobile ? 20 : 24, marginTop: isMobile ? 12 : 20, paddingTop: isMobile ? 12 : 16, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
             <div>
-              <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Поступления</div>
-              <div style={{ fontWeight: 700, fontSize: 15 }}>{totalIncome.toLocaleString('ru-RU')} BYN</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Поступления</div>
+              <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 15 }}>{totalIncome.toLocaleString('ru-RU')} BYN</div>
             </div>
             <div>
-              <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Списания</div>
-              <div style={{ fontWeight: 700, fontSize: 15 }}>{totalExpense.toLocaleString('ru-RU')} BYN</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Списания</div>
+              <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 15 }}>{totalExpense.toLocaleString('ru-RU')} BYN</div>
             </div>
           </div>
         </div>
-        <div style={{ background: 'linear-gradient(135deg, #1E9E5A 0%, #15734A 100%)', borderRadius: 22, padding: '26px 24px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(30,158,90,0.4)' }}>
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>ПОСТУПЛЕНИЯ</div>
-          <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
-          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
-          <div style={{ marginTop: 14, fontSize: 12.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{receipts.length} заявок оплачено</div>
-        </div>
-        <div style={{ background: 'linear-gradient(135deg, #1366F0 0%, #0D4FB5 100%)', borderRadius: 22, padding: '26px 24px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(19,102,240,0.4)' }}>
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>СПИСАНИЯ</div>
-          <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
-          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
-          <div style={{ marginTop: 14, fontSize: 12.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{expenses.length} перевозчиков оплачено</div>
+        {/* On mobile, show these as a 2-col row */}
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr', gap: isMobile ? 10 : 16 }}>
+          <div style={{ background: 'linear-gradient(135deg, #1E9E5A 0%, #15734A 100%)', borderRadius: 22, padding: isMobile ? '14px 14px' : '26px 24px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(30,158,90,0.4)' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: isMobile ? 4 : 8 }}>ПОСТУПЛЕНИЯ</div>
+            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 20 : 32, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
+            <div style={{ marginTop: isMobile ? 6 : 14, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{receipts.length} оплачено</div>
+          </div>
+          <div style={{ background: 'linear-gradient(135deg, #1366F0 0%, #0D4FB5 100%)', borderRadius: 22, padding: isMobile ? '14px 14px' : '26px 24px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(19,102,240,0.4)' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: isMobile ? 4 : 8 }}>СПИСАНИЯ</div>
+            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 20 : 32, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
+            <div style={{ marginTop: isMobile ? 6 : 14, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{expenses.length} оплачено</div>
+          </div>
         </div>
       </div>
 
       {/* KPI */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr 1fr' : 'repeat(3,1fr)', gap: isMobile ? 8 : 12 }}>
         {[
-          { label: 'Выручка от клиентов', val: fmtMoney(totalIncome), color: '#1E9E5A' },
-          { label: 'Выплачено перевозчикам', val: fmtMoney(totalExpense), color: '#1366F0' },
-          { label: 'Маржинальность', val: marginPct + '%', color: '#D97706' },
+          { label: 'Выручка', val: fmtMoney(totalIncome), color: '#1E9E5A' },
+          { label: 'Перевозчики', val: fmtMoney(totalExpense), color: '#1366F0' },
+          { label: 'Маржа', val: marginPct + '%', color: '#D97706' },
         ].map(k => (
-          <div key={k.label} className="card" style={{ padding: '16px 18px' }}>
-            <div style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600, marginBottom: 6 }}>{k.label}</div>
-            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 18, color: k.color }}>{k.val}</div>
+          <div key={k.label} className="card" style={{ padding: isMobile ? '10px 12px' : '16px 18px' }}>
+            <div style={{ fontSize: isMobile ? 10 : 11, color: '#A6AEB8', fontWeight: 600, marginBottom: isMobile ? 4 : 6 }}>{k.label}</div>
+            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 14 : 18, color: k.color }}>{k.val}</div>
           </div>
         ))}
       </div>

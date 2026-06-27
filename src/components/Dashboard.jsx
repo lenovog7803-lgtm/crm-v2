@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getDashboard, getOrders } from '../api'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 const MONTH_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
 const MONTH_RU_SHORT = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек']
@@ -418,7 +419,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
 
   const netProfit = margin * 0.85
 
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+  const isMobile = useIsMobile()
 
   return (
     <div style={{ padding: isMobile ? 0 : '0 2px', display: 'flex', flexDirection: 'column', gap: isMobile ? 10 : 16 }}>
@@ -428,12 +429,12 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         {/* Dark: margin */}
         <div style={{
           background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)',
-          borderRadius: 22, padding: '28px 28px', color: '#fff',
+          borderRadius: 22, padding: isMobile ? '18px 18px' : '28px 28px', color: '#fff',
           boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)',
           position: 'relative', overflow: 'hidden',
         }}>
           <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'rgba(19,102,240,0.15)' }} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.45)' }}>МАРЖА</div>
             {marginDiff !== null && (
               <div style={{
@@ -449,18 +450,18 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
               </div>
             )}
           </div>
-          <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 40, letterSpacing: '-0.03em', lineHeight: 1 }}>
+          <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 32 : 40, letterSpacing: '-0.03em', lineHeight: 1 }}>
             {margin.toLocaleString('ru-RU')}
           </div>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>BYN</div>
-          <div style={{ display: 'flex', gap: 24, marginTop: 20 }}>
+          <div style={{ display: 'flex', gap: isMobile ? 16 : 24, marginTop: isMobile ? 12 : 20 }}>
             <div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Выручка</div>
-              <div style={{ fontWeight: 700, fontSize: 15 }}>{revenue.toLocaleString('ru-RU')} BYN</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Выручка</div>
+              <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 15 }}>{revenue.toLocaleString('ru-RU')} BYN</div>
             </div>
             <div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Чистая прибыль</div>
-              <div style={{ fontWeight: 700, fontSize: 15, color: '#5BE89B' }}>{Math.round(netProfit).toLocaleString('ru-RU')} BYN</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Чистая прибыль</div>
+              <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 15, color: '#5BE89B' }}>{Math.round(netProfit).toLocaleString('ru-RU')} BYN</div>
             </div>
           </div>
         </div>
@@ -470,20 +471,20 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           onClick={() => setShowDebtors(true)}
           style={{
             background: 'linear-gradient(135deg, rgba(255,236,214,0.95), rgba(255,213,170,0.85))',
-            borderRadius: 22, padding: '28px 24px',
+            borderRadius: 22, padding: isMobile ? '16px 18px' : '28px 24px',
             border: '1px solid rgba(255,255,255,0.6)',
             boxShadow: '0 16px 40px -16px rgba(217,119,6,0.4)',
             cursor: 'pointer', position: 'relative', overflow: 'hidden',
           }}
         >
           <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#A86A20', marginBottom: 8 }}>ОЖИДАЕТСЯ ОТ КЛИЕНТОВ</div>
-          <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: '#7A4A12' }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#A86A20', marginBottom: isMobile ? 4 : 8 }}>ОЖИДАЕТСЯ ОТ КЛИЕНТОВ</div>
+          <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 24 : 30, letterSpacing: '-0.02em', color: '#7A4A12' }}>
             {clientDebt.toLocaleString('ru-RU')}
           </div>
-          <div style={{ fontSize: 12, color: '#A86A20', marginTop: 2 }}>BYN</div>
-          <div style={{ marginTop: 14, fontSize: 12, color: '#A86A20', fontWeight: 600 }}>
-            {debtorOrders.length} заявок · нажмите →
+          <div style={{ fontSize: 11, color: '#A86A20', marginTop: 2 }}>BYN</div>
+          <div style={{ marginTop: isMobile ? 8 : 14, fontSize: 12, color: '#A86A20', fontWeight: 600 }}>
+            {debtorOrders.length} заявок →
           </div>
         </div>
 
@@ -492,20 +493,20 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           onClick={() => setShowCarrierDebt(true)}
           style={{
             background: 'linear-gradient(135deg, rgba(224,224,255,0.95), rgba(208,191,255,0.85))',
-            borderRadius: 22, padding: '28px 24px',
+            borderRadius: 22, padding: isMobile ? '16px 18px' : '28px 24px',
             border: '1px solid rgba(255,255,255,0.6)',
             boxShadow: '0 16px 40px -16px rgba(124,58,237,0.4)',
             cursor: 'pointer', position: 'relative', overflow: 'hidden',
           }}
         >
           <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#6B3FB8', marginBottom: 8 }}>К ОПЛАТЕ ПЕРЕВОЗЧИКАМ</div>
-          <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: '#4A2785' }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#6B3FB8', marginBottom: isMobile ? 4 : 8 }}>К ОПЛАТЕ ПЕРЕВОЗЧИКАМ</div>
+          <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 24 : 30, letterSpacing: '-0.02em', color: '#4A2785' }}>
             {carrierDebt.toLocaleString('ru-RU')}
           </div>
-          <div style={{ fontSize: 12, color: '#6B3FB8', marginTop: 2 }}>BYN</div>
-          <div style={{ marginTop: 14, fontSize: 12, color: '#6B3FB8', fontWeight: 600 }}>
-            {carrierDebtOrders.length} заявок · нажмите →
+          <div style={{ fontSize: 11, color: '#6B3FB8', marginTop: 2 }}>BYN</div>
+          <div style={{ marginTop: isMobile ? 8 : 14, fontSize: 12, color: '#6B3FB8', fontWeight: 600 }}>
+            {carrierDebtOrders.length} заявок →
           </div>
         </div>
       </div>
@@ -518,18 +519,18 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           { label: 'Клиентов', value: clientsCount, color: '#D97706', bg: 'rgba(217,119,6,0.08)' },
           { label: 'Перевозчиков', value: carriersCount, color: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
         ].map(kpi => (
-          <div key={kpi.label} className="card" style={{ padding: '18px 20px' }}>
-            <div style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600, marginBottom: 6 }}>{kpi.label}</div>
+          <div key={kpi.label} className="card" style={{ padding: isMobile ? '12px 14px' : '18px 20px' }}>
+            <div style={{ fontSize: isMobile ? 10 : 11, color: '#A6AEB8', fontWeight: 600, marginBottom: isMobile ? 4 : 6 }}>{kpi.label}</div>
             <div style={{
-              fontFamily: 'Onest', fontWeight: 800, fontSize: 36, color: kpi.color,
-              background: kpi.bg, borderRadius: 12, padding: '8px 14px', display: 'inline-block', lineHeight: 1,
+              fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 26 : 36, color: kpi.color,
+              background: kpi.bg, borderRadius: isMobile ? 9 : 12, padding: isMobile ? '5px 10px' : '8px 14px', display: 'inline-block', lineHeight: 1,
             }}>{kpi.value}</div>
           </div>
         ))}
       </div>
 
       {/* Chart */}
-      <div className="card" style={{ padding: '24px 24px 16px' }}>
+      <div className="card" style={{ padding: isMobile ? '16px 14px 12px' : '24px 24px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>Маржа</div>
@@ -552,9 +553,9 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       </div>
 
       {/* Bottom 3-col */}
-      <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+      <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: isMobile ? 10 : 16 }}>
         {/* Top clients */}
-        <div className="card" style={{ padding: '20px 20px' }}>
+        <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px' }}>
           <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 4 }}>Топ клиентов</div>
           <div style={{ fontSize: 12, color: '#A6AEB8', marginBottom: 14 }}>по выручке за период</div>
           {topClients.length > 0 ? (
@@ -575,9 +576,9 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         </div>
 
         {/* Top by margin */}
-        <div className="card" style={{ padding: '20px 20px' }}>
+        <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px' }}>
           <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 4 }}>Топ по марже</div>
-          <div style={{ fontSize: 12, color: '#A6AEB8', marginBottom: 14 }}>% маржинальности</div>
+          <div style={{ fontSize: 12, color: '#A6AEB8', marginBottom: isMobile ? 10 : 14 }}>% маржинальности</div>
           {topByMargin.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               {topByMargin.map((c, i) => (
@@ -596,9 +597,9 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         </div>
 
         {/* Debtors */}
-        <div className="card" style={{ padding: '20px 20px' }}>
+        <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px' }}>
           <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 4 }}>Должники</div>
-          <div style={{ fontSize: 12, color: '#A6AEB8', marginBottom: 14 }}>неоплаченные доставки</div>
+          <div style={{ fontSize: 12, color: '#A6AEB8', marginBottom: isMobile ? 10 : 14 }}>неоплаченные доставки</div>
           {topDebtors.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               {topDebtors.map((c, i) => (

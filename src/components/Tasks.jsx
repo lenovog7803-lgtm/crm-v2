@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getTasks, updateTask as apiUpdate, deleteTask as apiDelete } from '../api'
 import { ModalOverlay, ModalHeader } from './Modal'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 const TYPE_COLORS = { call: '#1366F0', reminder: '#D97706', payment: '#1E9E5A', other: '#8A93A0' }
 const TYPE_BG = { call: 'rgba(19,102,240,0.1)', reminder: 'rgba(217,119,6,0.1)', payment: 'rgba(30,158,90,0.1)', other: 'rgba(138,147,160,0.1)' }
@@ -14,6 +15,7 @@ const inputStyle = {
 const labelStyle = { fontSize: 12, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.05em', marginBottom: 6, display: 'block' }
 
 export default function Tasks({ onAdd, refreshKey, search = '' }) {
+  const isMobile = useIsMobile()
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
@@ -80,21 +82,22 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
-        {[{ k: 'all', l: 'Все' }, { k: 'active', l: 'Активные' }, { k: 'done', l: 'Завершённые' }].map(f => (
-          <button key={f.k} onClick={() => setFilter(f.k)} style={{
-            padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer',
-            fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
-            background: filter === f.k ? '#0E1726' : 'rgba(14,23,38,0.06)',
-            color: filter === f.k ? '#fff' : '#5A6573',
-          }}>{f.l}</button>
-        ))}
-        <div style={{ flex: 1 }} />
-        <button className="btn-primary" onClick={onAdd}>
+      <div className="card" style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 6, flex: 1, overflowX: 'auto', scrollbarWidth: 'none' }}>
+          {[{ k: 'all', l: 'Все' }, { k: 'active', l: 'Активные' }, { k: 'done', l: 'Завершённые' }].map(f => (
+            <button key={f.k} onClick={() => setFilter(f.k)} style={{
+              padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer', flexShrink: 0,
+              fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
+              background: filter === f.k ? '#0E1726' : 'rgba(14,23,38,0.06)',
+              color: filter === f.k ? '#fff' : '#5A6573',
+            }}>{f.l}</button>
+          ))}
+        </div>
+        <button className="btn-primary" onClick={onAdd} style={{ flexShrink: 0, padding: isMobile ? '9px 10px' : '11px 18px' }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          Новая задача
+          {!isMobile && 'Новая задача'}
         </button>
       </div>
 
