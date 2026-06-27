@@ -13,7 +13,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    pingServer(); // wake Render immediately
+    pingServer(); // wake Render immediately (async, doesn't block UI)
     const t = getToken();
     if (t) {
       const saved = localStorage.getItem('crm_user');
@@ -22,6 +22,14 @@ export function AuthProvider({ children }) {
       setUser(profile ? { token: t, user: profile } : { token: t });
     }
     setLoading(false);
+  }, []);
+
+  // Re-read token from localStorage (needed if another tab set it)
+  useEffect(() => {
+    const stored = localStorage.getItem('crm_token');
+    if (stored && stored !== getToken()) {
+      setToken(stored);
+    }
   }, []);
 
   const signIn = async (username, password) => {

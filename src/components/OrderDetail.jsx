@@ -219,93 +219,133 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       {/* Top bar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 12, flexWrap: 'nowrap', overflowX: isMobile ? 'auto' : 'visible' }}>
-        <button className="btn-ghost" onClick={onBack} style={{ flexShrink: 0 }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-          {!isMobile && 'Назад'}
-        </button>
-        <span style={{ fontFamily: 'JetBrains Mono', fontWeight: 600, fontSize: isMobile ? 13 : 15, color: '#1366F0', flexShrink: 0 }}>
-          {order.order_number || `#${order.id}`}
-        </span>
-        {!isMobile && order.created_at && (
-          <span style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 500 }}>
-            создана {new Date(order.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}
+      {isMobile ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {/* Row 1: back + order info + save */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button onClick={onBack} style={{
+              width: 36, height: 36, borderRadius: 11, border: '1px solid rgba(14,23,38,0.12)',
+              background: 'rgba(255,255,255,0.7)', color: '#0E1726', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+            <span style={{ fontFamily: 'JetBrains Mono', fontWeight: 700, fontSize: 14, color: '#1366F0' }}>
+              {order.order_number || `#${order.id}`}
+            </span>
+            <span style={{
+              padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
+              background: curStatus.bg, color: curStatus.color,
+            }}>{curStatus.label}</span>
+            <div style={{ flex: 1 }} />
+            {saveErr && <span style={{ fontSize: 11, color: '#C81923', fontWeight: 700 }}>Ошибка</span>}
+            <button onClick={handleSave} disabled={!isDirty || saving} style={{
+              minWidth: 36, height: 36, borderRadius: 11, cursor: isDirty ? 'pointer' : 'default',
+              border: `1px solid ${savedOk ? 'rgba(30,158,90,0.4)' : isDirty ? 'rgba(19,102,240,0.4)' : 'rgba(14,23,38,0.1)'}`,
+              background: savedOk ? 'rgba(30,158,90,0.12)' : isDirty ? 'rgba(19,102,240,0.12)' : 'rgba(255,255,255,0.5)',
+              color: savedOk ? '#1E9E5A' : isDirty ? '#1366F0' : '#C4CAD4',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              fontFamily: 'Manrope', fontWeight: 700, fontSize: 13, flexShrink: 0,
+              padding: isDirty ? '0 14px' : '0 10px',
+              transition: 'all 0.2s',
+            }}>
+              {savedOk
+                ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              }
+              {isDirty && <span>{saving ? 'Сохр...' : savedOk ? 'OK' : 'Сохранить'}</span>}
+            </button>
+          </div>
+          {/* Row 2: secondary actions */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {isDirty && <span style={{ fontSize: 11.5, color: '#D97706', fontWeight: 600 }}>Есть изменения</span>}
+            <div style={{ flex: 1 }} />
+            {onEdit && (
+              <button onClick={() => onEdit(order)} style={{
+                height: 34, padding: '0 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
+                background: 'rgba(19,102,240,0.08)', color: '#1366F0',
+                fontFamily: 'Manrope', fontWeight: 600, fontSize: 12.5,
+                display: 'flex', alignItems: 'center', gap: 5,
+              }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                Ред.
+              </button>
+            )}
+            <button onClick={handleDuplicate} disabled={duplicating} style={{
+              width: 34, height: 34, borderRadius: 10, border: 'none', cursor: 'pointer',
+              background: 'rgba(14,23,38,0.06)', color: '#5A6573',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+            </button>
+            <button onClick={handleDelete} style={{
+              width: 34, height: 34, borderRadius: 10, border: 'none', cursor: 'pointer',
+              background: 'rgba(200,25,35,0.08)', color: '#C81923',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button className="btn-ghost" onClick={onBack} style={{ flexShrink: 0 }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            Назад
+          </button>
+          <span style={{ fontFamily: 'JetBrains Mono', fontWeight: 600, fontSize: 15, color: '#1366F0', flexShrink: 0 }}>
+            {order.order_number || `#${order.id}`}
           </span>
-        )}
-        <span style={{
-          padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, flexShrink: 0,
-          background: curStatus.bg, color: curStatus.color,
-        }}>{curStatus.label}</span>
-        {isDirty && !isMobile && (
-          <span style={{ fontSize: 11.5, fontWeight: 600, color: '#D97706', padding: '3px 10px', borderRadius: 8, background: 'rgba(217,119,6,0.1)' }}>
-            Есть изменения
-          </span>
-        )}
-        <div style={{ flex: 1 }} />
-        {saveErr && <span style={{ fontSize: 12, color: '#C81923', fontWeight: 600, flexShrink: 0 }}>Ошибка</span>}
-
-        {/* Save button */}
-        <button
-          onClick={handleSave}
-          disabled={!isDirty || saving}
-          title="Сохранить"
-          style={{
-            padding: isMobile ? '8px' : '11px 26px', borderRadius: 12, cursor: isDirty ? 'pointer' : 'default',
+          {order.created_at && (
+            <span style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 500 }}>
+              создана {new Date(order.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </span>
+          )}
+          <span style={{ padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, flexShrink: 0, background: curStatus.bg, color: curStatus.color }}>{curStatus.label}</span>
+          {isDirty && <span style={{ fontSize: 11.5, fontWeight: 600, color: '#D97706', padding: '3px 10px', borderRadius: 8, background: 'rgba(217,119,6,0.1)' }}>Есть изменения</span>}
+          <div style={{ flex: 1 }} />
+          {saveErr && <span style={{ fontSize: 12, color: '#C81923', fontWeight: 600, flexShrink: 0 }}>Ошибка</span>}
+          <button onClick={handleSave} disabled={!isDirty || saving} style={{
+            padding: '11px 26px', borderRadius: 12, cursor: isDirty ? 'pointer' : 'default',
             border: `1px solid ${savedOk ? 'rgba(30,158,90,0.35)' : isDirty ? 'rgba(19,102,240,0.35)' : 'rgba(255,255,255,0.2)'}`,
             background: savedOk ? 'rgba(30,158,90,0.15)' : isDirty ? 'rgba(19,102,240,0.15)' : 'rgba(255,255,255,0.07)',
-            backdropFilter: 'blur(24px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
             color: savedOk ? '#1E9E5A' : isDirty ? '#1366F0' : '#A6AEB8',
             fontFamily: 'Manrope', fontWeight: 700, fontSize: 14,
-            display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0,
-            transition: 'all 0.25s',
-          }}
-        >
-          {savedOk
-            ? <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-            : <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          }
-          {!isMobile && (saving ? 'Сохранение...' : savedOk ? 'Сохранено' : 'Сохранить')}
-        </button>
-
-        {onEdit && (
-          <button onClick={() => onEdit(order)} title="Редактировать" style={{
-            padding: isMobile ? '8px' : '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0,
-            background: 'rgba(19,102,240,0.08)', color: '#1366F0',
-            fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
-            display: 'flex', alignItems: 'center', gap: 6,
+            display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0, transition: 'all 0.25s',
           }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-            {!isMobile && 'Редактировать'}
+            {savedOk
+              ? <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+              : <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            }
+            {saving ? 'Сохранение...' : savedOk ? 'Сохранено' : 'Сохранить'}
           </button>
-        )}
-        <button onClick={handleDuplicate} disabled={duplicating} title="Дублировать" style={{
-          padding: isMobile ? '8px' : '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0,
-          background: 'rgba(14,23,38,0.06)', color: '#5A6573',
-          fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
-          display: 'flex', alignItems: 'center', gap: 6,
-        }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-          </svg>
-          {!isMobile && (duplicating ? '...' : 'Дублировать')}
-        </button>
-        <button onClick={handleDelete} title="Удалить" style={{
-          padding: isMobile ? '8px' : '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0,
-          background: 'rgba(200,25,35,0.1)', color: '#C81923',
-          fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
-          display: 'flex', alignItems: 'center', gap: 6,
-        }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" />
-          </svg>
-          {!isMobile && 'Удалить'}
-        </button>
-      </div>
+          {onEdit && (
+            <button onClick={() => onEdit(order)} style={{ padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0, background: 'rgba(19,102,240,0.08)', color: '#1366F0', fontFamily: 'Manrope', fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Редактировать
+            </button>
+          )}
+          <button onClick={handleDuplicate} disabled={duplicating} style={{ padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0, background: 'rgba(14,23,38,0.06)', color: '#5A6573', fontFamily: 'Manrope', fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            {duplicating ? '...' : 'Дублировать'}
+          </button>
+          <button onClick={handleDelete} style={{ padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0, background: 'rgba(200,25,35,0.1)', color: '#C81923', fontFamily: 'Manrope', fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /></svg>
+            Удалить
+          </button>
+        </div>
+      )}
 
       <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 16, alignItems: 'start' }}>
         {/* LEFT COLUMN */}
@@ -313,43 +353,44 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
           {/* Hero dark card */}
           <div style={{
             background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)',
-            borderRadius: 22, padding: '28px 28px', color: '#fff',
+            borderRadius: 22, padding: isMobile ? '18px 18px' : '28px 28px', color: '#fff',
             boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)',
           }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.4)', marginBottom: 6 }}>МАРШРУТ</div>
-            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 22, letterSpacing: '-0.02em' }}>{route}</div>
-            <div style={{ display: 'flex', gap: 20, marginTop: 18 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>МАРШРУТ</div>
+            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 17 : 22, letterSpacing: '-0.02em', lineHeight: 1.2 }}>{route}</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: isMobile ? 10 : 20, marginTop: isMobile ? 12 : 18 }}>
               <div>
-                <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Груз</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Груз</div>
                 <div style={{ fontWeight: 600, fontSize: 13 }}>{view.cargo || '—'}</div>
               </div>
               <div>
-                <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Вес</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Вес</div>
                 <div style={{ fontWeight: 600, fontSize: 13 }}>{view.weight_tons ? view.weight_tons + ' т' : '—'}</div>
               </div>
               <div>
-                <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Загрузка</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Загрузка</div>
                 <div style={{ fontWeight: 600, fontSize: 13 }}>{view.load_date || '—'}</div>
               </div>
               <div>
-                <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Выгрузка</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Выгрузка</div>
                 <div style={{ fontWeight: 600, fontSize: 13 }}>{view.unload_date || '—'}</div>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: 24, marginTop: 22, paddingTop: 18, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: isMobile ? 8 : 24, marginTop: isMobile ? 14 : 22, paddingTop: isMobile ? 14 : 18, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
               <div>
-                <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Ставка клиента</div>
-                <div style={{ fontWeight: 800, fontSize: 20, fontFamily: 'Onest' }}>{fmtMoney(clientRate)}</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Клиент</div>
+                <div style={{ fontWeight: 800, fontSize: isMobile ? 15 : 20, fontFamily: 'Onest' }}>{fmtMoney(clientRate)}</div>
               </div>
               <div>
-                <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Ставка перевозчика</div>
-                <div style={{ fontWeight: 800, fontSize: 20, fontFamily: 'Onest' }}>{fmtMoney(carrierRate)}</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Перевозчик</div>
+                <div style={{ fontWeight: 800, fontSize: isMobile ? 15 : 20, fontFamily: 'Onest' }}>{fmtMoney(carrierRate)}</div>
               </div>
               <div>
-                <div style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Маржа</div>
-                <div style={{ fontWeight: 800, fontSize: 20, fontFamily: 'Onest', color: '#5BE89B' }}>
-                  {fmtMoney(margin)} <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>({marginPct}%)</span>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Маржа</div>
+                <div style={{ fontWeight: 800, fontSize: isMobile ? 15 : 20, fontFamily: 'Onest', color: '#5BE89B' }}>
+                  {fmtMoney(margin)}{!isMobile && <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}> ({marginPct}%)</span>}
                 </div>
+                {isMobile && <div style={{ fontSize: 10, color: 'rgba(91,232,155,0.7)', marginTop: 1 }}>{marginPct}%</div>}
               </div>
             </div>
           </div>

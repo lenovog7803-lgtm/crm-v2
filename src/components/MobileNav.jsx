@@ -61,12 +61,25 @@ const NAV = [
       </svg>
     ),
   },
+  {
+    key: 'carriers',
+    label: 'Перевозчики',
+    icon: (a) => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={a ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">
+        <rect x="1" y="3" width="15" height="13" rx="1"/>
+        <path d="M16 8h4l3 3v5h-7V8z"/>
+        <circle cx="5.5" cy="18.5" r="2.5"/>
+        <circle cx="18.5" cy="18.5" r="2.5"/>
+      </svg>
+    ),
+  },
 ]
 
 const ACTIVE_KEYS = {
   'order-detail': 'orders',
   'client-detail': 'clients',
-  'carrier-detail': 'clients',
+  'carrier-detail': 'carriers',
+  'carriers': 'carriers',
 }
 
 export default function MobileNav({ page, onNav, counts }) {
@@ -109,24 +122,25 @@ export default function MobileNav({ page, onNav, counts }) {
               color: active ? '#1366F0' : '#8E8E93',
               WebkitTapHighlightColor: 'transparent',
               transition: 'color 0.1s',
+              padding: '0 2px',
             }}
           >
-            <span style={{ position: 'relative', display: 'flex' }}>
+            <span style={{ position: 'relative', display: 'flex', transform: 'scale(0.85)', transformOrigin: 'center' }}>
               {item.icon(active)}
               {badgeVal > 0 && (
                 <span style={{
                   position: 'absolute', top: -4, right: -6,
-                  minWidth: 16, height: 16, borderRadius: 99,
+                  minWidth: 15, height: 15, borderRadius: 99,
                   background: badgeColor,
                   border: '1.5px solid rgba(251,251,253,0.94)',
-                  color: '#fff', fontSize: 9, fontWeight: 800,
+                  color: '#fff', fontSize: 8, fontWeight: 800,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   padding: '0 3px', lineHeight: 1,
                 }}>{badgeVal > 99 ? '99+' : badgeVal}</span>
               )}
             </span>
             <span style={{
-              fontSize: 10,
+              fontSize: 9,
               fontWeight: active ? 600 : 400,
               fontFamily: 'Manrope',
               letterSpacing: '-0.01em',

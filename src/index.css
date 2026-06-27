@@ -158,9 +158,9 @@ body { font-family: Manrope, sans-serif; background: #EDEFF3; -webkit-font-smoot
     box-shadow: none !important;
   }
 
-  /* Scroll area: edge-to-edge, breathes only at bottom for tab bar */
+  /* Scroll area: 16px iOS standard horizontal margins */
   .scroll-area {
-    padding: 12px 12px 84px !important;
+    padding: 14px 16px calc(80px + env(safe-area-inset-bottom)) !important;
   }
 
   /* Grids → single column */

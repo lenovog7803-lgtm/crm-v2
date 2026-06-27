@@ -2,8 +2,10 @@ const BASE = import.meta.env.VITE_API_URL || 'https://logistics-crm-backend.onre
 const ROOT = BASE.replace('/api', '');
 
 // Wake up Render on app start (free tier sleeps after 15 min)
-export function pingServer() {
-  fetch(ROOT + '/health').catch(() => {});
+export async function pingServer() {
+  try {
+    await fetch(ROOT + '/health');
+  } catch (_) {}
 }
 
 let token = localStorage.getItem('crm_token') || '';
@@ -15,17 +17,29 @@ export function setToken(t) {
 
 export function getToken() { return token; }
 
-async function req(path, options = {}) {
-  const res = await fetch(BASE + path, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : '',
-      ...options.headers,
-    },
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function req(path, options = {}, retries = 2) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(BASE + path, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
+          ...options.headers,
+        },
+      });
+      if (!res.ok) throw new Error(await res.text());
+      return res.json();
+    } catch (e) {
+      if (attempt < retries) {
+        await sleep(2000 * (attempt + 1));
+      } else {
+        throw e;
+      }
+    }
+  }
 }
 
 // Auth
