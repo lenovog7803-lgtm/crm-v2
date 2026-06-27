@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getCarrier, deleteCarrier as apiDelete, getOrders } from '../api'
+import { getCarrier, deleteCarrier as apiDelete, updateCarrier, getOrders } from '../api'
 import { fmtMoney, statusLabel, statusColor, statusBg, getGradient } from '../utils'
 
 function Row({ label, value, mono }) {
@@ -19,10 +19,44 @@ function StarIcon() {
   )
 }
 
+const iStyle = {
+  width: '100%', height: 34, padding: '0 10px', fontSize: 13, borderRadius: 9,
+  border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)',
+  fontFamily: 'Manrope', color: '#0E1726', outline: 'none', boxSizing: 'border-box',
+}
+
+function EditField({ label, value, onChange, mono, type = 'text' }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
+      <span style={{ fontSize: 12, color: '#A6AEB8', fontWeight: 500, flexShrink: 0, minWidth: 90 }}>{label}</span>
+      <input
+        type={type}
+        value={value || ''}
+        onChange={e => onChange(e.target.value)}
+        style={{ ...iStyle, fontFamily: mono ? 'JetBrains Mono' : 'Manrope', fontSize: mono ? 12 : 13 }}
+      />
+    </div>
+  )
+}
+
+function EditSelect({ label, value, onChange, options }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
+      <span style={{ fontSize: 12, color: '#A6AEB8', fontWeight: 500, flexShrink: 0, minWidth: 90 }}>{label}</span>
+      <select value={value || ''} onChange={e => onChange(e.target.value)} style={iStyle}>
+        {options.map(o => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </div>
+  )
+}
+
 export default function CarrierDetail({ carrierId, onBack, onDelete, onOpenOrder }) {
   const [carrier, setCarrier] = useState(null)
   const [carrierOrders, setCarrierOrders] = useState([])
   const [loading, setLoading] = useState(true)
+  const [editing, setEditing] = useState(false)
+  const [form, setForm] = useState({})
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (!carrierId) return
@@ -45,6 +79,45 @@ export default function CarrierDetail({ carrierId, onBack, onDelete, onOpenOrder
   const cap = carrier.capacity_tons ? carrier.capacity_tons + ' т' : '—'
   const [avA, avB] = getGradient(name)
 
+  const startEdit = () => {
+    setForm({
+      company_name: carrier.company_name || '',
+      driver_name: carrier.driver_name || '',
+      phone: carrier.phone || '',
+      unp: carrier.unp || carrier.inn || '',
+      director: carrier.director || '',
+      basis: carrier.basis || 'Устава',
+      address: carrier.address || carrier.legal_address || '',
+      postal_address: carrier.postal_address || '',
+      bank: carrier.bank || carrier.bank_name || '',
+      rs: carrier.rs || carrier.bank_account || '',
+      bik: carrier.bik || carrier.bank_bik || carrier.bank_bic || '',
+      vehicle_type: carrier.vehicle_type || '',
+      plate: carrier.plate || '',
+      capacity_tons: carrier.capacity_tons || '',
+      regions: carrier.regions || '',
+      cargo_types: carrier.cargo_types || '',
+    })
+    setEditing(true)
+  }
+
+  const cancelEdit = () => setEditing(false)
+
+  const saveEdit = async () => {
+    setSaving(true)
+    try {
+      const updated = await updateCarrier(carrier.id, {
+        ...form,
+        capacity_tons: form.capacity_tons ? parseFloat(form.capacity_tons) : 0,
+      })
+      setCarrier(updated || { ...carrier, ...form })
+      setEditing(false)
+    } catch (err) { console.error(err) }
+    setSaving(false)
+  }
+
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
   const handleDelete = async () => {
     await apiDelete(carrier.id).catch(console.error)
     onDelete(carrier.id)
@@ -61,17 +134,42 @@ export default function CarrierDetail({ carrierId, onBack, onDelete, onOpenOrder
           Перевозчики
         </button>
         <div style={{ flex: 1 }} />
-        <button onClick={handleDelete} style={{
-          padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
-          background: 'rgba(200,25,35,0.1)', color: '#C81923',
-          fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
-          display: 'flex', alignItems: 'center', gap: 6,
-        }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
-          </svg>
-          Удалить
-        </button>
+        {editing ? (
+          <>
+            <button onClick={cancelEdit} style={{ padding: '9px 16px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', cursor: 'pointer', background: 'transparent', color: '#5A6573', fontFamily: 'Manrope', fontWeight: 600, fontSize: 13 }}>
+              Отмена
+            </button>
+            <button onClick={saveEdit} disabled={saving} style={{ padding: '9px 18px', borderRadius: 12, border: 'none', cursor: 'pointer', background: '#1366F0', color: '#fff', fontFamily: 'Manrope', fontWeight: 600, fontSize: 13 }}>
+              {saving ? 'Сохранение...' : 'Сохранить'}
+            </button>
+          </>
+        ) : (
+          <>
+            <button onClick={startEdit} style={{
+              padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
+              background: 'rgba(19,102,240,0.1)', color: '#1366F0',
+              fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
+              display: 'flex', alignItems: 'center', gap: 6,
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              Редактировать
+            </button>
+            <button onClick={handleDelete} style={{
+              padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
+              background: 'rgba(200,25,35,0.1)', color: '#C81923',
+              fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
+              display: 'flex', alignItems: 'center', gap: 6,
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+              </svg>
+              Удалить
+            </button>
+          </>
+        )}
       </div>
 
       <div className="card" style={{ padding: '32px', textAlign: 'center' }}>
@@ -87,39 +185,76 @@ export default function CarrierDetail({ carrierId, onBack, onDelete, onOpenOrder
             <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
           </svg>
         </div>
-        <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 22, color: '#0E1726', letterSpacing: '-0.02em' }}>{name}</div>
-        <div style={{ fontSize: 14, color: '#A6AEB8', marginTop: 4 }}>{driver}</div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 10 }}>
-          <StarIcon />
-          <span style={{ fontSize: 16, fontWeight: 700, color: '#D97706' }}>{carrier.rating || '5.0'}</span>
-        </div>
-        {carrier.phone && (
-          <a href={`tel:${carrier.phone}`} style={{ display: 'block', marginTop: 8, fontSize: 15, fontWeight: 600, color: '#1366F0', textDecoration: 'none' }}>{carrier.phone}</a>
+        {editing ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 360, margin: '0 auto' }}>
+            <input value={form.company_name} onChange={e => set('company_name', e.target.value)} placeholder="Наименование" style={{ ...iStyle, textAlign: 'center', fontWeight: 700, fontSize: 16 }} />
+            <input value={form.driver_name} onChange={e => set('driver_name', e.target.value)} placeholder="Водитель" style={{ ...iStyle, textAlign: 'center' }} />
+            <input value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="Телефон" style={{ ...iStyle, textAlign: 'center' }} />
+          </div>
+        ) : (
+          <>
+            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 22, color: '#0E1726', letterSpacing: '-0.02em' }}>{name}</div>
+            <div style={{ fontSize: 14, color: '#A6AEB8', marginTop: 4 }}>{driver}</div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 10 }}>
+              <StarIcon />
+              <span style={{ fontSize: 16, fontWeight: 700, color: '#D97706' }}>{carrier.rating || '5.0'}</span>
+            </div>
+            {carrier.phone && (
+              <a href={`tel:${carrier.phone}`} style={{ display: 'block', marginTop: 8, fontSize: 15, fontWeight: 600, color: '#1366F0', textDecoration: 'none' }}>{carrier.phone}</a>
+            )}
+          </>
         )}
       </div>
 
       <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
         <div className="card" style={{ padding: '20px 22px' }}>
           <div className="section-label" style={{ marginBottom: 10 }}>ИНФОРМАЦИЯ</div>
-          <Row label="УНП" value={carrier.unp || carrier.inn} mono />
-          <Row label="Директор" value={carrier.director} />
-          <Row label="Основание" value={carrier.basis} />
-          <Row label="Юр. адрес" value={carrier.address || carrier.legal_address} />
-          <Row label="Почтовый адрес" value={carrier.postal_address} />
-          <Row label="Грузоподъёмность" value={cap} />
-          <Row label="Тип ТС" value={carrier.vehicle_type} />
-          <Row label="Номер ТС" value={carrier.plate && !/^\d+\.?\d*$/.test(carrier.plate) ? carrier.plate : null} mono />
-          <Row label="Регионы" value={carrier.regions} />
-          <Row label="Груз" value={carrier.cargo_types} />
+          {editing ? (
+            <>
+              <EditField label="УНП" value={form.unp} onChange={v => set('unp', v)} mono />
+              <EditField label="Директор" value={form.director} onChange={v => set('director', v)} />
+              <EditSelect label="Основание" value={form.basis} onChange={v => set('basis', v)} options={['Устава', 'Свидетельства о гос. регистрации']} />
+              <EditField label="Юр. адрес" value={form.address} onChange={v => set('address', v)} />
+              <EditField label="Почт. адрес" value={form.postal_address} onChange={v => set('postal_address', v)} />
+              <EditField label="Груз. (т)" value={form.capacity_tons} onChange={v => set('capacity_tons', v)} type="number" />
+              <EditField label="Тип ТС" value={form.vehicle_type} onChange={v => set('vehicle_type', v)} />
+              <EditField label="Номер ТС" value={form.plate} onChange={v => set('plate', v)} mono />
+              <EditField label="Регионы" value={form.regions} onChange={v => set('regions', v)} />
+              <EditField label="Груз" value={form.cargo_types} onChange={v => set('cargo_types', v)} />
+            </>
+          ) : (
+            <>
+              <Row label="УНП" value={carrier.unp || carrier.inn} mono />
+              <Row label="Директор" value={carrier.director} />
+              <Row label="Основание" value={carrier.basis} />
+              <Row label="Юр. адрес" value={carrier.address || carrier.legal_address} />
+              <Row label="Почтовый адрес" value={carrier.postal_address} />
+              <Row label="Грузоподъёмность" value={cap} />
+              <Row label="Тип ТС" value={carrier.vehicle_type} />
+              <Row label="Номер ТС" value={carrier.plate && !/^\d+\.?\d*$/.test(carrier.plate) ? carrier.plate : null} mono />
+              <Row label="Регионы" value={carrier.regions} />
+              <Row label="Груз" value={carrier.cargo_types} />
+            </>
+          )}
         </div>
 
         <div className="card" style={{ padding: '20px 22px' }}>
           <div className="section-label" style={{ marginBottom: 10 }}>БАНКОВСКИЕ РЕКВИЗИТЫ</div>
-          <Row label="Банк" value={carrier.bank || carrier.bank_name} />
-          <Row label="Р/С" value={carrier.rs || carrier.bank_account} mono />
-          <Row label="БИК" value={carrier.bik || carrier.bank_bik || carrier.bank_bic} mono />
-          {carrier.email && <Row label="Email" value={carrier.email} />}
-          {carrier.notes && <Row label="Примечания" value={carrier.notes} />}
+          {editing ? (
+            <>
+              <EditField label="Банк" value={form.bank} onChange={v => set('bank', v)} />
+              <EditField label="Р/С" value={form.rs} onChange={v => set('rs', v)} mono />
+              <EditField label="БИК" value={form.bik} onChange={v => set('bik', v)} mono />
+            </>
+          ) : (
+            <>
+              <Row label="Банк" value={carrier.bank || carrier.bank_name} />
+              <Row label="Р/С" value={carrier.rs || carrier.bank_account} mono />
+              <Row label="БИК" value={carrier.bik || carrier.bank_bik || carrier.bank_bic} mono />
+              {carrier.email && <Row label="Email" value={carrier.email} />}
+              {carrier.notes && <Row label="Примечания" value={carrier.notes} />}
+            </>
+          )}
         </div>
 
         {/* Carrier order history */}

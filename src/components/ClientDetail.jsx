@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getClient, deleteClient as apiDelete, getOrders } from '../api'
+import { getClient, deleteClient as apiDelete, updateClient, getOrders } from '../api'
 import { initials, fmtMoney, statusLabel, statusColor, statusBg, getGradient } from '../utils'
 
 function Row({ label, value, mono }) {
@@ -11,10 +11,44 @@ function Row({ label, value, mono }) {
   )
 }
 
+const iStyle = {
+  width: '100%', height: 34, padding: '0 10px', fontSize: 13, borderRadius: 9,
+  border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)',
+  fontFamily: 'Manrope', color: '#0E1726', outline: 'none', boxSizing: 'border-box',
+}
+
+function EditField({ label, value, onChange, mono, type = 'text' }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
+      <span style={{ fontSize: 12, color: '#A6AEB8', fontWeight: 500, flexShrink: 0, minWidth: 90 }}>{label}</span>
+      <input
+        type={type}
+        value={value || ''}
+        onChange={e => onChange(e.target.value)}
+        style={{ ...iStyle, fontFamily: mono ? 'JetBrains Mono' : 'Manrope', fontSize: mono ? 12 : 13 }}
+      />
+    </div>
+  )
+}
+
+function EditSelect({ label, value, onChange, options }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
+      <span style={{ fontSize: 12, color: '#A6AEB8', fontWeight: 500, flexShrink: 0, minWidth: 90 }}>{label}</span>
+      <select value={value || ''} onChange={e => onChange(e.target.value)} style={iStyle}>
+        {options.map(o => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </div>
+  )
+}
+
 export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }) {
   const [client, setClient] = useState(null)
   const [clientOrders, setClientOrders] = useState([])
   const [loading, setLoading] = useState(true)
+  const [editing, setEditing] = useState(false)
+  const [form, setForm] = useState({})
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (!clientId) return
@@ -33,10 +67,40 @@ export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }
   if (!client) return <div style={{ padding: 60, textAlign: 'center', color: '#A6AEB8' }}>Клиент не найден</div>
 
   const [avA, avB] = getGradient(client.name || '')
-  const contact = client.contact_person || ''
-  const unp = client.unp || client.inn || ''
-  const address = client.legal_address || ''
-  const terms = client.payment_terms || ''
+
+  const startEdit = () => {
+    setForm({
+      name: client.name || '',
+      contact_person: client.contact_person || '',
+      phone: client.phone || '',
+      email: client.email || '',
+      unp: client.unp || client.inn || '',
+      director: client.director || '',
+      basis: client.basis || 'Устава',
+      legal_address: client.legal_address || '',
+      postal_address: client.postal_address || '',
+      payment_terms: client.payment_terms || '',
+      bank_name: client.bank_name || '',
+      bank_account: client.bank_account || '',
+      bank_bik: client.bank_bik || '',
+      notes: client.notes || '',
+    })
+    setEditing(true)
+  }
+
+  const cancelEdit = () => setEditing(false)
+
+  const saveEdit = async () => {
+    setSaving(true)
+    try {
+      const updated = await updateClient(client.id, form)
+      setClient(updated || { ...client, ...form })
+      setEditing(false)
+    } catch (err) { console.error(err) }
+    setSaving(false)
+  }
+
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
   const handleDelete = async () => {
     await apiDelete(client.id).catch(console.error)
@@ -54,17 +118,42 @@ export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }
           Клиенты
         </button>
         <div style={{ flex: 1 }} />
-        <button onClick={handleDelete} style={{
-          padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
-          background: 'rgba(200,25,35,0.1)', color: '#C81923',
-          fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
-          display: 'flex', alignItems: 'center', gap: 6,
-        }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
-          </svg>
-          Удалить клиента
-        </button>
+        {editing ? (
+          <>
+            <button onClick={cancelEdit} style={{ padding: '9px 16px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', cursor: 'pointer', background: 'transparent', color: '#5A6573', fontFamily: 'Manrope', fontWeight: 600, fontSize: 13 }}>
+              Отмена
+            </button>
+            <button onClick={saveEdit} disabled={saving} style={{ padding: '9px 18px', borderRadius: 12, border: 'none', cursor: 'pointer', background: '#1366F0', color: '#fff', fontFamily: 'Manrope', fontWeight: 600, fontSize: 13 }}>
+              {saving ? 'Сохранение...' : 'Сохранить'}
+            </button>
+          </>
+        ) : (
+          <>
+            <button onClick={startEdit} style={{
+              padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
+              background: 'rgba(19,102,240,0.1)', color: '#1366F0',
+              fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
+              display: 'flex', alignItems: 'center', gap: 6,
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+              Редактировать
+            </button>
+            <button onClick={handleDelete} style={{
+              padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
+              background: 'rgba(200,25,35,0.1)', color: '#C81923',
+              fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
+              display: 'flex', alignItems: 'center', gap: 6,
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+              </svg>
+              Удалить клиента
+            </button>
+          </>
+        )}
       </div>
 
       <div className="card" style={{ padding: '32px', textAlign: 'center' }}>
@@ -74,37 +163,77 @@ export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: '#fff', fontWeight: 800, fontSize: 24,
           boxShadow: `0 12px 30px -12px ${avB}80`,
-        }}>{initials(client.name)}</div>
-        <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 22, color: '#0E1726', letterSpacing: '-0.02em' }}>{client.name}</div>
-        {contact && <div style={{ fontSize: 14, color: '#A6AEB8', marginTop: 4 }}>{contact}</div>}
-        {client.phone && (
-          <a href={`tel:${client.phone}`} style={{ display: 'block', marginTop: 8, fontSize: 15, fontWeight: 600, color: '#1366F0', textDecoration: 'none' }}>{client.phone}</a>
+        }}>{initials(editing ? form.name : client.name)}</div>
+        {editing ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 360, margin: '0 auto' }}>
+            <input value={form.name} onChange={e => set('name', e.target.value)} placeholder="Наименование" style={{ ...iStyle, textAlign: 'center', fontWeight: 700, fontSize: 16 }} />
+            <input value={form.contact_person} onChange={e => set('contact_person', e.target.value)} placeholder="Контактное лицо" style={{ ...iStyle, textAlign: 'center' }} />
+            <input value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="Телефон" style={{ ...iStyle, textAlign: 'center' }} />
+          </div>
+        ) : (
+          <>
+            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 22, color: '#0E1726', letterSpacing: '-0.02em' }}>{client.name}</div>
+            {client.contact_person && <div style={{ fontSize: 14, color: '#A6AEB8', marginTop: 4 }}>{client.contact_person}</div>}
+            {client.phone && (
+              <a href={`tel:${client.phone}`} style={{ display: 'block', marginTop: 8, fontSize: 15, fontWeight: 600, color: '#1366F0', textDecoration: 'none' }}>{client.phone}</a>
+            )}
+          </>
         )}
       </div>
 
       <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
         <div className="card" style={{ padding: '20px 22px' }}>
           <div className="section-label" style={{ marginBottom: 10 }}>РЕКВИЗИТЫ</div>
-          <Row label="УНП" value={unp} mono />
-          {client.director && <Row label="Директор" value={client.director} />}
-          {client.basis && <Row label="Основание" value={client.basis} />}
-          <Row label="Юр. адрес" value={address} />
-          {client.postal_address && <Row label="Почт. адрес" value={client.postal_address} />}
-          <Row label="Условия оплаты" value={terms} />
+          {editing ? (
+            <>
+              <EditField label="УНП" value={form.unp} onChange={v => set('unp', v)} mono />
+              <EditField label="Директор" value={form.director} onChange={v => set('director', v)} />
+              <EditSelect label="Основание" value={form.basis} onChange={v => set('basis', v)} options={['Устава', 'Свидетельства о гос. регистрации']} />
+              <EditField label="Юр. адрес" value={form.legal_address} onChange={v => set('legal_address', v)} />
+              <EditField label="Почт. адрес" value={form.postal_address} onChange={v => set('postal_address', v)} />
+              <EditField label="Условия оплаты" value={form.payment_terms} onChange={v => set('payment_terms', v)} />
+              <EditField label="Email" value={form.email} onChange={v => set('email', v)} />
+            </>
+          ) : (
+            <>
+              <Row label="УНП" value={client.unp || client.inn} mono />
+              {client.director && <Row label="Директор" value={client.director} />}
+              {client.basis && <Row label="Основание" value={client.basis} />}
+              <Row label="Юр. адрес" value={client.legal_address} />
+              {client.postal_address && <Row label="Почт. адрес" value={client.postal_address} />}
+              <Row label="Условия оплаты" value={client.payment_terms} />
+            </>
+          )}
         </div>
 
         <div className="card" style={{ padding: '20px 22px' }}>
           <div className="section-label" style={{ marginBottom: 10 }}>БАНКОВСКИЕ РЕКВИЗИТЫ</div>
-          <Row label="Банк" value={client.bank_name} />
-          <Row label="Счёт" value={client.bank_account} mono />
-          <Row label="БИК" value={client.bank_bik} mono />
+          {editing ? (
+            <>
+              <EditField label="Банк" value={form.bank_name} onChange={v => set('bank_name', v)} />
+              <EditField label="Р/С" value={form.bank_account} onChange={v => set('bank_account', v)} mono />
+              <EditField label="БИК" value={form.bank_bik} onChange={v => set('bank_bik', v)} mono />
+            </>
+          ) : (
+            <>
+              <Row label="Банк" value={client.bank_name} />
+              <Row label="Счёт" value={client.bank_account} mono />
+              <Row label="БИК" value={client.bank_bik} mono />
+            </>
+          )}
         </div>
 
         <div className="card" style={{ padding: '20px 22px' }}>
           <div className="section-label" style={{ marginBottom: 10 }}>ДОПОЛНИТЕЛЬНО</div>
-          {client.email && <Row label="Email" value={client.email} />}
-          {client.kpp && <Row label="КПП" value={client.kpp} mono />}
-          {client.notes && <Row label="Примечания" value={client.notes} />}
+          {editing ? (
+            <EditField label="Примечания" value={form.notes} onChange={v => set('notes', v)} />
+          ) : (
+            <>
+              {client.email && <Row label="Email" value={client.email} />}
+              {client.kpp && <Row label="КПП" value={client.kpp} mono />}
+              {client.notes && <Row label="Примечания" value={client.notes} />}
+            </>
+          )}
         </div>
 
         <div className="card" style={{ padding: '20px 22px' }}>
