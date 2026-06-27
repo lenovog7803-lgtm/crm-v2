@@ -34,7 +34,7 @@ export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }
 
   const [avA, avB] = getGradient(client.name || '')
   const contact = client.contact_person || ''
-  const inn = client.inn || ''
+  const unp = client.unp || client.inn || ''
   const address = client.legal_address || ''
   const terms = client.payment_terms || ''
 
@@ -85,10 +85,11 @@ export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }
       <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
         <div className="card" style={{ padding: '20px 22px' }}>
           <div className="section-label" style={{ marginBottom: 10 }}>РЕКВИЗИТЫ</div>
-          <Row label="УНП / ИНН" value={inn} mono />
+          <Row label="УНП" value={unp} mono />
+          {client.director && <Row label="Директор" value={client.director} />}
+          {client.basis && <Row label="Основание" value={client.basis} />}
           <Row label="Юр. адрес" value={address} />
-          <Row label="Направления" value={client.directions} />
-          <Row label="Груз" value={client.cargo_types} />
+          {client.postal_address && <Row label="Почт. адрес" value={client.postal_address} />}
           <Row label="Условия оплаты" value={terms} />
         </div>
 
