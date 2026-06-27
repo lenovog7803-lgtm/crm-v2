@@ -4,10 +4,14 @@ import { initials, statusLabel, statusColor, statusBg, getGradient } from '../ut
 import { useIsMobile } from '../hooks/useIsMobile'
 
 const DOC_FILTER_OPTIONS = [
-  { key: 'docs_to_client_sent', label: 'Отправлены клиенту' },
-  { key: 'docs_from_client_received', label: 'Получены от клиента' },
-  { key: 'docs_to_carrier_sent', label: 'Отправлены перевозчику' },
-  { key: 'docs_from_carrier_received', label: 'Получены от перевозчика' },
+  { key: 'docs_to_client_sent',         label: 'Отправлены клиенту',          not: false },
+  { key: '!docs_to_client_sent',        label: 'НЕ отправлены клиенту',       not: true  },
+  { key: 'docs_from_client_received',   label: 'Получены от клиента',          not: false },
+  { key: '!docs_from_client_received',  label: 'НЕ получены от клиента',      not: true  },
+  { key: 'docs_to_carrier_sent',        label: 'Отправлены перевозчику',       not: false },
+  { key: '!docs_to_carrier_sent',       label: 'НЕ отправлены перевозчику',   not: true  },
+  { key: 'docs_from_carrier_received',  label: 'Получены от перевозчика',      not: false },
+  { key: '!docs_from_carrier_received', label: 'НЕ получены от перевозчика',  not: true  },
 ]
 
 export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '' }) {
@@ -54,7 +58,9 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   if (payFilter === 'clientUnpaid') filtered = filtered.filter(o => !o.client_paid)
   if (payFilter === 'carrierUnpaid') filtered = filtered.filter(o => !o.carrier_paid)
   if (payFilter === 'debt') filtered = filtered.filter(o => o.client_paid && !o.carrier_paid)
-  if (docFilters.length > 0) filtered = filtered.filter(o => docFilters.every(f => o[f]))
+  if (docFilters.length > 0) filtered = filtered.filter(o =>
+    docFilters.every(f => f.startsWith('!') ? !o[f.slice(1)] : !!o[f])
+  )
   if (search) {
     const q = search.toLowerCase()
     filtered = filtered.filter(o =>
@@ -141,34 +147,40 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
 
         {/* Doc filter panel — inline below, no positioning */}
         {showDocFilter && (
-          <div style={{
-            marginTop: 10, paddingTop: 10,
-            borderTop: '1px solid rgba(14,23,38,0.07)',
-            display: 'flex', flexDirection: 'column', gap: 2,
-          }}>
-            {DOC_FILTER_OPTIONS.map(f => (
-              <label key={f.key} style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                padding: '8px 10px', cursor: 'pointer', borderRadius: 10,
-                fontSize: 13, fontWeight: 500, color: '#0E1726',
-                background: docFilters.includes(f.key) ? 'rgba(19,102,240,0.07)' : 'transparent',
-                transition: 'background 0.12s',
-              }}>
-                <input
-                  type="checkbox"
-                  checked={docFilters.includes(f.key)}
-                  onChange={() => toggleDocFilter(f.key)}
-                  style={{ accentColor: '#1366F0', width: 15, height: 15, flexShrink: 0 }}
-                />
-                {f.label}
-              </label>
-            ))}
+          <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(14,23,38,0.07)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+              {DOC_FILTER_OPTIONS.map((f, i) => (
+                <>
+                  {i % 2 === 0 && i > 0 && (
+                    <div key={`sep-${i}`} style={{ gridColumn: '1/-1', height: 1, background: 'rgba(14,23,38,0.05)', margin: '3px 0' }} />
+                  )}
+                  <label key={f.key} style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '7px 10px', cursor: 'pointer', borderRadius: 9,
+                    fontSize: 12.5, fontWeight: f.not ? 500 : 600,
+                    color: f.not ? '#8A93A0' : '#0E1726',
+                    background: docFilters.includes(f.key)
+                      ? (f.not ? 'rgba(200,25,35,0.07)' : 'rgba(19,102,240,0.07)')
+                      : 'transparent',
+                    transition: 'background 0.12s',
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={docFilters.includes(f.key)}
+                      onChange={() => toggleDocFilter(f.key)}
+                      style={{ accentColor: f.not ? '#C81923' : '#1366F0', width: 14, height: 14, flexShrink: 0 }}
+                    />
+                    {f.label}
+                  </label>
+                </>
+              ))}
+            </div>
             {docFilters.length > 0 && (
               <button onClick={() => { setDocFilters([]); setShowDocFilter(false) }} style={{
-                padding: '7px 10px', border: 'none', cursor: 'pointer', marginTop: 2,
+                padding: '7px 10px', border: 'none', cursor: 'pointer', marginTop: 6,
                 background: 'rgba(200,25,35,0.07)', color: '#C81923',
                 fontFamily: 'Manrope', fontSize: 12, fontWeight: 600, borderRadius: 10,
-                textAlign: 'left',
+                textAlign: 'left', width: '100%',
               }}>Сбросить фильтр</button>
             )}
           </div>
