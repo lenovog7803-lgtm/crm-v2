@@ -114,7 +114,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           <button onClick={() => {
             if (!showDocFilter && docBtnRef.current) {
               const r = docBtnRef.current.getBoundingClientRect()
-              setDocDropPos({ top: r.bottom + 6, right: window.innerWidth - r.right })
+              const left = Math.min(r.left, window.innerWidth - 260)
+              setDocDropPos({ top: r.bottom + 6, left: Math.max(left, 8) })
             }
             setShowDocFilter(v => !v)
           }} style={{
@@ -134,7 +135,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
             <div style={{
               position: 'fixed',
               top: docDropPos?.top ?? 100,
-              right: docDropPos?.right ?? 16,
+              left: docDropPos?.left ?? 8,
               background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
               borderRadius: 16, padding: '8px 4px',
