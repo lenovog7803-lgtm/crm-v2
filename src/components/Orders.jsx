@@ -110,9 +110,9 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           <div style={{ flex: '0 0 auto', width: 1, height: 20, background: 'rgba(14,23,38,0.1)' }} />
 
           {/* Doc filter */}
-          <div ref={docBtnRef} style={{ position: 'relative', flexShrink: 0 }}>
+          <div ref={docBtnRef} style={{ flexShrink: 0 }}>
           <button onClick={() => {
-            if (!showDocFilter && isMobile && docBtnRef.current) {
+            if (!showDocFilter && docBtnRef.current) {
               const r = docBtnRef.current.getBoundingClientRect()
               setDocDropPos({ top: r.bottom + 6, right: window.innerWidth - r.right })
             }
@@ -132,10 +132,9 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           </button>
           {showDocFilter && (
             <div style={{
-              position: isMobile ? 'fixed' : 'absolute',
-              top: isMobile ? (docDropPos?.top ?? 100) : '100%',
-              right: isMobile ? (docDropPos?.right ?? 16) : 0,
-              marginTop: isMobile ? 0 : 6,
+              position: 'fixed',
+              top: docDropPos?.top ?? 100,
+              right: docDropPos?.right ?? 16,
               background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
               borderRadius: 16, padding: '8px 4px',
