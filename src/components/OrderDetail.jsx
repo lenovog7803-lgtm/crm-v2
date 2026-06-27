@@ -87,6 +87,7 @@ function PaymentButton({ type, order, onClick }) {
 }
 
 export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, onOpenCarrier, onOpenOrder, onDuplicate, onEdit }) {
+  const isMobile = useIsMobile()
   const [order, setOrder] = useState(null)
   const [loading, setLoading] = useState(true)
   const [payLoading, setPayLoading] = useState(null)
@@ -214,7 +215,6 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
   const [avAc, avBc] = getGradient(order.client_name || '')
   const [avAr, avBr] = getGradient(order.carrier_name || '')
   const curStatus = STATUSES.find(s => s.id === view.status) || STATUSES[0]
-  const isMobile = useIsMobile()
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
