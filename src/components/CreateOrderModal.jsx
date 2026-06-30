@@ -365,7 +365,7 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
         <div style={{ display: 'flex', gap: 10 }}>
           <button type="button" className="btn-ghost" onClick={handleClose} style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button type="submit" className="btn-primary" disabled={loading} style={{ flex: 2, justifyContent: 'center' }}>
-            {loading ? 'Создание...' : 'Создать заявку →'}
+            {loading ? (isEdit ? 'Сохранение...' : 'Создание...') : (isEdit ? 'Сохранить изменения' : 'Создать заявку →')}
           </button>
         </div>
       </form>
