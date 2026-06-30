@@ -1,7 +1,12 @@
 export const fmtMoney = n => (n || 0).toLocaleString('ru-RU') + ' BYN'
 
-export const initials = name =>
-  (name || '').replace(/[«»"']/g, '').split(/\s+/).filter(Boolean).map(w => w[0].toUpperCase()).slice(0, 2).join('')
+const LEGAL_FORMS = new Set(['ООО','ОАО','ЗАО','ПАО','АО','ИП','ЧУП','ЧПУП','УП','РУП','СООО','ОДО','КУП','РУПП','ТОО','СП','НП','ФЛ'])
+export const initials = name => {
+  const words = (name || '').replace(/[«»"']/g, '').split(/\s+/).filter(Boolean)
+  const meaningful = words.filter(w => !LEGAL_FORMS.has(w.toUpperCase()))
+  const source = meaningful.length > 0 ? meaningful : words
+  return source.map(w => w[0].toUpperCase()).slice(0, 2).join('')
+}
 
 // Handles both legacy (active/done) and API (in_progress/delivered/new) statuses
 export const statusLabel = s => ({

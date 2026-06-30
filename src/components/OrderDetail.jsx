@@ -11,10 +11,10 @@ const STATUSES = [
 ]
 
 const DOC_STEPS = [
-  { key: 'docs_to_client_sent', label: 'Отправлено клиенту' },
-  { key: 'docs_from_client_received', label: 'Получено от клиента' },
-  { key: 'docs_to_carrier_sent', label: 'Отправлено перевозчику' },
-  { key: 'docs_from_carrier_received', label: 'Получено от перевозчика' },
+  { key: 'docs_to_client_sent',       dateKey: 'docs_to_client_date',      label: 'Отправлено клиенту' },
+  { key: 'docs_from_client_received', dateKey: 'docs_from_client_date',    label: 'Получено от клиента' },
+  { key: 'docs_to_carrier_sent',      dateKey: 'docs_to_carrier_date',     label: 'Отправлено перевозчику' },
+  { key: 'docs_from_carrier_received',dateKey: 'docs_from_carrier_date',   label: 'Получено от перевозчика' },
 ]
 
 const sLabel = {
@@ -192,7 +192,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
   }
 
   const handleDocToggle = (key) => {
-    const dateKey = key + '_date'
+    const step = DOC_STEPS.find(s => s.key === key)
+    const dateKey = step?.dateKey || key + '_date'
     const current = draft[key] !== undefined ? draft[key] : order[key]
     const newVal = !current
     const now = new Date().toISOString()
@@ -446,7 +447,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {DOC_STEPS.map(step => {
                 const isDone = !!view[step.key]
-                const date = view[step.key + '_date']
+                const date = view[step.dateKey]
                 return (
                   <div
                     key={step.key}
