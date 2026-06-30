@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getOrders, getClients, getCarriers, getPaymentsIn, getPaymentsOut, createPaymentIn, createPaymentOut, deletePaymentIn, deletePaymentOut, generateReconciliation, getReconciliationHistory } from '../api'
+import { getOrders, getClients, getCarriers, getPaymentsIn, getPaymentsOut, createPaymentIn, createPaymentOut, deletePaymentIn, deletePaymentOut, generateReconciliation, getReconciliationHistory, generateAllActs } from '../api'
 import { fmtMoney, initials, getGradient } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 
@@ -102,10 +102,15 @@ export default function Finance({ refreshKey }) {
     if (!recPartyId) return
     setRecLoading(true)
     try {
-      const result = await generateReconciliation({ type: recType, counterparty_id: recPartyId, period: recPeriod })
+      let result
+      if (recType === 'client') {
+        result = await generateAllActs(recPartyId)
+      } else {
+        result = await generateReconciliation({ type: recType, counterparty_id: recPartyId, period: recPeriod })
+      }
       if (result?.url) window.open(result.url, '_blank')
       getReconciliationHistory({}).then(r => setRecHistory(Array.isArray(r) ? r : (r?.history || []))).catch(() => {})
-    } catch (e) { console.error(e) }
+    } catch (e) { console.error(e); alert('Ошибка: ' + e.message) }
     setRecLoading(false)
   }
 

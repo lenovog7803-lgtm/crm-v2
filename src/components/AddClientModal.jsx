@@ -17,7 +17,13 @@ export default function AddClientModal({ onClose, onSuccess }) {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+  const [isDirty, setIsDirty] = useState(false)
+  const set = (k, v) => { setIsDirty(true); setForm(f => ({ ...f, [k]: v })) }
+
+  const handleClose = () => {
+    if (isDirty && !window.confirm('Вы уверены? Изменения не сохранятся.')) return
+    onClose()
+  }
 
   const handleSubmit = async e => {
     e.preventDefault()
@@ -26,6 +32,7 @@ export default function AddClientModal({ onClose, onSuccess }) {
     setError('')
     try {
       await createClient(form)
+      setIsDirty(false)
       onSuccess()
     } catch (e) {
       setError('Ошибка при сохранении')
@@ -34,8 +41,8 @@ export default function AddClientModal({ onClose, onSuccess }) {
   }
 
   return (
-    <ModalOverlay onClose={onClose}>
-      <ModalHeader title="Добавить клиента" onClose={onClose} />
+    <ModalOverlay onClose={handleClose}>
+      <ModalHeader title="Добавить клиента" onClose={handleClose} />
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
         {/* Основное */}
@@ -129,7 +136,7 @@ export default function AddClientModal({ onClose, onSuccess }) {
 
         {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center' }}>{error}</div>}
         <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-          <button type="button" className="btn-ghost" onClick={onClose} style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+          <button type="button" className="btn-ghost" onClick={handleClose} style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button type="submit" className="btn-primary" disabled={loading} style={{ flex: 2, justifyContent: 'center' }}>
             {loading ? 'Сохранение...' : 'Добавить клиента'}
           </button>

@@ -139,8 +139,10 @@ function CityInput({ value, onChange, placeholder }) {
 
 export default function CreateOrderModal({ onClose, onSuccess, initialData, editOrderId }) {
   const isEdit = Boolean(editOrderId)
+  const [isDirty, setIsDirty] = useState(false)
   const handleClose = () => {
-    if (window.confirm('Закрыть форму? Несохранённые данные будут потеряны.')) onClose()
+    if (isDirty && !window.confirm('Вы уверены? Изменения не сохранятся.')) return
+    onClose()
   }
   const [clients, setClients] = useState([])
   const [carriers, setCarriers] = useState([])
@@ -171,7 +173,7 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
     getCarriers().then(r => setCarriers(Array.isArray(r) ? r : [])).catch(() => {})
   }, [])
 
-  const upd = (k, v) => setForm(p => ({ ...p, [k]: v }))
+  const upd = (k, v) => { setIsDirty(true); setForm(p => ({ ...p, [k]: v })) }
 
   const handleCarrierSelect = carrier => {
     const vehicleInfo = [carrier.plate, carrier.vehicle_type, carrier.driver_name, carrier.phone].filter(Boolean).join(', ')
@@ -226,6 +228,7 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
         await createOrder({ ...payload, status: 'new' })
       }
       syncToSheets().catch(() => {})
+      setIsDirty(false)
       onSuccess()
     } catch (e) {
       setError(isEdit ? 'Ошибка при сохранении' : 'Ошибка при создании заявки')
