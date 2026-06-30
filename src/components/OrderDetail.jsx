@@ -156,6 +156,25 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     setSaveErr(false)
     try {
       await apiUpdate(order.id, draft)
+      // Create payment records when payment status newly set to paid
+      if (draft.client_paid === true && !order.client_paid) {
+        createPaymentIn({
+          client_id: order.client_id, client_name: order.client_name,
+          amount: order.client_rate,
+          date: (draft.client_paid_date || new Date().toISOString()).slice(0, 10),
+          order_id: order.id, order_number: order.order_number,
+          description: `Оплата по заявке ${order.order_number || order.id}`,
+        }).catch(console.error)
+      }
+      if (draft.carrier_paid === true && !order.carrier_paid) {
+        createPaymentOut({
+          carrier_id: order.carrier_id, carrier_name: order.carrier_name,
+          amount: order.carrier_rate,
+          date: (draft.carrier_paid_date || new Date().toISOString()).slice(0, 10),
+          order_id: order.id, order_number: order.order_number,
+          description: `Оплата перевозчику по заявке ${order.order_number || order.id}`,
+        }).catch(console.error)
+      }
       setOrder(prev => ({ ...prev, ...draft }))
       setDraft({})
       setSavedOk(true)
@@ -184,45 +203,13 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     setDraft(d => ({ ...d, [field]: value }))
   }
 
-  const handlePayment = async type => {
-    if (payLoading) return
+  const handlePayment = (type) => {
     const paidField = type === 'client' ? 'client_paid' : 'carrier_paid'
     const dateField = type === 'client' ? 'client_paid_date' : 'carrier_paid_date'
-    const rateField = type === 'client' ? 'client_rate' : 'carrier_rate'
+    const currentVal = draft[paidField] !== undefined ? draft[paidField] : order[paidField]
+    const newVal = !currentVal
     const now = new Date().toISOString()
-    const newVal = !order[paidField]
-    const updated = { [paidField]: newVal, [dateField]: newVal ? now : null }
-
-    // Optimistic UI update first
-    setOrder(prev => ({ ...prev, ...updated }))
-    setPayLoading(type)
-
-    apiUpdate(order.id, updated).catch(console.error)
-
-    if (newVal) {
-      if (type === 'client') {
-        createPaymentIn({
-          client_id: order.client_id,
-          client_name: order.client_name,
-          amount: order[rateField],
-          date: now.slice(0, 10),
-          order_id: order.id,
-          order_number: order.order_number,
-          description: `Оплата по заявке ${order.order_number || order.id}`,
-        }).catch(console.error)
-      } else {
-        createPaymentOut({
-          carrier_id: order.carrier_id,
-          carrier_name: order.carrier_name,
-          amount: order[rateField],
-          date: now.slice(0, 10),
-          order_id: order.id,
-          order_number: order.order_number,
-          description: `Оплата перевозчику по заявке ${order.order_number || order.id}`,
-        }).catch(console.error)
-      }
-    }
-    setPayLoading(null)
+    setDraft(d => ({ ...d, [paidField]: newVal, [dateField]: newVal ? now : null }))
   }
 
   const handleDelete = async () => {
@@ -448,8 +435,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
           <div className="card" style={{ padding: '20px 20px' }}>
             <SLabel>ОПЛАТА</SLabel>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <PaymentButton type="client" order={order} onClick={() => !payLoading && handlePayment('client')} />
-              <PaymentButton type="carrier" order={order} onClick={() => !payLoading && handlePayment('carrier')} />
+              <PaymentButton type="client" order={view} onClick={() => handlePayment('client')} />
+              <PaymentButton type="carrier" order={view} onClick={() => handlePayment('carrier')} />
             </div>
           </div>
 
