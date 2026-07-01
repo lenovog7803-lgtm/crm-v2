@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { getOrders, deleteOrder as apiDelete } from '../api'
 import { initials, statusLabel, statusColor, statusBg, getGradient } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
@@ -58,7 +58,15 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   const today = new Date().toISOString().slice(0, 10)
   const isOverdue = o => o.unload_date && o.unload_date < today && o.status !== 'done' && o.status !== 'cancelled'
 
-  let filtered = [...orders]
+  const sortedOrders = useMemo(() => {
+    return [...orders].sort((a, b) => {
+      const numA = parseInt(a.order_number?.match(/\d+/)?.[0] || '0')
+      const numB = parseInt(b.order_number?.match(/\d+/)?.[0] || '0')
+      return numB - numA
+    })
+  }, [orders])
+
+  let filtered = [...sortedOrders]
   if (statusFilter !== 'all') filtered = filtered.filter(o => o.status === statusFilter)
   if (payFilter === 'clientUnpaid') filtered = filtered.filter(o => !o.client_paid)
   if (payFilter === 'carrierUnpaid') filtered = filtered.filter(o => !o.carrier_paid)
