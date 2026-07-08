@@ -60,13 +60,15 @@ export default function Finance({ refreshKey }) {
     getReconciliationHistory({}).then(r => setRecHistory(Array.isArray(r) ? r : (r?.history || []))).catch(() => {})
   }, [refreshKey])
 
-  // Hero totals — from orders (paid flags)
-  const receipts = orders.filter(o => o.client_paid)
-  const expenses = orders.filter(o => o.carrier_paid)
-  const totalIncome = receipts.reduce((s, o) => s + (o.client_rate || 0), 0)
-  const totalExpense = expenses.reduce((s, o) => s + (o.carrier_rate || 0), 0)
+  // Hero totals — only manual entries from payments_in / payments_out
+  const totalIncome = paymentsIn.reduce((s, p) => s + (p.amount || 0), 0)
+  const totalExpense = paymentsOut.reduce((s, p) => s + (p.amount || 0), 0)
   const netProfit = totalIncome - totalExpense
   const marginPct = totalIncome > 0 ? Math.round((netProfit / totalIncome) * 100) : 0
+
+  // Заявки с оплатой — используются только для акта сверки ниже
+  const paidClientOrders = orders.filter(o => o.client_paid)
+  const paidCarrierOrders = orders.filter(o => o.carrier_paid)
 
   // Manual payments table (with pp_number + date)
   const allPayments = [
@@ -82,13 +84,13 @@ export default function Finance({ refreshKey }) {
   const visible = showAll ? filtered : filtered.slice(0, PREVIEW)
 
   // Reconciliation
-  const actClientNames = [...new Set(receipts.map(o => o.client_name).filter(Boolean))]
-  const actCarrierNames = [...new Set(expenses.map(o => o.carrier_name).filter(Boolean))]
+  const actClientNames = [...new Set(paidClientOrders.map(o => o.client_name).filter(Boolean))]
+  const actCarrierNames = [...new Set(paidCarrierOrders.map(o => o.carrier_name).filter(Boolean))]
   const actNames = actPartyType === 'clients' ? actClientNames : actCarrierNames
   const actOrders = actParty
     ? (actPartyType === 'clients'
-        ? receipts.filter(o => o.client_name === actParty)
-        : expenses.filter(o => o.carrier_name === actParty))
+        ? paidClientOrders.filter(o => o.client_name === actParty)
+        : paidCarrierOrders.filter(o => o.carrier_name === actParty))
     : []
 
   let balance = 0
@@ -178,13 +180,13 @@ export default function Finance({ refreshKey }) {
               <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>ПОСТУПЛЕНИЯ</div>
               <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
-              <div style={{ marginTop: 6, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{receipts.length} оплачено</div>
+              <div style={{ marginTop: 6, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paymentsIn.length} платежей</div>
             </div>
             <div style={{ background: 'linear-gradient(135deg, #1366F0 0%, #0D4FB5 100%)', borderRadius: 22, padding: '14px 14px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(19,102,240,0.4)' }}>
               <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>СПИСАНИЯ</div>
               <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
-              <div style={{ marginTop: 6, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{expenses.length} оплачено</div>
+              <div style={{ marginTop: 6, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paymentsOut.length} платежей</div>
             </div>
           </div>
         </div>
@@ -209,13 +211,13 @@ export default function Finance({ refreshKey }) {
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>ПОСТУПЛЕНИЯ</div>
             <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
-            <div style={{ marginTop: 14, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{receipts.length} оплачено</div>
+            <div style={{ marginTop: 14, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paymentsIn.length} платежей</div>
           </div>
           <div style={{ background: 'linear-gradient(135deg, #1366F0 0%, #0D4FB5 100%)', borderRadius: 22, padding: '26px 24px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(19,102,240,0.4)' }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>СПИСАНИЯ</div>
             <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
-            <div style={{ marginTop: 14, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{expenses.length} оплачено</div>
+            <div style={{ marginTop: 14, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paymentsOut.length} платежей</div>
           </div>
         </div>
       )}
