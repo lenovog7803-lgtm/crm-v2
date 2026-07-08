@@ -13,6 +13,8 @@ export default function Finance({ refreshKey }) {
   const [loading, setLoading] = useState(true)
   const [typeFilter, setTypeFilter] = useState('all')
   const [showAll, setShowAll] = useState(false)
+  const [showInModal, setShowInModal] = useState(false)
+  const [showOutModal, setShowOutModal] = useState(false)
 
   // Add payment modal state
   const [showAdd, setShowAdd] = useState(false)
@@ -80,7 +82,7 @@ export default function Finance({ refreshKey }) {
   if (typeFilter === 'income') filtered = filtered.filter(p => p.kind === 'income')
   if (typeFilter === 'expense') filtered = filtered.filter(p => p.kind === 'expense')
 
-  const PREVIEW = 15
+  const PREVIEW = 5
   const visible = showAll ? filtered : filtered.slice(0, PREVIEW)
 
   // Reconciliation
@@ -176,13 +178,13 @@ export default function Finance({ refreshKey }) {
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <div style={{ background: 'linear-gradient(135deg, #1E9E5A 0%, #15734A 100%)', borderRadius: 22, padding: '14px 14px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(30,158,90,0.4)' }}>
+            <div onClick={() => setShowInModal(true)} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #1E9E5A 0%, #15734A 100%)', borderRadius: 22, padding: '14px 14px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(30,158,90,0.4)' }}>
               <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>ПОСТУПЛЕНИЯ</div>
               <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
               <div style={{ marginTop: 6, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paymentsIn.length} платежей</div>
             </div>
-            <div style={{ background: 'linear-gradient(135deg, #1366F0 0%, #0D4FB5 100%)', borderRadius: 22, padding: '14px 14px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(19,102,240,0.4)' }}>
+            <div onClick={() => setShowOutModal(true)} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #1366F0 0%, #0D4FB5 100%)', borderRadius: 22, padding: '14px 14px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(19,102,240,0.4)' }}>
               <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>СПИСАНИЯ</div>
               <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
@@ -207,13 +209,13 @@ export default function Finance({ refreshKey }) {
               </div>
             </div>
           </div>
-          <div style={{ background: 'linear-gradient(135deg, #1E9E5A 0%, #15734A 100%)', borderRadius: 22, padding: '26px 24px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(30,158,90,0.4)' }}>
+          <div onClick={() => setShowInModal(true)} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #1E9E5A 0%, #15734A 100%)', borderRadius: 22, padding: '26px 24px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(30,158,90,0.4)' }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>ПОСТУПЛЕНИЯ</div>
             <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
             <div style={{ marginTop: 14, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paymentsIn.length} платежей</div>
           </div>
-          <div style={{ background: 'linear-gradient(135deg, #1366F0 0%, #0D4FB5 100%)', borderRadius: 22, padding: '26px 24px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(19,102,240,0.4)' }}>
+          <div onClick={() => setShowOutModal(true)} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #1366F0 0%, #0D4FB5 100%)', borderRadius: 22, padding: '26px 24px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(19,102,240,0.4)' }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>СПИСАНИЯ</div>
             <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
@@ -476,6 +478,96 @@ export default function Finance({ refreshKey }) {
           </div>
         )}
       </div>
+
+      {/* Модалка — детали поступлений */}
+      {showInModal && (
+        <div onClick={() => setShowInModal(false)} style={{
+          position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.4)', backdropFilter: 'blur(8px)',
+          zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(30px)', borderRadius: 24, padding: 28,
+            width: '90%', maxWidth: 560, maxHeight: '80vh', overflow: 'auto',
+            border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 40px 80px rgba(20,30,55,0.3)',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <div>
+                <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>Поступления</div>
+                <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 2 }}>Итого: {totalIncome.toLocaleString('ru-RU')} BYN</div>
+              </div>
+              <button onClick={() => setShowInModal(false)} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: 'transparent', cursor: 'pointer', fontSize: 18, color: '#A6AEB8' }}>×</button>
+            </div>
+            {paymentsIn.length === 0 ? (
+              <div style={{ textAlign: 'center', color: '#A6AEB8', padding: 40 }}>Нет поступлений</div>
+            ) : paymentsIn.map((p, i) => {
+              const [avA, avB] = getGradient(p.client_name || '')
+              return (
+                <div key={p.id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid rgba(14,23,38,0.06)' }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                    background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12, fontWeight: 700,
+                  }}>{initials(p.client_name)}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#0E1726' }}>{p.client_name || '—'}</div>
+                    <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>
+                      {p.date || '—'}{p.pp_number ? ` · ПП ${p.pp_number}` : ''}
+                    </div>
+                  </div>
+                  <div style={{ fontFamily: 'JetBrains Mono', fontSize: 14, fontWeight: 700, color: '#1E9E5A', flexShrink: 0 }}>
+                    +{parseFloat(p.amount || 0).toLocaleString('ru-RU')} BYN
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Модалка — детали списаний */}
+      {showOutModal && (
+        <div onClick={() => setShowOutModal(false)} style={{
+          position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.4)', backdropFilter: 'blur(8px)',
+          zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(30px)', borderRadius: 24, padding: 28,
+            width: '90%', maxWidth: 560, maxHeight: '80vh', overflow: 'auto',
+            border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 40px 80px rgba(20,30,55,0.3)',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <div>
+                <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>Списания</div>
+                <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 2 }}>Итого: {totalExpense.toLocaleString('ru-RU')} BYN</div>
+              </div>
+              <button onClick={() => setShowOutModal(false)} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: 'transparent', cursor: 'pointer', fontSize: 18, color: '#A6AEB8' }}>×</button>
+            </div>
+            {paymentsOut.length === 0 ? (
+              <div style={{ textAlign: 'center', color: '#A6AEB8', padding: 40 }}>Нет списаний</div>
+            ) : paymentsOut.map((p, i) => {
+              const [avA, avB] = getGradient(p.carrier_name || '')
+              return (
+                <div key={p.id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid rgba(14,23,38,0.06)' }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                    background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12, fontWeight: 700,
+                  }}>{initials(p.carrier_name)}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#0E1726' }}>{p.carrier_name || '—'}</div>
+                    <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>
+                      {p.date || '—'}{p.pp_number ? ` · ПП ${p.pp_number}` : ''}
+                    </div>
+                  </div>
+                  <div style={{ fontFamily: 'JetBrains Mono', fontSize: 14, fontWeight: 700, color: '#1366F0', flexShrink: 0 }}>
+                    -{parseFloat(p.amount || 0).toLocaleString('ru-RU')} BYN
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
