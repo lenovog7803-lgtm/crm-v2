@@ -39,8 +39,8 @@ const PAGE_SIZE = 80
 export default function Leads({ refreshKey, search = '' }) {
   const [leads, setLeads] = useState([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState('all')
-  const [industryFilter, setIndustryFilter] = useState('')
+  const [filter, setFilter] = useState(() => localStorage.getItem('leads_filter') || 'all')
+  const [industryFilter, setIndustryFilter] = useState(() => localStorage.getItem('leads_industryFilter') || '')
   const [editLead, setEditLead] = useState(null)
   const [noteText, setNoteText] = useState('')
   const [saving, setSaving] = useState(false)
@@ -56,6 +56,8 @@ export default function Leads({ refreshKey, search = '' }) {
   }, [refreshKey])
 
   useEffect(() => { setPage(1) }, [filter, industryFilter, search])
+  useEffect(() => { localStorage.setItem('leads_filter', filter) }, [filter])
+  useEffect(() => { localStorage.setItem('leads_industryFilter', industryFilter) }, [industryFilter])
 
   const setStatus = async (lead, status) => {
     try {
