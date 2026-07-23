@@ -26,6 +26,35 @@ import AddCarrierModal from './components/AddCarrierModal'
 import PaymentModal from './components/PaymentModal'
 import MobileNav from './components/MobileNav'
 
+const SEARCH_STORAGE_KEYS = {
+  orders: 'search_orders',
+  clients: 'search_clients',
+  carriers: 'search_carriers',
+  leads: 'search_leads',
+}
+
+function loadPageSearch(page) {
+  const key = SEARCH_STORAGE_KEYS[page]
+  if (!key) return ''
+  try {
+    return localStorage.getItem(key) || ''
+  } catch {
+    return ''
+  }
+}
+
+function savePageSearch(page, value) {
+  const key = SEARCH_STORAGE_KEYS[page]
+  if (!key) return
+  try {
+    if (value) {
+      localStorage.setItem(key, value)
+    } else {
+      localStorage.removeItem(key)
+    }
+  } catch {}
+}
+
 function MainApp() {
   const { signOut } = useAuth()
 
@@ -45,7 +74,7 @@ function MainApp() {
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [paymentModalKind, setPaymentModalKind] = useState('income')
 
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(() => loadPageSearch('dashboard'))
   const [overdueItems, setOverdueItems] = useState([])
 
   // Refresh triggers — increment to tell the component to re-fetch
@@ -95,7 +124,12 @@ function MainApp() {
 
   const handleNav = key => {
     setPage(key)
-    setSearch('')
+    setSearch(loadPageSearch(key))
+  }
+
+  const handleSearchChange = value => {
+    setSearch(value)
+    savePageSearch(page, value)
   }
 
   const openPaymentModal = kind => {
@@ -121,7 +155,7 @@ function MainApp() {
         />
 
         <main className="app-main">
-          <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={setSearch} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} />
+          <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={handleSearchChange} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} />
           <div className="scroll-area" key={page}>
             {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} onMonthsLoaded={setAvailableMonths} preloadedOrders={allOrders} />}
 
@@ -136,7 +170,7 @@ function MainApp() {
             {page === 'order-detail' && (
               <OrderDetail
                 orderId={selectedOrderId}
-                onBack={() => setPage('orders')}
+                onBack={() => handleNav('orders')}
                 onDelete={() => { setOrdersKey(k => k + 1) }}
                 onOpenClient={id => openClient(id)}
                 onOpenCarrier={id => openCarrier(id)}
@@ -172,7 +206,7 @@ function MainApp() {
             {page === 'client-detail' && (
               <ClientDetail
                 clientId={selectedClientId}
-                onBack={() => setPage('clients')}
+                onBack={() => handleNav('clients')}
                 onDelete={() => { setClientsKey(k => k + 1) }}
                 onOpenOrder={id => openOrder(id)}
               />
@@ -189,7 +223,7 @@ function MainApp() {
             {page === 'carrier-detail' && (
               <CarrierDetail
                 carrierId={selectedCarrierId}
-                onBack={() => setPage('carriers')}
+                onBack={() => handleNav('carriers')}
                 onDelete={() => { setCarriersKey(k => k + 1) }}
                 onOpenOrder={id => openOrder(id)}
               />
