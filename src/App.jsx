@@ -16,7 +16,7 @@ import Clients from './components/Clients'
 import ClientDetail from './components/ClientDetail'
 import Carriers from './components/Carriers'
 import CarrierDetail from './components/CarrierDetail'
-import Leads from './components/Leads'
+import Leads from './pages/Leads'
 import Trash from './components/Trash'
 
 import CreateOrderModal from './components/CreateOrderModal'
@@ -86,7 +86,6 @@ function MainApp() {
   const [clientsKey, setClientsKey] = useState(0)
   const [carriersKey, setCarriersKey] = useState(0)
   const [financeKey, setFinanceKey] = useState(0)
-  const [leadsKey, setLeadsKey] = useState(0)
 
   const [allOrders, setAllOrders] = useState([])
   const [counts, setCounts] = useState({ newOrders: 0, pendingTasks: 0, newLeads: 0 })
@@ -229,7 +228,7 @@ function MainApp() {
               />
             )}
 
-            {page === 'leads' && <Leads refreshKey={leadsKey} search={search} />}
+            {page === 'leads' && <Leads />}
             {page === 'trash' && <Trash />}
           </div>
         </main>

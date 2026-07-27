@@ -80,11 +80,19 @@ export const deleteTask = (id) => req(`/tasks/${id}`, { method: 'DELETE' });
 export const getLeads = (params = {}) => req('/leads?' + new URLSearchParams(params));
 export const getLead = (id) => req(`/leads/${id}`);
 export const createLead = (data) => req('/leads', { method: 'POST', body: JSON.stringify(data) });
-export const updateLead = (id, data) => req(`/leads/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const updateLead = (id, data) => req(`/leads/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const deleteLead = (id) => req(`/leads/${id}`, { method: 'DELETE' });
-export const addCallNote = (id, text) => req(`/leads/${id}/call_notes`, { method: 'POST', body: JSON.stringify({ text }) });
-export const logCall = (leadId, data) => req(`/leads/${leadId}/call`, { method: 'POST', body: JSON.stringify(data) });
+export const getCallQueue = (industry) =>
+  req('/leads/queue' + (industry ? `?industry=${encodeURIComponent(industry)}` : ''));
+export const logCall = (leadId, data) =>
+  req(`/leads/${leadId}/call`, { method: 'POST', body: JSON.stringify(data) });
 export const getCallHistory = (leadId) => req(`/leads/${leadId}/calls`);
+export const convertLead = (leadId) => req(`/leads/${leadId}/convert`, { method: 'POST' });
+export const getIndustries = () => req('/leads/industries');
+export const getScripts = () => req('/leads/scripts');
+export const saveScripts = (scripts) =>
+  req('/leads/scripts', { method: 'PUT', body: JSON.stringify({ scripts }) });
+export const getLeadsAnalytics = (period) => req(`/leads/analytics?period=${period || 'month'}`);
 
 // Finance
 export const getPaymentsIn = (params = {}) => req('/payments/in?' + new URLSearchParams(params));
