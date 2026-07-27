@@ -18,6 +18,16 @@ export default function CallCard({ lead, onEdit }) {
   const attempts = lead.call_attempts || 0
   const cadenceStep = lead.cadence_step || 0
 
+  const legacyNotes = (lead.call_notes || []).map((n, i) => ({
+    id: `legacy-${i}-${n.date}`,
+    kind: 'note',
+    text: n.text,
+    author: n.author,
+    created_at: n.date,
+  }))
+  const callEntries = history.map(h => ({ ...h, kind: 'call' }))
+  const timeline = [...callEntries, ...legacyNotes].sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
+
   return (
     <div className="card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
@@ -70,11 +80,24 @@ export default function CallCard({ lead, onEdit }) {
 
       <div>
         <div style={{ fontSize: 10, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
-          История звонков {history.length > 0 && `(${history.length})`}
+          История звонков {timeline.length > 0 && `(${timeline.length})`}
         </div>
-        {history.length === 0 && <div style={{ fontSize: 12.5, color: '#A6AEB8' }}>Звонков ещё не было</div>}
+        {timeline.length === 0 && <div style={{ fontSize: 12.5, color: '#A6AEB8' }}>Звонков ещё не было</div>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 220, overflowY: 'auto' }}>
-          {history.map((h) => {
+          {timeline.map((h) => {
+            if (h.kind === 'note') {
+              return (
+                <div key={h.id} style={{ display: 'flex', gap: 10, padding: '8px 12px', background: 'rgba(14,23,38,0.03)', borderRadius: 10 }}>
+                  <div style={{ fontSize: 14, flexShrink: 0 }}>📝</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 11, color: '#8A93A0', fontWeight: 700 }}>
+                      {h.author ? `${h.author} · ` : ''}{h.created_at ? new Date(h.created_at).toLocaleString('ru-RU') : ''}
+                    </div>
+                    {h.text && <div style={{ fontSize: 12.5, color: '#5A6573', marginTop: 2 }}>{h.text}</div>}
+                  </div>
+                </div>
+              )
+            }
             const o = outcomeById(h.outcome)
             return (
               <div key={h.id} style={{ display: 'flex', gap: 10, padding: '8px 12px', background: 'rgba(14,23,38,0.03)', borderRadius: 10 }}>

@@ -1,16 +1,23 @@
 import { useState, useEffect } from 'react'
-import { getLeads, updateLead } from '../../api'
+import { getLeads, updateLead, logCall } from '../../api'
 import { STAGES } from '../../constants/leads'
+import CallCard from './CallCard'
+import CallOutcomeBar from './CallOutcomeBar'
+import ScriptPanel from './ScriptPanel'
+import LeadEditModal from './LeadEditModal'
 
 export default function KanbanView({ industry }) {
   const [leads, setLeads] = useState([])
   const [loading, setLoading] = useState(true)
   const [dragId, setDragId] = useState(null)
   const [overStage, setOverStage] = useState(null)
+  const [activeLead, setActiveLead] = useState(null)
+  const [editLead, setEditLead] = useState(null)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     setLoading(true)
-    getLeads({ limit: 3000 }).then(r => setLeads(Array.isArray(r) ? r : (r.items || []))).catch(console.error).finally(() => setLoading(false))
+    getLeads({ limit: 3000 }).then(r => setLeads(Array.isArray(r) ? r : (r?.items || []))).catch(console.error).finally(() => setLoading(false))
   }, [])
 
   const filtered = industry ? leads.filter(l => l.industry === industry) : leads
@@ -27,6 +34,17 @@ export default function KanbanView({ industry }) {
     setOverStage(null)
     if (dragId) moveTo(dragId, stageId)
     setDragId(null)
+  }
+
+  const handleSave = async (data) => {
+    if (!activeLead) return
+    setSaving(true)
+    try {
+      const res = await logCall(activeLead.id, data)
+      setLeads(prev => prev.map(l => l.id === activeLead.id ? res.lead : l))
+      setActiveLead(null)
+    } catch (e) { console.error(e) }
+    setSaving(false)
   }
 
   const renderColumn = (stage) => {
@@ -54,9 +72,10 @@ export default function KanbanView({ industry }) {
               key={l.id}
               draggable
               onDragStart={() => setDragId(l.id)}
+              onClick={() => setActiveLead(l)}
               style={{
                 padding: '10px 12px', borderRadius: 12, background: 'rgba(255,255,255,0.7)',
-                border: '1px solid rgba(14,23,38,0.08)', cursor: 'grab',
+                border: '1px solid rgba(14,23,38,0.08)', cursor: 'pointer',
               }}
             >
               <div style={{ fontSize: 12.5, fontWeight: 700, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
@@ -73,10 +92,38 @@ export default function KanbanView({ industry }) {
   if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>
 
   return (
-    <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 8 }}>
-      {activeStages.map(renderColumn)}
-      <div style={{ width: 1, background: 'rgba(14,23,38,0.1)', flexShrink: 0 }} />
-      {closedStages.map(renderColumn)}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 8 }}>
+        {activeStages.map(renderColumn)}
+        <div style={{ width: 1, background: 'rgba(14,23,38,0.1)', flexShrink: 0 }} />
+        {closedStages.map(renderColumn)}
+      </div>
+
+      {activeLead && (
+        <div className="leads-call-modal" style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, overflowY: 'auto' }}
+          onClick={e => { if (e.target === e.currentTarget) setActiveLead(null) }}>
+          <style>{`.leads-call-modal .card { background: #FFFFFF; backdrop-filter: none; -webkit-backdrop-filter: none; border: 1px solid rgba(14,23,38,0.08); }`}</style>
+          <div style={{ width: '100%', maxWidth: 1000, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <button onClick={() => setActiveLead(null)} className="btn-ghost" style={{ alignSelf: 'flex-end' }}>Закрыть ✕</button>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, alignItems: 'start' }}>
+              <CallCard lead={activeLead} onEdit={setEditLead} />
+              <ScriptPanel stage={activeLead?.stage} />
+            </div>
+            <CallOutcomeBar lead={activeLead} onSave={handleSave} saving={saving} />
+          </div>
+        </div>
+      )}
+
+      {editLead && (
+        <LeadEditModal
+          lead={editLead}
+          onClose={() => setEditLead(null)}
+          onSaved={(updated) => {
+            setLeads(prev => prev.map(l => l.id === updated.id ? { ...l, ...updated } : l))
+            setActiveLead(prev => prev && prev.id === updated.id ? { ...prev, ...updated } : prev)
+          }}
+        />
+      )}
     </div>
   )
 }
