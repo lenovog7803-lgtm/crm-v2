@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { getLeads } from '../../api'
 import { STAGES, stageById } from '../../constants/leads'
 import CallCard from './CallCard'
@@ -19,27 +19,24 @@ const tdStyle = { padding: '12px 14px', fontSize: 13, color: '#0E1726', borderTo
 export default function ListView({ industry }) {
   const [leads, setLeads] = useState([])
   const [loading, setLoading] = useState(true)
-  const [filters, setFilters] = useState(() => ({ search: '', stage: '', city: '', overdueOnly: false, ...loadFilters() }))
+  const [filters, setFilters] = useState(() => ({ search: '', stage: '', overdueOnly: false, ...loadFilters() }))
   const [activeLead, setActiveLead] = useState(null)
   const [editLead, setEditLead] = useState(null)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     setLoading(true)
-    getLeads({ limit: 3000 }).then(r => setLeads(Array.isArray(r) ? r : (r.items || []))).catch(console.error).finally(() => setLoading(false))
+    getLeads({ limit: 3000 }).then(r => setLeads(Array.isArray(r) ? r : (r?.items || []))).catch(console.error).finally(() => setLoading(false))
   }, [])
 
   useEffect(() => { localStorage.setItem(FILTERS_KEY, JSON.stringify(filters)) }, [filters])
 
   const set = (k) => (v) => setFilters(p => ({ ...p, [k]: v }))
 
-  const cities = useMemo(() => [...new Set(leads.map(l => l.city).filter(Boolean))].sort(), [leads])
-
   const now = new Date().toISOString()
   const filtered = leads.filter(l => {
     if (industry && l.industry !== industry) return false
     if (filters.stage && l.stage !== filters.stage) return false
-    if (filters.city && l.city !== filters.city) return false
     if (filters.overdueOnly && !(l.next_call && l.next_call < now)) return false
     if (filters.search) {
       const q = filters.search.toLowerCase()
@@ -74,12 +71,6 @@ export default function ListView({ industry }) {
           <option value="">Все стадии</option>
           {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
         </select>
-        {cities.length > 0 && (
-          <select value={filters.city} onChange={e => set('city')(e.target.value)} className="form-input" style={{ minWidth: 140 }}>
-            <option value="">Все города</option>
-            {cities.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
-        )}
         <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: '#5A6573', cursor: 'pointer' }}>
           <input type="checkbox" checked={filters.overdueOnly} onChange={e => set('overdueOnly')(e.target.checked)} />
           Только просроченные
@@ -131,13 +122,14 @@ export default function ListView({ industry }) {
       )}
 
       {activeLead && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.4)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, overflowY: 'auto' }}
+        <div className="leads-call-modal" style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, overflowY: 'auto' }}
           onClick={e => { if (e.target === e.currentTarget) setActiveLead(null) }}>
+          <style>{`.leads-call-modal .card { background: #FFFFFF; backdrop-filter: none; -webkit-backdrop-filter: none; border: 1px solid rgba(14,23,38,0.08); }`}</style>
           <div style={{ width: '100%', maxWidth: 1000, display: 'flex', flexDirection: 'column', gap: 16 }}>
             <button onClick={() => setActiveLead(null)} className="btn-ghost" style={{ alignSelf: 'flex-end' }}>Закрыть ✕</button>
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, alignItems: 'start' }}>
               <CallCard lead={activeLead} onEdit={setEditLead} />
-              <ScriptPanel stage={activeLead.stage} />
+              <ScriptPanel stage={activeLead?.stage} />
             </div>
             <CallOutcomeBar lead={activeLead} onSave={handleSave} saving={saving} />
           </div>

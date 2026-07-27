@@ -117,10 +117,24 @@ export default function QueueView({ industry, onCounts }) {
       )}
 
       {askClient && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.4)', backdropFilter: 'blur(8px)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="card" style={{ padding: 28, maxWidth: 380, textAlign: 'center' }}>
+        <div style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(14,23,38,0.55)',
+          backdropFilter: 'blur(6px)',
+          zIndex: 1100,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+        }}>
+          <div style={{
+            background: '#FFFFFF',
+            borderRadius: 24,
+            padding: 26,
+            width: '100%', maxWidth: 380,
+            textAlign: 'center',
+            border: '1px solid rgba(14,23,38,0.08)',
+            boxShadow: '0 40px 80px rgba(20,30,55,0.28)',
+          }}>
             <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 16, color: '#0E1726', marginBottom: 8 }}>Создать карточку клиента?</div>
-            <div style={{ fontSize: 13, color: '#5A6573', marginBottom: 20 }}>{askClient.name} стал клиентом — перенести в раздел «Клиенты»?</div>
+            <div style={{ fontSize: 13, color: '#5A6573', marginBottom: 20 }}>{askClient?.name} стал клиентом — перенести в раздел «Клиенты»?</div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => handleConvert(false)} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Нет</button>
               <button onClick={() => handleConvert(true)} className="btn-primary" style={{ flex: 1, justifyContent: 'center' }}>Да</button>

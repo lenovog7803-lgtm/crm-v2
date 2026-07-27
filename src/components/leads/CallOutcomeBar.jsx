@@ -18,7 +18,7 @@ export default function CallOutcomeBar({ lead, onSave, saving }) {
     setError('')
   }, [lead?.id])
 
-  const cfg = OUTCOMES.find(o => o.id === outcome)
+  const cfg = OUTCOMES.find(o => o.id === outcome) || null
   const showDateBlock = outcome && outcome !== 'no_answer' && outcome !== 'won' && outcome !== 'lost'
 
   const setPreset = (days) => {
@@ -29,15 +29,15 @@ export default function CallOutcomeBar({ lead, onSave, saving }) {
   }
 
   const handleSave = () => {
-    if (!outcome) { setError('Выберите результат звонка'); return }
-    if (cfg.needsComment && !comment.trim()) { setError('Напишите комментарий'); return }
-    if (cfg.needsReason && !lostReason) { setError('Укажите причину отказа'); return }
+    if (!outcome || !cfg) { setError('Выберите результат звонка'); return }
+    if (cfg?.needsComment && !comment.trim()) { setError('Напишите комментарий'); return }
+    if (cfg?.needsReason && !lostReason) { setError('Укажите причину отказа'); return }
 
     setError('')
     onSave({
       outcome,
       comment: comment.trim(),
-      lost_reason: cfg.needsReason ? lostReason : undefined,
+      lost_reason: cfg?.needsReason ? lostReason : undefined,
       next_call: nextCall ? new Date(nextCall).toISOString() : undefined,
     })
   }
@@ -52,7 +52,7 @@ export default function CallOutcomeBar({ lead, onSave, saving }) {
             onClick={() => { setOutcome(o.id); setError('') }}
             style={{
               display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 12,
-              background: outcome === o.id ? o.color + '1F' : 'rgba(255,255,255,0.6)',
+              background: outcome === o.id ? o.color + '1F' : '#F7F8FA',
               border: `1.5px solid ${outcome === o.id ? o.color + '55' : 'rgba(14,23,38,0.08)'}`,
               cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s',
             }}
@@ -68,7 +68,7 @@ export default function CallOutcomeBar({ lead, onSave, saving }) {
       {cfg?.needsReason && (
         <div style={{ marginBottom: 16 }}>
           <span style={labelStyle}>Причина отказа</span>
-          <select value={lostReason} onChange={e => { setLostReason(e.target.value); setError('') }} className="form-input" style={{ width: '100%' }}>
+          <select value={lostReason} onChange={e => { setLostReason(e.target.value); setError('') }} className="form-input" style={{ width: '100%', background: '#F7F8FA' }}>
             <option value="">Выберите причину…</option>
             {LOST_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
@@ -83,7 +83,7 @@ export default function CallOutcomeBar({ lead, onSave, saving }) {
             onChange={e => { setComment(e.target.value); setError('') }}
             placeholder="О чём говорили, что решили…"
             autoFocus
-            style={{ width: '100%', minHeight: 70, padding: '11px 13px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', background: 'rgba(255,255,255,0.8)', fontSize: 13, fontFamily: 'Manrope', color: '#0E1726', resize: 'vertical', boxSizing: 'border-box' }}
+            style={{ width: '100%', minHeight: 70, padding: '11px 13px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', background: '#F7F8FA', fontSize: 13, fontFamily: 'Manrope', color: '#0E1726', resize: 'vertical', boxSizing: 'border-box' }}
           />
         </div>
       )}
@@ -103,7 +103,7 @@ export default function CallOutcomeBar({ lead, onSave, saving }) {
             value={nextCall}
             onChange={e => setNextCall(e.target.value)}
             className="form-input"
-            style={{ width: '100%' }}
+            style={{ width: '100%', background: '#F7F8FA' }}
           />
           {!nextCall && (
             <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 6 }}>
