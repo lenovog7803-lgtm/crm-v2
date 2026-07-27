@@ -83,6 +83,8 @@ export const createLead = (data) => req('/leads', { method: 'POST', body: JSON.s
 export const updateLead = (id, data) => req(`/leads/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
 export const deleteLead = (id) => req(`/leads/${id}`, { method: 'DELETE' });
 export const addCallNote = (id, text) => req(`/leads/${id}/call_notes`, { method: 'POST', body: JSON.stringify({ text }) });
+export const logCall = (leadId, data) => req(`/leads/${leadId}/call`, { method: 'POST', body: JSON.stringify(data) });
+export const getCallHistory = (leadId) => req(`/leads/${leadId}/calls`);
 
 // Finance
 export const getPaymentsIn = (params = {}) => req('/payments/in?' + new URLSearchParams(params));

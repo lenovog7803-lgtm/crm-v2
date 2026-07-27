@@ -2,19 +2,23 @@ import { useState, useEffect } from 'react'
 import { getLeads, updateLead as apiUpdate, deleteLead as apiDelete, addCallNote } from '../api'
 import { initials, getGradient } from '../utils'
 import { ModalOverlay, ModalHeader } from './Modal'
+import CallModal from './CallModal'
 
 const STATUS_LABELS = {
   new: 'Новый', thinking: 'Думает', sent_kp: 'КП отправлено', callback: 'Перезвонить', won: 'Клиент', lost: 'Отказ',
+  no_contact: 'Нет контакта',
   // Legacy statuses from DB
   contacted: 'Контакт', in_work: 'В работе', converted: 'Клиент',
 }
 const STATUS_COLORS = {
   new: '#1366F0', thinking: '#8A93A0', sent_kp: '#D97706', callback: '#F47A1F', won: '#1E9E5A', lost: '#C81923',
+  no_contact: '#8A93A0',
   contacted: '#8A93A0', in_work: '#D97706', converted: '#1E9E5A',
 }
 const STATUS_BG = {
   new: 'rgba(19,102,240,0.1)', thinking: 'rgba(138,147,160,0.1)', sent_kp: 'rgba(217,119,6,0.1)',
   callback: 'rgba(244,122,31,0.1)', won: 'rgba(30,158,90,0.1)', lost: 'rgba(200,25,35,0.1)',
+  no_contact: 'rgba(138,147,160,0.1)',
   contacted: 'rgba(138,147,160,0.1)', in_work: 'rgba(217,119,6,0.1)', converted: 'rgba(30,158,90,0.1)',
 }
 
@@ -25,6 +29,7 @@ const ALL_STATUSES = [
   { value: 'callback', label: 'Перезвонить' },
   { value: 'won', label: 'Клиент' },
   { value: 'lost', label: 'Отказ' },
+  { value: 'no_contact', label: 'Нет контакта' },
 ]
 
 const inputStyle = {
@@ -42,18 +47,21 @@ export default function Leads({ refreshKey, search = '' }) {
   const [filter, setFilter] = useState(() => localStorage.getItem('leads_filter') || 'all')
   const [industryFilter, setIndustryFilter] = useState(() => localStorage.getItem('leads_industryFilter') || '')
   const [editLead, setEditLead] = useState(null)
+  const [callLead, setCallLead] = useState(null)
   const [noteText, setNoteText] = useState('')
   const [saving, setSaving] = useState(false)
   const [noteLoading, setNoteLoading] = useState(false)
   const [page, setPage] = useState(1)
 
-  useEffect(() => {
+  const loadLeads = () => {
     setLoading(true)
-    getLeads({ limit: 3000 })
+    return getLeads({ limit: 3000 })
       .then(r => setLeads(Array.isArray(r) ? r : (r.items || [])))
       .catch(console.error)
       .finally(() => setLoading(false))
-  }, [refreshKey])
+  }
+
+  useEffect(() => { loadLeads() }, [refreshKey])
 
   useEffect(() => { setPage(1) }, [filter, industryFilter, search])
   useEffect(() => { localStorage.setItem('leads_filter', filter) }, [filter])
@@ -63,16 +71,6 @@ export default function Leads({ refreshKey, search = '' }) {
     try {
       await apiUpdate(lead.id, { status })
       setLeads(prev => prev.map(l => l.id === lead.id ? { ...l, status } : l))
-    } catch (e) { console.error(e) }
-  }
-
-  const handleCall = async lead => {
-    const note = `Звонок ${new Date().toLocaleDateString('ru-RU')}`
-    try {
-      await addCallNote(lead.id, note)
-      setLeads(prev => prev.map(l => l.id === lead.id ? {
-        ...l, call_notes: [...(l.call_notes || []), { text: note, created_at: new Date().toISOString() }]
-      } : l))
     } catch (e) { console.error(e) }
   }
 
@@ -180,7 +178,7 @@ export default function Leads({ refreshKey, search = '' }) {
 
       {/* Filters */}
       <div className="card" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-        {[{ k: 'all', l: 'Все' }, { k: 'new', l: 'Новые' }, { k: 'thinking', l: 'Думает' }, { k: 'sent_kp', l: 'КП' }, { k: 'callback', l: 'Перезвонить' }, { k: 'won', l: 'Клиент' }, { k: 'lost', l: 'Отказ' }].map(f => (
+        {[{ k: 'all', l: 'Все' }, { k: 'new', l: 'Новые' }, { k: 'thinking', l: 'Думает' }, { k: 'sent_kp', l: 'КП' }, { k: 'callback', l: 'Перезвонить' }, { k: 'won', l: 'Клиент' }, { k: 'lost', l: 'Отказ' }, { k: 'no_contact', l: 'Нет контакта' }].map(f => (
           <button key={f.k} onClick={() => setFilter(f.k)} style={{
             padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer',
             fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
@@ -270,7 +268,7 @@ export default function Leads({ refreshKey, search = '' }) {
 
               <div style={{ display: 'flex', gap: 8, paddingTop: 12, borderTop: '1px solid rgba(14,23,38,0.06)', flexWrap: 'wrap' }}
                 onClick={e => e.stopPropagation()}>
-                <button onClick={() => handleCall(lead)} style={{
+                <button onClick={() => setCallLead(lead)} style={{
                   padding: '7px 13px', borderRadius: 10, border: 'none', cursor: 'pointer',
                   background: 'rgba(19,102,240,0.1)', color: '#1366F0',
                   fontFamily: 'Manrope', fontSize: 12, fontWeight: 600,
@@ -400,6 +398,14 @@ export default function Leads({ refreshKey, search = '' }) {
             </div>
           </div>
         </ModalOverlay>
+      )}
+
+      {callLead && (
+        <CallModal
+          lead={callLead}
+          onClose={() => setCallLead(null)}
+          onSaved={loadLeads}
+        />
       )}
     </div>
   )
