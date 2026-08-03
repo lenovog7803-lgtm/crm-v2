@@ -73,7 +73,7 @@ export default function CallCard({ lead, onEdit }) {
       </div>
 
       {lead.notes && (
-        <div style={{ fontSize: 13, color: '#5A6573', lineHeight: 1.5, background: 'rgba(14,23,38,0.03)', borderRadius: 12, padding: '10px 13px' }}>
+        <div style={{ fontSize: 13, color: '#5A6573', lineHeight: 1.5, background: '#F7F8FA', border: '1px solid rgba(14,23,38,0.08)', borderRadius: 12, padding: '10px 13px' }}>
           {lead.notes}
         </div>
       )}
@@ -87,7 +87,7 @@ export default function CallCard({ lead, onEdit }) {
           {timeline.map((h) => {
             if (h.kind === 'note') {
               return (
-                <div key={h.id} style={{ display: 'flex', gap: 10, padding: '8px 12px', background: 'rgba(14,23,38,0.03)', borderRadius: 10 }}>
+                <div key={h.id} style={{ display: 'flex', gap: 10, padding: '8px 12px', background: '#F7F8FA', border: '1px solid rgba(14,23,38,0.08)', borderRadius: 10 }}>
                   <div style={{ fontSize: 14, flexShrink: 0 }}>📝</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 11, color: '#8A93A0', fontWeight: 700 }}>
@@ -100,7 +100,7 @@ export default function CallCard({ lead, onEdit }) {
             }
             const o = outcomeById(h.outcome)
             return (
-              <div key={h.id} style={{ display: 'flex', gap: 10, padding: '8px 12px', background: 'rgba(14,23,38,0.03)', borderRadius: 10 }}>
+              <div key={h.id} style={{ display: 'flex', gap: 10, padding: '8px 12px', background: '#F7F8FA', border: '1px solid rgba(14,23,38,0.08)', borderRadius: 10 }}>
                 <div style={{ fontSize: 14, flexShrink: 0 }}>{o?.icon || '📞'}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 11, color: o?.color || '#8A93A0', fontWeight: 700 }}>
