@@ -537,7 +537,7 @@ export default function Finance({ refreshKey }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <div>
                 <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>Оплачено перевозчикам</div>
-                <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 2 }}>Итого: {totalExpense.toLocaleString('ru-RU')} BYN · {paidCarrierOrders.length} заявок</div>
+                <div style={{ fontSize: 12, color: '#E0473B', fontWeight: 600, marginTop: 2 }}>Итого: -{totalExpense.toLocaleString('ru-RU')} BYN · {paidCarrierOrders.length} заявок</div>
               </div>
               <button onClick={() => setShowOutModal(false)} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: 'transparent', cursor: 'pointer', fontSize: 18, color: '#A6AEB8' }}>×</button>
             </div>
@@ -546,7 +546,7 @@ export default function Finance({ refreshKey }) {
             ) : paidCarrierOrders.map((o, i) => {
               const [avA, avB] = getGradient(o.carrier_name || '')
               return (
-                <div key={o.id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid rgba(14,23,38,0.06)' }}>
+                <div key={o.id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 8px', borderBottom: '1px solid rgba(14,23,38,0.06)', borderLeft: '3px solid rgba(224,71,59,0.35)', background: 'rgba(224,71,59,0.03)' }}>
                   <div style={{
                     width: 36, height: 36, borderRadius: 10, flexShrink: 0,
                     background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
@@ -559,7 +559,7 @@ export default function Finance({ refreshKey }) {
                       {o.carrier_paid_date ? ` · ${new Date(o.carrier_paid_date).toLocaleDateString('ru-RU')}` : ''}
                     </div>
                   </div>
-                  <div style={{ fontFamily: 'JetBrains Mono', fontSize: 14, fontWeight: 700, color: '#1366F0', flexShrink: 0 }}>
+                  <div style={{ fontFamily: 'JetBrains Mono', fontSize: 15, fontWeight: 700, color: '#E0473B', flexShrink: 0 }}>
                     -{parseFloat(o.carrier_rate || 0).toLocaleString('ru-RU')} BYN
                   </div>
                 </div>

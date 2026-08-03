@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, createPaymentIn, createPaymentOut, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct } from '../api'
+import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, createPaymentIn, createPaymentOut, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers } from '../api'
 import { fmtMoney, initials, getGradient } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 
@@ -37,22 +37,26 @@ function FieldLabel({ children }) {
 }
 
 function PaymentButton({ type, order, onClick }) {
-  const isPaid = type === 'client' ? order.client_paid : order.carrier_paid
-  const date = type === 'client' ? order.client_paid_date : order.carrier_paid_date
-  const amount = type === 'client' ? (order.client_rate || 0) : (order.carrier_rate || 0)
-  const label = type === 'client' ? 'Клиент оплатил' : 'Перевозчику оплачено'
+  const isCarrier = type === 'carrier'
+  const isPaid = isCarrier ? order.carrier_paid : order.client_paid
+  const date = isCarrier ? order.carrier_paid_date : order.client_paid_date
+  const amount = isCarrier ? (order.carrier_rate || 0) : (order.client_rate || 0)
+  const label = isCarrier ? 'Платим перевозчику' : 'Получаем от клиента'
+  const accent = isPaid ? '#1E9E5A' : (isCarrier ? '#E0473B' : '#0E1726')
 
   return (
     <div
       onClick={onClick}
       style={{
         flex: 1, padding: '14px 18px', borderRadius: 14, cursor: 'pointer',
-        background: isPaid ? 'rgba(30,158,90,0.08)' : 'rgba(14,23,38,0.04)',
-        border: `1px solid ${isPaid ? 'rgba(30,158,90,0.25)' : 'rgba(14,23,38,0.08)'}`,
+        background: isPaid ? 'rgba(30,158,90,0.08)' : (isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(14,23,38,0.04)'),
+        border: isCarrier
+          ? `2px solid ${isPaid ? 'rgba(30,158,90,0.28)' : 'rgba(224,71,59,0.35)'}`
+          : `1px solid ${isPaid ? 'rgba(30,158,90,0.25)' : 'rgba(14,23,38,0.08)'}`,
         transition: 'all 0.2s',
       }}
-      onMouseEnter={e => { if (!isPaid) e.currentTarget.style.background = 'rgba(14,23,38,0.07)' }}
-      onMouseLeave={e => { if (!isPaid) e.currentTarget.style.background = 'rgba(14,23,38,0.04)' }}
+      onMouseEnter={e => { if (!isPaid) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.09)' : 'rgba(14,23,38,0.07)' }}
+      onMouseLeave={e => { if (!isPaid) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(14,23,38,0.04)' }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{
@@ -69,17 +73,22 @@ function PaymentButton({ type, order, onClick }) {
           )}
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: isPaid ? '#1E9E5A' : '#0E1726' }}>{label}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 13, color: accent }}>{isCarrier ? '↑' : '↓'}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: isPaid ? '#1E9E5A' : accent }}>{label}</span>
+          </div>
           {isPaid && date ? (
             <div style={{ fontSize: 11, color: '#1E9E5A', marginTop: 2 }}>
               {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}
             </div>
           ) : (
-            <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>Нажмите чтобы отметить</div>
+            <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>
+              {isCarrier ? 'Сумма к перечислению — нажмите чтобы отметить' : 'Нажмите чтобы отметить'}
+            </div>
           )}
         </div>
-        <div style={{ fontFamily: 'JetBrains Mono', fontSize: 16, fontWeight: 700, color: isPaid ? '#1E9E5A' : '#0E1726', flexShrink: 0 }}>
-          {amount.toLocaleString('ru-RU')} Br
+        <div style={{ fontFamily: 'JetBrains Mono', fontSize: isCarrier ? 18 : 16, fontWeight: 700, color: isPaid ? '#1E9E5A' : accent, flexShrink: 0 }}>
+          {isCarrier ? '' : '+'}{amount.toLocaleString('ru-RU')} Br
         </div>
       </div>
     </div>
@@ -209,6 +218,16 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     const dateField = type === 'client' ? 'client_paid_date' : 'carrier_paid_date'
     const currentVal = draft[paidField] !== undefined ? draft[paidField] : order[paidField]
     const newVal = !currentVal
+    if (type === 'carrier' && newVal) {
+      const ok = window.confirm(
+        `Подтвердите платёж перевозчику\n\n` +
+        `Получатель: ${order.carrier_name || '—'}\n` +
+        `Сумма: ${(order.carrier_rate || 0).toLocaleString('ru-RU')} Br\n` +
+        `Заявка: ${order.order_number || order.id}\n\n` +
+        `Отметить как оплаченное?`
+      )
+      if (!ok) return
+    }
     const now = new Date().toISOString()
     setDraft(d => ({ ...d, [paidField]: newVal, [dateField]: newVal ? now : null }))
   }
@@ -222,6 +241,46 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
 
   const handleDuplicate = () => {
     if (onDuplicate) onDuplicate(order)
+  }
+
+  const openClientDetail = async () => {
+    if (!onOpenClient) return
+    if (order.client_id) {
+      try {
+        await getClient(order.client_id)
+        onOpenClient(order.client_id)
+        return
+      } catch (e) {}
+    }
+    if (order.client_name) {
+      try {
+        const res = await getClients(order.client_name)
+        const list = Array.isArray(res) ? res : (res.clients || [])
+        const found = list.find(c => (c.name || '').toLowerCase() === order.client_name.toLowerCase())
+        if (found) { onOpenClient(found.id); return }
+      } catch (e) {}
+    }
+    alert('Карточка клиента не найдена в базе')
+  }
+
+  const openCarrierDetail = async () => {
+    if (!onOpenCarrier) return
+    if (order.carrier_id) {
+      try {
+        await getCarrier(order.carrier_id)
+        onOpenCarrier(order.carrier_id)
+        return
+      } catch (e) {}
+    }
+    if (order.carrier_name) {
+      try {
+        const res = await getCarriers(order.carrier_name)
+        const list = Array.isArray(res) ? res : (res.carriers || [])
+        const found = list.find(c => (c.company_name || c.name || '').toLowerCase() === order.carrier_name.toLowerCase())
+        if (found) { onOpenCarrier(found.id); return }
+      } catch (e) {}
+    }
+    alert('Карточка перевозчика не найдена в базе')
   }
 
   const [avAc, avBc] = getGradient(order.client_name || '')
@@ -362,6 +421,24 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
       <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 16, alignItems: 'start' }}>
         {/* LEFT COLUMN */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {!view.carrier_paid && (view.carrier_rate || 0) > 0 && (
+            <div style={{
+              background: 'rgba(224,71,59,0.08)',
+              border: '1px solid rgba(224,71,59,0.25)',
+              borderRadius: 14, padding: '12px 16px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#E0473B', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  К оплате перевозчику
+                </div>
+                <div style={{ fontSize: 13, color: '#5A6573', marginTop: 2 }}>{view.carrier_name || '—'}</div>
+              </div>
+              <div style={{ fontFamily: 'JetBrains Mono', fontSize: 24, fontWeight: 700, color: '#E0473B' }}>
+                {(view.carrier_rate || 0).toLocaleString('ru-RU')} Br
+              </div>
+            </div>
+          )}
           {/* Hero dark card */}
           <div style={{
             background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)',
@@ -509,8 +586,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                   color: '#fff', fontWeight: 700, fontSize: 14,
                 }}>{initials(order.client_name)}</div>
                 <div>
-                  {onOpenClient && order.client_id ? (
-                    <button onClick={() => onOpenClient(order.client_id)} style={{
+                  {onOpenClient && (order.client_id || order.client_name) ? (
+                    <button onClick={openClientDetail} style={{
                       background: 'none', border: 'none', padding: 0, cursor: 'pointer',
                       fontWeight: 700, fontSize: 14, color: '#1366F0',
                       textDecoration: 'underline', textDecorationColor: 'rgba(19,102,240,0.4)',
@@ -542,8 +619,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                   </svg>
                 </div>
                 <div>
-                  {onOpenCarrier && order.carrier_id ? (
-                    <button onClick={() => onOpenCarrier(order.carrier_id)} style={{
+                  {onOpenCarrier && (order.carrier_id || order.carrier_name) ? (
+                    <button onClick={openCarrierDetail} style={{
                       background: 'none', border: 'none', padding: 0, cursor: 'pointer',
                       fontWeight: 700, fontSize: 14, color: '#1366F0',
                       textDecoration: 'underline', textDecorationColor: 'rgba(19,102,240,0.4)',
