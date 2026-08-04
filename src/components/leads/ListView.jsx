@@ -6,6 +6,7 @@ import CallOutcomeBar from './CallOutcomeBar'
 import ScriptPanel from './ScriptPanel'
 import LeadEditModal from './LeadEditModal'
 import { logCall } from '../../api'
+import { SkeletonRow } from '../Skeleton'
 
 const FILTERS_KEY = 'leads_list_filters'
 
@@ -91,7 +92,11 @@ export default function ListView({ industry }) {
         </label>
       </div>
 
-      {loading && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
+      {loading && (
+        <div className="card" style={{ padding: '4px 16px' }}>
+          {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)}
+        </div>
+      )}
 
       {!loading && (
         <div className="card" style={{ overflow: 'hidden' }}>

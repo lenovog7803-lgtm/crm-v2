@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react'
 import { getOrders, getClients, getCarriers, getPaymentsIn, getPaymentsOut, createPaymentIn, createPaymentOut, deletePaymentIn, deletePaymentOut, generateReconciliation, getReconciliationHistory, generateAllActs } from '../api'
 import { fmtMoney, initials, getGradient } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
+import { SkeletonRow } from './Skeleton'
+import { useToast } from './Toast'
 
 export default function Finance({ refreshKey }) {
   const isMobile = useIsMobile()
+  const { show } = useToast()
   const [orders, setOrders] = useState([])
   const [clients, setClients] = useState([])
   const [carriers, setCarriers] = useState([])
@@ -112,7 +115,7 @@ export default function Finance({ refreshKey }) {
       }
       if (result?.url) window.open(result.url, '_blank')
       getReconciliationHistory({}).then(r => setRecHistory(Array.isArray(r) ? r : (r?.history || []))).catch(() => {})
-    } catch (e) { console.error(e); alert('Ошибка: ' + e.message) }
+    } catch (e) { console.error(e); show('Ошибка: ' + e.message, { type: 'error' }) }
     setRecLoading(false)
   }
 
@@ -316,7 +319,11 @@ export default function Finance({ refreshKey }) {
           </form>
         )}
 
-        {loading && <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>}
+        {loading && (
+          <div>
+            {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
+          </div>
+        )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
           {visible.map((p, i) => {
             const [avA, avB] = getGradient(p.gradKey)

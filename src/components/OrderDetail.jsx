@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
-import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, createPaymentIn, createPaymentOut, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers } from '../api'
+import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, restoreTrash, markPayment, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers } from '../api'
 import { fmtMoney, initials, getGradient } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
+import { useToast } from './Toast'
+import OrderPaymentModal from './OrderPaymentModal'
 
 const STATUSES = [
   { id: 'new', label: 'Новая', color: '#7C3AED', bg: 'rgba(124,58,237,0.1)' },
@@ -61,6 +63,7 @@ function PaymentButton({ type, order, onClick }) {
   const isCarrier = type === 'carrier'
   const isPaid = isCarrier ? order.carrier_paid : order.client_paid
   const date = isCarrier ? order.carrier_paid_date : order.client_paid_date
+  const ppNumber = isCarrier ? order.carrier_pp_number : order.client_pp_number
   const amount = isCarrier ? (order.carrier_rate || 0) : (order.client_rate || 0)
   const label = isCarrier ? 'Платим перевозчику' : 'Получаем от клиента'
   const accent = isPaid ? '#1E9E5A' : (isCarrier ? '#E0473B' : '#0E1726')
@@ -101,6 +104,7 @@ function PaymentButton({ type, order, onClick }) {
           {isPaid && date ? (
             <div style={{ fontSize: 11, color: '#1E9E5A', marginTop: 2 }}>
               {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}
+              {ppNumber && ` · ПП №${ppNumber}`}
             </div>
           ) : (
             <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>
@@ -118,9 +122,11 @@ function PaymentButton({ type, order, onClick }) {
 
 export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, onOpenCarrier, onOpenOrder, onDuplicate, onEdit }) {
   const isMobile = useIsMobile()
+  const { show } = useToast()
   const [order, setOrder] = useState(null)
   const [loading, setLoading] = useState(true)
   const [payLoading, setPayLoading] = useState(null)
+  const [paymentModal, setPaymentModal] = useState(null) // 'client' | 'carrier' | null
   const [docsRefreshing, setDocsRefreshing] = useState(false)
   const [docLoading, setDocLoading] = useState({})
   const [draft, setDraft] = useState({})
@@ -159,11 +165,11 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
         window.open(url, '_blank')
       } else {
         console.error('[DOC] No URL in result:', result)
-        alert('Документ создан, но URL не получен')
+        show('Документ создан, но URL не получен', { type: 'error' })
       }
     } catch (e) {
       console.error('[DOC] Error:', e)
-      alert('Ошибка генерации: ' + (e.message || e))
+      show('Ошибка генерации: ' + (e.message || e), { type: 'error' })
     }
     setDocLoading(prev => ({ ...prev, [type]: false }))
   }
@@ -186,25 +192,6 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     setSaveErr(false)
     try {
       await apiUpdate(order.id, draft)
-      // Create payment records when payment status newly set to paid
-      if (draft.client_paid === true && !order.client_paid) {
-        createPaymentIn({
-          client_id: order.client_id, client_name: order.client_name,
-          amount: order.client_rate,
-          date: (draft.client_paid_date || new Date().toISOString()).slice(0, 10),
-          order_id: order.id, order_number: order.order_number,
-          description: `Оплата по заявке ${order.order_number || order.id}`,
-        }).catch(console.error)
-      }
-      if (draft.carrier_paid === true && !order.carrier_paid) {
-        createPaymentOut({
-          carrier_id: order.carrier_id, carrier_name: order.carrier_name,
-          amount: order.carrier_rate,
-          date: (draft.carrier_paid_date || new Date().toISOString()).slice(0, 10),
-          order_id: order.id, order_number: order.order_number,
-          description: `Оплата перевозчику по заявке ${order.order_number || order.id}`,
-        }).catch(console.error)
-      }
       setOrder(prev => ({ ...prev, ...draft }))
       setDraft({})
       setSavedOk(true)
@@ -234,30 +221,49 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     setDraft(d => ({ ...d, [field]: value }))
   }
 
-  const handlePayment = (type) => {
-    const paidField = type === 'client' ? 'client_paid' : 'carrier_paid'
-    const dateField = type === 'client' ? 'client_paid_date' : 'carrier_paid_date'
-    const currentVal = draft[paidField] !== undefined ? draft[paidField] : order[paidField]
-    const newVal = !currentVal
-    if (type === 'carrier' && newVal) {
-      const ok = window.confirm(
-        `Подтвердите платёж перевозчику\n\n` +
-        `Получатель: ${order.carrier_name || '—'}\n` +
-        `Сумма: ${(order.carrier_rate || 0).toLocaleString('ru-RU')} Br\n` +
-        `Заявка: ${order.order_number || order.id}\n\n` +
-        `Отметить как оплаченное?`
-      )
-      if (!ok) return
+  const handlePayment = async (side) => {
+    const isPaid = side === 'client' ? order.client_paid : order.carrier_paid
+    if (!isPaid) {
+      setPaymentModal(side) // открыть модалку ввода ПП
+      return
     }
-    const now = new Date().toISOString()
-    setDraft(d => ({ ...d, [paidField]: newVal, [dateField]: newVal ? now : null }))
+    // снятие отметки — без модалки, простое действие + тост с отменой
+    const paidField = side === 'client' ? 'client_paid' : 'carrier_paid'
+    const prevPPNumber = side === 'client' ? order.client_pp_number : order.carrier_pp_number
+    const prevPPDate = side === 'client' ? order.client_pp_date : order.carrier_pp_date
+    try {
+      await markPayment(order.id, side, { paid: false })
+      setOrder(prev => ({ ...prev, [paidField]: false }))
+      show('Отметка оплаты снята', {
+        type: 'info',
+        actionLabel: 'Отменить',
+        onAction: async () => {
+          await markPayment(order.id, side, { paid: true, pp_number: prevPPNumber || null, pp_date: prevPPDate || null })
+          getOrder(order.id).then(setOrder).catch(console.error)
+        },
+      })
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
   }
 
   const handleDelete = async () => {
-    if (!window.confirm('Удалить заявку?')) return
-    await apiDelete(order.id).catch(console.error)
-    onDelete(order.id)
-    onBack()
+    const deletedId = order.id
+    try {
+      await apiDelete(deletedId)
+      onDelete(deletedId)
+      onBack()
+      show('Заявка удалена', {
+        type: 'info',
+        actionLabel: 'Отменить',
+        onAction: async () => {
+          await restoreTrash('orders', deletedId)
+          onOpenOrder?.(deletedId)
+        },
+      })
+    } catch (e) {
+      show('Ошибка удаления: ' + e.message, { type: 'error' })
+    }
   }
 
   const handleDuplicate = () => {
@@ -267,7 +273,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
   const openClientDetail = async () => {
     if (!onOpenClient) return
     if (!order.client_id && !order.client_name) {
-      alert('Клиент не указан в заявке')
+      show('Клиент не указан в заявке', { type: 'error' })
       return
     }
     if (order.client_id) {
@@ -287,13 +293,13 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
         if (found) { onOpenClient(found.id); return }
       } catch (e) {}
     }
-    alert(`Карточка клиента «${order.client_name || order.client_id}» не найдена в базе`)
+    show(`Карточка клиента «${order.client_name || order.client_id}» не найдена в базе`, { type: 'error' })
   }
 
   const openCarrierDetail = async () => {
     if (!onOpenCarrier) return
     if (!order.carrier_id && !order.carrier_name) {
-      alert('Перевозчик не указан в заявке')
+      show('Перевозчик не указан в заявке', { type: 'error' })
       return
     }
     if (order.carrier_id) {
@@ -315,7 +321,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
         if (found) { onOpenCarrier(found.id); return }
       } catch (e) {}
     }
-    alert(`Карточка перевозчика «${order.carrier_name || order.carrier_id}» не найдена в базе`)
+    show(`Карточка перевозчика «${order.carrier_name || order.carrier_id}» не найдена в базе`, { type: 'error' })
   }
 
   const [avAc, avBc] = getGradient(order.client_name || '')
@@ -767,6 +773,15 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
           )}
         </div>
       </div>
+
+      {paymentModal && (
+        <OrderPaymentModal
+          order={order}
+          side={paymentModal}
+          onClose={() => setPaymentModal(null)}
+          onSaved={() => { getOrder(order.id).then(setOrder).catch(console.error); setPaymentModal(null) }}
+        />
+      )}
     </div>
   )
 }

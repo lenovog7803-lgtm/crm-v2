@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import './index.css'
 
 import { AuthProvider, useAuth } from './AuthContext'
+import { ToastProvider } from './components/Toast'
 import Login from './pages/Login'
 import { getDashboard, getOrders, getTasks } from './api'
 
@@ -289,8 +290,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ToastProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ToastProvider>
   )
 }

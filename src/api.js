@@ -128,3 +128,7 @@ export const restoreTrash = (collection, itemId) => req(`/trash/restore/${collec
 // Duplicate order
 export const duplicateOrder = (orderId) => req(`/orders/${orderId}/duplicate`, { method: 'POST' });
 export const syncOrderDocUrls = (orderId) => req(`/orders/${orderId}/sync_doc_urls`, { method: 'POST' });
+
+// Mark order payment (side: 'client' | 'carrier')
+export const markPayment = (orderId, side, data) =>
+  req(`/orders/${orderId}/mark_payment?side=${side}`, { method: 'POST', body: JSON.stringify(data) });

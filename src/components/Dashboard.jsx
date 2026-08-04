@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { getDashboard, getOrders } from '../api'
 import { useIsMobile } from '../hooks/useIsMobile'
+import { CountUp } from './CountUp'
+import { SkeletonCard } from './Skeleton'
 
 const MONTH_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
 const MONTH_RU_SHORT = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек']
@@ -458,6 +460,18 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
 
   const isMobile = useIsMobile()
 
+  if (loading) return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 12 }}>
+        {[1, 2, 3].map(i => <SkeletonCard key={i} lines={2} />)}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 12 }}>
+        {[1, 2, 3, 4].map(i => <SkeletonCard key={i} lines={1} />)}
+      </div>
+      <SkeletonCard lines={6} />
+    </div>
+  )
+
   return (
     <div style={{ padding: isMobile ? 0 : '0 2px', display: 'flex', flexDirection: 'column', gap: isMobile ? 10 : 16 }}>
 
@@ -488,17 +502,17 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             )}
           </div>
           <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 32 : 40, letterSpacing: '-0.03em', lineHeight: 1 }}>
-            {margin.toLocaleString('ru-RU')}
+            <CountUp value={margin} />
           </div>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>BYN</div>
           <div style={{ display: 'flex', gap: isMobile ? 16 : 24, marginTop: isMobile ? 12 : 20 }}>
             <div>
               <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Выручка</div>
-              <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 15 }}>{revenue.toLocaleString('ru-RU')} BYN</div>
+              <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 15 }}><CountUp value={revenue} format={v => `${Math.round(v).toLocaleString('ru-RU')} BYN`} /></div>
             </div>
             <div>
               <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Чистая прибыль</div>
-              <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 15, color: '#5BE89B' }}>{Math.round(netProfit).toLocaleString('ru-RU')} BYN</div>
+              <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 15, color: '#5BE89B' }}><CountUp value={netProfit} format={v => `${Math.round(v).toLocaleString('ru-RU')} BYN`} /></div>
             </div>
           </div>
         </div>
@@ -517,7 +531,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
           <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#A86A20', marginBottom: isMobile ? 4 : 8 }}>ОЖИДАЕТСЯ ОТ КЛИЕНТОВ</div>
           <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 24 : 30, letterSpacing: '-0.02em', color: '#7A4A12' }}>
-            {clientDebt.toLocaleString('ru-RU')}
+            <CountUp value={clientDebt} />
           </div>
           <div style={{ fontSize: 11, color: '#A86A20', marginTop: 2 }}>BYN</div>
           <div style={{ marginTop: isMobile ? 8 : 14, fontSize: 12, color: '#A86A20', fontWeight: 600 }}>
@@ -539,7 +553,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
           <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#6B3FB8', marginBottom: isMobile ? 4 : 8 }}>К ОПЛАТЕ ПЕРЕВОЗЧИКАМ</div>
           <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 24 : 30, letterSpacing: '-0.02em', color: '#4A2785' }}>
-            {carrierDebt.toLocaleString('ru-RU')}
+            <CountUp value={carrierDebt} />
           </div>
           <div style={{ fontSize: 11, color: '#6B3FB8', marginTop: 2 }}>BYN</div>
           <div style={{ marginTop: isMobile ? 8 : 14, fontSize: 12, color: '#6B3FB8', fontWeight: 600 }}>
@@ -561,7 +575,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             <div style={{
               fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 26 : 36, color: kpi.color,
               background: kpi.bg, borderRadius: isMobile ? 9 : 12, padding: isMobile ? '5px 10px' : '8px 14px', display: 'inline-block', lineHeight: 1,
-            }}>{kpi.value}</div>
+            }}><CountUp value={kpi.value} format={v => Math.round(v).toLocaleString('ru-RU')} /></div>
           </div>
         ))}
       </div>

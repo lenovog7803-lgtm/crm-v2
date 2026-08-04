@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getClients, deleteClient as apiDelete } from '../api'
 import { initials, getGradient } from '../utils'
+import { SkeletonCard } from './Skeleton'
 
 export default function Clients({ onOpenClient, onAdd, refreshKey, search = '' }) {
   const [clients, setClients] = useState([])
@@ -47,7 +48,12 @@ export default function Clients({ onOpenClient, onAdd, refreshKey, search = '' }
         </button>
       </div>
 
-      {loading && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>}
+      {loading && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+          {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} lines={3} />)}
+        </div>
+      )}
+      {!loading && (
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
         {visible.map(client => {
           const [avA, avB] = getGradient(client.name || '')
@@ -118,6 +124,7 @@ export default function Clients({ onOpenClient, onAdd, refreshKey, search = '' }
           )
         })}
       </div>
+      )}
     </div>
   )
 }

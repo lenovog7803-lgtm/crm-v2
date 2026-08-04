@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { getOrders, deleteOrder as apiDelete } from '../api'
 import { initials, statusLabel, statusColor, statusBg, getGradient } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
+import { SkeletonRow } from './Skeleton'
 
 const DOC_FILTER_OPTIONS = [
   { key: 'docs_to_client_sent',         label: 'Отправлены клиенту',          not: false },
@@ -204,7 +205,9 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
       {isMobile ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
           {loading && (
-            <div style={{ padding: 40, textAlign: 'center', color: '#8E8E93', fontSize: 14 }}>Загрузка...</div>
+            <div className="card" style={{ padding: '4px 16px' }}>
+              {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)}
+            </div>
           )}
           {!loading && filtered.length === 0 && (
             <div style={{ padding: 40, textAlign: 'center', color: '#8E8E93', fontSize: 14 }}>Нет заявок</div>
@@ -283,7 +286,11 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
             <div key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8' }}>{h}</div>
           ))}
         </div>
-        {loading && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>}
+        {loading && (
+          <div style={{ padding: '4px 20px' }}>
+            {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)}
+          </div>
+        )}
         {!loading && filtered.map((order, i) => {
           const margin = (order.client_rate || 0) - (order.carrier_rate || 0)
           const marginPct = order.client_rate > 0 ? Math.round(margin / order.client_rate * 100) : 0

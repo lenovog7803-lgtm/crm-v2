@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getTasks, updateTask as apiUpdate, deleteTask as apiDelete } from '../api'
 import { ModalOverlay, ModalHeader } from './Modal'
 import { useIsMobile } from '../hooks/useIsMobile'
+import { SkeletonRow } from './Skeleton'
 
 const TYPE_COLORS = { call: '#1366F0', reminder: '#D97706', payment: '#1E9E5A', other: '#8A93A0' }
 const TYPE_BG = { call: 'rgba(19,102,240,0.1)', reminder: 'rgba(217,119,6,0.1)', payment: 'rgba(30,158,90,0.1)', other: 'rgba(138,147,160,0.1)' }
@@ -102,7 +103,11 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
       </div>
 
       <div className="card" style={{ overflow: 'hidden' }}>
-        {loading && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>}
+        {loading && (
+          <div style={{ padding: '4px 20px' }}>
+            {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)}
+          </div>
+        )}
         {!loading && filtered.map((task, i) => {
           const done = task.status === 'done'
           const typeKey = task.task_type || 'other'

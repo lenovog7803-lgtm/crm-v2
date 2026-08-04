@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getCarriers, deleteCarrier as apiDelete } from '../api'
 import { getGradient } from '../utils'
+import { SkeletonCard } from './Skeleton'
 
 function StarIcon() {
   return (
@@ -56,7 +57,12 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
         </button>
       </div>
 
-      {loading && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>}
+      {loading && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+          {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} lines={3} />)}
+        </div>
+      )}
+      {!loading && (
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
         {visible.map(carrier => {
           const name = carrier.company_name || carrier.name || '—'
@@ -144,6 +150,7 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
           )
         })}
       </div>
+      )}
     </div>
   )
 }
