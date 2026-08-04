@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getOrders, getClients, getCarriers, getPaymentsIn, getPaymentsOut, createPaymentIn, createPaymentOut, deletePaymentIn, deletePaymentOut, generateReconciliation, getReconciliationHistory, generateAllActs } from '../api'
+import { getOrders, getClients, getCarriers, getPaymentsIn, getPaymentsOut, createPaymentIn, createPaymentOut, deletePaymentIn, deletePaymentOut, generateReconciliation, getReconciliationHistory } from '../api'
 import { fmtMoney, initials, getGradient } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
@@ -62,8 +62,14 @@ export default function Finance({ refreshKey }) {
       setPaymentsIn(Array.isArray(ins) ? ins : [])
       setPaymentsOut(Array.isArray(outs) ? outs : [])
     }).finally(() => setLoading(false))
-    getReconciliationHistory({}).then(r => setRecHistory(Array.isArray(r) ? r : (r?.history || []))).catch(() => {})
   }, [refreshKey])
+
+  // История актов сверки скопирована к конкретному контрагенту — бэкенд
+  // возвращает [] без counterparty_id, поэтому подгружаем при выборе.
+  useEffect(() => {
+    if (!recPartyId) { setRecHistory([]); return }
+    getReconciliationHistory({ counterparty_id: recPartyId, type: recType }).then(r => setRecHistory(Array.isArray(r) ? r : (r?.history || []))).catch(() => {})
+  }, [recPartyId, recType])
 
   // Hero totals — из заявок по флагам оплаты (client_paid / carrier_paid)
   const paidClientOrders = orders.filter(o => o.client_paid && !o.deleted)
@@ -107,14 +113,10 @@ export default function Finance({ refreshKey }) {
     if (!recPartyId) return
     setRecLoading(true)
     try {
-      let result
-      if (recType === 'client') {
-        result = await generateAllActs(recPartyId)
-      } else {
-        result = await generateReconciliation({ type: recType, counterparty_id: recPartyId, period: recPeriod })
-      }
-      if (result?.url) window.open(result.url, '_blank')
-      getReconciliationHistory({}).then(r => setRecHistory(Array.isArray(r) ? r : (r?.history || []))).catch(() => {})
+      const result = await generateReconciliation({ type: recType, counterparty_id: recPartyId, counterparty_name: recPartyName, period: recPeriod })
+      if (result?.doc_error) show('Акт сформирован без документа: ' + result.doc_error, { type: 'error' })
+      else if (result?.url) { window.open(result.url, '_blank'); show(`Акт сформирован: ${result.counterparty_name || recPartyName}`, { type: 'success' }) }
+      getReconciliationHistory({ counterparty_id: recPartyId, type: recType }).then(r => setRecHistory(Array.isArray(r) ? r : (r?.history || []))).catch(() => {})
     } catch (e) { console.error(e); show('Ошибка: ' + e.message, { type: 'error' }) }
     setRecLoading(false)
   }
@@ -343,6 +345,7 @@ export default function Finance({ refreshKey }) {
                   <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 1 }}>
                     {p.kind === 'income' ? 'Поступление' : 'Списание'}
                     {p.pp_number ? ` · ПП ${p.pp_number}` : ''}
+                    {p.order_number ? <span style={{ color: '#1366F0', fontFamily: 'JetBrains Mono' }}> · {p.order_number}</span> : ''}
                   </div>
                 </div>
                 <div style={{ fontSize: 11.5, color: '#A6AEB8', flexShrink: 0 }}>{p.date || '—'}</div>
