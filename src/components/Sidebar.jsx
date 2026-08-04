@@ -125,23 +125,16 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   const [hiddenMenuOpen, setHiddenMenuOpen] = useState(false)
   const longPressTimer = useRef(null)
   const avatarRef = useRef(null)
-  const [hiddenMenuPos, setHiddenMenuPos] = useState({ left: 0, bottom: 0 })
+  const [hiddenMenuBottom, setHiddenMenuBottom] = useState(0)
 
   const startLongPress = () => {
+    // Only reachable with the sidebar expanded — collapsed, the avatar sits
+    // too close to the screen edge for a 200px popup to sit near it without
+    // overlapping content awkwardly either way.
+    if (!expanded) return
     longPressTimer.current = setTimeout(() => {
       const rect = avatarRef.current?.getBoundingClientRect()
-      if (rect) {
-        // Center the popup on the avatar rather than pinning its left edge —
-        // pinned-left looked lopsided since the popup is much wider than the
-        // avatar. Clamp to the viewport so it can't run off-screen when the
-        // sidebar is collapsed and the avatar sits close to the edge.
-        const centerX = rect.left + rect.width / 2
-        const left = Math.min(
-          Math.max(centerX - HIDDEN_MENU_WIDTH / 2, 8),
-          window.innerWidth - HIDDEN_MENU_WIDTH - 8
-        )
-        setHiddenMenuPos({ left, bottom: window.innerHeight - rect.top + 8 })
-      }
+      if (rect) setHiddenMenuBottom(window.innerHeight - rect.top + 8)
       setHiddenMenuOpen(true)
     }, 550)
   }
@@ -292,7 +285,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
           <div
             onClick={e => e.stopPropagation()}
             style={{
-              position: 'fixed', left: hiddenMenuPos.left, bottom: hiddenMenuPos.bottom,
+              position: 'fixed', left: '50%', bottom: hiddenMenuBottom, transform: 'translateX(-50%)',
               width: HIDDEN_MENU_WIDTH, borderRadius: 16, padding: 8,
               background: 'rgba(255,255,255,0.72)',
               backdropFilter: 'blur(24px) saturate(180%)',
