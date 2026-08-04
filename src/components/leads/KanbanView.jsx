@@ -1,10 +1,85 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { getLeads, updateLead, logCall } from '../../api'
 import { STAGES } from '../../constants/leads'
 import CallCard from './CallCard'
 import CallOutcomeBar from './CallOutcomeBar'
 import ScriptPanel from './ScriptPanel'
 import LeadEditModal from './LeadEditModal'
+
+const PAGE_SIZE = 10
+
+function KanbanColumn({ stage, items, dragId, overStage, onDragStart, onDragOver, onDragLeave, onDrop, onOpenLead }) {
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+  const listRef = useRef(null)
+
+  const sorted = useMemo(() => {
+    return [...items].sort((a, b) => {
+      const da = new Date(a.stage_changed_at || a.updated_at || a.created_at || 0).getTime()
+      const db = new Date(b.stage_changed_at || b.updated_at || b.created_at || 0).getTime()
+      return db - da
+    })
+  }, [items])
+
+  useEffect(() => { setVisibleCount(PAGE_SIZE) }, [stage.id])
+
+  const visible = sorted.slice(0, visibleCount)
+
+  const handleScroll = () => {
+    const el = listRef.current
+    if (!el) return
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 40) {
+      setVisibleCount(prev => Math.min(prev + PAGE_SIZE, sorted.length))
+    }
+  }
+
+  return (
+    <div
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
+      style={{ minWidth: 240, width: 240, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 10 }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 4px' }}>
+        <span style={{ width: 8, height: 8, borderRadius: 4, background: stage.color, flexShrink: 0 }} />
+        <span style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 12.5, color: '#0E1726' }}>{stage.label}</span>
+        <span style={{ fontSize: 11.5, color: '#A6AEB8', marginLeft: 'auto' }}>{sorted.length}</span>
+      </div>
+      <div
+        ref={listRef}
+        onScroll={handleScroll}
+        className="card"
+        style={{
+          padding: 8, minHeight: 100, maxHeight: 560, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8,
+          background: overStage === stage.id ? 'rgba(19,102,240,0.06)' : undefined,
+          border: overStage === stage.id ? '1.5px dashed rgba(19,102,240,0.4)' : undefined,
+        }}
+      >
+        {visible.map(l => (
+          <div
+            key={l.id}
+            draggable
+            onDragStart={() => onDragStart(l.id)}
+            onClick={() => onOpenLead(l)}
+            style={{
+              padding: '10px 12px', borderRadius: 12, background: 'rgba(255,255,255,0.7)',
+              border: '1px solid rgba(14,23,38,0.08)', cursor: 'pointer',
+            }}
+          >
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
+            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: '#1366F0', marginTop: 3 }}>{l.phone}</div>
+            {l.contact_person && <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>{l.contact_person}</div>}
+            {l.next_call && <div style={{ fontSize: 10.5, color: '#F47A1F', marginTop: 4 }}>→ {new Date(l.next_call).toLocaleDateString('ru-RU')}</div>}
+          </div>
+        ))}
+        {visibleCount < sorted.length && (
+          <div style={{ textAlign: 'center', padding: 10, fontSize: 11, color: '#8A93A0' }}>
+            ещё {sorted.length - visibleCount}, докрутите вниз
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
 
 export default function KanbanView({ industry }) {
   const [leads, setLeads] = useState([])
@@ -50,42 +125,18 @@ export default function KanbanView({ industry }) {
   const renderColumn = (stage) => {
     const items = filtered.filter(l => (l.stage || 'new') === stage.id)
     return (
-      <div
+      <KanbanColumn
         key={stage.id}
+        stage={stage}
+        items={items}
+        dragId={dragId}
+        overStage={overStage}
+        onDragStart={setDragId}
         onDragOver={e => { e.preventDefault(); setOverStage(stage.id) }}
         onDragLeave={() => setOverStage(null)}
         onDrop={handleDrop(stage.id)}
-        style={{ minWidth: 240, width: 240, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 10 }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 4px' }}>
-          <span style={{ width: 8, height: 8, borderRadius: 4, background: stage.color, flexShrink: 0 }} />
-          <span style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 12.5, color: '#0E1726' }}>{stage.label}</span>
-          <span style={{ fontSize: 11.5, color: '#A6AEB8', marginLeft: 'auto' }}>{items.length}</span>
-        </div>
-        <div className="card" style={{
-          padding: 8, minHeight: 100, flex: 1, display: 'flex', flexDirection: 'column', gap: 8,
-          background: overStage === stage.id ? 'rgba(19,102,240,0.06)' : undefined,
-          border: overStage === stage.id ? '1.5px dashed rgba(19,102,240,0.4)' : undefined,
-        }}>
-          {items.map(l => (
-            <div
-              key={l.id}
-              draggable
-              onDragStart={() => setDragId(l.id)}
-              onClick={() => setActiveLead(l)}
-              style={{
-                padding: '10px 12px', borderRadius: 12, background: 'rgba(255,255,255,0.7)',
-                border: '1px solid rgba(14,23,38,0.08)', cursor: 'pointer',
-              }}
-            >
-              <div style={{ fontSize: 12.5, fontWeight: 700, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
-              <div style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: '#1366F0', marginTop: 3 }}>{l.phone}</div>
-              {l.contact_person && <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>{l.contact_person}</div>}
-              {l.next_call && <div style={{ fontSize: 10.5, color: '#F47A1F', marginTop: 4 }}>→ {new Date(l.next_call).toLocaleDateString('ru-RU')}</div>}
-            </div>
-          ))}
-        </div>
-      </div>
+        onOpenLead={setActiveLead}
+      />
     )
   }
 

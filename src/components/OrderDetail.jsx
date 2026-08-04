@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, createPaymentIn, createPaymentOut, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers } from '../api'
+import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, createPaymentIn, createPaymentOut, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClients, getCarriers } from '../api'
 import { fmtMoney, initials, getGradient } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 
@@ -34,6 +34,27 @@ function SLabel({ children }) {
 
 function FieldLabel({ children }) {
   return <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', marginBottom: 5 }}>{children}</div>
+}
+
+function ClickableName({ name, onClick }) {
+  const [pressed, setPressed] = useState(false)
+  const handleClick = () => {
+    setPressed(true)
+    setTimeout(onClick, 90)
+  }
+  return (
+    <span
+      onClick={handleClick}
+      style={{
+        cursor: 'pointer', display: 'inline-block', padding: '2px 6px', margin: '-2px -6px',
+        borderRadius: 8, background: pressed ? 'rgba(19,102,240,0.12)' : 'transparent',
+        transition: 'background 0.12s ease',
+        fontWeight: 700, fontSize: 14, color: '#1366F0',
+        textDecoration: 'underline', textDecorationColor: 'rgba(19,102,240,0.4)',
+        fontFamily: 'Manrope',
+      }}
+    >{name}</span>
+  )
 }
 
 function PaymentButton({ type, order, onClick }) {
@@ -243,42 +264,44 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     if (onDuplicate) onDuplicate(order)
   }
 
-  const openClientDetail = async () => {
+  const openClientDetail = () => {
     if (!onOpenClient) return
     if (order.client_id) {
-      try {
-        await getClient(order.client_id)
-        onOpenClient(order.client_id)
-        return
-      } catch (e) {}
+      onOpenClient(order.client_id)
+      return
     }
     if (order.client_name) {
-      try {
-        const res = await getClients(order.client_name)
-        const list = Array.isArray(res) ? res : (res.clients || [])
-        const found = list.find(c => (c.name || '').toLowerCase() === order.client_name.toLowerCase())
-        if (found) { onOpenClient(found.id); return }
-      } catch (e) {}
+      (async () => {
+        try {
+          const res = await getClients(order.client_name)
+          const list = Array.isArray(res) ? res : (res.clients || [])
+          const found = list.find(c => (c.name || '').toLowerCase() === order.client_name.toLowerCase())
+          if (found) { onOpenClient(found.id); return }
+        } catch (e) {}
+        alert('Карточка клиента не найдена в базе')
+      })()
+      return
     }
     alert('Карточка клиента не найдена в базе')
   }
 
-  const openCarrierDetail = async () => {
+  const openCarrierDetail = () => {
     if (!onOpenCarrier) return
     if (order.carrier_id) {
-      try {
-        await getCarrier(order.carrier_id)
-        onOpenCarrier(order.carrier_id)
-        return
-      } catch (e) {}
+      onOpenCarrier(order.carrier_id)
+      return
     }
     if (order.carrier_name) {
-      try {
-        const res = await getCarriers(order.carrier_name)
-        const list = Array.isArray(res) ? res : (res.carriers || [])
-        const found = list.find(c => (c.company_name || c.name || '').toLowerCase() === order.carrier_name.toLowerCase())
-        if (found) { onOpenCarrier(found.id); return }
-      } catch (e) {}
+      (async () => {
+        try {
+          const res = await getCarriers(order.carrier_name)
+          const list = Array.isArray(res) ? res : (res.carriers || [])
+          const found = list.find(c => (c.company_name || c.name || '').toLowerCase() === order.carrier_name.toLowerCase())
+          if (found) { onOpenCarrier(found.id); return }
+        } catch (e) {}
+        alert('Карточка перевозчика не найдена в базе')
+      })()
+      return
     }
     alert('Карточка перевозчика не найдена в базе')
   }
@@ -421,24 +444,6 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
       <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 16, alignItems: 'start' }}>
         {/* LEFT COLUMN */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {!view.carrier_paid && (view.carrier_rate || 0) > 0 && (
-            <div style={{
-              background: 'rgba(224,71,59,0.08)',
-              border: '1px solid rgba(224,71,59,0.25)',
-              borderRadius: 14, padding: '12px 16px',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            }}>
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#E0473B', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                  К оплате перевозчику
-                </div>
-                <div style={{ fontSize: 13, color: '#5A6573', marginTop: 2 }}>{view.carrier_name || '—'}</div>
-              </div>
-              <div style={{ fontFamily: 'JetBrains Mono', fontSize: 24, fontWeight: 700, color: '#E0473B' }}>
-                {(view.carrier_rate || 0).toLocaleString('ru-RU')} Br
-              </div>
-            </div>
-          )}
           {/* Hero dark card */}
           <div style={{
             background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)',
@@ -587,12 +592,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                 }}>{initials(order.client_name)}</div>
                 <div>
                   {onOpenClient && (order.client_id || order.client_name) ? (
-                    <button onClick={openClientDetail} style={{
-                      background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-                      fontWeight: 700, fontSize: 14, color: '#1366F0',
-                      textDecoration: 'underline', textDecorationColor: 'rgba(19,102,240,0.4)',
-                      fontFamily: 'Manrope',
-                    }}>{order.client_name}</button>
+                    <ClickableName name={order.client_name} onClick={openClientDetail} />
                   ) : (
                     <div style={{ fontWeight: 700, fontSize: 14, color: '#0E1726' }}>{order.client_name}</div>
                   )}
@@ -620,12 +620,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                 </div>
                 <div>
                   {onOpenCarrier && (order.carrier_id || order.carrier_name) ? (
-                    <button onClick={openCarrierDetail} style={{
-                      background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-                      fontWeight: 700, fontSize: 14, color: '#1366F0',
-                      textDecoration: 'underline', textDecorationColor: 'rgba(19,102,240,0.4)',
-                      fontFamily: 'Manrope',
-                    }}>{order.carrier_name}</button>
+                    <ClickableName name={order.carrier_name} onClick={openCarrierDetail} />
                   ) : (
                     <div style={{ fontWeight: 700, fontSize: 14, color: '#0E1726' }}>{order.carrier_name}</div>
                   )}
