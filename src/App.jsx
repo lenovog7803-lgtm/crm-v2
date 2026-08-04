@@ -26,6 +26,7 @@ import AddClientModal from './components/AddClientModal'
 import AddCarrierModal from './components/AddCarrierModal'
 import PaymentModal from './components/PaymentModal'
 import MobileNav from './components/MobileNav'
+import CommandPalette from './components/CommandPalette'
 
 const SEARCH_STORAGE_KEYS = {
   orders: 'search_orders',
@@ -74,6 +75,7 @@ function MainApp() {
   const [showCarrierModal, setShowCarrierModal] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [paymentModalKind, setPaymentModalKind] = useState('income')
+  const [paletteOpen, setPaletteOpen] = useState(false)
 
   const [search, setSearch] = useState(() => loadPageSearch('dashboard'))
   const [overdueItems, setOverdueItems] = useState([])
@@ -137,6 +139,17 @@ function MainApp() {
     setShowPaymentModal(true)
   }
 
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setPaletteOpen(true)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
   return (
     <div className="app-root">
       <div className="aurora-bg">
@@ -155,7 +168,7 @@ function MainApp() {
         />
 
         <main className="app-main">
-          <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={handleSearchChange} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} />
+          <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={handleSearchChange} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} onOpenPalette={() => setPaletteOpen(true)} />
           <div className="scroll-area" key={page}>
             {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} onMonthsLoaded={setAvailableMonths} preloadedOrders={allOrders} />}
 
@@ -271,6 +284,15 @@ function MainApp() {
           onSuccess={() => { setShowPaymentModal(false); setFinanceKey(k => k + 1) }}
         />
       )}
+
+      <CommandPalette
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        onOpenOrder={id => openOrder(id)}
+        onOpenClient={id => openClient(id)}
+        onOpenCarrier={id => openCarrier(id)}
+        onNav={handleNav}
+      />
     </div>
   )
 }

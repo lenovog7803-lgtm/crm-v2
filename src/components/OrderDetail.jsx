@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, restoreTrash, markPayment, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers } from '../api'
+import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, restoreTrash, markPayment, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers, getOrderHistory } from '../api'
 import { fmtMoney, initials, getGradient } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useToast } from './Toast'
@@ -18,6 +18,78 @@ const DOC_STEPS = [
   { key: 'docs_to_carrier_sent',      dateKey: 'docs_to_carrier_date',     label: 'Отправлено перевозчику' },
   { key: 'docs_from_carrier_received',dateKey: 'docs_from_carrier_date',   label: 'Получено от перевозчика' },
 ]
+
+const HISTORY_FIELD_LABEL = {
+  client_rate: 'Ставка клиента',
+  carrier_rate: 'Ставка перевозчика',
+  status: 'Статус заявки',
+  client_paid: 'Оплата клиента',
+  carrier_paid: 'Оплата перевозчику',
+  route_from: 'Город отправления',
+  route_to: 'Город назначения',
+  route_from_address: 'Адрес загрузки',
+  route_to_address: 'Адрес выгрузки',
+  load_date: 'Дата загрузки',
+  unload_date: 'Дата выгрузки',
+  cargo: 'Груз',
+  weight_tons: 'Вес',
+  notes: 'Заметки',
+  driver_name: 'Водитель',
+  driver_phone: 'Телефон водителя',
+  vehicle_plate: 'Номер ТС',
+  vehicle_type: 'Тип ТС',
+}
+
+function OrderHistorySection({ orderId }) {
+  const [open, setOpen] = useState(false)
+  const [history, setHistory] = useState([])
+  const [loaded, setLoaded] = useState(false)
+
+  const toggle = async () => {
+    if (!open && !loaded) {
+      const logs = await getOrderHistory(orderId).catch(() => [])
+      setHistory(Array.isArray(logs) ? logs : [])
+      setLoaded(true)
+    }
+    setOpen(!open)
+  }
+
+  return (
+    <div className="card" style={{ padding: '20px 20px' }}>
+      <div
+        onClick={toggle}
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+      >
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8' }}>
+          ИСТОРИЯ ИЗМЕНЕНИЙ
+        </span>
+        <span style={{ fontSize: 12, color: '#8A93A0' }}>{open ? 'свернуть ▲' : 'показать ▼'}</span>
+      </div>
+
+      {open && (
+        <div style={{ marginTop: 12 }}>
+          {history.length === 0 ? (
+            <div style={{ fontSize: 12, color: '#A6AEB8', textAlign: 'center', padding: 16 }}>Изменений пока не было</div>
+          ) : (
+            history.map((h, i) => (
+              <div key={h.id || i} style={{ display: 'flex', gap: 10, padding: '9px 0', borderBottom: i < history.length - 1 ? '1px solid rgba(14,23,38,0.05)' : 'none' }}>
+                <div style={{ width: 6, height: 6, borderRadius: 3, background: '#1366F0', marginTop: 6, flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12.5, color: '#0E1726' }}>
+                    <b>{HISTORY_FIELD_LABEL[h.field] || h.field}</b>: {h.old_value || '—'} → {h.new_value || '—'}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>
+                    {h.user} · {new Date(h.timestamp).toLocaleDateString('ru-RU')} в {new Date(h.timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
 
 const sLabel = {
   fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', marginBottom: 12,
@@ -773,6 +845,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
           )}
         </div>
       </div>
+
+      <OrderHistorySection orderId={order.id} />
 
       {paymentModal && (
         <OrderPaymentModal

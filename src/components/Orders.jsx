@@ -1,8 +1,18 @@
-import { useState, useEffect, useMemo } from 'react'
-import { getOrders, deleteOrder as apiDelete } from '../api'
+import { useState, useEffect, useMemo, useRef } from 'react'
+import { getOrders, deleteOrder as apiDelete, updateOrder, restoreOrder } from '../api'
 import { initials, statusLabel, statusColor, statusBg, getGradient } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
+import { useToast } from './Toast'
+
+const BULK_STATUSES = [
+  { id: 'new', label: 'Новая' },
+  { id: 'in_progress', label: 'В работе' },
+  { id: 'done', label: 'Доставлено' },
+  { id: 'cancelled', label: 'Отменено' },
+]
+
+const bulkBtnStyle = { background: 'transparent', border: 'none', color: '#FFFFFF', fontSize: 13, cursor: 'pointer', padding: '6px 10px', borderRadius: 8 }
 
 const DOC_FILTER_OPTIONS = [
   { key: 'docs_to_client_sent',         label: 'Отправлены клиенту',          not: false },
@@ -16,6 +26,7 @@ const DOC_FILTER_OPTIONS = [
 ]
 
 export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '' }) {
+  const { show } = useToast()
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState(() => localStorage.getItem('orders_statusFilter') || 'all')
@@ -24,15 +35,21 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
     try { return JSON.parse(localStorage.getItem('orders_docFilters') || '[]') } catch { return [] }
   })
   const [showDocFilter, setShowDocFilter] = useState(false)
+  const [selected, setSelected] = useState(new Set())
+  const [selectMode, setSelectMode] = useState(false)
+  const [showStatusMenu, setShowStatusMenu] = useState(false)
+  const longPressTimer = useRef(null)
   const isMobile = useIsMobile()
 
-  useEffect(() => {
+  const loadOrders = () => {
     setLoading(true)
-    getOrders()
+    return getOrders()
       .then(r => setOrders(Array.isArray(r) ? r : []))
       .catch(console.error)
       .finally(() => setLoading(false))
-  }, [refreshKey])
+  }
+
+  useEffect(() => { loadOrders() }, [refreshKey])
 
   useEffect(() => { localStorage.setItem('orders_statusFilter', statusFilter) }, [statusFilter])
   useEffect(() => { localStorage.setItem('orders_payFilter', payFilter || '') }, [payFilter])
@@ -42,6 +59,66 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
     e.stopPropagation()
     await apiDelete(id).catch(console.error)
     setOrders(prev => prev.filter(o => o.id !== id))
+  }
+
+  const toggleSelect = (id) => {
+    setSelected(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.size === 0) setSelectMode(false)
+      return next
+    })
+  }
+
+  const handleMouseDown = (id) => {
+    longPressTimer.current = setTimeout(() => {
+      setSelectMode(true)
+      toggleSelect(id)
+    }, 500)
+  }
+  const handleMouseUp = () => clearTimeout(longPressTimer.current)
+
+  const handleRowClick = (order, e) => {
+    if (e.metaKey || e.ctrlKey) {
+      e.preventDefault()
+      setSelectMode(true)
+      toggleSelect(order.id)
+      return
+    }
+    if (selectMode) { toggleSelect(order.id); return }
+    onOpenOrder(order.id)
+  }
+
+  const clearSelection = () => { setSelected(new Set()); setSelectMode(false); setShowStatusMenu(false) }
+
+  const handleBulkMarkPaid = async () => {
+    const ids = [...selected]
+    await Promise.all(ids.map(id => updateOrder(id, { client_paid: true, client_paid_date: new Date().toISOString() })))
+    show(`Отмечено оплаченными: ${ids.length}`, { type: 'success' })
+    clearSelection()
+    loadOrders()
+  }
+
+  const handleBulkDelete = async () => {
+    const ids = [...selected]
+    const ok = window.confirm(`Удалить ${ids.length} заявок? Это действие можно отменить в течение нескольких секунд.`)
+    if (!ok) return
+    await Promise.all(ids.map(id => apiDelete(id)))
+    show(`Удалено заявок: ${ids.length}`, {
+      type: 'info',
+      actionLabel: 'Отменить',
+      onAction: async () => { await Promise.all(ids.map(id => restoreOrder(id))); loadOrders() },
+    })
+    clearSelection()
+    loadOrders()
+  }
+
+  const handleBulkStatus = async (status) => {
+    const ids = [...selected]
+    await Promise.all(ids.map(id => updateOrder(id, { status })))
+    show(`Статус изменён у ${ids.length} заявок`, { type: 'success' })
+    clearSelection()
+    loadOrders()
   }
 
   const toggleDocFilter = key => {
@@ -297,21 +374,37 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           const route = order.route_from && order.route_to ? `${order.route_from} → ${order.route_to}` : (order.route || '—')
           const [avA, avB] = getGradient(order.client_name || '')
           const overdue = isOverdue(order)
+          const isSelected = selected.has(order.id)
           return (
             <div
               key={order.id}
               style={{
-                display: 'grid', gridTemplateColumns: '140px 1fr 1fr 110px 90px 70px',
+                display: 'flex', alignItems: 'center',
                 padding: '14px 20px',
                 borderBottom: i < filtered.length - 1 ? '1px solid rgba(14,23,38,0.05)' : 'none',
-                alignItems: 'center', cursor: 'pointer', transition: 'background 0.12s',
-                background: overdue ? 'rgba(200,25,35,0.05)' : 'transparent',
-                borderLeft: overdue ? '3px solid rgba(200,25,35,0.5)' : '3px solid transparent',
+                cursor: 'pointer', transition: 'background 0.12s',
+                background: isSelected ? '#EBF2FF' : (overdue ? 'rgba(200,25,35,0.05)' : 'transparent'),
+                ...(isSelected
+                  ? { outline: '1px solid #1366F0', outlineOffset: -1 }
+                  : { borderLeft: overdue ? '3px solid rgba(200,25,35,0.5)' : '3px solid transparent' }),
               }}
-              onMouseEnter={e => e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.08)' : 'rgba(14,23,38,0.02)'}
-              onMouseLeave={e => e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.05)' : 'transparent'}
-              onClick={() => onOpenOrder(order.id)}
+              onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.08)' : 'rgba(14,23,38,0.02)' }}
+              onMouseLeave={e => { handleMouseUp(); if (!isSelected) e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.05)' : 'transparent' }}
+              onMouseDown={() => handleMouseDown(order.id)}
+              onMouseUp={handleMouseUp}
+              onClick={e => handleRowClick(order, e)}
             >
+              {selectMode && (
+                <div style={{
+                  width: 18, height: 18, borderRadius: 6, flexShrink: 0, marginRight: 12,
+                  background: isSelected ? '#1366F0' : '#FFFFFF',
+                  border: `1.5px solid ${isSelected ? '#1366F0' : '#C4CAD4'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {isSelected && <span style={{ color: '#fff', fontSize: 11 }}>✓</span>}
+                </div>
+              )}
+              <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '140px 1fr 1fr 110px 90px 70px', alignItems: 'center' }}>
               <div>
                 <div style={{ fontFamily: 'JetBrains Mono', fontWeight: 600, fontSize: 13.5, color: '#1366F0' }}>
                   {order.order_number || order.id}
@@ -382,6 +475,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                   </svg>
                 </button>
               </div>
+              </div>
             </div>
           )
         })}
@@ -389,6 +483,43 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           <div style={{ padding: '40px', textAlign: 'center', color: '#A6AEB8', fontSize: 14 }}>Нет заявок</div>
         )}
       </div>
+      )}
+
+      {selectMode && selected.size > 0 && (
+        <div style={{
+          position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 500, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+        }}>
+          {showStatusMenu && (
+            <div style={{
+              background: '#0E1726', borderRadius: 14, padding: 8,
+              display: 'flex', flexDirection: 'column', gap: 2,
+              boxShadow: '0 20px 50px rgba(14,23,38,0.4)', minWidth: 180,
+            }}>
+              {BULK_STATUSES.map(s => (
+                <button
+                  key={s.id}
+                  onClick={() => handleBulkStatus(s.id)}
+                  style={{ ...bulkBtnStyle, textAlign: 'left', padding: '8px 10px' }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                >{s.label}</button>
+              ))}
+            </div>
+          )}
+          <div style={{
+            background: '#0E1726', borderRadius: 16, padding: '12px 16px',
+            display: 'flex', alignItems: 'center', gap: 14,
+            boxShadow: '0 20px 50px rgba(14,23,38,0.4)',
+          }}>
+            <span style={{ fontSize: 13, color: '#FFFFFF', fontWeight: 600 }}>Выбрано: {selected.size}</span>
+            <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.15)' }} />
+            <button onClick={() => setShowStatusMenu(v => !v)} style={bulkBtnStyle}>Сменить статус</button>
+            <button onClick={handleBulkMarkPaid} style={bulkBtnStyle}>Отметить оплаченными</button>
+            <button onClick={handleBulkDelete} style={{ ...bulkBtnStyle, color: '#FF8A80' }}>Удалить</button>
+            <button onClick={clearSelection} style={{ ...bulkBtnStyle, color: '#8A93A0' }}>Отмена</button>
+          </div>
+        </div>
       )}
     </div>
   )

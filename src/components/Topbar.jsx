@@ -29,7 +29,7 @@ const fmtMonth = m => {
   return `${MONTH_RU[parseInt(mo) - 1]} ${y}`
 }
 
-export default function Topbar({ page, onSignOut, period = 'month', onPeriodChange, availableMonths = [], search = '', onSearchChange, overdueItems = [], onOpenOrder, onNav }) {
+export default function Topbar({ page, onSignOut, period = 'month', onPeriodChange, availableMonths = [], search = '', onSearchChange, overdueItems = [], onOpenOrder, onNav, onOpenPalette }) {
   const meta = PAGE_META[page] || { title: page, subtitle: '' }
   const [bellOpen, setBellOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
@@ -108,7 +108,7 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
           onChange={e => onSearchChange && onSearchChange(e.target.value)}
           placeholder="Поиск..."
           style={{
-            width: '100%', paddingLeft: 34, paddingRight: 12,
+            width: '100%', paddingLeft: 34, paddingRight: 40,
             height: 38, borderRadius: 11,
             border: '1px solid rgba(14,23,38,0.12)',
             background: 'rgba(255,255,255,0.7)',
@@ -116,6 +116,18 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
             outline: 'none',
           }}
         />
+        {onOpenPalette && (
+          <button
+            onClick={onOpenPalette}
+            title="Быстрый поиск по всей базе (⌘K)"
+            style={{
+              position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)',
+              height: 24, padding: '0 7px', borderRadius: 7, border: '1px solid rgba(14,23,38,0.1)',
+              background: 'rgba(255,255,255,0.8)', color: '#8A93A0', cursor: 'pointer',
+              fontFamily: 'Manrope', fontSize: 11, fontWeight: 600,
+            }}
+          >⌘K</button>
+        )}
       </div>
 
       {/* Period — only on dashboard */}

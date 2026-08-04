@@ -132,3 +132,12 @@ export const syncOrderDocUrls = (orderId) => req(`/orders/${orderId}/sync_doc_ur
 // Mark order payment (side: 'client' | 'carrier')
 export const markPayment = (orderId, side, data) =>
   req(`/orders/${orderId}/mark_payment?side=${side}`, { method: 'POST', body: JSON.stringify(data) });
+
+// Global search (Cmd+K)
+export const globalSearch = (q) => req(`/search?q=${encodeURIComponent(q)}`);
+
+// Order change history
+export const getOrderHistory = (orderId) => req(`/orders/${orderId}/logs`);
+
+// Restore a soft-deleted order (wraps the existing trash-restore endpoint)
+export const restoreOrder = (id) => restoreTrash('orders', id);
