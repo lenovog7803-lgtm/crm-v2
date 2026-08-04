@@ -197,7 +197,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
                 style={{ ...inputStyle, height: 72, padding: '10px 12px', resize: 'vertical' }}
               />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
               <div>
                 <label style={labelStyle}>ТИП</label>
                 <select value={editTask.task_type} onChange={e => setEditTask(p => ({ ...p, task_type: e.target.value }))} style={inputStyle}>

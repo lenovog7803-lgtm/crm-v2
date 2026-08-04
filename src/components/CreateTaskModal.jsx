@@ -32,7 +32,7 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
           <label className="form-label">НАЗВАНИЕ</label>
           <input className="form-input" placeholder="Описание задачи" value={form.title} onChange={e => set('title', e.target.value)} required />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
           <div className="form-field">
             <label className="form-label">ТИП</label>
             <select className="form-input" value={form.task_type} onChange={e => set('task_type', e.target.value)}>

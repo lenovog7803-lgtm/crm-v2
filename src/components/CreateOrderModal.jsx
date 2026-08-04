@@ -38,7 +38,7 @@ function Field({ label, children }) {
 }
 
 function Grid2({ children }) {
-  return <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>{children}</div>
+  return <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>{children}</div>
 }
 
 function SectionTitle({ title }) {
@@ -308,7 +308,7 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
         {/* 4. Финансы */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <SectionTitle title="ФИНАНСЫ" />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <Field label="СТАВКА КЛИЕНТА (Br)">
               <input type="number" value={form.client_rate} onChange={e => upd('client_rate', e.target.value)}
                 placeholder="0" style={iStyle} />

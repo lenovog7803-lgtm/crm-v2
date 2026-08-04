@@ -560,7 +560,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
           }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>МАРШРУТ</div>
             <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 17 : 22, letterSpacing: '-0.02em', lineHeight: 1.2 }}>{route}</div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: isMobile ? 10 : 20, marginTop: isMobile ? 12 : 18 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: isMobile ? 10 : 20, marginTop: isMobile ? 12 : 18 }}>
               <div>
                 <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Груз</div>
                 <div style={{ fontWeight: 600, fontSize: 13 }}>{view.cargo || '—'}</div>
@@ -578,7 +578,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                 <div style={{ fontWeight: 600, fontSize: 13 }}>{view.unload_date || '—'}</div>
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: isMobile ? 8 : 24, marginTop: isMobile ? 14 : 22, paddingTop: isMobile ? 14 : 18, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)', gap: isMobile ? 8 : 24, marginTop: isMobile ? 14 : 22, paddingTop: isMobile ? 14 : 18, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
               <div>
                 <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Клиент</div>
                 <div style={{ fontWeight: 800, fontSize: isMobile ? 15 : 20, fontFamily: 'Onest' }}>{fmtMoney(clientRate)}</div>
@@ -838,22 +838,22 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
           </div>
 
           {/* Cargo info */}
-          {(order.cargo || order.weight_tons || order.payment_days) && (
+          {Boolean(order.cargo || order.weight_tons || order.payment_days) && (
             <div className="card" style={{ padding: '20px' }}>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', marginBottom: 14 }}>ГРУЗ И УСЛОВИЯ</div>
-              {order.cargo && (
+              {Boolean(order.cargo) && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
                   <span style={{ fontSize: 12, color: '#A6AEB8' }}>Груз</span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: '#0E1726' }}>{order.cargo}</span>
                 </div>
               )}
-              {order.weight_tons && (
+              {Boolean(order.weight_tons) && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
                   <span style={{ fontSize: 12, color: '#A6AEB8' }}>Вес</span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: '#0E1726', fontFamily: 'JetBrains Mono' }}>{order.weight_tons} т</span>
                 </div>
               )}
-              {order.payment_days && (
+              {Boolean(order.payment_days) && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0' }}>
                   <span style={{ fontSize: 12, color: '#A6AEB8' }}>Срок оплаты</span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: '#0E1726', fontFamily: 'JetBrains Mono' }}>{order.payment_days} дн.</span>

@@ -74,7 +74,7 @@ export default function LeadEditModal({ lead, onClose, onSaved }) {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div>
               <label style={labelStyle}>НАЗВАНИЕ КОМПАНИИ</label>
               <input value={form.name || ''} onChange={set('name')} className="form-input" style={fieldStyle} />

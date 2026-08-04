@@ -56,7 +56,7 @@ export default function AddCarrierModal({ onClose, onSuccess }) {
             <label className="form-label">НАИМЕНОВАНИЕ</label>
             <input className="form-input" placeholder="ИП Иванов / ООО «ТрансЛайн»" value={form.company_name} onChange={e => set('company_name', e.target.value)} required />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div className="form-field">
               <label className="form-label">ВОДИТЕЛЬ</label>
               <input className="form-input" placeholder="Фамилия И.О." value={form.driver_name} onChange={e => set('driver_name', e.target.value)} />
@@ -71,7 +71,7 @@ export default function AddCarrierModal({ onClose, onSuccess }) {
         {/* Реквизиты */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={sectionLabel}>РЕКВИЗИТЫ</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div className="form-field">
               <label className="form-label">УНП</label>
               <input className="form-input" placeholder="100000000" value={form.unp} onChange={e => set('unp', e.target.value)} />
@@ -105,7 +105,7 @@ export default function AddCarrierModal({ onClose, onSuccess }) {
             <label className="form-label">БАНК</label>
             <input className="form-input" placeholder="ОАО «АСБ Беларусбанк»" value={form.bank} onChange={e => set('bank', e.target.value)} />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div className="form-field">
               <label className="form-label">Р/С</label>
               <input className="form-input" placeholder="BY12 BAPB 3012 1234 5678 9000 0000" value={form.rs} onChange={e => set('rs', e.target.value)} />
@@ -120,7 +120,7 @@ export default function AddCarrierModal({ onClose, onSuccess }) {
         {/* ТС */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={sectionLabel}>ТРАНСПОРТ</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div className="form-field">
               <label className="form-label">ТИП ТС</label>
               <input className="form-input" placeholder="Тент / Реф / Контейнер" value={form.vehicle_type} onChange={e => set('vehicle_type', e.target.value)} />
@@ -130,7 +130,7 @@ export default function AddCarrierModal({ onClose, onSuccess }) {
               <input className="form-input" placeholder="АВ 1234-7" value={form.plate} onChange={e => set('plate', e.target.value)} />
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div className="form-field">
               <label className="form-label">ГРУЗОПОДЪЁМНОСТЬ (т)</label>
               <input className="form-input" type="number" placeholder="20" value={form.capacity_tons} onChange={e => set('capacity_tons', e.target.value)} />

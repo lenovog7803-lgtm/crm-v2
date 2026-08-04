@@ -49,12 +49,12 @@ export default function Clients({ onOpenClient, onAdd, refreshKey, search = '' }
       </div>
 
       {loading && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 14 }}>
           {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} lines={3} />)}
         </div>
       )}
       {!loading && (
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 14 }}>
         {visible.map(client => {
           const [avA, avB] = getGradient(client.name || '')
           const contact = client.contact_person || client.contact || ''
@@ -82,7 +82,7 @@ export default function Clients({ onOpenClient, onAdd, refreshKey, search = '' }
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10, marginBottom: 14 }}>
                 <div style={{ background: 'rgba(14,23,38,0.04)', borderRadius: 12, padding: '10px 14px' }}>
                   <div style={{ fontSize: 10.5, color: '#A6AEB8', fontWeight: 600, marginBottom: 4 }}>УНП / ИНН</div>
                   <div style={{ fontFamily: 'JetBrains Mono', fontWeight: 700, fontSize: 13, color: '#0E1726' }}>{inn || '—'}</div>

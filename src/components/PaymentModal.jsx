@@ -47,7 +47,7 @@ export default function PaymentModal({ defaultKind, onClose, onSuccess }) {
     <ModalOverlay onClose={onClose}>
       <ModalHeader title={form.kind === 'income' ? 'Поступление' : 'Списание'} onClose={onClose} />
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
           <div className="form-field">
             <label className="form-label">ТИП</label>
             <select className="form-input" value={form.kind} onChange={e => {
@@ -75,7 +75,7 @@ export default function PaymentModal({ defaultKind, onClose, onSuccess }) {
             {partyList.map(p => <option key={p.id} value={p.id}>{p.name || p.company_name}</option>)}
           </select>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
           <div className="form-field">
             <label className="form-label">СУММА (BYN)</label>
             <input className="form-input" type="number" placeholder="0" value={form.amount} onChange={e => set('amount', e.target.value)} required />

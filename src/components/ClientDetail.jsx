@@ -181,7 +181,7 @@ export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }
         )}
       </div>
 
-      <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+      <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 14 }}>
         <div className="card" style={{ padding: '20px 22px' }}>
           <div className="section-label" style={{ marginBottom: 10 }}>РЕКВИЗИТЫ</div>
           {editing ? (

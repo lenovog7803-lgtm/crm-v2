@@ -249,7 +249,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
         {/* Doc filter panel — inline below, no positioning */}
         {showDocFilter && (
           <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(14,23,38,0.07)' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 2 }}>
               {DOC_FILTER_OPTIONS.map((f, i) => (
                 <>
                   {i % 2 === 0 && i > 0 && (

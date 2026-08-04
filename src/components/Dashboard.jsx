@@ -604,7 +604,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       </div>
 
       {/* Bottom 3-col */}
-      <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: isMobile ? 10 : 16 }}>
+      <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)', gap: isMobile ? 10 : 16 }}>
         {/* Top clients */}
         <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px', minWidth: 0 }}>
           <div onClick={() => setOpenModal('clients')} style={{ cursor: 'pointer', marginBottom: 14 }}>

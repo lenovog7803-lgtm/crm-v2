@@ -181,7 +181,7 @@ export default function AnalyticsView() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 20 }}>
         {/* 3. Причины отказов */}
         <div className="card" style={{ padding: 20 }}>
           <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Причины отказов</div>
@@ -202,7 +202,7 @@ export default function AnalyticsView() {
         </div>
 
         {/* 5. Отдача от холодных лидов */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, alignContent: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12, alignContent: 'start' }}>
           <StatCard label="Лидов → клиентов" value={fmt(data.cold_leads?.converted_count)} color="#1E9E5A" />
           <StatCard label="Заявок от них" value={fmt(data.cold_leads?.orders_count)} color="#1366F0" />
           <StatCard label="Выручка, BYN" value={fmt(data.cold_leads?.revenue)} />

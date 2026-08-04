@@ -52,7 +52,7 @@ export default function AddClientModal({ onClose, onSuccess }) {
             <label className="form-label">НАИМЕНОВАНИЕ</label>
             <input className="form-input" placeholder="ООО «Компания»" value={form.name} onChange={e => set('name', e.target.value)} required />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div className="form-field">
               <label className="form-label">КОНТАКТНОЕ ЛИЦО</label>
               <input className="form-input" placeholder="Фамилия И.О." value={form.contact_person} onChange={e => set('contact_person', e.target.value)} />
@@ -71,7 +71,7 @@ export default function AddClientModal({ onClose, onSuccess }) {
         {/* Реквизиты */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={sectionLabel}>РЕКВИЗИТЫ</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div className="form-field">
               <label className="form-label">УНП</label>
               <input className="form-input" placeholder="100000000" value={form.unp} onChange={e => set('unp', e.target.value)} />
@@ -117,7 +117,7 @@ export default function AddClientModal({ onClose, onSuccess }) {
         {/* Доп */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={sectionLabel}>ДОПОЛНИТЕЛЬНО</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div className="form-field">
               <label className="form-label">ГРУЗ</label>
               <input className="form-input" placeholder="Тип груза" value={form.cargo_types} onChange={e => set('cargo_types', e.target.value)} />
