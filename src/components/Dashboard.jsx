@@ -66,12 +66,11 @@ function calcStats(orders, period, apiData) {
     clientMap[key].cost += o.carrier_rate || 0
     clientMap[key].cnt++
   })
-  const topClients = Object.values(clientMap).sort((a, b) => b.rev - a.rev).slice(0, 6)
+  const topClients = Object.values(clientMap).sort((a, b) => b.rev - a.rev)
   const topByMargin = Object.values(clientMap)
     .filter(c => c.rev > 0)
     .map(c => ({ ...c, pct: (c.rev - c.cost) / c.rev * 100 }))
     .sort((a, b) => b.pct - a.pct)
-    .slice(0, 6)
 
   // Debtor orders
   const debtorOrders = allDone.filter(o => !o.client_paid && (o.client_rate || 0) > 0)
@@ -84,7 +83,7 @@ function calcStats(orders, period, apiData) {
     if (!debtorMap[key]) debtorMap[key] = { name: key, amt: 0 }
     debtorMap[key].amt += o.client_rate || 0
   })
-  const topDebtors = Object.values(debtorMap).sort((a, b) => b.amt - a.amt).slice(0, 6)
+  const topDebtors = Object.values(debtorMap).sort((a, b) => b.amt - a.amt)
 
   // Prefer locally computed counts (from all fetched orders) — API often returns 0 for these
   const activeOrders = active || apiData?.active_orders || 0
@@ -370,12 +369,48 @@ function DebtModal({ title, orders, onClose, onOpenOrder }) {
   )
 }
 
+const linkBtnStyle = { fontSize: 12, color: '#1366F0', background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 600 }
+
+function TopRow({ rank, name, value, color, bg }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
+      <span style={{ width: 24, height: 24, borderRadius: 8, flexShrink: 0, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>{rank}</span>
+      <span style={{ flex: 1, fontSize: 13, fontWeight: 500, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
+      <span style={{ fontFamily: 'JetBrains Mono', fontSize: 12, fontWeight: 700, color, flexShrink: 0 }}>{value}</span>
+    </div>
+  )
+}
+
+function FullListModal({ title, subtitle, items, valueOf, color, bg, onClose }) {
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: '#FFFFFF', borderRadius: 24, padding: 26, width: '100%', maxWidth: 520, maxHeight: '80vh', display: 'flex', flexDirection: 'column', border: '1px solid rgba(14,23,38,0.08)', boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
+          <div>
+            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
+            <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>{subtitle}</div>
+          </div>
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: '#F7F8FA', cursor: 'pointer', fontSize: 18, color: '#8A93A0', flexShrink: 0 }}>×</button>
+        </div>
+        <div style={{ overflowY: 'auto' }}>
+          {items.map((c, i) => (
+            <TopRow key={i} rank={i + 1} name={c.name} value={valueOf(c)} color={color} bg={bg} />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMonthsLoaded, preloadedOrders }) {
   const [allOrders, setAllOrders] = useState(preloadedOrders || [])
   const [apiData, setApiData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showDebtors, setShowDebtors] = useState(false)
   const [showCarrierDebt, setShowCarrierDebt] = useState(false)
+  const [showAllClients, setShowAllClients] = useState(false)
+  const [showAllMargin, setShowAllMargin] = useState(false)
+  const [showAllDebtors, setShowAllDebtors] = useState(false)
 
   // Use preloaded orders if available, otherwise fetch
   useEffect(() => {
@@ -556,20 +591,19 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: isMobile ? 10 : 16 }}>
         {/* Top clients */}
         <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px' }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 4 }}>Топ клиентов</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Топ клиентов</div>
+            {topClients.length > 6 && (
+              <button onClick={() => setShowAllClients(true)} style={linkBtnStyle}>Все {topClients.length} →</button>
+            )}
+          </div>
           <div style={{ fontSize: 12, color: '#A6AEB8', marginBottom: 14 }}>по выручке за период</div>
           {topClients.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {topClients.map((c, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
-                  <div style={{ width: 24, height: 24, borderRadius: 8, flexShrink: 0, background: 'rgba(19,102,240,0.1)', color: '#1366F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>{i + 1}</div>
-                  <div style={{ flex: 1, fontSize: 13, fontWeight: 500, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {c.name || c.client_name}
-                  </div>
-                  <div style={{ fontFamily: 'JetBrains Mono', fontSize: 12, fontWeight: 600, color: '#1366F0', flexShrink: 0 }}>
-                    {Math.round(c.rev || c.revenue || c.total_revenue || 0).toLocaleString('ru-RU')} Br
-                  </div>
-                </div>
+              {topClients.slice(0, 6).map((c, i) => (
+                <TopRow key={i} rank={i + 1} name={c.name || c.client_name}
+                  value={`${Math.round(c.rev || c.revenue || c.total_revenue || 0).toLocaleString('ru-RU')} Br`}
+                  color="#1366F0" bg="rgba(19,102,240,0.1)" />
               ))}
             </div>
           ) : <div style={{ color: '#A6AEB8', fontSize: 13 }}>Нет данных за период</div>}
@@ -577,20 +611,19 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
 
         {/* Top by margin */}
         <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px' }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 4 }}>Топ по марже</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Топ по марже</div>
+            {topByMargin.length > 6 && (
+              <button onClick={() => setShowAllMargin(true)} style={linkBtnStyle}>Все {topByMargin.length} →</button>
+            )}
+          </div>
           <div style={{ fontSize: 12, color: '#A6AEB8', marginBottom: isMobile ? 10 : 14 }}>% маржинальности</div>
           {topByMargin.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {topByMargin.map((c, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
-                  <div style={{ width: 24, height: 24, borderRadius: 8, flexShrink: 0, background: 'rgba(30,158,90,0.1)', color: '#1E9E5A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>{i + 1}</div>
-                  <div style={{ flex: 1, fontSize: 13, fontWeight: 500, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {c.name || c.client_name}
-                  </div>
-                  <div style={{ fontFamily: 'JetBrains Mono', fontSize: 12, fontWeight: 700, color: '#1E9E5A', flexShrink: 0 }}>
-                    {(c.pct || c.margin_pct || 0).toFixed(1)}%
-                  </div>
-                </div>
+              {topByMargin.slice(0, 6).map((c, i) => (
+                <TopRow key={i} rank={i + 1} name={c.name || c.client_name}
+                  value={`${(c.pct || c.margin_pct || c.margin_percent || 0).toFixed(1)}%`}
+                  color="#1E9E5A" bg="rgba(30,158,90,0.1)" />
               ))}
             </div>
           ) : <div style={{ color: '#A6AEB8', fontSize: 13 }}>Нет данных за период</div>}
@@ -598,20 +631,19 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
 
         {/* Debtors */}
         <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px' }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 4 }}>Должники</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Должники</div>
+            {topDebtors.length > 6 && (
+              <button onClick={() => setShowAllDebtors(true)} style={linkBtnStyle}>Все {topDebtors.length} →</button>
+            )}
+          </div>
           <div style={{ fontSize: 12, color: '#A6AEB8', marginBottom: isMobile ? 10 : 14 }}>неоплаченные доставки</div>
           {topDebtors.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {topDebtors.map((c, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 9, background: 'rgba(217,119,6,0.12)', color: '#D97706', flexShrink: 0, fontFamily: 'Onest', fontWeight: 700, fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {(c.name || '?')[0].toUpperCase()}
-                  </div>
-                  <div style={{ flex: 1, fontSize: 13, fontWeight: 500, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</div>
-                  <div style={{ fontFamily: 'JetBrains Mono', fontSize: 12, fontWeight: 700, color: '#D97706', flexShrink: 0 }}>
-                    {Math.round(c.amt).toLocaleString('ru-RU')} Br
-                  </div>
-                </div>
+              {topDebtors.slice(0, 6).map((c, i) => (
+                <TopRow key={i} rank={i + 1} name={c.name}
+                  value={`${Math.round(c.amt || 0).toLocaleString('ru-RU')} Br`}
+                  color="#D97706" bg="rgba(217,119,6,0.12)" />
               ))}
             </div>
           ) : <div style={{ color: '#A6AEB8', fontSize: 13 }}>Нет должников</div>}
@@ -633,6 +665,30 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           orders={carrierDebtOrders.map(o => ({ ...o, client_rate: o.carrier_rate }))}
           onClose={() => setShowCarrierDebt(false)}
           onOpenOrder={onOpenOrder}
+        />
+      )}
+      {showAllClients && (
+        <FullListModal
+          title="Все клиенты" subtitle="по выручке за период" items={topClients}
+          valueOf={c => `${Math.round(c.rev || c.revenue || c.total_revenue || 0).toLocaleString('ru-RU')} Br`}
+          color="#1366F0" bg="rgba(19,102,240,0.1)"
+          onClose={() => setShowAllClients(false)}
+        />
+      )}
+      {showAllMargin && (
+        <FullListModal
+          title="Топ по марже" subtitle="% маржинальности" items={topByMargin}
+          valueOf={c => `${(c.pct || c.margin_pct || c.margin_percent || 0).toFixed(1)}%`}
+          color="#1E9E5A" bg="rgba(30,158,90,0.1)"
+          onClose={() => setShowAllMargin(false)}
+        />
+      )}
+      {showAllDebtors && (
+        <FullListModal
+          title="Все должники" subtitle="неоплаченные доставки" items={topDebtors}
+          valueOf={c => `${Math.round(c.amt || 0).toLocaleString('ru-RU')} Br`}
+          color="#D97706" bg="rgba(217,119,6,0.12)"
+          onClose={() => setShowAllDebtors(false)}
         />
       )}
     </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getLeads } from '../../api'
 import { STAGES, stageById } from '../../constants/leads'
 import CallCard from './CallCard'
@@ -23,6 +23,8 @@ export default function ListView({ industry }) {
   const [activeLead, setActiveLead] = useState(null)
   const [editLead, setEditLead] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [visibleCount, setVisibleCount] = useState(10)
+  const scrollRef = useRef(null)
 
   useEffect(() => {
     setLoading(true)
@@ -45,6 +47,18 @@ export default function ListView({ industry }) {
     }
     return true
   })
+
+  useEffect(() => { setVisibleCount(10) }, [filters, industry])
+
+  const visible = filtered.slice(0, visibleCount)
+
+  const handleScroll = () => {
+    const el = scrollRef.current
+    if (!el) return
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 60) {
+      setVisibleCount(prev => Math.min(prev + 10, filtered.length))
+    }
+  }
 
   const handleSave = async (data) => {
     if (!activeLead) return
@@ -80,44 +94,51 @@ export default function ListView({ industry }) {
       {loading && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
 
       {!loading && (
-        <div className="card" style={{ overflow: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th style={thStyle}>Компания</th>
-                <th style={thStyle}>Контакт</th>
-                <th style={thStyle}>Телефон</th>
-                <th style={thStyle}>Отрасль</th>
-                <th style={thStyle}>Город</th>
-                <th style={thStyle}>Стадия</th>
-                <th style={thStyle}>Попыток</th>
-                <th style={thStyle}>Следующий звонок</th>
-                <th style={thStyle}>Всего звонков</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map(l => {
-                const st = stageById(l.stage)
-                return (
-                  <tr key={l.id} onClick={() => setActiveLead(l)} style={{ cursor: 'pointer' }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.02)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                  >
-                    <td style={{ ...tdStyle, fontWeight: 600 }}>{l.name}</td>
-                    <td style={tdStyle}>{l.contact_person || '—'}</td>
-                    <td style={{ ...tdStyle, fontFamily: 'JetBrains Mono' }}>{l.phone}</td>
-                    <td style={tdStyle}>{l.industry || '—'}</td>
-                    <td style={tdStyle}>{l.city || '—'}</td>
-                    <td style={tdStyle}><span style={{ padding: '3px 10px', borderRadius: 8, background: st.bg, color: st.color, fontSize: 11, fontWeight: 600 }}>{st.label}</span></td>
-                    <td style={tdStyle}>{l.call_attempts || 0}</td>
-                    <td style={tdStyle}>{l.next_call ? new Date(l.next_call).toLocaleString('ru-RU') : '—'}</td>
-                    <td style={tdStyle}>{l.total_calls || 0}</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-          {filtered.length === 0 && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Нет лидов по фильтрам</div>}
+        <div className="card" style={{ overflow: 'hidden' }}>
+          <div ref={scrollRef} onScroll={handleScroll} style={{ maxHeight: 640, overflowY: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  <th style={thStyle}>Компания</th>
+                  <th style={thStyle}>Контакт</th>
+                  <th style={thStyle}>Телефон</th>
+                  <th style={thStyle}>Отрасль</th>
+                  <th style={thStyle}>Город</th>
+                  <th style={thStyle}>Стадия</th>
+                  <th style={thStyle}>Попыток</th>
+                  <th style={thStyle}>Следующий звонок</th>
+                  <th style={thStyle}>Всего звонков</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visible.map(l => {
+                  const st = stageById(l.stage)
+                  return (
+                    <tr key={l.id} onClick={() => setActiveLead(l)} style={{ cursor: 'pointer' }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.02)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <td style={{ ...tdStyle, fontWeight: 600 }}>{l.name}</td>
+                      <td style={tdStyle}>{l.contact_person || '—'}</td>
+                      <td style={{ ...tdStyle, fontFamily: 'JetBrains Mono' }}>{l.phone}</td>
+                      <td style={tdStyle}>{l.industry || '—'}</td>
+                      <td style={tdStyle}>{l.city || '—'}</td>
+                      <td style={tdStyle}><span style={{ padding: '3px 10px', borderRadius: 8, background: st.bg, color: st.color, fontSize: 11, fontWeight: 600 }}>{st.label}</span></td>
+                      <td style={tdStyle}>{l.call_attempts || 0}</td>
+                      <td style={tdStyle}>{l.next_call ? new Date(l.next_call).toLocaleString('ru-RU') : '—'}</td>
+                      <td style={tdStyle}>{l.total_calls || 0}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+            {visibleCount < filtered.length && (
+              <div style={{ textAlign: 'center', padding: 14, fontSize: 12, color: '#8A93A0' }}>
+                показано {visible.length} из {filtered.length} · докрутите вниз
+              </div>
+            )}
+            {filtered.length === 0 && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Нет лидов по фильтрам</div>}
+          </div>
         </div>
       )}
 
