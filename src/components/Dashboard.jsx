@@ -369,8 +369,6 @@ function DebtModal({ title, orders, onClose, onOpenOrder }) {
   )
 }
 
-const linkBtnStyle = { fontSize: 12, color: '#1366F0', background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 600 }
-
 function TopRow({ rank, name, value, color, bg }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
@@ -393,9 +391,13 @@ function FullListModal({ title, subtitle, items, valueOf, color, bg, onClose }) 
           <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: '#F7F8FA', cursor: 'pointer', fontSize: 18, color: '#8A93A0', flexShrink: 0 }}>×</button>
         </div>
         <div style={{ overflowY: 'auto' }}>
-          {items.map((c, i) => (
-            <TopRow key={i} rank={i + 1} name={c.name} value={valueOf(c)} color={color} bg={bg} />
-          ))}
+          {items.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 30, fontSize: 13, color: '#8A93A0' }}>Нет данных</div>
+          ) : (
+            items.map((c, i) => (
+              <TopRow key={i} rank={i + 1} name={c.name} value={valueOf(c)} color={color} bg={bg} />
+            ))
+          )}
         </div>
       </div>
     </div>
@@ -408,9 +410,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
   const [loading, setLoading] = useState(true)
   const [showDebtors, setShowDebtors] = useState(false)
   const [showCarrierDebt, setShowCarrierDebt] = useState(false)
-  const [showAllClients, setShowAllClients] = useState(false)
-  const [showAllMargin, setShowAllMargin] = useState(false)
-  const [showAllDebtors, setShowAllDebtors] = useState(false)
+  const [openModal, setOpenModal] = useState(null) // 'clients' | 'margin' | 'debtors' | null
 
   // Use preloaded orders if available, otherwise fetch
   useEffect(() => {
@@ -590,14 +590,11 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       {/* Bottom 3-col */}
       <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: isMobile ? 10 : 16 }}>
         {/* Top clients */}
-        <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+        <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px', minWidth: 0 }}>
+          <div onClick={() => setOpenModal('clients')} style={{ cursor: 'pointer', marginBottom: 14 }}>
             <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Топ клиентов</div>
-            {topClients.length > 6 && (
-              <button onClick={() => setShowAllClients(true)} style={linkBtnStyle}>Все {topClients.length} →</button>
-            )}
+            <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 4 }}>по выручке за период</div>
           </div>
-          <div style={{ fontSize: 12, color: '#A6AEB8', marginBottom: 14 }}>по выручке за период</div>
           {topClients.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               {topClients.slice(0, 6).map((c, i) => (
@@ -610,14 +607,11 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         </div>
 
         {/* Top by margin */}
-        <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+        <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px', minWidth: 0 }}>
+          <div onClick={() => setOpenModal('margin')} style={{ cursor: 'pointer', marginBottom: isMobile ? 10 : 14 }}>
             <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Топ по марже</div>
-            {topByMargin.length > 6 && (
-              <button onClick={() => setShowAllMargin(true)} style={linkBtnStyle}>Все {topByMargin.length} →</button>
-            )}
+            <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 4 }}>% маржинальности</div>
           </div>
-          <div style={{ fontSize: 12, color: '#A6AEB8', marginBottom: isMobile ? 10 : 14 }}>% маржинальности</div>
           {topByMargin.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               {topByMargin.slice(0, 6).map((c, i) => (
@@ -630,14 +624,11 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         </div>
 
         {/* Debtors */}
-        <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+        <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px', minWidth: 0 }}>
+          <div onClick={() => setOpenModal('debtors')} style={{ cursor: 'pointer', marginBottom: isMobile ? 10 : 14 }}>
             <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Должники</div>
-            {topDebtors.length > 6 && (
-              <button onClick={() => setShowAllDebtors(true)} style={linkBtnStyle}>Все {topDebtors.length} →</button>
-            )}
+            <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 4 }}>неоплаченные доставки</div>
           </div>
-          <div style={{ fontSize: 12, color: '#A6AEB8', marginBottom: isMobile ? 10 : 14 }}>неоплаченные доставки</div>
           {topDebtors.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               {topDebtors.slice(0, 6).map((c, i) => (
@@ -667,28 +658,26 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           onOpenOrder={onOpenOrder}
         />
       )}
-      {showAllClients && (
+      {openModal && (
         <FullListModal
-          title="Все клиенты" subtitle="по выручке за период" items={topClients}
-          valueOf={c => `${Math.round(c.rev || c.revenue || c.total_revenue || 0).toLocaleString('ru-RU')} Br`}
-          color="#1366F0" bg="rgba(19,102,240,0.1)"
-          onClose={() => setShowAllClients(false)}
-        />
-      )}
-      {showAllMargin && (
-        <FullListModal
-          title="Топ по марже" subtitle="% маржинальности" items={topByMargin}
-          valueOf={c => `${(c.pct || c.margin_pct || c.margin_percent || 0).toFixed(1)}%`}
-          color="#1E9E5A" bg="rgba(30,158,90,0.1)"
-          onClose={() => setShowAllMargin(false)}
-        />
-      )}
-      {showAllDebtors && (
-        <FullListModal
-          title="Все должники" subtitle="неоплаченные доставки" items={topDebtors}
-          valueOf={c => `${Math.round(c.amt || 0).toLocaleString('ru-RU')} Br`}
-          color="#D97706" bg="rgba(217,119,6,0.12)"
-          onClose={() => setShowAllDebtors(false)}
+          {...{
+            clients: {
+              title: 'Все клиенты', subtitle: 'по выручке за период', items: topClients,
+              valueOf: c => `${Math.round(c.rev || c.revenue || c.total_revenue || 0).toLocaleString('ru-RU')} Br`,
+              color: '#1366F0', bg: 'rgba(19,102,240,0.1)',
+            },
+            margin: {
+              title: 'Топ по марже', subtitle: '% маржинальности', items: topByMargin,
+              valueOf: c => `${(c.pct || c.margin_pct || c.margin_percent || 0).toFixed(1)}%`,
+              color: '#1E9E5A', bg: 'rgba(30,158,90,0.1)',
+            },
+            debtors: {
+              title: 'Все должники', subtitle: 'неоплаченные доставки', items: topDebtors,
+              valueOf: c => `${Math.round(c.amt || 0).toLocaleString('ru-RU')} Br`,
+              color: '#D97706', bg: 'rgba(217,119,6,0.12)',
+            },
+          }[openModal]}
+          onClose={() => setOpenModal(null)}
         />
       )}
     </div>
