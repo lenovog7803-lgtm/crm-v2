@@ -125,7 +125,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   const [hiddenMenuOpen, setHiddenMenuOpen] = useState(false)
   const longPressTimer = useRef(null)
   const avatarRef = useRef(null)
-  const [hiddenMenuBottom, setHiddenMenuBottom] = useState(0)
+  const [hiddenMenuPos, setHiddenMenuPos] = useState({ left: 0, bottom: 0 })
 
   const startLongPress = () => {
     // Only reachable with the sidebar expanded — collapsed, the avatar sits
@@ -133,8 +133,14 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
     // overlapping content awkwardly either way.
     if (!expanded) return
     longPressTimer.current = setTimeout(() => {
-      const rect = avatarRef.current?.getBoundingClientRect()
-      if (rect) setHiddenMenuBottom(window.innerHeight - rect.top + 8)
+      const sidebarRect = avatarRef.current?.closest('.desktop-sidebar')?.getBoundingClientRect()
+      const avatarRect = avatarRef.current?.getBoundingClientRect()
+      if (sidebarRect && avatarRect) {
+        setHiddenMenuPos({
+          left: sidebarRect.left + sidebarRect.width / 2,
+          bottom: window.innerHeight - avatarRect.top + 8,
+        })
+      }
       setHiddenMenuOpen(true)
     }, 550)
   }
@@ -285,7 +291,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
           <div
             onClick={e => e.stopPropagation()}
             style={{
-              position: 'fixed', left: '50%', bottom: hiddenMenuBottom, transform: 'translateX(-50%)',
+              position: 'fixed', left: hiddenMenuPos.left, bottom: hiddenMenuPos.bottom, transform: 'translateX(-50%)',
               width: HIDDEN_MENU_WIDTH, borderRadius: 16, padding: 8,
               background: 'rgba(255,255,255,0.72)',
               backdropFilter: 'blur(24px) saturate(180%)',
