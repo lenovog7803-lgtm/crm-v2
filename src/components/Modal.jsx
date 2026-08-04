@@ -10,8 +10,9 @@ export function ModalOverlay({ onClose, children }) {
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
         zIndex: 1000,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: 24,
+        overflowY: 'auto',
+        display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
+        padding: '5vh 24px',
         animation: 'rise 0.2s ease both',
       }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
@@ -20,15 +21,15 @@ export function ModalOverlay({ onClose, children }) {
         background: 'rgba(255,255,255,0.97)',
         backdropFilter: 'blur(24px) saturate(180%)',
         borderRadius: 24,
-        padding: 32,
         width: '100%',
         maxWidth: 560,
-        maxHeight: '90vh',
-        overflowY: 'auto',
+        margin: 'auto',
         boxShadow: '0 30px 80px -20px rgba(14,23,38,0.3)',
         position: 'relative',
       }}>
-        {children}
+        <div style={{ maxHeight: '86vh', overflowY: 'auto', padding: 32 }}>
+          {children}
+        </div>
       </div>
     </div>
   )

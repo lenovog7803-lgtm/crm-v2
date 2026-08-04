@@ -335,34 +335,36 @@ function ChartSVG({ current, prev, labels, mode, todayIdx }) {
 
 function DebtModal({ title, orders, onClose, onOpenOrder }) {
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.45)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.45)', backdropFilter: 'blur(8px)', zIndex: 1000, overflowY: 'auto', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '5vh 20px' }}
       onClick={onClose}>
-      <div style={{ background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(30px)', borderRadius: 24, padding: 28, maxWidth: 560, width: '90%', maxHeight: '80vh', overflow: 'auto', border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 40px 80px rgba(20,30,55,0.3)' }}
+      <div style={{ background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(30px)', borderRadius: 24, maxWidth: 560, width: '90%', margin: 'auto', border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 40px 80px rgba(20,30,55,0.3)' }}
         onClick={e => e.stopPropagation()}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
-          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: 'transparent', cursor: 'pointer', fontSize: 20, color: '#8A93A0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
-        </div>
-        {orders.length === 0 && <div style={{ color: '#A6AEB8', fontSize: 13, textAlign: 'center', padding: '20px 0' }}>Нет неоплаченных заявок</div>}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {orders.map((o, i) => (
-            <div key={i}
-              onClick={() => { onOpenOrder && onOpenOrder(o.id); onClose() }}
-              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', borderRadius: 12, borderBottom: '1px solid rgba(14,23,38,0.06)', cursor: onOpenOrder ? 'pointer' : 'default', transition: 'background 0.1s' }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(19,102,240,0.05)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-            >
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontFamily: 'JetBrains Mono', fontSize: 12, color: '#1366F0', fontWeight: 600 }}>{o.order_number || `#${o.id}`}</div>
-                <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {o.client_name || o.carrier_name || '—'}{(o.route_from && o.route_to) ? ` · ${o.route_from} → ${o.route_to}` : ''}
+        <div style={{ maxHeight: '86vh', overflowY: 'auto', padding: 28 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
+            <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: 'transparent', cursor: 'pointer', fontSize: 20, color: '#8A93A0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+          </div>
+          {orders.length === 0 && <div style={{ color: '#A6AEB8', fontSize: 13, textAlign: 'center', padding: '20px 0' }}>Нет неоплаченных заявок</div>}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {orders.map((o, i) => (
+              <div key={i}
+                onClick={() => { onOpenOrder && onOpenOrder(o.id); onClose() }}
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', borderRadius: 12, borderBottom: '1px solid rgba(14,23,38,0.06)', cursor: onOpenOrder ? 'pointer' : 'default', transition: 'background 0.1s' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(19,102,240,0.05)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              >
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontFamily: 'JetBrains Mono', fontSize: 12, color: '#1366F0', fontWeight: 600 }}>{o.order_number || `#${o.id}`}</div>
+                  <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {o.client_name || o.carrier_name || '—'}{(o.route_from && o.route_to) ? ` · ${o.route_from} → ${o.route_to}` : ''}
+                  </div>
+                </div>
+                <div style={{ fontFamily: 'JetBrains Mono', fontSize: 14, fontWeight: 700, color: '#D97706', flexShrink: 0, marginLeft: 12 }}>
+                  {(o.client_rate || o.carrier_rate || 0).toLocaleString('ru-RU')} Br
                 </div>
               </div>
-              <div style={{ fontFamily: 'JetBrains Mono', fontSize: 14, fontWeight: 700, color: '#D97706', flexShrink: 0, marginLeft: 12 }}>
-                {(o.client_rate || o.carrier_rate || 0).toLocaleString('ru-RU')} Br
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -381,16 +383,16 @@ function TopRow({ rank, name, value, color, bg }) {
 
 function FullListModal({ title, subtitle, items, valueOf, color, bg, onClose }) {
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: '#FFFFFF', borderRadius: 24, padding: 26, width: '100%', maxWidth: 520, maxHeight: '80vh', display: 'flex', flexDirection: 'column', border: '1px solid rgba(14,23,38,0.08)', boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
-          <div>
-            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
-            <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>{subtitle}</div>
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '5vh 20px' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 520, margin: 'auto', border: '1px solid rgba(14,23,38,0.08)', boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
+        <div style={{ maxHeight: '86vh', overflowY: 'auto', padding: 26 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
+            <div>
+              <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
+              <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>{subtitle}</div>
+            </div>
+            <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: '#F7F8FA', cursor: 'pointer', fontSize: 18, color: '#8A93A0', flexShrink: 0 }}>×</button>
           </div>
-          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: '#F7F8FA', cursor: 'pointer', fontSize: 18, color: '#8A93A0', flexShrink: 0 }}>×</button>
-        </div>
-        <div style={{ overflowY: 'auto' }}>
           {items.length === 0 ? (
             <div style={{ textAlign: 'center', padding: 30, fontSize: 13, color: '#8A93A0' }}>Нет данных</div>
           ) : (

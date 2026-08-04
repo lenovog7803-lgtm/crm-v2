@@ -43,18 +43,19 @@ export default function LeadEditModal({ lead, onClose, onSaved }) {
         background: 'rgba(14,23,38,0.55)',
         backdropFilter: 'blur(6px)',
         zIndex: 1200,
-        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+        overflowY: 'auto',
+        display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '5vh 20px',
       }}
     >
       <div style={{
         background: '#FFFFFF',
         borderRadius: 24,
-        padding: 26,
         width: '100%', maxWidth: 560,
-        maxHeight: '86vh', overflow: 'auto',
+        margin: 'auto',
         border: '1px solid rgba(14,23,38,0.08)',
         boxShadow: '0 40px 80px rgba(20,30,55,0.28)',
       }}>
+        <div style={{ maxHeight: '86vh', overflowY: 'auto', padding: 26 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>Редактировать лида</div>
           <button
@@ -128,6 +129,7 @@ export default function LeadEditModal({ lead, onClose, onSaved }) {
               {saving ? 'Сохранение…' : 'Сохранить'}
             </button>
           </div>
+        </div>
         </div>
       </div>
     </div>
