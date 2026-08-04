@@ -39,6 +39,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   const [selectMode, setSelectMode] = useState(false)
   const [showStatusMenu, setShowStatusMenu] = useState(false)
   const longPressTimer = useRef(null)
+  const longPressFired = useRef(false)
   const isMobile = useIsMobile()
 
   const loadOrders = () => {
@@ -71,7 +72,9 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   }
 
   const handleMouseDown = (id) => {
+    longPressFired.current = false
     longPressTimer.current = setTimeout(() => {
+      longPressFired.current = true
       setSelectMode(true)
       toggleSelect(id)
     }, 500)
@@ -79,6 +82,13 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   const handleMouseUp = () => clearTimeout(longPressTimer.current)
 
   const handleRowClick = (order, e) => {
+    // A native click always follows mousedown+mouseup, even after a long
+    // press — without this, it would immediately re-toggle (deselect)
+    // the row the long press just selected.
+    if (longPressFired.current) {
+      longPressFired.current = false
+      return
+    }
     if (e.metaKey || e.ctrlKey) {
       e.preventDefault()
       setSelectMode(true)
