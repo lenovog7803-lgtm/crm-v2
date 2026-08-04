@@ -12,6 +12,7 @@ const PAGE_META = {
   carriers: { title: 'Перевозчики', subtitle: 'База перевозчиков' },
   'carrier-detail': { title: 'Перевозчик', subtitle: 'Карточка перевозчика' },
   leads: { title: 'База обзвона', subtitle: 'Лиды и потенциальные клиенты' },
+  backups: { title: 'Резервные копии', subtitle: 'Автоматические снимки базы' },
 }
 
 const PERIOD_OPTIONS = [

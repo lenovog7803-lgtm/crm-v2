@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getLeadsAnalytics } from '../../api'
+import { getLeadsAnalytics, getCallsByDay } from '../../api'
 
 const PERIODS = [
   { id: 'week', label: 'Неделя' },
@@ -19,10 +19,85 @@ function StatCard({ label, value, color = '#0E1726' }) {
   )
 }
 
+function CallsHeatmap({ data, onDayClick }) {
+  const max = Math.max(...data.map(d => d.calls), 1)
+  const colorFor = (n) => {
+    if (n === 0) return '#F0F1F4'
+    const t = n / max
+    if (t < 0.25) return '#CFE0FF'
+    if (t < 0.5) return '#8FB6FF'
+    if (t < 0.75) return '#4C8CFF'
+    return '#1366F0'
+  }
+
+  return (
+    <div className="card" style={{ padding: 20 }}>
+      <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Активность обзвона</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 16px)', gap: 4 }}>
+        {data.map((d) => (
+          <div
+            key={d.date}
+            onClick={() => onDayClick(d.date)}
+            title={`${d.date}: ${d.calls} звонков`}
+            style={{ width: 16, height: 16, borderRadius: 4, background: colorFor(d.calls), cursor: 'pointer' }}
+          />
+        ))}
+        {data.length === 0 && <div style={{ fontSize: 12.5, color: '#A6AEB8' }}>Нет данных за период</div>}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12, fontSize: 11, color: '#8A93A0' }}>
+        меньше
+        {['#F0F1F4', '#CFE0FF', '#8FB6FF', '#4C8CFF', '#1366F0'].map(c => (
+          <div key={c} style={{ width: 12, height: 12, borderRadius: 3, background: c }} />
+        ))}
+        больше
+      </div>
+    </div>
+  )
+}
+
+function DayCallsModal({ date, onClose }) {
+  const [calls, setCalls] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    setLoading(true)
+    getCallsByDay(date).then(r => setCalls(r.calls || [])).catch(console.error).finally(() => setLoading(false))
+  }, [date])
+
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
+      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 520, padding: 26 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 }}>
+          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 17, color: '#0E1726' }}>
+            Звонки за {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
+          </div>
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: '#F7F8FA', cursor: 'pointer', fontSize: 18, color: '#8A93A0', flexShrink: 0 }}>×</button>
+        </div>
+        <div style={{ fontSize: 12, color: '#8A93A0', marginBottom: 16 }}>{loading ? 'Загрузка…' : `${calls.length} звонков`}</div>
+        <div style={{ maxHeight: '55vh', overflowY: 'auto' }}>
+          {!loading && calls.length === 0 && (
+            <div style={{ fontSize: 12.5, color: '#A6AEB8', textAlign: 'center', padding: 20 }}>Звонков в этот день не было</div>
+          )}
+          {calls.map((c, i) => (
+            <div key={c.id || i} style={{ padding: '9px 0', borderBottom: '1px solid #F0F1F4' }}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: '#0E1726' }}>{c.lead_name}</div>
+              <div style={{ fontSize: 11, color: '#8A93A0', marginTop: 2 }}>
+                {c.outcome} · {new Date(c.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                {c.comment ? ` · ${c.comment}` : ''}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function AnalyticsView() {
   const [period, setPeriod] = useState('month')
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [heatmapDay, setHeatmapDay] = useState(null)
 
   useEffect(() => {
     setLoading(true)
@@ -79,6 +154,8 @@ export default function AnalyticsView() {
           {days.length === 0 && <div style={{ fontSize: 12.5, color: '#A6AEB8' }}>Нет данных за период</div>}
         </div>
       </div>
+
+      <CallsHeatmap data={days} onDayClick={setHeatmapDay} />
 
       {/* 2. Воронка конверсий */}
       <div className="card" style={{ padding: 20 }}>
@@ -159,6 +236,8 @@ export default function AnalyticsView() {
         </table>
         {(!data.by_industry || data.by_industry.length === 0) && <div style={{ padding: 20, textAlign: 'center', color: '#A6AEB8' }}>Нет данных</div>}
       </div>
+
+      {heatmapDay && <DayCallsModal date={heatmapDay} onClose={() => setHeatmapDay(null)} />}
     </div>
   )
 }

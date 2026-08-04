@@ -141,3 +141,12 @@ export const getOrderHistory = (orderId) => req(`/orders/${orderId}/logs`);
 
 // Restore a soft-deleted order (wraps the existing trash-restore endpoint)
 export const restoreOrder = (id) => restoreTrash('orders', id);
+
+// Backups (admin-only on the backend)
+export const getBackups = () => req('/backup/list');
+export const createBackupNow = () => req('/backup/create', { method: 'POST' });
+export const restoreBackup = (id, confirmWord) =>
+  req(`/backup/restore/${id}`, { method: 'POST', body: JSON.stringify({ confirm_word: confirmWord }) });
+
+// Calls heatmap drill-down
+export const getCallsByDay = (date) => req(`/leads/calls_by_day?date=${date}`);

@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, restoreTrash, markPayment, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers, getOrderHistory } from '../api'
 import { fmtMoney, initials, getGradient } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
+import { useRealtime } from '../hooks/useRealtime'
 import { useToast } from './Toast'
 import OrderPaymentModal from './OrderPaymentModal'
 
@@ -214,6 +215,20 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     getOrder(orderId).then(setOrder).catch(console.error).finally(() => setLoading(false))
   }, [orderId])
 
+  // Marked right before every local mutation so the realtime listener can
+  // tell "I just changed this" apart from "someone else changed this" — the
+  // broadcast reaches every connected client, including the one that made
+  // the edit, and it shouldn't tell you your own save was "another user".
+  const lastLocalEditRef = useRef(0)
+
+  useRealtime((event) => {
+    if (event.type === 'order_updated' && event.order_id === orderId) {
+      const isSelf = Date.now() - lastLocalEditRef.current < 2000
+      getOrder(orderId).then(setOrder).catch(console.error)
+      if (!isSelf) show('Заявка обновлена другим пользователем', { type: 'info' })
+    }
+  })
+
   const refreshDocs = () => {
     setDocsRefreshing(true)
     syncOrderDocUrls(orderId)
@@ -263,6 +278,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     setSaving(true)
     setSaveErr(false)
     try {
+      lastLocalEditRef.current = Date.now()
       await apiUpdate(order.id, draft)
       setOrder(prev => ({ ...prev, ...draft }))
       setDraft({})
@@ -304,12 +320,14 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     const prevPPNumber = side === 'client' ? order.client_pp_number : order.carrier_pp_number
     const prevPPDate = side === 'client' ? order.client_pp_date : order.carrier_pp_date
     try {
+      lastLocalEditRef.current = Date.now()
       await markPayment(order.id, side, { paid: false })
       setOrder(prev => ({ ...prev, [paidField]: false }))
       show('Отметка оплаты снята', {
         type: 'info',
         actionLabel: 'Отменить',
         onAction: async () => {
+          lastLocalEditRef.current = Date.now()
           await markPayment(order.id, side, { paid: true, pp_number: prevPPNumber || null, pp_date: prevPPDate || null })
           getOrder(order.id).then(setOrder).catch(console.error)
         },
@@ -853,7 +871,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
           order={order}
           side={paymentModal}
           onClose={() => setPaymentModal(null)}
-          onSaved={() => { getOrder(order.id).then(setOrder).catch(console.error); setPaymentModal(null) }}
+          onSaved={() => { lastLocalEditRef.current = Date.now(); getOrder(order.id).then(setOrder).catch(console.error); setPaymentModal(null) }}
         />
       )}
     </div>

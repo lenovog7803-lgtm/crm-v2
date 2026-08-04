@@ -19,6 +19,7 @@ import Carriers from './components/Carriers'
 import CarrierDetail from './components/CarrierDetail'
 import Leads from './pages/Leads'
 import Trash from './components/Trash'
+import Backups from './pages/Backups'
 
 import CreateOrderModal from './components/CreateOrderModal'
 import CreateTaskModal from './components/CreateTaskModal'
@@ -27,6 +28,7 @@ import AddCarrierModal from './components/AddCarrierModal'
 import PaymentModal from './components/PaymentModal'
 import MobileNav from './components/MobileNav'
 import CommandPalette from './components/CommandPalette'
+import { useRealtime } from './hooks/useRealtime'
 
 const SEARCH_STORAGE_KEYS = {
   orders: 'search_orders',
@@ -150,6 +152,15 @@ function MainApp() {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
+  // One shared connection covers Dashboard + Orders — both already refetch
+  // off ordersKey, so a single bump here silently refreshes both instead of
+  // opening a redundant WebSocket per page.
+  useRealtime((event) => {
+    if (event.type === 'order_updated' || event.type === 'payment_marked') {
+      setOrdersKey(k => k + 1)
+    }
+  })
+
   return (
     <div className="app-root">
       <div className="aurora-bg">
@@ -244,6 +255,7 @@ function MainApp() {
 
             {page === 'leads' && <Leads />}
             {page === 'trash' && <Trash />}
+            {page === 'backups' && <Backups />}
           </div>
         </main>
       </div>

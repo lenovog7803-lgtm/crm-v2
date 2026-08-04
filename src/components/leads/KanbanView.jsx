@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { getLeads, updateLead, logCall } from '../../api'
+import { useRealtime } from '../../hooks/useRealtime'
 import { STAGES } from '../../constants/leads'
 import CallCard from './CallCard'
 import CallOutcomeBar from './CallOutcomeBar'
@@ -90,10 +91,16 @@ export default function KanbanView({ industry }) {
   const [editLead, setEditLead] = useState(null)
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => {
-    setLoading(true)
-    getLeads({ limit: 3000 }).then(r => setLeads(Array.isArray(r) ? r : (r?.items || []))).catch(console.error).finally(() => setLoading(false))
-  }, [])
+  const loadLeads = (showLoading = true) => {
+    if (showLoading) setLoading(true)
+    return getLeads({ limit: 3000 }).then(r => setLeads(Array.isArray(r) ? r : (r?.items || []))).catch(console.error).finally(() => setLoading(false))
+  }
+
+  useEffect(() => { loadLeads() }, [])
+
+  useRealtime((event) => {
+    if (event.type === 'lead_updated') loadLeads(false)
+  })
 
   const filtered = industry ? leads.filter(l => l.industry === industry) : leads
   const activeStages = STAGES.filter(s => s.active)
