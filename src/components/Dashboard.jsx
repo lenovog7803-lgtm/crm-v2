@@ -335,11 +335,11 @@ function ChartSVG({ current, prev, labels, mode, todayIdx }) {
 
 function DebtModal({ title, orders, onClose, onOpenOrder }) {
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.45)', backdropFilter: 'blur(8px)', zIndex: 1000, overflowY: 'auto', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '5vh 20px' }}
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.45)', backdropFilter: 'blur(8px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 20 }}
       onClick={onClose}>
-      <div style={{ background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(30px)', borderRadius: 24, maxWidth: 560, width: '90%', margin: 'auto', border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 40px 80px rgba(20,30,55,0.3)' }}
+      <div style={{ margin: 'auto', background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(30px)', borderRadius: 24, maxWidth: 560, width: '90%', border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 40px 80px rgba(20,30,55,0.3)' }}
         onClick={e => e.stopPropagation()}>
-        <div style={{ maxHeight: '86vh', overflowY: 'auto', padding: 28 }}>
+        <div style={{ padding: 28 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
             <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: 'transparent', cursor: 'pointer', fontSize: 20, color: '#8A93A0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
@@ -383,9 +383,9 @@ function TopRow({ rank, name, value, color, bg }) {
 
 function FullListModal({ title, subtitle, items, valueOf, color, bg, onClose }) {
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '5vh 20px' }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 520, margin: 'auto', border: '1px solid rgba(14,23,38,0.08)', boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
-        <div style={{ maxHeight: '86vh', overflowY: 'auto', padding: 26 }}>
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 20 }}>
+      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 520, border: '1px solid rgba(14,23,38,0.08)', boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
+        <div style={{ padding: 26 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
             <div>
               <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
@@ -393,6 +393,7 @@ function FullListModal({ title, subtitle, items, valueOf, color, bg, onClose }) 
             </div>
             <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: '#F7F8FA', cursor: 'pointer', fontSize: 18, color: '#8A93A0', flexShrink: 0 }}>×</button>
           </div>
+          {console.log('[FullListModal] items count:', items.length)}
           {items.length === 0 ? (
             <div style={{ textAlign: 'center', padding: 30, fontSize: 13, color: '#8A93A0' }}>Нет данных</div>
           ) : (

@@ -44,18 +44,19 @@ export default function LeadEditModal({ lead, onClose, onSaved }) {
         backdropFilter: 'blur(6px)',
         zIndex: 1200,
         overflowY: 'auto',
-        display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '5vh 20px',
+        display: 'grid',
+        padding: 20,
       }}
     >
       <div style={{
+        margin: 'auto',
         background: '#FFFFFF',
         borderRadius: 24,
         width: '100%', maxWidth: 560,
-        margin: 'auto',
         border: '1px solid rgba(14,23,38,0.08)',
         boxShadow: '0 40px 80px rgba(20,30,55,0.28)',
       }}>
-        <div style={{ maxHeight: '86vh', overflowY: 'auto', padding: 26 }}>
+        <div style={{ padding: 26 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
           <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>Редактировать лида</div>
           <button

@@ -481,14 +481,15 @@ export default function Finance({ refreshKey }) {
       {showInModal && (
         <div onClick={() => setShowInModal(false)} style={{
           position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.4)', backdropFilter: 'blur(8px)',
-          zIndex: 1000, overflowY: 'auto', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '5vh 16px',
+          zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 16,
         }}>
           <div onClick={e => e.stopPropagation()} style={{
+            margin: 'auto',
             background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(30px)', borderRadius: 24,
-            width: '90%', maxWidth: 560, margin: 'auto',
+            width: '90%', maxWidth: 560,
             border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 40px 80px rgba(20,30,55,0.3)',
           }}>
-            <div style={{ maxHeight: '86vh', overflowY: 'auto', padding: 28 }}>
+            <div style={{ padding: 28 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
                   <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>Поступления от клиентов</div>
@@ -529,14 +530,15 @@ export default function Finance({ refreshKey }) {
       {showOutModal && (
         <div onClick={() => setShowOutModal(false)} style={{
           position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.4)', backdropFilter: 'blur(8px)',
-          zIndex: 1000, overflowY: 'auto', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '5vh 16px',
+          zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 16,
         }}>
           <div onClick={e => e.stopPropagation()} style={{
+            margin: 'auto',
             background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(30px)', borderRadius: 24,
-            width: '90%', maxWidth: 560, margin: 'auto',
+            width: '90%', maxWidth: 560,
             border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 40px 80px rgba(20,30,55,0.3)',
           }}>
-            <div style={{ maxHeight: '86vh', overflowY: 'auto', padding: 28 }}>
+            <div style={{ padding: 28 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
                   <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>Оплачено перевозчикам</div>

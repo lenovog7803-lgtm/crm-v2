@@ -11,23 +11,23 @@ export function ModalOverlay({ onClose, children }) {
         WebkitBackdropFilter: 'blur(8px)',
         zIndex: 1000,
         overflowY: 'auto',
-        display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
-        padding: '5vh 24px',
+        display: 'grid',
+        padding: 24,
         animation: 'rise 0.2s ease both',
       }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
       <div className="modal-panel" style={{
+        margin: 'auto',
         background: 'rgba(255,255,255,0.97)',
         backdropFilter: 'blur(24px) saturate(180%)',
         borderRadius: 24,
         width: '100%',
         maxWidth: 560,
-        margin: 'auto',
         boxShadow: '0 30px 80px -20px rgba(14,23,38,0.3)',
         position: 'relative',
       }}>
-        <div style={{ maxHeight: '86vh', overflowY: 'auto', padding: 32 }}>
+        <div style={{ padding: 32 }}>
           {children}
         </div>
       </div>

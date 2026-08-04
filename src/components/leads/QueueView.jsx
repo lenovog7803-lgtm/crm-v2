@@ -123,18 +123,19 @@ export default function QueueView({ industry, onCounts }) {
           backdropFilter: 'blur(6px)',
           zIndex: 1100,
           overflowY: 'auto',
-          display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '5vh 20px',
+          display: 'grid',
+          padding: 20,
         }}>
           <div style={{
+            margin: 'auto',
             background: '#FFFFFF',
             borderRadius: 24,
             width: '100%', maxWidth: 380,
-            margin: 'auto',
             textAlign: 'center',
             border: '1px solid rgba(14,23,38,0.08)',
             boxShadow: '0 40px 80px rgba(20,30,55,0.28)',
           }}>
-            <div style={{ maxHeight: '86vh', overflowY: 'auto', padding: 26 }}>
+            <div style={{ padding: 26 }}>
               <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 16, color: '#0E1726', marginBottom: 8 }}>Создать карточку клиента?</div>
               <div style={{ fontSize: 13, color: '#5A6573', marginBottom: 20 }}>{askClient?.name} стал клиентом — перенести в раздел «Клиенты»?</div>
               <div style={{ display: 'flex', gap: 10 }}>
