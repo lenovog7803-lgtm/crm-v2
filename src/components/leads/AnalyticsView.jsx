@@ -33,17 +33,20 @@ function CallsHeatmap({ data, onDayClick }) {
   return (
     <div className="card" style={{ padding: 20 }}>
       <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Активность обзвона</div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 16px)', gap: 4 }}>
-        {data.map((d) => (
-          <div
-            key={d.date}
-            onClick={() => onDayClick(d.date)}
-            title={`${d.date}: ${d.calls} звонков`}
-            style={{ width: 16, height: 16, borderRadius: 4, background: colorFor(d.calls), cursor: 'pointer' }}
-          />
-        ))}
-        {data.length === 0 && <div style={{ fontSize: 12.5, color: '#A6AEB8' }}>Нет данных за период</div>}
-      </div>
+      {data.length === 0 ? (
+        <div style={{ fontSize: 12.5, color: '#A6AEB8' }}>Нет данных за период</div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 16px)', gap: 4 }}>
+          {data.map((d) => (
+            <div
+              key={d.date}
+              onClick={() => onDayClick(d.date)}
+              title={`${d.date}: ${d.calls} звонков`}
+              style={{ width: 16, height: 16, borderRadius: 4, background: colorFor(d.calls), cursor: 'pointer' }}
+            />
+          ))}
+        </div>
+      )}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12, fontSize: 11, color: '#8A93A0' }}>
         меньше
         {['#F0F1F4', '#CFE0FF', '#8FB6FF', '#4C8CFF', '#1366F0'].map(c => (
