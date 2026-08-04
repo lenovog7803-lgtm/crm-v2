@@ -1,6 +1,9 @@
 import React, { useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useAuth } from '../AuthContext'
 import { initials } from '../utils'
+
+const HIDDEN_MENU_WIDTH = 200
 
 const NAV = [
   {
@@ -127,7 +130,18 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   const startLongPress = () => {
     longPressTimer.current = setTimeout(() => {
       const rect = avatarRef.current?.getBoundingClientRect()
-      if (rect) setHiddenMenuPos({ left: rect.left, bottom: window.innerHeight - rect.top + 8 })
+      if (rect) {
+        // Center the popup on the avatar rather than pinning its left edge —
+        // pinned-left looked lopsided since the popup is much wider than the
+        // avatar. Clamp to the viewport so it can't run off-screen when the
+        // sidebar is collapsed and the avatar sits close to the edge.
+        const centerX = rect.left + rect.width / 2
+        const left = Math.min(
+          Math.max(centerX - HIDDEN_MENU_WIDTH / 2, 8),
+          window.innerWidth - HIDDEN_MENU_WIDTH - 8
+        )
+        setHiddenMenuPos({ left, bottom: window.innerHeight - rect.top + 8 })
+      }
       setHiddenMenuOpen(true)
     }, 550)
   }
@@ -268,13 +282,18 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
         )}
       </div>
 
-      {hiddenMenuOpen && (
+      {hiddenMenuOpen && createPortal(
+        // Portalled to <body> — the sidebar itself has backdropFilter, which
+        // makes it a containing block for position:fixed descendants, so a
+        // fixed-position popup rendered inside it was positioning relative
+        // to the (narrow, overflow:hidden) sidebar box instead of the
+        // viewport and getting clipped when the sidebar was collapsed.
         <div onClick={() => setHiddenMenuOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 1000 }}>
           <div
             onClick={e => e.stopPropagation()}
             style={{
               position: 'fixed', left: hiddenMenuPos.left, bottom: hiddenMenuPos.bottom,
-              minWidth: 200, borderRadius: 16, padding: 8,
+              width: HIDDEN_MENU_WIDTH, borderRadius: 16, padding: 8,
               background: 'rgba(255,255,255,0.72)',
               backdropFilter: 'blur(24px) saturate(180%)',
               WebkitBackdropFilter: 'blur(24px) saturate(180%)',
@@ -304,7 +323,8 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
               </button>
             ))}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </aside>
   )
