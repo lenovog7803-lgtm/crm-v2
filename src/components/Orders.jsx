@@ -12,7 +12,7 @@ const BULK_STATUSES = [
   { id: 'cancelled', label: 'Отменено' },
 ]
 
-const bulkBtnStyle = { background: 'transparent', border: 'none', color: '#FFFFFF', fontSize: 13, cursor: 'pointer', padding: '6px 10px', borderRadius: 8 }
+const bulkBtnStyle = { background: 'transparent', border: 'none', color: '#0E1726', fontSize: 13, fontWeight: 600, cursor: 'pointer', padding: '6px 10px', borderRadius: 8, transition: 'background 0.15s' }
 
 const DOC_FILTER_OPTIONS = [
   { key: 'docs_to_client_sent',         label: 'Отправлены клиенту',          not: false },
@@ -492,32 +492,34 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
         }}>
           {showStatusMenu && (
             <div style={{
-              background: '#0E1726', borderRadius: 14, padding: 8,
+              background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+              border: '1px solid rgba(255,255,255,0.7)', borderRadius: 14, padding: 8,
               display: 'flex', flexDirection: 'column', gap: 2,
-              boxShadow: '0 20px 50px rgba(14,23,38,0.4)', minWidth: 180,
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 50px -12px rgba(14,23,38,0.35)', minWidth: 180,
             }}>
               {BULK_STATUSES.map(s => (
                 <button
                   key={s.id}
                   onClick={() => handleBulkStatus(s.id)}
                   style={{ ...bulkBtnStyle, textAlign: 'left', padding: '8px 10px' }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)'}
                   onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                 >{s.label}</button>
               ))}
             </div>
           )}
           <div style={{
-            background: '#0E1726', borderRadius: 16, padding: '12px 16px',
+            background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            border: '1px solid rgba(255,255,255,0.7)', borderRadius: 16, padding: '12px 16px',
             display: 'flex', alignItems: 'center', gap: 14,
-            boxShadow: '0 20px 50px rgba(14,23,38,0.4)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 50px -12px rgba(14,23,38,0.35)',
           }}>
-            <span style={{ fontSize: 13, color: '#FFFFFF', fontWeight: 600 }}>Выбрано: {selected.size}</span>
-            <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.15)' }} />
-            <button onClick={() => setShowStatusMenu(v => !v)} style={bulkBtnStyle}>Сменить статус</button>
-            <button onClick={handleBulkMarkPaid} style={bulkBtnStyle}>Отметить оплаченными</button>
-            <button onClick={handleBulkDelete} style={{ ...bulkBtnStyle, color: '#FF8A80' }}>Удалить</button>
-            <button onClick={clearSelection} style={{ ...bulkBtnStyle, color: '#8A93A0' }}>Отмена</button>
+            <span style={{ fontSize: 13, color: '#0E1726', fontWeight: 700 }}>Выбрано: {selected.size}</span>
+            <div style={{ width: 1, height: 20, background: 'rgba(14,23,38,0.12)' }} />
+            <button onClick={() => setShowStatusMenu(v => !v)} style={bulkBtnStyle} onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>Сменить статус</button>
+            <button onClick={handleBulkMarkPaid} style={bulkBtnStyle} onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>Отметить оплаченными</button>
+            <button onClick={handleBulkDelete} style={{ ...bulkBtnStyle, color: '#C81923' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(200,25,35,0.08)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>Удалить</button>
+            <button onClick={clearSelection} style={{ ...bulkBtnStyle, color: '#8A93A0' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>Отмена</button>
           </div>
         </div>
       )}
