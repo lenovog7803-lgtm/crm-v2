@@ -13,7 +13,7 @@ export function ModalOverlay({ onClose, children }) {
         overflowY: 'auto',
         display: 'grid',
         padding: 24,
-        animation: 'rise 0.2s ease both',
+        animation: 'rise 0.2s ease',
       }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >

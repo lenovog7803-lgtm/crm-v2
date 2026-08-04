@@ -393,7 +393,6 @@ function FullListModal({ title, subtitle, items, valueOf, color, bg, onClose }) 
             </div>
             <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: '#F7F8FA', cursor: 'pointer', fontSize: 18, color: '#8A93A0', flexShrink: 0 }}>×</button>
           </div>
-          {console.log('[FullListModal] items count:', items.length)}
           {items.length === 0 ? (
             <div style={{ textAlign: 'center', padding: 30, fontSize: 13, color: '#8A93A0' }}>Нет данных</div>
           ) : (
