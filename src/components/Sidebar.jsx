@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import { useAuth } from '../AuthContext'
 import { initials } from '../utils'
 
@@ -88,11 +88,16 @@ const NAV = [
       </svg>
     )
   },
+]
+
+// Not shown in the regular nav — only admins should reach these, revealed
+// via a long-press on the profile avatar until real per-user role gating exists.
+const HIDDEN_NAV = [
   {
     key: 'backups',
     label: 'Резервные копии',
     icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <ellipse cx="12" cy="5" rx="9" ry="3"/>
         <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
         <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
@@ -113,6 +118,22 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   const userName = profile.name || 'Пользователь'
   const userRole = roleLabel(profile.role, profile.position)
   const userInitials = initials(userName)
+
+  const [hiddenMenuOpen, setHiddenMenuOpen] = useState(false)
+  const longPressTimer = useRef(null)
+  const avatarRef = useRef(null)
+  const [hiddenMenuPos, setHiddenMenuPos] = useState({ left: 0, bottom: 0 })
+
+  const startLongPress = () => {
+    longPressTimer.current = setTimeout(() => {
+      const rect = avatarRef.current?.getBoundingClientRect()
+      if (rect) setHiddenMenuPos({ left: rect.left, bottom: window.innerHeight - rect.top + 8 })
+      setHiddenMenuOpen(true)
+    }, 550)
+  }
+  const cancelLongPress = () => {
+    if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null }
+  }
 
   return (
     <aside className="desktop-sidebar" style={{
@@ -215,12 +236,21 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
         display: 'flex', alignItems: 'center', gap: 10, paddingTop: 12,
         borderTop: '1px solid rgba(14,23,38,0.08)', paddingLeft: 2,
       }}>
-        <div style={{
-          width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-          background: 'linear-gradient(135deg, #A5D8FF 0%, #1366F0 100%)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#fff', fontWeight: 700, fontSize: 13,
-        }}>{userInitials}</div>
+        <div
+          ref={avatarRef}
+          onMouseDown={startLongPress}
+          onMouseUp={cancelLongPress}
+          onMouseLeave={cancelLongPress}
+          onTouchStart={startLongPress}
+          onTouchEnd={cancelLongPress}
+          style={{
+            width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+            background: 'linear-gradient(135deg, #A5D8FF 0%, #1366F0 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fff', fontWeight: 700, fontSize: 13,
+            cursor: 'pointer', userSelect: 'none', WebkitTapHighlightColor: 'transparent',
+          }}
+        >{userInitials}</div>
         {expanded && (
           <>
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -237,6 +267,45 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
           </>
         )}
       </div>
+
+      {hiddenMenuOpen && (
+        <div onClick={() => setHiddenMenuOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 1000 }}>
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              position: 'fixed', left: hiddenMenuPos.left, bottom: hiddenMenuPos.bottom,
+              minWidth: 200, borderRadius: 16, padding: 8,
+              background: 'rgba(255,255,255,0.72)',
+              backdropFilter: 'blur(24px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+              border: '1px solid rgba(255,255,255,0.7)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 14px 40px -22px rgba(20,30,55,0.35)',
+            }}
+          >
+            <div style={{ fontSize: 10.5, fontWeight: 700, color: '#A6AEB8', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '6px 10px 4px' }}>
+              Скрытые функции
+            </div>
+            {HIDDEN_NAV.map(item => (
+              <button
+                key={item.key}
+                onClick={() => { onNav(item.key); setHiddenMenuOpen(false) }}
+                style={{
+                  width: '100%', height: 38, borderRadius: 10, border: 'none', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', gap: 10, padding: '0 10px',
+                  background: page === item.key ? 'rgba(19,102,240,0.1)' : 'transparent',
+                  color: page === item.key ? '#1366F0' : '#5A6573',
+                  fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
+                }}
+                onMouseEnter={e => { if (page !== item.key) e.currentTarget.style.background = 'rgba(14,23,38,0.05)' }}
+                onMouseLeave={e => { if (page !== item.key) e.currentTarget.style.background = 'transparent' }}
+              >
+                <span style={{ flexShrink: 0, width: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{item.icon}</span>
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </aside>
   )
 }
