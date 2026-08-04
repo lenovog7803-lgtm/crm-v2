@@ -109,7 +109,11 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
                 </div>
                 <div style={{ background: 'rgba(14,23,38,0.04)', borderRadius: 12, padding: '10px 14px' }}>
                   <div style={{ fontSize: 10.5, color: '#A6AEB8', fontWeight: 600, marginBottom: 4 }}>Тип ТС</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#0E1726' }}>{carrier.vehicle_type || '—'}</div>
+                  <div style={{
+                    fontSize: 13, fontWeight: 700, color: '#0E1726',
+                    display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}>{carrier.vehicle_type || '—'}</div>
                 </div>
               </div>
 
