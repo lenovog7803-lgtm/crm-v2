@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, createPaymentIn, createPaymentOut, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClients, getCarriers } from '../api'
+import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, createPaymentIn, createPaymentOut, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers } from '../api'
 import { fmtMoney, initials, getGradient } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 
@@ -264,46 +264,58 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     if (onDuplicate) onDuplicate(order)
   }
 
-  const openClientDetail = () => {
+  const openClientDetail = async () => {
     if (!onOpenClient) return
-    if (order.client_id) {
-      onOpenClient(order.client_id)
+    if (!order.client_id && !order.client_name) {
+      alert('Клиент не указан в заявке')
       return
+    }
+    if (order.client_id) {
+      try {
+        const c = await getClient(order.client_id) // проверяем что реально существует
+        onOpenClient(c.id)
+        return
+      } catch (e) {
+        // id не сработал — ищем по имени как запасной вариант
+      }
     }
     if (order.client_name) {
-      (async () => {
-        try {
-          const res = await getClients(order.client_name)
-          const list = Array.isArray(res) ? res : (res.clients || [])
-          const found = list.find(c => (c.name || '').toLowerCase() === order.client_name.toLowerCase())
-          if (found) { onOpenClient(found.id); return }
-        } catch (e) {}
-        alert('Карточка клиента не найдена в базе')
-      })()
-      return
+      try {
+        const res = await getClients(order.client_name)
+        const list = Array.isArray(res) ? res : (res.clients || [])
+        const found = list.find(c => (c.name || '').toLowerCase().trim() === order.client_name.toLowerCase().trim())
+        if (found) { onOpenClient(found.id); return }
+      } catch (e) {}
     }
-    alert('Карточка клиента не найдена в базе')
+    alert(`Карточка клиента «${order.client_name || order.client_id}» не найдена в базе`)
   }
 
-  const openCarrierDetail = () => {
+  const openCarrierDetail = async () => {
     if (!onOpenCarrier) return
-    if (order.carrier_id) {
-      onOpenCarrier(order.carrier_id)
+    if (!order.carrier_id && !order.carrier_name) {
+      alert('Перевозчик не указан в заявке')
       return
+    }
+    if (order.carrier_id) {
+      try {
+        const c = await getCarrier(order.carrier_id) // проверяем что реально существует
+        onOpenCarrier(c.id)
+        return
+      } catch (e) {
+        // id не сработал — ищем по имени как запасной вариант
+      }
     }
     if (order.carrier_name) {
-      (async () => {
-        try {
-          const res = await getCarriers(order.carrier_name)
-          const list = Array.isArray(res) ? res : (res.carriers || [])
-          const found = list.find(c => (c.company_name || c.name || '').toLowerCase() === order.carrier_name.toLowerCase())
-          if (found) { onOpenCarrier(found.id); return }
-        } catch (e) {}
-        alert('Карточка перевозчика не найдена в базе')
-      })()
-      return
+      try {
+        const res = await getCarriers(order.carrier_name)
+        const list = Array.isArray(res) ? res : (res.carriers || [])
+        const found = list.find(c =>
+          (c.company_name || c.name || '').toLowerCase().trim() === order.carrier_name.toLowerCase().trim()
+        )
+        if (found) { onOpenCarrier(found.id); return }
+      } catch (e) {}
     }
-    alert('Карточка перевозчика не найдена в базе')
+    alert(`Карточка перевозчика «${order.carrier_name || order.carrier_id}» не найдена в базе`)
   }
 
   const [avAc, avBc] = getGradient(order.client_name || '')

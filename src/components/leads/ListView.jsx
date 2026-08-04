@@ -122,16 +122,23 @@ export default function ListView({ industry }) {
       )}
 
       {activeLead && (
-        <div className="leads-call-modal" style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, overflowY: 'auto' }}
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(10,16,28,0.65)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, overflowY: 'auto' }}
           onClick={e => { if (e.target === e.currentTarget) setActiveLead(null) }}>
-          <style>{`.leads-call-modal .card { background: #FFFFFF; backdrop-filter: none; -webkit-backdrop-filter: none; border: 1px solid rgba(14,23,38,0.08); }`}</style>
-          <div style={{ width: '100%', maxWidth: 1000, display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <button onClick={() => setActiveLead(null)} className="btn-ghost" style={{ alignSelf: 'flex-end' }}>Закрыть ✕</button>
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, alignItems: 'start' }}>
-              <CallCard lead={activeLead} onEdit={setEditLead} />
-              <ScriptPanel stage={activeLead?.stage} />
+          <div className="leads-call-modal" style={{ position: 'relative', width: '100%', maxWidth: 1000, maxHeight: '88vh', borderRadius: 24, overflow: 'hidden', boxShadow: '0 40px 90px rgba(10,16,28,0.5)' }}>
+            {/* Слой 1 — сплошная плотная подложка под блюром */}
+            <div style={{ position: 'absolute', inset: 0, background: '#EEF1F5' }} />
+            {/* Слой 2 — стекло поверх подложки */}
+            <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(40px) saturate(180%)', WebkitBackdropFilter: 'blur(40px) saturate(180%)' }} />
+            <style>{`.leads-call-modal .card { background: rgba(255,255,255,0.5); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); border: 1px solid rgba(255,255,255,0.7); }`}</style>
+            {/* Слой 3 — контент */}
+            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 16, maxHeight: '88vh', overflowY: 'auto', padding: 20 }}>
+              <button onClick={() => setActiveLead(null)} className="btn-ghost" style={{ alignSelf: 'flex-end' }}>Закрыть ✕</button>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, alignItems: 'start' }}>
+                <CallCard lead={activeLead} onEdit={setEditLead} />
+                <ScriptPanel stage={activeLead?.stage} />
+              </div>
+              <CallOutcomeBar lead={activeLead} onSave={handleSave} saving={saving} />
             </div>
-            <CallOutcomeBar lead={activeLead} onSave={handleSave} saving={saving} />
           </div>
         </div>
       )}
