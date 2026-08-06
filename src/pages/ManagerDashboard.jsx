@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getMyDashboard } from '../api'
 import { CountUp } from '../components/CountUp'
 import LeaderboardView from '../components/leads/LeaderboardView'
+import ErrorBoundary from '../components/ErrorBoundary'
 
 const MONTH_RU_SHORT = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек']
 const fmtMonth = m => {
@@ -83,7 +84,7 @@ export default function ManagerDashboard() {
         </div>
       </div>
 
-      <LeaderboardView />
+      <ErrorBoundary><LeaderboardView /></ErrorBoundary>
 
       <div className="card" style={{ padding: 20, overflow: 'auto' }}>
         <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Мои заявки и маржа</div>

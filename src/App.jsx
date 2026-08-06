@@ -23,6 +23,7 @@ import Trash from './components/Trash'
 import Backups from './pages/Backups'
 import Admin from './pages/Admin'
 import ManagerDashboard from './pages/ManagerDashboard'
+import ErrorBoundary from './components/ErrorBoundary'
 
 import CreateOrderModal from './components/CreateOrderModal'
 import CreateTaskModal from './components/CreateTaskModal'
@@ -220,7 +221,7 @@ function MainApp() {
           <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={handleSearchChange} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} onOpenPalette={() => setPaletteOpen(true)} />
           <div className="scroll-area" key={page}>
             {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} onMonthsLoaded={setAvailableMonths} preloadedOrders={allOrders} />}
-            {page === 'my-dashboard' && <ManagerDashboard />}
+            {page === 'my-dashboard' && <ErrorBoundary><ManagerDashboard /></ErrorBoundary>}
 
             {page === 'orders' && (
               <Orders
@@ -300,7 +301,7 @@ function MainApp() {
         </main>
       </div>
 
-      <MobileNav page={page} onNav={handleNav} counts={counts} />
+      <MobileNav page={page} onNav={handleNav} counts={counts} isManager={isManager} />
 
       {/* Modals */}
       {showOrderModal && (

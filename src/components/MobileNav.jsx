@@ -75,6 +75,46 @@ const NAV = [
   },
 ]
 
+// Managers get their own reduced set — mirrors Sidebar.jsx's desktop logic,
+// which this component doesn't share since it has its own nav list.
+const MANAGER_NAV = [
+  {
+    key: 'my-dashboard',
+    label: 'Дашборд',
+    icon: (a) => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill={a ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={a ? 0 : 1.8} strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
+    ),
+  },
+  {
+    key: 'tasks',
+    label: 'Задачи',
+    badge: 'pendingTasks',
+    badgeColor: '#D97706',
+    icon: (a) => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={a ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="9 11 12 14 22 4"/>
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+    ),
+  },
+  {
+    key: 'leads',
+    label: 'Обзвон',
+    badge: 'newLeads',
+    badgeColor: '#1366F0',
+    icon: (a) => (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={a ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 9.7 19.79 19.79 0 0 1 1.63 1.06 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.08 6.08l.96-.96a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+    ),
+  },
+]
+
 const ACTIVE_KEYS = {
   'order-detail': 'orders',
   'client-detail': 'clients',
@@ -82,7 +122,8 @@ const ACTIVE_KEYS = {
   'carriers': 'carriers',
 }
 
-export default function MobileNav({ page, onNav, counts }) {
+export default function MobileNav({ page, onNav, counts, isManager }) {
+  const navList = isManager ? MANAGER_NAV : NAV
   const activeKey = ACTIVE_KEYS[page] || page
 
   return (
@@ -99,7 +140,7 @@ export default function MobileNav({ page, onNav, counts }) {
       WebkitBackdropFilter: 'blur(40px) saturate(180%)',
       borderTop: '0.5px solid rgba(0,0,0,0.12)',
     }}>
-      {NAV.map(item => {
+      {navList.map(item => {
         const active = activeKey === item.key
         const badgeVal = item.badge ? counts?.[item.badge] : 0
         const badgeColor = item.badgeColor || '#1366F0'
