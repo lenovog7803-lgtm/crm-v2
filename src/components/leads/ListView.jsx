@@ -82,8 +82,12 @@ export default function ListView({ industry }) {
     e.stopPropagation()
     try {
       await claimLead(leadId)
-      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, assigned_to: myId } : l))
-      setActiveLead(prev => prev && prev.id === leadId ? { ...prev, assigned_to: myId } : prev)
+      setLeads(prev => {
+        const next = prev.map(l => l.id === leadId ? { ...l, assigned_to: myId } : l)
+        // Claiming acts like opening the row — jump straight into the call window.
+        setActiveLead(next.find(l => l.id === leadId) || null)
+        return next
+      })
     } catch (e) { console.error(e) }
   }
 
