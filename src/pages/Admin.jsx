@@ -224,7 +224,7 @@ function SessionsTab() {
           </div>
           <div style={{ fontSize: 12, color: '#5A6573', textAlign: 'right', flexShrink: 0 }}>
             <div>{relativeTime(s.last_activity)}</div>
-            <div style={{ color: '#A6AEB8', marginTop: 2 }}>{s.activity_summary?.calls ?? 0} звонков</div>
+            <div style={{ color: '#A6AEB8', marginTop: 2 }}>{s.activity_summary?.calls ?? 0} звонков · {s.activity_summary?.won ?? 0} в клиенты</div>
           </div>
           <button onClick={() => logout(s)} style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid rgba(224,71,59,0.3)', background: 'rgba(224,71,59,0.06)', color: '#E0473B', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
             Завершить сессию
