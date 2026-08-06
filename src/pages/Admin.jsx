@@ -155,26 +155,22 @@ function UsersTab() {
                       }}>{ROLE_LABEL[m.role] || m.role}</span>
                     </td>
                     <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)' }}>
-                      {isManager ? (
-                        <button onClick={() => toggleStatus(m)} style={{
-                          padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
-                          fontSize: 11.5, fontWeight: 700,
-                          background: m.status === 'suspended' ? 'rgba(224,71,59,0.1)' : 'rgba(30,158,90,0.1)',
-                          color: m.status === 'suspended' ? '#E0473B' : '#1E9E5A',
-                        }}>
-                          {m.status === 'suspended' ? 'Заблокирован' : 'Активен'}
-                        </button>
-                      ) : '—'}
+                      <button onClick={() => toggleStatus(m)} style={{
+                        padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
+                        fontSize: 11.5, fontWeight: 700,
+                        background: m.status === 'suspended' ? 'rgba(224,71,59,0.1)' : 'rgba(30,158,90,0.1)',
+                        color: m.status === 'suspended' ? '#E0473B' : '#1E9E5A',
+                      }}>
+                        {m.status === 'suspended' ? 'Заблокирован' : 'Активен'}
+                      </button>
                     </td>
                     <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)' }}>
-                      {isManager ? (
-                        <input
-                          type="number"
-                          defaultValue={m.daily_call_goal || 45}
-                          onBlur={e => changeGoal(m, e.target.value)}
-                          style={{ width: 70, padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(14,23,38,0.12)', fontSize: 12.5, fontFamily: 'JetBrains Mono' }}
-                        />
-                      ) : '—'}
+                      <input
+                        type="number"
+                        defaultValue={m.daily_call_goal || 45}
+                        onBlur={e => changeGoal(m, e.target.value)}
+                        style={{ width: 70, padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(14,23,38,0.12)', fontSize: 12.5, fontFamily: 'JetBrains Mono' }}
+                      />
                     </td>
                     <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)', textAlign: 'right' }}>
                       {isManager && (
@@ -223,7 +219,7 @@ function SessionsTab() {
       {sessions.map(s => (
         <div key={s.id} className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13.5, fontWeight: 700, color: '#0E1726' }}>{s.user_login} · <span style={{ fontWeight: 500, color: '#5A6573' }}>{s.role === 'admin' ? 'Директор' : 'Менеджер'}</span></div>
+            <div style={{ fontSize: 13.5, fontWeight: 700, color: '#0E1726' }}>{s.user_login} · <span style={{ fontWeight: 500, color: '#5A6573' }}>{ROLE_LABEL[s.role] || s.role}</span></div>
             <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>{parseDeviceInfo(s.device_info)} · {s.ip || '—'}</div>
           </div>
           <div style={{ fontSize: 12, color: '#5A6573', textAlign: 'right', flexShrink: 0 }}>
