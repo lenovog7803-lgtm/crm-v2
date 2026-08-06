@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, Fragment } from 'react'
 import {
-  getManagers, createManager, updateManager, deleteManager,
+  getAllUsers, createManager, updateManager, deleteManager,
   getSessions, forceLogoutSession,
   getManagerStats, getManagerStatsDetail,
 } from '../api'
@@ -8,10 +8,12 @@ import { useToast } from '../components/Toast'
 import { CallsHeatmap, FunnelChart } from '../components/leads/AnalyticsView'
 
 const TABS = [
-  { id: 'managers', label: 'Менеджеры' },
+  { id: 'managers', label: 'Пользователи' },
   { id: 'sessions', label: 'Сессии' },
   { id: 'stats', label: 'Статистика' },
 ]
+
+const ROLE_LABEL = { admin: 'Директор', director: 'Директор', manager: 'Менеджер' }
 
 const inputStyle = {
   width: '100%', padding: '10px 12px', borderRadius: 10,
@@ -38,16 +40,16 @@ function relativeTime(iso) {
   return `${Math.floor(hrs / 24)} дн назад`
 }
 
-function ManagersTab() {
+function UsersTab() {
   const { show } = useToast()
-  const [managers, setManagers] = useState([])
+  const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [form, setForm] = useState({ login: '', password: '', name: '', daily_call_goal: 45 })
   const [creating, setCreating] = useState(false)
 
   const load = () => {
     setLoading(true)
-    getManagers().then(r => setManagers(r.managers || r || [])).catch(e => show('Ошибка загрузки: ' + e.message, { type: 'error' })).finally(() => setLoading(false))
+    getAllUsers().then(r => setUsers(r.users || r || [])).catch(e => show('Ошибка загрузки: ' + e.message, { type: 'error' })).finally(() => setLoading(false))
   }
   useEffect(() => { load() }, [])
 
@@ -72,7 +74,7 @@ function ManagersTab() {
     const next = m.status === 'suspended' ? 'active' : 'suspended'
     try {
       await updateManager(m.id, { status: next })
-      setManagers(prev => prev.map(x => x.id === m.id ? { ...x, status: next } : x))
+      setUsers(prev => prev.map(x => x.id === m.id ? { ...x, status: next } : x))
     } catch (e) {
       show('Ошибка: ' + e.message, { type: 'error' })
     }
@@ -83,18 +85,18 @@ function ManagersTab() {
     if (!goal || goal === m.daily_call_goal) return
     try {
       await updateManager(m.id, { daily_call_goal: goal })
-      setManagers(prev => prev.map(x => x.id === m.id ? { ...x, daily_call_goal: goal } : x))
+      setUsers(prev => prev.map(x => x.id === m.id ? { ...x, daily_call_goal: goal } : x))
     } catch (e) {
       show('Ошибка: ' + e.message, { type: 'error' })
     }
   }
 
   const remove = async (m) => {
-    if (!window.confirm(`Удалить менеджера «${m.name}» (${m.login})? Это действие нельзя отменить.`)) return
+    if (!window.confirm(`Удалить пользователя «${m.name}» (${m.login})? Это действие нельзя отменить.`)) return
     try {
       await deleteManager(m.id)
-      setManagers(prev => prev.filter(x => x.id !== m.id))
-      show('Менеджер удалён', { type: 'info' })
+      setUsers(prev => prev.filter(x => x.id !== m.id))
+      show('Пользователь удалён', { type: 'info' })
     } catch (e) {
       show('Ошибка: ' + e.message, { type: 'error' })
     }
@@ -127,47 +129,63 @@ function ManagersTab() {
       <div className="card" style={{ padding: 0, overflow: 'auto' }}>
         {loading ? (
           <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>
-        ) : managers.length === 0 ? (
-          <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Менеджеров пока нет</div>
+        ) : users.length === 0 ? (
+          <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Пользователей пока нет</div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
-                {['Логин', 'Имя', 'Статус', 'План звонков/день', ''].map(h => (
+                {['Логин', 'Имя', 'Роль', 'Статус', 'План звонков/день', ''].map(h => (
                   <th key={h} style={{ textAlign: 'left', padding: '10px 14px', fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {managers.map(m => (
-                <tr key={m.id}>
-                  <td style={{ padding: '11px 14px', fontSize: 13, fontFamily: 'JetBrains Mono', color: '#1366F0', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.login}</td>
-                  <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: '#0E1726', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.name}</td>
-                  <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)' }}>
-                    <button onClick={() => toggleStatus(m)} style={{
-                      padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
-                      fontSize: 11.5, fontWeight: 700,
-                      background: m.status === 'suspended' ? 'rgba(224,71,59,0.1)' : 'rgba(30,158,90,0.1)',
-                      color: m.status === 'suspended' ? '#E0473B' : '#1E9E5A',
-                    }}>
-                      {m.status === 'suspended' ? 'Заблокирован' : 'Активен'}
-                    </button>
-                  </td>
-                  <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)' }}>
-                    <input
-                      type="number"
-                      defaultValue={m.daily_call_goal || 45}
-                      onBlur={e => changeGoal(m, e.target.value)}
-                      style={{ width: 70, padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(14,23,38,0.12)', fontSize: 12.5, fontFamily: 'JetBrains Mono' }}
-                    />
-                  </td>
-                  <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)', textAlign: 'right' }}>
-                    <button onClick={() => remove(m)} style={{ padding: '6px 12px', borderRadius: 9, border: 'none', background: 'rgba(200,25,35,0.08)', color: '#C81923', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-                      Удалить
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {users.map(m => {
+                const isManager = m.role === 'manager'
+                return (
+                  <tr key={m.id}>
+                    <td style={{ padding: '11px 14px', fontSize: 13, fontFamily: 'JetBrains Mono', color: '#1366F0', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.login}</td>
+                    <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: '#0E1726', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.name}</td>
+                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)' }}>
+                      <span style={{
+                        padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
+                        background: isManager ? 'rgba(19,102,240,0.1)' : 'rgba(124,58,237,0.1)',
+                        color: isManager ? '#1366F0' : '#7C3AED',
+                      }}>{ROLE_LABEL[m.role] || m.role}</span>
+                    </td>
+                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)' }}>
+                      {isManager ? (
+                        <button onClick={() => toggleStatus(m)} style={{
+                          padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
+                          fontSize: 11.5, fontWeight: 700,
+                          background: m.status === 'suspended' ? 'rgba(224,71,59,0.1)' : 'rgba(30,158,90,0.1)',
+                          color: m.status === 'suspended' ? '#E0473B' : '#1E9E5A',
+                        }}>
+                          {m.status === 'suspended' ? 'Заблокирован' : 'Активен'}
+                        </button>
+                      ) : '—'}
+                    </td>
+                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)' }}>
+                      {isManager ? (
+                        <input
+                          type="number"
+                          defaultValue={m.daily_call_goal || 45}
+                          onBlur={e => changeGoal(m, e.target.value)}
+                          style={{ width: 70, padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(14,23,38,0.12)', fontSize: 12.5, fontFamily: 'JetBrains Mono' }}
+                        />
+                      ) : '—'}
+                    </td>
+                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)', textAlign: 'right' }}>
+                      {isManager && (
+                        <button onClick={() => remove(m)} style={{ padding: '6px 12px', borderRadius: 9, border: 'none', background: 'rgba(200,25,35,0.08)', color: '#C81923', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                          Удалить
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         )}
@@ -338,7 +356,7 @@ export default function Admin() {
         ))}
       </div>
 
-      {tab === 'managers' && <ManagersTab />}
+      {tab === 'managers' && <UsersTab />}
       {tab === 'sessions' && <SessionsTab />}
       {tab === 'stats' && <StatsTab />}
     </div>

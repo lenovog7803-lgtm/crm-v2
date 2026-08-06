@@ -37,8 +37,9 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
   const [bellOpen, setBellOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [bellPulse, setBellPulse] = useState(false)
+  const [bubbles, setBubbles] = useState([]) // [{ id, notification, phase: 'enter' | 'exit' }]
   const bellRef = useRef(null)
-  const prevNotifCount = useRef(notifications.length)
+  const seenIds = useRef(new Set())
   const isMobile = useIsMobile()
 
   useEffect(() => {
@@ -48,17 +49,28 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
     return () => document.removeEventListener('mousedown', handler)
   }, [bellOpen])
 
-  // A new notification flies into the bell and gives it a brief pulse —
-  // only on growth, so dismissing one doesn't retrigger the animation.
+  // Every new notification gets a transient bubble that emerges out of the
+  // bell, sits for a bit, then sinks back into it and vanishes — it stays
+  // recorded in the persistent list (the dropdown) regardless, this is
+  // purely the "you just got something" cue.
   useEffect(() => {
-    if (notifications.length > prevNotifCount.current) {
-      setBellPulse(true)
-      const t = setTimeout(() => setBellPulse(false), 700)
-      prevNotifCount.current = notifications.length
-      return () => clearTimeout(t)
-    }
-    prevNotifCount.current = notifications.length
-  }, [notifications.length])
+    const fresh = notifications.filter(n => !seenIds.current.has(n.id))
+    if (fresh.length === 0) return
+    fresh.forEach(n => seenIds.current.add(n.id))
+
+    setBellPulse(true)
+    setTimeout(() => setBellPulse(false), 600)
+
+    setBubbles(prev => [...prev, ...fresh.map(n => ({ id: n.id, notification: n, phase: 'enter' }))])
+    fresh.forEach(n => {
+      setTimeout(() => {
+        setBubbles(prev => prev.map(b => b.id === n.id ? { ...b, phase: 'exit' } : b))
+        setTimeout(() => {
+          setBubbles(prev => prev.filter(b => b.id !== n.id))
+        }, 350)
+      }, 3000)
+    })
+  }, [notifications])
 
   const badgeCount = overdueItems.length + notifications.length
 
@@ -206,14 +218,53 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
               padding: '0 3px',
             }}>{badgeCount > 9 ? '9+' : badgeCount}</span>
           )}
-          {bellPulse && (
-            <span style={{
-              position: 'absolute', top: 6, right: 6,
-              width: 8, height: 8, borderRadius: '50%', background: '#1366F0',
-              animation: 'notifDrop 0.6s ease forwards',
-            }} />
-          )}
         </button>
+
+        {/* Transient bubbles — emerge from the bell, then sink back into it */}
+        <div style={{ position: 'absolute', top: '100%', right: 0, zIndex: 1500, display: 'flex', flexDirection: 'column-reverse', gap: 8, marginTop: 8 }}>
+          {bubbles.map(b => {
+            const n = b.notification
+            const accent = n.type === 'error' ? '#E0473B' : n.type === 'success' ? '#1E9E5A' : '#1366F0'
+            const tint = n.type === 'error' ? 'rgba(224,71,59,0.1)' : n.type === 'success' ? 'rgba(30,158,90,0.1)' : 'rgba(19,102,240,0.08)'
+            return (
+              <div
+                key={b.id}
+                onClick={() => { setBubbles(prev => prev.filter(x => x.id !== b.id)); dismiss(b.id) }}
+                style={{
+                  pointerEvents: 'auto', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  minWidth: 240, maxWidth: 340,
+                  background: `linear-gradient(${tint}, ${tint}), rgba(255,255,255,0.85)`,
+                  backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+                  border: `1px solid ${accent}40`, borderRadius: 14, padding: '10px 13px',
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 16px 40px -16px rgba(20,30,55,0.35)',
+                  transformOrigin: 'top right',
+                  animation: b.phase === 'enter'
+                    ? 'toastEmerge 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
+                    : 'toastAbsorb 0.35s cubic-bezier(0.5, 0, 0.75, 0) forwards',
+                }}
+              >
+                <div style={{
+                  width: 22, height: 22, borderRadius: 8, flexShrink: 0,
+                  background: `${accent}26`, border: `1px solid ${accent}40`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {n.type === 'success' && (
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  )}
+                  {n.type === 'error' && (
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  )}
+                  {n.type === 'info' && (
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="16" x2="12" y2="11"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  )}
+                </div>
+                <div style={{ flex: 1, fontSize: 12.5, fontWeight: 500, color: '#0E1726', lineHeight: 1.35 }}>{n.message}</div>
+              </div>
+            )
+          })}
+        </div>
+
         {bellOpen && (
           <div style={{
             position: 'absolute', top: 'calc(100% + 10px)', right: 0, zIndex: 9999,
@@ -340,9 +391,13 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
           55% { transform: scale(1.1) rotate(6deg); }
           100% { transform: scale(1) rotate(0); }
         }
-        @keyframes notifDrop {
-          0% { transform: translate(-18px, -22px) scale(1); opacity: 1; }
-          100% { transform: translate(0, 0) scale(0.2); opacity: 0; }
+        @keyframes toastEmerge {
+          0% { transform: scale(0.15) translateY(-12px); opacity: 0; }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        @keyframes toastAbsorb {
+          0% { transform: scale(1) translateY(0); opacity: 1; }
+          100% { transform: scale(0.15) translateY(-12px); opacity: 0; }
         }
       `}</style>
 

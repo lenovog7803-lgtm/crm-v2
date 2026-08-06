@@ -156,6 +156,7 @@ export const getCallsByDay = (date) => req(`/leads/calls_by_day?date=${date}`);
 // Admin — manager accounts (backed by the existing /users CRUD, role-scoped)
 export const createManager = (data) => req('/users', { method: 'POST', body: JSON.stringify({ ...data, role: 'manager' }) });
 export const getManagers = () => req('/users?role=manager');
+export const getAllUsers = () => req('/users');
 export const updateManager = (id, data) => req(`/users/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const deleteManager = (id) => req(`/users/${id}`, { method: 'DELETE' });
 
