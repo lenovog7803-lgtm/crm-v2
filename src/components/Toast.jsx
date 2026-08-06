@@ -11,6 +11,14 @@ export function ToastProvider({ children }) {
     setNotifications(prev => prev.filter(n => n.id !== id))
   }, [])
 
+  // ToastProvider sits above AuthProvider so it survives sign-out/sign-in
+  // on the same tab — without this, switching accounts on one device (e.g.
+  // testing as director, then logging in as a manager) leaves the previous
+  // account's notifications sitting in the bell for the next account.
+  const clearAll = useCallback(() => {
+    setNotifications([])
+  }, [])
+
   const show = useCallback((message, options = {}) => {
     const id = Date.now() + Math.random()
     const notification = {
@@ -26,7 +34,7 @@ export function ToastProvider({ children }) {
   }, [])
 
   return (
-    <ToastContext.Provider value={{ notifications, show, dismiss }}>
+    <ToastContext.Provider value={{ notifications, show, dismiss, clearAll }}>
       {children}
     </ToastContext.Provider>
   )

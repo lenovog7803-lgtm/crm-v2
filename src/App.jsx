@@ -64,7 +64,7 @@ function savePageSearch(page, value) {
 
 function MainApp() {
   const { signOut, user } = useAuth()
-  const { show } = useToast()
+  const { show, clearAll } = useToast()
   const role = user?.user?.role
   const isDirector = role === 'director' || role === 'admin'
   const isEgorDir = user?.username === 'egor_dir'
@@ -105,6 +105,12 @@ function MainApp() {
 
   const [allOrders, setAllOrders] = useState([])
   const [counts, setCounts] = useState({ newOrders: 0, pendingTasks: 0, newLeads: 0 })
+
+  // MainApp remounts fresh on every login (AppContent swaps Login <-> MainApp
+  // on user change) — but ToastProvider sits above AuthProvider and survives
+  // that swap, so without this a previous account's notifications on the
+  // same tab would still be sitting in the bell for whoever logs in next.
+  useEffect(() => { clearAll() }, [])
 
   useEffect(() => {
     const today = new Date().toISOString().slice(0, 10)
