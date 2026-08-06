@@ -10,8 +10,6 @@ const fmtMonth = m => {
   return `${MONTH_RU_SHORT[parseInt(mo) - 1]} ${y}`
 }
 
-const STATUS_LABEL = { new: 'Новая', in_progress: 'В работе', done: 'Доставлено', cancelled: 'Отменено' }
-
 function StatCard({ label, value, color = '#0E1726', format }) {
   return (
     <div className="card" style={{ padding: 18 }}>
@@ -46,36 +44,34 @@ export default function ManagerDashboard() {
   if (!data) return <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Нет данных</div>
 
   const monthly = data.monthly || []
-  const maxMargin = Math.max(1, ...monthly.map(m => Math.abs(m.margin)))
+  const maxCalls = Math.max(1, ...monthly.map(m => m.calls))
   const currentMonth = monthly[monthly.length - 1]
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 14 }}>
-        <StatCard
-          label="МАРЖА ЗА ВСЁ ВРЕМЯ"
-          value={data.total_margin}
-          color="#1E9E5A"
-          format={v => `${Math.round(v).toLocaleString('ru-RU')} BYN`}
-        />
+        <StatCard label="ЗВОНКОВ ЗА ВСЁ ВРЕМЯ" value={data.total_calls} color="#1366F0" />
         <StatCard
           label="ЛУЧШИЙ МЕСЯЦ"
-          value={data.best_month?.margin || 0}
+          value={data.best_month?.calls || 0}
           color="#D97706"
-          format={v => data.best_month ? `${fmtMonth(data.best_month.month)} · ${Math.round(v).toLocaleString('ru-RU')} BYN` : '—'}
+          format={v => data.best_month ? `${fmtMonth(data.best_month.month)} · ${Math.round(v)} звонков` : '—'}
         />
-        <StatCard label="ЗВОНКОВ В ЭТОМ МЕСЯЦЕ" value={currentMonth?.calls || 0} color="#1366F0" />
+        <StatCard label="СТАЛО КЛИЕНТАМИ ЗА ВСЁ ВРЕМЯ" value={data.total_won} color="#1E9E5A" />
       </div>
 
       <div className="card" style={{ padding: 20 }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 16 }}>Маржа по месяцам</div>
+        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 4 }}>Звонки по месяцам</div>
+        <div style={{ fontSize: 12.5, color: '#5A6573', marginBottom: 16 }}>
+          В этом месяце: <b style={{ color: '#0E1726' }}>{currentMonth?.calls || 0}</b> звонков, <b style={{ color: '#1E9E5A' }}>{currentMonth?.won || 0}</b> в клиенты
+        </div>
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, height: 150 }}>
           {monthly.map(m => {
-            const h = Math.max(4, (Math.abs(m.margin) / maxMargin) * 130)
+            const h = Math.max(4, (m.calls / maxCalls) * 130)
             const isBest = data.best_month && m.month === data.best_month.month
             return (
               <div key={m.month} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                <div style={{ fontSize: 10.5, color: '#5A6573', fontWeight: 600 }}>{Math.round(m.margin).toLocaleString('ru-RU')}</div>
+                <div style={{ fontSize: 10.5, color: '#5A6573', fontWeight: 600 }}>{m.calls}</div>
                 <div style={{ width: '100%', maxWidth: 36, height: h, borderRadius: 8, background: isBest ? '#D97706' : '#1366F0', transition: 'height 0.4s' }} />
                 <span style={{ fontSize: 10.5, color: '#A6AEB8' }}>{fmtMonth(m.month)}</span>
               </div>
@@ -85,33 +81,6 @@ export default function ManagerDashboard() {
       </div>
 
       <ErrorBoundary><LeaderboardView /></ErrorBoundary>
-
-      <div className="card" style={{ padding: 20, overflow: 'auto' }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Мои заявки и маржа</div>
-        {data.orders.length === 0 ? (
-          <div style={{ padding: 20, textAlign: 'center', color: '#A6AEB8' }}>Пока нет заявок</div>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                {['Заявка', 'Дата загрузки', 'Статус', 'Маржа'].map(h => (
-                  <th key={h} style={{ textAlign: 'left', padding: '8px 12px', fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.orders.map(o => (
-                <tr key={o.order_number}>
-                  <td style={{ padding: '10px 12px', fontSize: 13, fontFamily: 'JetBrains Mono', color: '#1366F0', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{o.order_number}</td>
-                  <td style={{ padding: '10px 12px', fontSize: 13, borderTop: '1px solid rgba(14,23,38,0.05)' }}>{o.load_date || '—'}</td>
-                  <td style={{ padding: '10px 12px', fontSize: 13, borderTop: '1px solid rgba(14,23,38,0.05)' }}>{STATUS_LABEL[o.status] || o.status}</td>
-                  <td style={{ padding: '10px 12px', fontSize: 13, fontWeight: 700, color: o.margin < 0 ? '#C81923' : '#1E9E5A', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{o.margin.toLocaleString('ru-RU')} BYN</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
     </div>
   )
 }
