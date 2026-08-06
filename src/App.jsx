@@ -22,6 +22,7 @@ import Leads from './pages/Leads'
 import Trash from './components/Trash'
 import Backups from './pages/Backups'
 import Admin from './pages/Admin'
+import ManagerDashboard from './pages/ManagerDashboard'
 
 import CreateOrderModal from './components/CreateOrderModal'
 import CreateTaskModal from './components/CreateTaskModal'
@@ -68,10 +69,11 @@ function MainApp() {
   const isDirector = role === 'director' || role === 'admin'
   const isEgorDir = user?.username === 'egor_dir'
   const isManager = role === 'manager'
-  // Managers don't have a dashboard — director-only pages redirect to this.
-  const MANAGER_PAGES = ['tasks', 'leads', 'order-detail', 'client-detail', 'carrier-detail']
+  // Managers get their own dashboard (my-dashboard), not the company-wide
+  // one — director-only pages redirect here instead.
+  const MANAGER_PAGES = ['my-dashboard', 'tasks', 'leads', 'order-detail', 'client-detail', 'carrier-detail']
 
-  const [page, setPage] = useState(() => isManager ? 'leads' : 'dashboard')
+  const [page, setPage] = useState(() => isManager ? 'my-dashboard' : 'dashboard')
   const [selectedOrderId, setSelectedOrderId] = useState(null)
   const [selectedClientId, setSelectedClientId] = useState(null)
   const [selectedCarrierId, setSelectedCarrierId] = useState(null)
@@ -137,7 +139,7 @@ function MainApp() {
 
   const handleNav = key => {
     if (key === 'admin' && !isEgorDir) key = 'tasks'
-    if (isManager && !MANAGER_PAGES.includes(key)) key = 'leads'
+    if (isManager && !MANAGER_PAGES.includes(key)) key = 'my-dashboard'
     setPage(key)
     setSearch(loadPageSearch(key))
   }
@@ -212,6 +214,7 @@ function MainApp() {
           <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={handleSearchChange} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} onOpenPalette={() => setPaletteOpen(true)} />
           <div className="scroll-area" key={page}>
             {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} onMonthsLoaded={setAvailableMonths} preloadedOrders={allOrders} />}
+            {page === 'my-dashboard' && <ManagerDashboard />}
 
             {page === 'orders' && (
               <Orders

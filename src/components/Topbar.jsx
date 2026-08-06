@@ -4,6 +4,7 @@ import { useToast } from './Toast'
 
 const PAGE_META = {
   dashboard: { title: 'Дашборд', subtitle: 'Обзор бизнеса' },
+  'my-dashboard': { title: 'Дашборд', subtitle: 'Ваша статистика и заявки' },
   orders: { title: 'Заявки', subtitle: 'Управление грузоперевозками' },
   'order-detail': { title: 'Заявка', subtitle: 'Детали перевозки' },
   finance: { title: 'Финансы', subtitle: 'Платежи и расчёты' },

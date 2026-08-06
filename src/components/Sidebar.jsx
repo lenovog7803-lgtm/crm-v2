@@ -94,9 +94,23 @@ const NAV = [
 ]
 
 // Managers only work leads and tasks — everything else (finance, clients,
-// carriers, dashboard, admin) stays director-only until per-manager scoping
-// exists for those sections too.
+// carriers, admin) stays director-only until per-manager scoping exists for
+// those sections too. The business dashboard is director-only too (it's
+// company-wide financials) — managers get their own below instead.
 const MANAGER_NAV_KEYS = ['tasks', 'leads']
+
+const MANAGER_DASHBOARD_ITEM = {
+  key: 'my-dashboard',
+  label: 'Дашборд',
+  icon: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1"/>
+      <rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/>
+      <rect x="14" y="14" width="7" height="7" rx="1"/>
+    </svg>
+  )
+}
 
 // Not shown in the regular nav — reachable only by egor_dir specifically
 // (his own call, not even the other director account), via a long-press on
@@ -138,7 +152,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   const userInitials = initials(userName)
   const isEgorDir = user?.username === 'egor_dir'
   const navItems = profile.role === 'manager'
-    ? NAV.filter(item => MANAGER_NAV_KEYS.includes(item.key))
+    ? [MANAGER_DASHBOARD_ITEM, ...NAV.filter(item => MANAGER_NAV_KEYS.includes(item.key))]
     : NAV
 
   const [hiddenMenuOpen, setHiddenMenuOpen] = useState(false)

@@ -4,15 +4,13 @@ import QueueView from '../components/leads/QueueView'
 import ListView from '../components/leads/ListView'
 import KanbanView from '../components/leads/KanbanView'
 import AnalyticsView from '../components/leads/AnalyticsView'
-import LeaderboardView from '../components/leads/LeaderboardView'
 import ErrorBoundary from '../components/ErrorBoundary'
 
 const VIEWS = [
-  { id: 'queue',       label: 'Очередь' },
-  { id: 'list',        label: 'Список' },
-  { id: 'kanban',      label: 'Канбан' },
-  { id: 'leaderboard', label: 'Лидерборд' },
-  { id: 'analytics',   label: 'Отчёты' },
+  { id: 'queue',     label: 'Очередь' },
+  { id: 'list',      label: 'Список' },
+  { id: 'kanban',    label: 'Канбан' },
+  { id: 'analytics', label: 'Отчёты' },
 ]
 
 export default function Leads() {
@@ -61,7 +59,6 @@ export default function Leads() {
       {view === 'queue'     && <ErrorBoundary><QueueView industry={industry} onCounts={setCounts} /></ErrorBoundary>}
       {view === 'list'      && <ErrorBoundary><ListView industry={industry} /></ErrorBoundary>}
       {view === 'kanban'    && <ErrorBoundary><KanbanView industry={industry} /></ErrorBoundary>}
-      {view === 'leaderboard' && <ErrorBoundary><LeaderboardView /></ErrorBoundary>}
       {view === 'analytics' && <ErrorBoundary><AnalyticsView /></ErrorBoundary>}
     </div>
   )
