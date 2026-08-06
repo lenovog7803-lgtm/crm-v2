@@ -5,6 +5,7 @@ import {
   getManagerStats, getManagerStatsDetail,
 } from '../api'
 import { useToast } from '../components/Toast'
+import { ModalOverlay, ModalHeader } from '../components/Modal'
 import { CallsHeatmap, FunnelChart } from '../components/leads/AnalyticsView'
 
 const TABS = [
@@ -14,6 +15,16 @@ const TABS = [
 ]
 
 const ROLE_LABEL = { admin: 'Директор', director: 'Директор', manager: 'Менеджер' }
+
+// The user doc has a few more permission keys (can_view_finance,
+// can_view_all_clients, can_create_orders) left over from an earlier design
+// — only these two are actually checked anywhere in the backend today, so
+// those are the only toggles offered here. Showing switches that don't do
+// anything would be worse than not showing them.
+const PERMISSION_OPTIONS = [
+  { key: 'can_view_all_leads', label: 'Видит все лиды, а не только свои и общий пул' },
+  { key: 'can_view_all_orders', label: 'Видит все заявки, а не только свои и общий пул' },
+]
 
 const inputStyle = {
   width: '100%', padding: '10px 12px', borderRadius: 10,
@@ -40,12 +51,94 @@ function relativeTime(iso) {
   return `${Math.floor(hrs / 24)} дн назад`
 }
 
+function UserDetailModal({ user, onClose, onSaved }) {
+  const { show } = useToast()
+  const [login, setLogin] = useState(user.login)
+  const [name, setName] = useState(user.name)
+  const [password, setPassword] = useState('')
+  const [perms, setPerms] = useState(user.permissions || {})
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  const togglePerm = (key) => setPerms(p => ({ ...p, [key]: !p[key] }))
+
+  const handleSave = async () => {
+    if (!login.trim() || !name.trim()) return
+    setSaving(true)
+    setError('')
+    try {
+      const payload = { login: login.trim(), name: name.trim(), permissions: perms }
+      if (password.trim()) payload.password = password.trim()
+      const updated = await updateManager(user.id, payload)
+      show(`${updated.name || name}: изменения сохранены`, { type: 'success' })
+      onSaved(updated)
+      onClose()
+    } catch (e) {
+      setError(e.message || 'Ошибка сохранения')
+    }
+    setSaving(false)
+  }
+
+  return (
+    <ModalOverlay onClose={onClose}>
+      <ModalHeader title={`Пользователь: ${user.login}`} onClose={onClose} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{
+            padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
+            background: user.role === 'manager' ? 'rgba(19,102,240,0.1)' : 'rgba(124,58,237,0.1)',
+            color: user.role === 'manager' ? '#1366F0' : '#7C3AED',
+          }}>{ROLE_LABEL[user.role] || user.role}</span>
+          <span style={{ fontSize: 11.5, color: '#A6AEB8' }}>роль меняется отдельно, не через эту форму</span>
+        </div>
+
+        <div>
+          <div style={{ fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', marginBottom: 5 }}>ЛОГИН</div>
+          <input style={inputStyle} value={login} onChange={e => setLogin(e.target.value)} />
+        </div>
+        <div>
+          <div style={{ fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', marginBottom: 5 }}>ИМЯ</div>
+          <input style={inputStyle} value={name} onChange={e => setName(e.target.value)} />
+        </div>
+        <div>
+          <div style={{ fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', marginBottom: 5 }}>НОВЫЙ ПАРОЛЬ</div>
+          <input type="password" style={inputStyle} value={password} onChange={e => setPassword(e.target.value)} placeholder="Оставьте пустым, чтобы не менять" autoComplete="new-password" />
+          <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 5, lineHeight: 1.4 }}>
+            Текущий пароль хранится хешированным и нигде не может быть показан — можно только задать новый.
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', marginBottom: 8 }}>ПРАВА ДОСТУПА</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {PERMISSION_OPTIONS.map(p => (
+              <label key={p.key} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 10, cursor: 'pointer', fontSize: 13, color: '#0E1726', background: perms[p.key] ? 'rgba(19,102,240,0.06)' : 'transparent' }}>
+                <input type="checkbox" checked={!!perms[p.key]} onChange={() => togglePerm(p.key)} style={{ width: 15, height: 15, accentColor: '#1366F0' }} />
+                {p.label}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center' }}>{error}</div>}
+
+        <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+          <button onClick={onClose} style={{ flex: 1, height: 44, borderRadius: 13, border: '1px solid rgba(14,23,38,0.12)', background: 'transparent', cursor: 'pointer', fontFamily: 'Manrope', fontSize: 14, fontWeight: 600, color: '#5A6573' }}>Отмена</button>
+          <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ flex: 2, justifyContent: 'center', opacity: saving ? 0.7 : 1 }}>
+            {saving ? 'Сохранение…' : 'Сохранить'}
+          </button>
+        </div>
+      </div>
+    </ModalOverlay>
+  )
+}
+
 function UsersTab() {
   const { show } = useToast()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [form, setForm] = useState({ login: '', password: '', name: '', daily_call_goal: 45 })
   const [creating, setCreating] = useState(false)
+  const [editUser, setEditUser] = useState(null)
 
   const load = () => {
     setLoading(true)
@@ -144,7 +237,10 @@ function UsersTab() {
               {users.map(m => {
                 const isManager = m.role === 'manager'
                 return (
-                  <tr key={m.id}>
+                  <tr key={m.id} onClick={() => setEditUser(m)} style={{ cursor: 'pointer' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.02)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  >
                     <td style={{ padding: '11px 14px', fontSize: 13, fontFamily: 'JetBrains Mono', color: '#1366F0', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.login}</td>
                     <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: '#0E1726', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.name}</td>
                     <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)' }}>
@@ -154,7 +250,7 @@ function UsersTab() {
                         color: isManager ? '#1366F0' : '#7C3AED',
                       }}>{ROLE_LABEL[m.role] || m.role}</span>
                     </td>
-                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)' }}>
+                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)' }} onClick={e => e.stopPropagation()}>
                       <button onClick={() => toggleStatus(m)} style={{
                         padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
                         fontSize: 11.5, fontWeight: 700,
@@ -164,7 +260,7 @@ function UsersTab() {
                         {m.status === 'suspended' ? 'Заблокирован' : 'Активен'}
                       </button>
                     </td>
-                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)' }}>
+                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)' }} onClick={e => e.stopPropagation()}>
                       <input
                         type="number"
                         defaultValue={m.daily_call_goal || 45}
@@ -172,7 +268,7 @@ function UsersTab() {
                         style={{ width: 70, padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(14,23,38,0.12)', fontSize: 12.5, fontFamily: 'JetBrains Mono' }}
                       />
                     </td>
-                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)', textAlign: 'right' }}>
+                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)', textAlign: 'right' }} onClick={e => e.stopPropagation()}>
                       {isManager && (
                         <button onClick={() => remove(m)} style={{ padding: '6px 12px', borderRadius: 9, border: 'none', background: 'rgba(200,25,35,0.08)', color: '#C81923', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
                           Удалить
@@ -186,6 +282,14 @@ function UsersTab() {
           </table>
         )}
       </div>
+
+      {editUser && (
+        <UserDetailModal
+          user={editUser}
+          onClose={() => setEditUser(null)}
+          onSaved={updated => setUsers(prev => prev.map(x => x.id === updated.id ? { ...x, ...updated } : x))}
+        />
+      )}
     </div>
   )
 }
