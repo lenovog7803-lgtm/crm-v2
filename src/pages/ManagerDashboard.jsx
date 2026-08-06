@@ -25,12 +25,24 @@ function StatCard({ label, value, color = '#0E1726', format }) {
 export default function ManagerDashboard() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  useEffect(() => {
-    getMyDashboard().then(setData).catch(console.error).finally(() => setLoading(false))
-  }, [])
+  const load = () => {
+    setLoading(true)
+    setError('')
+    getMyDashboard().then(setData).catch(e => setError(e.message || 'Ошибка загрузки')).finally(() => setLoading(false))
+  }
 
-  if (loading || !data) return <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>
+  useEffect(() => { load() }, [])
+
+  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>
+  if (error) return (
+    <div className="card" style={{ padding: 40, textAlign: 'center' }}>
+      <div style={{ fontSize: 13, color: '#C81923', marginBottom: 12 }}>Не удалось загрузить дашборд: {error}</div>
+      <button onClick={load} className="btn-primary" style={{ margin: '0 auto' }}>Попробовать снова</button>
+    </div>
+  )
+  if (!data) return <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Нет данных</div>
 
   const monthly = data.monthly || []
   const maxMargin = Math.max(1, ...monthly.map(m => Math.abs(m.margin)))
