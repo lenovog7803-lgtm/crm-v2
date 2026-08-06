@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useIsMobile } from '../hooks/useIsMobile'
+import { useToast } from './Toast'
 
 const PAGE_META = {
   dashboard: { title: 'Дашборд', subtitle: 'Обзор бизнеса' },
@@ -30,7 +31,8 @@ const fmtMonth = m => {
   return `${MONTH_RU[parseInt(mo) - 1]} ${y}`
 }
 
-export default function Topbar({ page, onSignOut, period = 'month', onPeriodChange, availableMonths = [], search = '', onSearchChange, overdueItems = [], onOpenOrder, onNav, onOpenPalette, notifications = [], onDismissNotification }) {
+export default function Topbar({ page, onSignOut, period = 'month', onPeriodChange, availableMonths = [], search = '', onSearchChange, overdueItems = [], onOpenOrder, onNav, onOpenPalette }) {
+  const { notifications, dismiss } = useToast()
   const meta = PAGE_META[page] || { title: page, subtitle: '' }
   const [bellOpen, setBellOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
@@ -227,38 +229,58 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
                     УВЕДОМЛЕНИЯ · {notifications.length}
                   </span>
                 </div>
-                <div style={{ maxHeight: 220, overflowY: 'auto' }}>
-                  {notifications.map(n => (
-                    <div
-                      key={n.id}
-                      onClick={() => onDismissNotification && onDismissNotification(n.id)}
-                      style={{
-                        display: 'flex', alignItems: 'flex-start', gap: 12,
-                        padding: '11px 16px', cursor: 'pointer',
-                        borderBottom: '1px solid rgba(14,23,38,0.05)', transition: 'background 0.12s',
-                      }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(19,102,240,0.05)'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <div style={{
-                        width: 32, height: 32, borderRadius: 10, flexShrink: 0,
-                        background: 'rgba(19,102,240,0.1)', color: '#1366F0',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                        </svg>
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 12.5, color: '#0E1726', lineHeight: 1.4 }}>{n.message}</div>
-                        {n.created_at && (
-                          <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>
-                            {new Date(n.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                <div style={{ maxHeight: 300, overflowY: 'auto' }}>
+                  {notifications.map(n => {
+                    const accent = n.type === 'error' ? '#E0473B' : n.type === 'success' ? '#1E9E5A' : '#1366F0'
+                    const tint = n.type === 'error' ? 'rgba(224,71,59,0.1)' : n.type === 'success' ? 'rgba(30,158,90,0.1)' : 'rgba(19,102,240,0.1)'
+                    return (
+                      <div
+                        key={n.id}
+                        onClick={() => dismiss(n.id)}
+                        style={{
+                          display: 'flex', alignItems: 'flex-start', gap: 12,
+                          padding: '11px 16px', cursor: 'pointer',
+                          borderBottom: '1px solid rgba(14,23,38,0.05)', transition: 'background 0.12s',
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = `${tint}`}
+                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <div style={{
+                          width: 32, height: 32, borderRadius: 10, flexShrink: 0,
+                          background: tint, color: accent,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                          {n.type === 'success' && (
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          )}
+                          {n.type === 'error' && (
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                          )}
+                          {n.type === 'info' && (
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="16" x2="12" y2="11"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                          )}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 12.5, color: '#0E1726', lineHeight: 1.4 }}>{n.message}</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                            {n.created_at && (
+                              <span style={{ fontSize: 11, color: '#A6AEB8' }}>
+                                {new Date(n.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            )}
+                            {n.actionLabel && (
+                              <button
+                                onClick={e => { e.stopPropagation(); n.onAction?.(); dismiss(n.id) }}
+                                style={{ fontSize: 11.5, fontWeight: 700, color: accent, background: `${accent}1A`, border: 'none', borderRadius: 8, padding: '3px 9px', cursor: 'pointer' }}
+                              >
+                                {n.actionLabel}
+                              </button>
+                            )}
                           </div>
-                        )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </>
             )}

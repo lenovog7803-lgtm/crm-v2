@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import './index.css'
 
 import { AuthProvider, useAuth } from './AuthContext'
-import { ToastProvider } from './components/Toast'
+import { ToastProvider, useToast } from './components/Toast'
 import { CelebrationProvider } from './components/Celebration'
 import Login from './pages/Login'
 import { getDashboard, getOrders, getTasks, getNotifications, markNotificationRead } from './api'
@@ -63,6 +63,7 @@ function savePageSearch(page, value) {
 
 function MainApp() {
   const { signOut, user } = useAuth()
+  const { show } = useToast()
   const role = user?.user?.role
   const isDirector = role === 'director' || role === 'admin'
   const isEgorDir = user?.username === 'egor_dir'
@@ -141,21 +142,19 @@ function MainApp() {
     setSearch(loadPageSearch(key))
   }
 
-  const [notifications, setNotifications] = useState([])
-  const dismissNotification = id => setNotifications(prev => prev.filter(n => n.id !== id))
-
   useEffect(() => {
     if (role !== 'director' && role !== 'admin') return
     const check = async () => {
       const r = await getNotifications().catch(() => null)
       const fresh = r?.notifications || []
-      if (fresh.length) {
-        // Marked read on the backend immediately (so they don't repeat next
-        // poll or in another tab) but kept locally until the user actually
-        // clicks them in the bell — that's the "seen" signal here, not a timer.
-        setNotifications(prev => [...fresh, ...prev])
-        fresh.forEach(n => markNotificationRead(n.id).catch(() => {}))
-      }
+      // Marked read on the backend right away (so they don't repeat next
+      // poll or in another tab); the bell dropdown is what keeps them
+      // visible locally until dismissed — same unified store as every
+      // other show() call in the app now uses.
+      fresh.forEach(n => {
+        show(n.message, { type: 'info' })
+        markNotificationRead(n.id).catch(() => {})
+      })
     }
     check()
     const t = setInterval(check, 60000)
@@ -210,7 +209,7 @@ function MainApp() {
         />
 
         <main className="app-main">
-          <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={handleSearchChange} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} onOpenPalette={() => setPaletteOpen(true)} notifications={notifications} onDismissNotification={dismissNotification} />
+          <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={handleSearchChange} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} onOpenPalette={() => setPaletteOpen(true)} />
           <div className="scroll-area" key={page}>
             {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} onMonthsLoaded={setAvailableMonths} preloadedOrders={allOrders} />}
 
