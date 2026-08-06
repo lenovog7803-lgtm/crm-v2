@@ -30,11 +30,13 @@ const fmtMonth = m => {
   return `${MONTH_RU[parseInt(mo) - 1]} ${y}`
 }
 
-export default function Topbar({ page, onSignOut, period = 'month', onPeriodChange, availableMonths = [], search = '', onSearchChange, overdueItems = [], onOpenOrder, onNav, onOpenPalette }) {
+export default function Topbar({ page, onSignOut, period = 'month', onPeriodChange, availableMonths = [], search = '', onSearchChange, overdueItems = [], onOpenOrder, onNav, onOpenPalette, notifications = [], onDismissNotification }) {
   const meta = PAGE_META[page] || { title: page, subtitle: '' }
   const [bellOpen, setBellOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
+  const [bellPulse, setBellPulse] = useState(false)
   const bellRef = useRef(null)
+  const prevNotifCount = useRef(notifications.length)
   const isMobile = useIsMobile()
 
   useEffect(() => {
@@ -43,6 +45,20 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [bellOpen])
+
+  // A new notification flies into the bell and gives it a brief pulse —
+  // only on growth, so dismissing one doesn't retrigger the animation.
+  useEffect(() => {
+    if (notifications.length > prevNotifCount.current) {
+      setBellPulse(true)
+      const t = setTimeout(() => setBellPulse(false), 700)
+      prevNotifCount.current = notifications.length
+      return () => clearTimeout(t)
+    }
+    prevNotifCount.current = notifications.length
+  }, [notifications.length])
+
+  const badgeCount = overdueItems.length + notifications.length
 
   const fixedIds = new Set(['month', 'last_month', 'quarter', 'year', 'all'])
   const extraMonths = availableMonths.filter(m => !fixedIds.has(m))
@@ -169,20 +185,31 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
       <div ref={bellRef} style={{ position: 'relative' }}>
         <button
           onClick={() => setBellOpen(v => !v)}
-          style={{ position: 'relative', background: bellOpen ? 'rgba(200,25,35,0.08)' : 'none', border: 'none', cursor: 'pointer', color: overdueItems.length > 0 ? '#C81923' : '#5A6573', padding: 6, borderRadius: 10 }}
+          style={{
+            position: 'relative', background: bellOpen ? 'rgba(200,25,35,0.08)' : 'none', border: 'none', cursor: 'pointer',
+            color: badgeCount > 0 ? '#C81923' : '#5A6573', padding: 6, borderRadius: 10,
+            animation: bellPulse ? 'bellPulse 0.6s ease' : 'none',
+          }}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
             <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
           </svg>
-          {overdueItems.length > 0 && (
+          {badgeCount > 0 && (
             <span style={{
               position: 'absolute', top: 3, right: 3,
               minWidth: 16, height: 16, borderRadius: 8, background: '#C81923',
               border: '2px solid #fff', color: '#fff',
               fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center',
               padding: '0 3px',
-            }}>{overdueItems.length > 9 ? '9+' : overdueItems.length}</span>
+            }}>{badgeCount > 9 ? '9+' : badgeCount}</span>
+          )}
+          {bellPulse && (
+            <span style={{
+              position: 'absolute', top: 6, right: 6,
+              width: 8, height: 8, borderRadius: '50%', background: '#1366F0',
+              animation: 'notifDrop 0.6s ease forwards',
+            }} />
           )}
         </button>
         {bellOpen && (
@@ -193,9 +220,52 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
             boxShadow: '0 20px 60px rgba(20,30,55,0.18)',
             minWidth: 320, maxWidth: 380, overflow: 'hidden',
           }}>
+            {notifications.length > 0 && (
+              <>
+                <div style={{ padding: '14px 16px 10px', borderBottom: '1px solid rgba(14,23,38,0.07)' }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', color: '#A6AEB8' }}>
+                    УВЕДОМЛЕНИЯ · {notifications.length}
+                  </span>
+                </div>
+                <div style={{ maxHeight: 220, overflowY: 'auto' }}>
+                  {notifications.map(n => (
+                    <div
+                      key={n.id}
+                      onClick={() => onDismissNotification && onDismissNotification(n.id)}
+                      style={{
+                        display: 'flex', alignItems: 'flex-start', gap: 12,
+                        padding: '11px 16px', cursor: 'pointer',
+                        borderBottom: '1px solid rgba(14,23,38,0.05)', transition: 'background 0.12s',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(19,102,240,0.05)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <div style={{
+                        width: 32, height: 32, borderRadius: 10, flexShrink: 0,
+                        background: 'rgba(19,102,240,0.1)', color: '#1366F0',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 12.5, color: '#0E1726', lineHeight: 1.4 }}>{n.message}</div>
+                        {n.created_at && (
+                          <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>
+                            {new Date(n.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
             <div style={{ padding: '14px 16px 10px', borderBottom: '1px solid rgba(14,23,38,0.07)' }}>
               <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', color: '#A6AEB8' }}>
-                {overdueItems.length > 0 ? `ПРОСРОЧЕНО · ${overdueItems.length}` : 'УВЕДОМЛЕНИЯ'}
+                {overdueItems.length > 0 ? `ПРОСРОЧЕНО · ${overdueItems.length}` : 'ПРОСРОЧЕННЫЕ'}
               </span>
             </div>
             {overdueItems.length === 0 ? (
@@ -241,6 +311,18 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
           </div>
         )}
       </div>
+      <style>{`
+        @keyframes bellPulse {
+          0% { transform: scale(1); }
+          30% { transform: scale(1.25) rotate(-8deg); }
+          55% { transform: scale(1.1) rotate(6deg); }
+          100% { transform: scale(1) rotate(0); }
+        }
+        @keyframes notifDrop {
+          0% { transform: translate(-18px, -22px) scale(1); opacity: 1; }
+          100% { transform: translate(0, 0) scale(0.2); opacity: 0; }
+        }
+      `}</style>
 
       {/* Sign out */}
       {onSignOut && (

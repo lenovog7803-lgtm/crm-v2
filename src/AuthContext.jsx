@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
       const saved = localStorage.getItem('crm_user');
       const savedUsername = localStorage.getItem('crm_username');
       const profile = (savedUsername && USER_PROFILES[savedUsername]) || (saved ? JSON.parse(saved) : null);
-      setUser(profile ? { token: t, user: profile } : { token: t });
+      setUser(profile ? { token: t, user: profile, username: savedUsername } : { token: t });
     }
     setLoading(false);
   }, []);
@@ -38,7 +38,7 @@ export function AuthProvider({ children }) {
     const profile = USER_PROFILES[username] || data.user || { name: username, role: 'manager' };
     localStorage.setItem('crm_user', JSON.stringify(profile));
     localStorage.setItem('crm_username', username);
-    setUser({ token: data.token, user: profile });
+    setUser({ token: data.token, user: profile, username });
   };
 
   const signOut = () => {

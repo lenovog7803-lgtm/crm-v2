@@ -93,24 +93,24 @@ const NAV = [
   },
 ]
 
-const ADMIN_ITEM = {
-  key: 'admin',
-  label: 'Администрирование',
-  icon: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-    </svg>
-  )
-}
-
 // Managers only work leads and tasks — everything else (finance, clients,
 // carriers, dashboard, admin) stays director-only until per-manager scoping
 // exists for those sections too.
 const MANAGER_NAV_KEYS = ['tasks', 'leads']
 
-// Not shown in the regular nav — only admins should reach these, revealed
-// via a long-press on the profile avatar until real per-user role gating exists.
+// Not shown in the regular nav — reachable only by egor_dir specifically
+// (his own call, not even the other director account), via a long-press on
+// the profile avatar.
 const HIDDEN_NAV = [
+  {
+    key: 'admin',
+    label: 'Администрирование',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    )
+  },
   {
     key: 'backups',
     label: 'Резервные копии',
@@ -136,10 +136,10 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   const userName = profile.name || 'Пользователь'
   const userRole = roleLabel(profile.role, profile.position)
   const userInitials = initials(userName)
-  const isDirector = profile.role === 'director' || profile.role === 'admin'
+  const isEgorDir = user?.username === 'egor_dir'
   const navItems = profile.role === 'manager'
     ? NAV.filter(item => MANAGER_NAV_KEYS.includes(item.key))
-    : (isDirector ? [...NAV, ADMIN_ITEM] : NAV)
+    : NAV
 
   const [hiddenMenuOpen, setHiddenMenuOpen] = useState(false)
   const longPressTimer = useRef(null)
@@ -147,6 +147,9 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   const [hiddenMenuPos, setHiddenMenuPos] = useState({ left: 0, bottom: 0 })
 
   const startLongPress = () => {
+    // Egor's own call — nobody else, not even the other director account,
+    // should be able to reach this menu.
+    if (!isEgorDir) return
     // Only reachable with the sidebar expanded — collapsed, the avatar sits
     // too close to the screen edge for a 200px popup to sit near it without
     // overlapping content awkwardly either way.
