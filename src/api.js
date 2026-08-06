@@ -24,6 +24,11 @@ async function req(path, options = {}, retries = 2) {
     try {
       const res = await fetch(BASE + path, {
         ...options,
+        // A hung request (slow backend, dead connection) would otherwise
+        // wait forever — fetch has no default timeout of its own — and a
+        // page like the manager dashboard would spin indefinitely instead
+        // of ever reaching the retry/error path below.
+        signal: AbortSignal.timeout(25000),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': token ? `Bearer ${token}` : '',
@@ -36,7 +41,7 @@ async function req(path, options = {}, retries = 2) {
       if (attempt < retries) {
         await sleep(2000 * (attempt + 1));
       } else {
-        throw e;
+        throw e.name === 'TimeoutError' ? new Error('Сервер не отвечает — превышено время ожидания') : e;
       }
     }
   }
