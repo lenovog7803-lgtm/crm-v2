@@ -166,6 +166,7 @@ export const forceLogoutSession = (id) => req(`/admin/sessions/${id}/logout`, { 
 
 // Admin — manager stats
 export const getManagerStats = (period) => req(`/admin/manager_stats?period=${period || 'today'}`);
+export const getLeaderboard = (period) => req(`/leads/leaderboard?period=${period || 'today'}`);
 export const getManagerStatsDetail = (id, period) => req(`/admin/manager_stats/${id}?period=${period || 'week'}`);
 
 // Admin — notifications
