@@ -66,8 +66,11 @@ function MainApp() {
   const { show } = useToast()
   const role = user?.user?.role
   const isDirector = role === 'director' || role === 'admin'
+  const isManager = role === 'manager'
+  // Managers don't have a dashboard — director-only pages redirect to this.
+  const MANAGER_PAGES = ['tasks', 'leads', 'order-detail', 'client-detail', 'carrier-detail']
 
-  const [page, setPage] = useState('dashboard')
+  const [page, setPage] = useState(() => isManager ? 'leads' : 'dashboard')
   const [selectedOrderId, setSelectedOrderId] = useState(null)
   const [selectedClientId, setSelectedClientId] = useState(null)
   const [selectedCarrierId, setSelectedCarrierId] = useState(null)
@@ -133,6 +136,7 @@ function MainApp() {
 
   const handleNav = key => {
     if (key === 'admin' && !isDirector) key = 'tasks'
+    if (isManager && !MANAGER_PAGES.includes(key)) key = 'leads'
     setPage(key)
     setSearch(loadPageSearch(key))
   }
