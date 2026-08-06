@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react'
 import './index.css'
 
 import { AuthProvider, useAuth } from './AuthContext'
-import { ToastProvider } from './components/Toast'
+import { ToastProvider, useToast } from './components/Toast'
+import { CelebrationProvider } from './components/Celebration'
 import Login from './pages/Login'
-import { getDashboard, getOrders, getTasks } from './api'
+import { getDashboard, getOrders, getTasks, getNotifications, markNotificationRead } from './api'
 
 import Sidebar from './components/Sidebar'
 import Topbar from './components/Topbar'
@@ -20,6 +21,7 @@ import CarrierDetail from './components/CarrierDetail'
 import Leads from './pages/Leads'
 import Trash from './components/Trash'
 import Backups from './pages/Backups'
+import Admin from './pages/Admin'
 
 import CreateOrderModal from './components/CreateOrderModal'
 import CreateTaskModal from './components/CreateTaskModal'
@@ -60,7 +62,10 @@ function savePageSearch(page, value) {
 }
 
 function MainApp() {
-  const { signOut } = useAuth()
+  const { signOut, user } = useAuth()
+  const { show } = useToast()
+  const role = user?.user?.role
+  const isDirector = role === 'director' || role === 'admin'
 
   const [page, setPage] = useState('dashboard')
   const [selectedOrderId, setSelectedOrderId] = useState(null)
@@ -127,9 +132,24 @@ function MainApp() {
   const openCarrier = id => { setSelectedCarrierId(id); setPage('carrier-detail'); setSearch('') }
 
   const handleNav = key => {
+    if (key === 'admin' && !isDirector) key = 'tasks'
     setPage(key)
     setSearch(loadPageSearch(key))
   }
+
+  useEffect(() => {
+    if (role !== 'director' && role !== 'admin') return
+    const check = async () => {
+      const r = await getNotifications().catch(() => null)
+      ;(r?.notifications || []).forEach(n => {
+        show(n.message, { type: 'info' })
+        markNotificationRead(n.id).catch(() => {})
+      })
+    }
+    check()
+    const t = setInterval(check, 60000)
+    return () => clearInterval(t)
+  }, [role])
 
   const handleSearchChange = value => {
     setSearch(value)
@@ -256,6 +276,7 @@ function MainApp() {
             {page === 'leads' && <Leads />}
             {page === 'trash' && <Trash />}
             {page === 'backups' && <Backups />}
+            {page === 'admin' && isDirector && <Admin />}
           </div>
         </main>
       </div>
@@ -325,9 +346,11 @@ function AppContent() {
 export default function App() {
   return (
     <ToastProvider>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <CelebrationProvider>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </CelebrationProvider>
     </ToastProvider>
   )
 }

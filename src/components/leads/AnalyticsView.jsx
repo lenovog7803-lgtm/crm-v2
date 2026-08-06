@@ -19,7 +19,7 @@ function StatCard({ label, value, color = '#0E1726' }) {
   )
 }
 
-function CallsHeatmap({ data, onDayClick }) {
+export function CallsHeatmap({ data, onDayClick }) {
   const max = Math.max(...data.map(d => d.calls), 1)
   const colorFor = (n) => {
     if (n === 0) return '#F0F1F4'
@@ -54,6 +54,30 @@ function CallsHeatmap({ data, onDayClick }) {
         ))}
         больше
       </div>
+    </div>
+  )
+}
+
+export function FunnelChart({ funnel }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {(funnel || []).map((f, i) => {
+        const width = funnel[0] ? Math.max(4, (f.cumulative / (funnel[0].cumulative || 1)) * 100) : 0
+        const troubled = i > 0 && f.conversion < 30
+        return (
+          <div key={f.stage}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <span style={{ fontSize: 12.5, color: '#5A6573', fontWeight: 600 }}>{f.label}</span>
+              <span style={{ fontSize: 12, color: troubled ? '#D97706' : '#5A6573' }}>
+                {f.count} · {f.cumulative} лидов {i > 0 && `· ${f.conversion}%`}
+              </span>
+            </div>
+            <div style={{ height: 14, borderRadius: 8, background: 'rgba(14,23,38,0.06)' }}>
+              <div style={{ height: '100%', borderRadius: 8, width: `${width}%`, background: troubled ? '#D97706' : f.color, transition: 'width 0.4s' }} />
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -163,25 +187,7 @@ export default function AnalyticsView() {
       {/* 2. Воронка конверсий */}
       <div className="card" style={{ padding: 20 }}>
         <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Воронка конверсий</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {(data.funnel || []).map((f, i) => {
-            const width = data.funnel[0] ? Math.max(4, (f.cumulative / (data.funnel[0].cumulative || 1)) * 100) : 0
-            const troubled = i > 0 && f.conversion < 30
-            return (
-              <div key={f.stage}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 12.5, color: '#5A6573', fontWeight: 600 }}>{f.label}</span>
-                  <span style={{ fontSize: 12, color: troubled ? '#D97706' : '#5A6573' }}>
-                    {f.count} · {f.cumulative} лидов {i > 0 && `· ${f.conversion}%`}
-                  </span>
-                </div>
-                <div style={{ height: 14, borderRadius: 8, background: 'rgba(14,23,38,0.06)' }}>
-                  <div style={{ height: '100%', borderRadius: 8, width: `${width}%`, background: troubled ? '#D97706' : f.color, transition: 'width 0.4s' }} />
-                </div>
-              </div>
-            )
-          })}
-        </div>
+        <FunnelChart funnel={data.funnel} />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 20 }}>

@@ -4,6 +4,7 @@ import { fmtMoney, initials, getGradient } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useRealtime } from '../hooks/useRealtime'
 import { useToast } from './Toast'
+import { useCelebration } from './Celebration'
 import OrderPaymentModal from './OrderPaymentModal'
 
 const STATUSES = [
@@ -196,6 +197,7 @@ function PaymentButton({ type, order, onClick }) {
 export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, onOpenCarrier, onOpenOrder, onDuplicate, onEdit }) {
   const isMobile = useIsMobile()
   const { show } = useToast()
+  const { celebrate } = useCelebration()
   const [order, setOrder] = useState(null)
   const [loading, setLoading] = useState(true)
   const [payLoading, setPayLoading] = useState(null)
@@ -277,12 +279,14 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     if (!isDirty || saving) return
     setSaving(true)
     setSaveErr(false)
+    const becameDelivered = draft.status === 'done' && order.status !== 'done'
     try {
       lastLocalEditRef.current = Date.now()
       await apiUpdate(order.id, draft)
       setOrder(prev => ({ ...prev, ...draft }))
       setDraft({})
       setSavedOk(true)
+      if (becameDelivered) celebrate()
       setTimeout(() => setSavedOk(false), 2500)
     } catch (e) {
       console.error(e)

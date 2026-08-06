@@ -75,6 +75,7 @@ export const getTasks = () => req('/tasks');
 export const createTask = (data) => req('/tasks', { method: 'POST', body: JSON.stringify(data) });
 export const updateTask = (id, data) => req(`/tasks/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const deleteTask = (id) => req(`/tasks/${id}`, { method: 'DELETE' });
+export const assignTask = (id, userId) => req(`/tasks/${id}/assign`, { method: 'POST', body: JSON.stringify({ user_id: userId }) });
 
 // Leads
 export const getLeads = (params = {}) => req('/leads?' + new URLSearchParams(params));
@@ -93,6 +94,7 @@ export const getScripts = () => req('/leads/scripts');
 export const saveScripts = (scripts) =>
   req('/leads/scripts', { method: 'PUT', body: JSON.stringify({ scripts }) });
 export const getLeadsAnalytics = (period) => req(`/leads/analytics?period=${period || 'month'}`);
+export const claimLead = (id) => req(`/leads/${id}/claim`, { method: 'POST' });
 
 // Finance
 export const getPaymentsIn = (params = {}) => req('/payments/in?' + new URLSearchParams(params));
@@ -150,3 +152,21 @@ export const restoreBackup = (id, confirmWord) =>
 
 // Calls heatmap drill-down
 export const getCallsByDay = (date) => req(`/leads/calls_by_day?date=${date}`);
+
+// Admin — manager accounts (backed by the existing /users CRUD, role-scoped)
+export const createManager = (data) => req('/users', { method: 'POST', body: JSON.stringify({ ...data, role: 'manager' }) });
+export const getManagers = () => req('/users?role=manager');
+export const updateManager = (id, data) => req(`/users/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+export const deleteManager = (id) => req(`/users/${id}`, { method: 'DELETE' });
+
+// Admin — sessions
+export const getSessions = () => req('/admin/sessions');
+export const forceLogoutSession = (id) => req(`/admin/sessions/${id}/logout`, { method: 'POST' });
+
+// Admin — manager stats
+export const getManagerStats = (period) => req(`/admin/manager_stats?period=${period || 'today'}`);
+export const getManagerStatsDetail = (id, period) => req(`/admin/manager_stats/${id}?period=${period || 'week'}`);
+
+// Admin — notifications
+export const getNotifications = () => req('/notifications');
+export const markNotificationRead = (id) => req(`/notifications/${id}/read`, { method: 'POST' });

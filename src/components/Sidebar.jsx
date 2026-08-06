@@ -93,6 +93,21 @@ const NAV = [
   },
 ]
 
+const ADMIN_ITEM = {
+  key: 'admin',
+  label: 'Администрирование',
+  icon: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+  )
+}
+
+// Managers only work leads and tasks — everything else (finance, clients,
+// carriers, dashboard, admin) stays director-only until per-manager scoping
+// exists for those sections too.
+const MANAGER_NAV_KEYS = ['tasks', 'leads']
+
 // Not shown in the regular nav — only admins should reach these, revealed
 // via a long-press on the profile avatar until real per-user role gating exists.
 const HIDDEN_NAV = [
@@ -121,6 +136,10 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   const userName = profile.name || 'Пользователь'
   const userRole = roleLabel(profile.role, profile.position)
   const userInitials = initials(userName)
+  const isDirector = profile.role === 'director' || profile.role === 'admin'
+  const navItems = profile.role === 'manager'
+    ? NAV.filter(item => MANAGER_NAV_KEYS.includes(item.key))
+    : (isDirector ? [...NAV, ADMIN_ITEM] : NAV)
 
   const [hiddenMenuOpen, setHiddenMenuOpen] = useState(false)
   const longPressTimer = useRef(null)
@@ -203,7 +222,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
 
       {/* Nav */}
       <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
-        {NAV.map(item => {
+        {navItems.map(item => {
           const active = page === item.key || (item.key === 'orders' && page === 'order-detail') || (item.key === 'clients' && page === 'client-detail') || (item.key === 'carriers' && page === 'carrier-detail')
           const badgeVal = item.badge ? counts[item.badge] : null
           const badgeColor = item.badgeColor || '#1366F0'

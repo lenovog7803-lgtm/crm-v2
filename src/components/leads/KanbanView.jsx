@@ -1,15 +1,17 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { getLeads, updateLead, logCall } from '../../api'
+import { getLeads, updateLead, logCall, claimLead } from '../../api'
 import { useRealtime } from '../../hooks/useRealtime'
 import { STAGES } from '../../constants/leads'
 import CallCard from './CallCard'
 import CallOutcomeBar from './CallOutcomeBar'
 import ScriptPanel from './ScriptPanel'
 import LeadEditModal from './LeadEditModal'
+import { useCelebration } from '../Celebration'
+import { useAuth } from '../../AuthContext'
 
 const PAGE_SIZE = 10
 
-function KanbanColumn({ stage, items, dragId, overStage, onDragStart, onDragOver, onDragLeave, onDrop, onOpenLead }) {
+function KanbanColumn({ stage, items, dragId, overStage, onDragStart, onDragOver, onDragLeave, onDrop, onOpenLead, onClaim }) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const listRef = useRef(null)
 
@@ -70,6 +72,14 @@ function KanbanColumn({ stage, items, dragId, overStage, onDragStart, onDragOver
             <div style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: '#1366F0', marginTop: 3 }}>{l.phone}</div>
             {l.contact_person && <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>{l.contact_person}</div>}
             {l.next_call && <div style={{ fontSize: 10.5, color: '#F47A1F', marginTop: 4 }}>→ {new Date(l.next_call).toLocaleDateString('ru-RU')}</div>}
+            {!l.assigned_to && (
+              <button
+                onClick={e => { e.stopPropagation(); onClaim(l.id) }}
+                style={{ marginTop: 6, width: '100%', padding: '5px 0', borderRadius: 8, border: 'none', cursor: 'pointer', background: 'rgba(19,102,240,0.1)', color: '#1366F0', fontSize: 11, fontWeight: 700 }}
+              >
+                Взять в работу
+              </button>
+            )}
           </div>
         ))}
         {visibleCount < sorted.length && (
@@ -83,6 +93,8 @@ function KanbanColumn({ stage, items, dragId, overStage, onDragStart, onDragOver
 }
 
 export default function KanbanView({ industry }) {
+  const { user } = useAuth()
+  const myId = user?.user?.id
   const [leads, setLeads] = useState([])
   const [loading, setLoading] = useState(true)
   const [dragId, setDragId] = useState(null)
@@ -90,6 +102,7 @@ export default function KanbanView({ industry }) {
   const [activeLead, setActiveLead] = useState(null)
   const [editLead, setEditLead] = useState(null)
   const [saving, setSaving] = useState(false)
+  const { celebrate } = useCelebration()
 
   const loadLeads = (showLoading = true) => {
     if (showLoading) setLoading(true)
@@ -118,12 +131,21 @@ export default function KanbanView({ industry }) {
     setDragId(null)
   }
 
+  const handleClaim = async (leadId) => {
+    try {
+      await claimLead(leadId)
+      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, assigned_to: myId } : l))
+      setActiveLead(prev => prev && prev.id === leadId ? { ...prev, assigned_to: myId } : prev)
+    } catch (e) { console.error(e) }
+  }
+
   const handleSave = async (data) => {
     if (!activeLead) return
     setSaving(true)
     try {
       const res = await logCall(activeLead.id, data)
       setLeads(prev => prev.map(l => l.id === activeLead.id ? res.lead : l))
+      if (data.outcome === 'won') celebrate()
       setActiveLead(null)
     } catch (e) { console.error(e) }
     setSaving(false)
@@ -143,6 +165,7 @@ export default function KanbanView({ industry }) {
         onDragLeave={() => setOverStage(null)}
         onDrop={handleDrop(stage.id)}
         onOpenLead={setActiveLead}
+        onClaim={handleClaim}
       />
     )
   }
@@ -168,7 +191,12 @@ export default function KanbanView({ industry }) {
             <style>{`.leads-call-modal .card { background: rgba(255,255,255,0.5); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); border: 1px solid rgba(255,255,255,0.7); }`}</style>
             {/* Слой 3 — контент */}
             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 16, padding: 20 }}>
-              <button onClick={() => setActiveLead(null)} className="btn-ghost" style={{ alignSelf: 'flex-end' }}>Закрыть ✕</button>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+                {!activeLead.assigned_to && (
+                  <button onClick={() => handleClaim(activeLead.id)} className="btn-primary" style={{ padding: '8px 14px', fontSize: 12.5 }}>Взять в работу</button>
+                )}
+                <button onClick={() => setActiveLead(null)} className="btn-ghost">Закрыть ✕</button>
+              </div>
               <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, alignItems: 'start' }}>
                 <CallCard lead={activeLead} onEdit={setEditLead} />
                 <ScriptPanel stage={activeLead?.stage} />

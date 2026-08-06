@@ -5,8 +5,10 @@ import CallCard from './CallCard'
 import CallOutcomeBar from './CallOutcomeBar'
 import ScriptPanel from './ScriptPanel'
 import LeadEditModal from './LeadEditModal'
-import { logCall } from '../../api'
+import { logCall, claimLead } from '../../api'
 import { SkeletonRow } from '../Skeleton'
+import { useCelebration } from '../Celebration'
+import { useAuth } from '../../AuthContext'
 
 const FILTERS_KEY = 'leads_list_filters'
 
@@ -18,6 +20,8 @@ const thStyle = { textAlign: 'left', padding: '10px 14px', fontSize: 10.5, fontW
 const tdStyle = { padding: '12px 14px', fontSize: 13, color: '#0E1726', borderTop: '1px solid rgba(14,23,38,0.05)' }
 
 export default function ListView({ industry }) {
+  const { user } = useAuth()
+  const myId = user?.user?.id
   const [leads, setLeads] = useState([])
   const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState(() => ({ search: '', stage: '', overdueOnly: false, ...loadFilters() }))
@@ -26,6 +30,7 @@ export default function ListView({ industry }) {
   const [saving, setSaving] = useState(false)
   const [visibleCount, setVisibleCount] = useState(10)
   const scrollRef = useRef(null)
+  const { celebrate } = useCelebration()
 
   useEffect(() => {
     setLoading(true)
@@ -67,9 +72,19 @@ export default function ListView({ industry }) {
     try {
       const res = await logCall(activeLead.id, data)
       setLeads(prev => prev.map(l => l.id === activeLead.id ? res.lead : l))
+      if (data.outcome === 'won') celebrate()
       setActiveLead(null)
     } catch (e) { console.error(e) }
     setSaving(false)
+  }
+
+  const handleClaim = async (leadId, e) => {
+    e.stopPropagation()
+    try {
+      await claimLead(leadId)
+      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, assigned_to: myId } : l))
+      setActiveLead(prev => prev && prev.id === leadId ? { ...prev, assigned_to: myId } : prev)
+    } catch (e) { console.error(e) }
   }
 
   return (
@@ -113,6 +128,7 @@ export default function ListView({ industry }) {
                   <th style={thStyle}>Попыток</th>
                   <th style={thStyle}>Следующий звонок</th>
                   <th style={thStyle}>Всего звонков</th>
+                  <th style={thStyle}></th>
                 </tr>
               </thead>
               <tbody>
@@ -132,6 +148,11 @@ export default function ListView({ industry }) {
                       <td style={tdStyle}>{l.call_attempts || 0}</td>
                       <td style={tdStyle}>{l.next_call ? new Date(l.next_call).toLocaleString('ru-RU') : '—'}</td>
                       <td style={tdStyle}>{l.total_calls || 0}</td>
+                      <td style={tdStyle}>
+                        {!l.assigned_to && (
+                          <button onClick={e => handleClaim(l.id, e)} className="btn-ghost" style={{ padding: '5px 12px', fontSize: 11.5 }}>Взять в работу</button>
+                        )}
+                      </td>
                     </tr>
                   )
                 })}
@@ -158,7 +179,12 @@ export default function ListView({ industry }) {
             <style>{`.leads-call-modal .card { background: rgba(255,255,255,0.5); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); border: 1px solid rgba(255,255,255,0.7); }`}</style>
             {/* Слой 3 — контент */}
             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 16, padding: 20 }}>
-              <button onClick={() => setActiveLead(null)} className="btn-ghost" style={{ alignSelf: 'flex-end' }}>Закрыть ✕</button>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+                {!activeLead.assigned_to && (
+                  <button onClick={e => handleClaim(activeLead.id, e)} className="btn-primary" style={{ padding: '8px 14px', fontSize: 12.5 }}>Взять в работу</button>
+                )}
+                <button onClick={() => setActiveLead(null)} className="btn-ghost">Закрыть ✕</button>
+              </div>
               <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, alignItems: 'start' }}>
                 <CallCard lead={activeLead} onEdit={setEditLead} />
                 <ScriptPanel stage={activeLead?.stage} />

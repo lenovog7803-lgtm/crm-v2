@@ -1,14 +1,25 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ModalOverlay, ModalHeader } from './Modal'
-import { createTask } from '../api'
+import { createTask, getManagers } from '../api'
+import { useAuth } from '../AuthContext'
 
 export default function CreateTaskModal({ onClose, onSuccess }) {
+  const { user } = useAuth()
+  const role = user?.user?.role
+  const isDirector = role === 'director' || role === 'admin'
+
   const [form, setForm] = useState({
-    title: '', task_type: 'call', due_date: '', description: '',
+    title: '', task_type: 'call', due_date: '', description: '', assigned_user_id: '',
   })
+  const [managers, setManagers] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
+  useEffect(() => {
+    if (!isDirector) return
+    getManagers().then(r => setManagers(r.managers || r || [])).catch(() => {})
+  }, [isDirector])
 
   const handleSubmit = async e => {
     e.preventDefault()
@@ -16,7 +27,7 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
     setLoading(true)
     setError('')
     try {
-      await createTask({ ...form, status: 'pending' })
+      await createTask({ ...form, status: 'pending', assigned_user_id: form.assigned_user_id || null })
       onSuccess()
     } catch (e) {
       setError('Ошибка при создании задачи')
@@ -51,6 +62,15 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
           <label className="form-label">ОПИСАНИЕ</label>
           <input className="form-input" placeholder="Напр. Заявка №А2-2847 · БелСталь" value={form.description} onChange={e => set('description', e.target.value)} />
         </div>
+        {isDirector && managers.length > 0 && (
+          <div className="form-field">
+            <label className="form-label">НАЗНАЧИТЬ МЕНЕДЖЕРУ</label>
+            <select className="form-input" value={form.assigned_user_id} onChange={e => set('assigned_user_id', e.target.value)}>
+              <option value="">Не назначать</option>
+              {managers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+            </select>
+          </div>
+        )}
         {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center' }}>{error}</div>}
         <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
           <button type="button" className="btn-ghost" onClick={onClose} style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>

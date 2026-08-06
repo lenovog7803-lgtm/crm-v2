@@ -1,12 +1,16 @@
 import { useState, useEffect, useCallback } from 'react'
-import { getCallQueue, logCall, convertLead, getLeadsAnalytics } from '../../api'
+import { getCallQueue, logCall, convertLead, getLeadsAnalytics, claimLead } from '../../api'
 import { DAILY_GOAL } from '../../constants/leads'
 import CallCard from './CallCard'
 import CallOutcomeBar from './CallOutcomeBar'
 import ScriptPanel from './ScriptPanel'
 import LeadEditModal from './LeadEditModal'
+import { useCelebration } from '../Celebration'
+import { useAuth } from '../../AuthContext'
 
 export default function QueueView({ industry, onCounts }) {
+  const { user } = useAuth()
+  const myId = user?.user?.id
   const [queue, setQueue] = useState([])
   const [index, setIndex] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -14,6 +18,7 @@ export default function QueueView({ industry, onCounts }) {
   const [editLead, setEditLead] = useState(null)
   const [askClient, setAskClient] = useState(null)
   const [todayCalls, setTodayCalls] = useState(0)
+  const { celebrate } = useCelebration()
 
   const load = useCallback(() => {
     setLoading(true)
@@ -47,6 +52,7 @@ export default function QueueView({ industry, onCounts }) {
     try {
       const res = await logCall(lead.id, data)
       setTodayCalls(c => c + 1)
+      if (data.outcome === 'won') celebrate()
       if (res.ask_create_client) {
         setAskClient(lead)
       } else {
@@ -64,6 +70,16 @@ export default function QueueView({ industry, onCounts }) {
     }
     setAskClient(null)
     advance()
+  }
+
+  const handleClaim = async () => {
+    if (!lead) return
+    try {
+      await claimLead(lead.id)
+      setQueue(prev => prev.map(l => l.id === lead.id ? { ...l, assigned_to: myId } : l))
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   const pct = Math.min(100, Math.round((todayCalls / DAILY_GOAL) * 100))
@@ -96,7 +112,12 @@ export default function QueueView({ industry, onCounts }) {
         <>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: 12.5, color: '#A6AEB8' }}>{index + 1} из {queue.length} в очереди</span>
-            <button onClick={advance} className="btn-ghost">Пропустить →</button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {!lead.assigned_to && (
+                <button onClick={handleClaim} className="btn-primary" style={{ padding: '8px 14px', fontSize: 12.5 }}>Взять в работу</button>
+              )}
+              <button onClick={advance} className="btn-ghost">Пропустить →</button>
+            </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, alignItems: 'start' }}>
