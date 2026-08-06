@@ -252,6 +252,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
         const field = type === 'client' ? 'doc_url_client' : type === 'carrier' ? 'doc_url_carrier' : 'doc_url_act'
         setOrder(prev => ({ ...prev, [field]: url }))
         window.open(url, '_blank')
+        const docLabel = type === 'client' ? 'Заявка-договор' : type === 'carrier' ? 'Заявка перевозчику' : 'Акт'
+        show(`${docLabel}: документ сформирован`, { type: 'success' })
       } else {
         console.error('[DOC] No URL in result:', result)
         show('Документ создан, но URL не получен', { type: 'error' })
@@ -300,13 +302,24 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     setDraft(d => ({ ...d, status: newStatus }))
   }
 
-  const handleDocToggle = (key) => {
+  const handleDocToggle = async (key) => {
+    // Saved immediately (not staged into draft) — this is a checklist tick,
+    // not a form field, and losing the timestamp because someone navigated
+    // away before hitting the main Save button defeats the point of it.
     const step = DOC_STEPS.find(s => s.key === key)
     const dateKey = step?.dateKey || key + '_date'
     const current = draft[key] !== undefined ? draft[key] : order[key]
     const newVal = !current
     const now = new Date().toISOString()
-    setDraft(d => ({ ...d, [key]: newVal, [dateKey]: newVal ? now : null }))
+    const patch = { [key]: newVal, [dateKey]: newVal ? now : null }
+    try {
+      lastLocalEditRef.current = Date.now()
+      await apiUpdate(order.id, patch)
+      setOrder(prev => ({ ...prev, ...patch }))
+      show(`${step?.label || key}${newVal ? ' — отмечено' : ' — снято'}`, { type: 'success' })
+    } catch (e) {
+      show('Ошибка сохранения: ' + e.message, { type: 'error' })
+    }
   }
 
   const handleFieldChange = (field, value) => {

@@ -42,6 +42,37 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   const longPressFired = useRef(false)
   const isMobile = useIsMobile()
 
+  // Mobile swipe-right-to-select (iOS-style) — one row swipes at a time,
+  // tracked by id since only its transform needs to follow the finger.
+  const [swipe, setSwipe] = useState({ id: null, dx: 0 })
+  const swipeStart = useRef({ x: 0, y: 0 })
+  const swipeAxis = useRef(null) // 'x' | 'y' — locked in after a few px so vertical scroll still works
+
+  const handleTouchStart = (id, e) => {
+    const t = e.touches[0]
+    swipeStart.current = { x: t.clientX, y: t.clientY }
+    swipeAxis.current = null
+    setSwipe({ id, dx: 0 })
+  }
+  const handleTouchMove = (id, e) => {
+    const t = e.touches[0]
+    const dx = t.clientX - swipeStart.current.x
+    const dy = t.clientY - swipeStart.current.y
+    if (!swipeAxis.current && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+      swipeAxis.current = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'
+    }
+    if (swipeAxis.current !== 'x' || dx < 0) return
+    setSwipe({ id, dx: Math.min(dx, 90) })
+  }
+  const handleTouchEnd = (id) => {
+    if (swipe.id === id && swipe.dx > 60) {
+      if (!selectMode) setSelectMode(true)
+      toggleSelect(id)
+    }
+    setSwipe({ id: null, dx: 0 })
+    swipeAxis.current = null
+  }
+
   const loadOrders = () => {
     setLoading(true)
     return getOrders()
@@ -305,21 +336,39 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 const margin = (order.client_rate || 0) - (order.carrier_rate || 0)
                 const route = order.route_from && order.route_to ? `${order.route_from} → ${order.route_to}` : (order.route || '—')
                 const overdue = isOverdue(order)
+                const isSelected = selected.has(order.id)
+                const dx = swipe.id === order.id ? swipe.dx : 0
                 return (
                   <div
                     key={order.id}
-                    onClick={() => onOpenOrder(order.id)}
+                    onClick={() => { if (selectMode) toggleSelect(order.id); else onOpenOrder(order.id) }}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '13px 16px',
                       borderBottom: i < filtered.length - 1 ? '0.5px solid rgba(14,23,38,0.1)' : 'none',
-                      background: overdue ? 'rgba(200,25,35,0.03)' : 'transparent',
+                      background: isSelected ? '#EBF2FF' : (overdue ? 'rgba(200,25,35,0.03)' : 'transparent'),
                       cursor: 'pointer',
                       WebkitTapHighlightColor: 'rgba(14,23,38,0.06)',
+                      touchAction: 'pan-y',
+                      transform: `translateX(${dx}px)`,
+                      transition: dx === 0 ? 'transform 0.2s ease, background 0.15s' : 'none',
                     }}
-                    onTouchStart={e => e.currentTarget.style.background = 'rgba(14,23,38,0.05)'}
-                    onTouchEnd={e => e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.03)' : 'transparent'}
+                    onTouchStart={e => { e.currentTarget.style.background = isSelected ? '#EBF2FF' : 'rgba(14,23,38,0.05)'; handleTouchStart(order.id, e) }}
+                    onTouchMove={e => handleTouchMove(order.id, e)}
+                    onTouchEnd={e => { e.currentTarget.style.background = isSelected ? '#EBF2FF' : (overdue ? 'rgba(200,25,35,0.03)' : 'transparent'); handleTouchEnd(order.id) }}
                   >
+                    {/* Selection checkbox — shown once select mode is on, or while actively swiping past the threshold */}
+                    {(selectMode || dx > 60) && (
+                      <div style={{
+                        width: 20, height: 20, borderRadius: 7, flexShrink: 0,
+                        background: isSelected ? '#1366F0' : '#FFFFFF',
+                        border: `1.5px solid ${isSelected ? '#1366F0' : '#C4CAD4'}`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'all 0.15s',
+                      }}>
+                        {isSelected && <span style={{ color: '#fff', fontSize: 12 }}>✓</span>}
+                      </div>
+                    )}
                     {/* Status dot */}
                     <div style={{
                       width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
