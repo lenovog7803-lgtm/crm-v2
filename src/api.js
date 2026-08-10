@@ -17,6 +17,14 @@ export function setToken(t) {
 
 export function getToken() { return token; }
 
+// AuthProvider registers itself here so a 401 anywhere can force a
+// sign-out. A stale/expired token used to just fail every request forever
+// with no visible error and no way back to the login screen short of
+// manually clearing localStorage — this is what that looked like on
+// mobile: an authenticated-looking shell that never loads any data.
+let onUnauthorized = null;
+export function setUnauthorizedHandler(fn) { onUnauthorized = fn; }
+
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 async function req(path, options = {}, retries = 2) {
@@ -35,10 +43,16 @@ async function req(path, options = {}, retries = 2) {
           ...options.headers,
         },
       });
+      if (res.status === 401) {
+        onUnauthorized?.();
+        throw new Error('Сессия истекла — войдите заново');
+      }
       if (!res.ok) throw new Error(await res.text());
       return res.json();
     } catch (e) {
-      if (attempt < retries) {
+      // Retrying a rejected token just repeats the same 401 three times —
+      // bail immediately once onUnauthorized has already fired.
+      if (attempt < retries && e.message !== 'Сессия истекла — войдите заново') {
         await sleep(2000 * (attempt + 1));
       } else {
         throw e.name === 'TimeoutError' ? new Error('Сервер не отвечает — превышено время ожидания') : e;

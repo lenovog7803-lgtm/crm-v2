@@ -73,11 +73,18 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
     swipeAxis.current = null
   }
 
+  const [loadError, setLoadError] = useState(false)
+
   const loadOrders = () => {
     setLoading(true)
+    setLoadError(false)
     return getOrders()
       .then(r => setOrders(Array.isArray(r) ? r : []))
-      .catch(console.error)
+      .catch(e => {
+        console.error(e)
+        setLoadError(true)
+        show('Не удалось загрузить заявки: ' + e.message, { type: 'error' })
+      })
       .finally(() => setLoading(false))
   }
 
@@ -327,7 +334,13 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
               {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)}
             </div>
           )}
-          {!loading && filtered.length === 0 && (
+          {!loading && loadError && (
+            <div style={{ padding: 40, textAlign: 'center' }}>
+              <div style={{ color: '#8E8E93', fontSize: 14, marginBottom: 12 }}>Не удалось загрузить заявки</div>
+              <button onClick={loadOrders} style={{ background: '#1366F0', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Повторить</button>
+            </div>
+          )}
+          {!loading && !loadError && filtered.length === 0 && (
             <div style={{ padding: 40, textAlign: 'center', color: '#8E8E93', fontSize: 14 }}>Нет заявок</div>
           )}
           {!loading && (
@@ -549,7 +562,13 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
             </div>
           )
         })}
-        {!loading && filtered.length === 0 && (
+        {!loading && loadError && (
+          <div style={{ padding: '40px', textAlign: 'center' }}>
+            <div style={{ color: '#A6AEB8', fontSize: 14, marginBottom: 12 }}>Не удалось загрузить заявки</div>
+            <button onClick={loadOrders} style={{ background: '#1366F0', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Повторить</button>
+          </div>
+        )}
+        {!loading && !loadError && filtered.length === 0 && (
           <div style={{ padding: '40px', textAlign: 'center', color: '#A6AEB8', fontSize: 14 }}>Нет заявок</div>
         )}
       </div>

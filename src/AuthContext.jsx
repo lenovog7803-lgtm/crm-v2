@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { login as apiLogin, setToken, getToken, pingServer } from './api';
+import { login as apiLogin, setToken, getToken, pingServer, setUnauthorizedHandler } from './api';
 
 const AuthContext = createContext(null);
 
@@ -47,6 +47,12 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('crm_username');
     setUser(null);
   };
+
+  // Any expired/rejected token anywhere in the app funnels through here —
+  // registered once so req() in api.js (outside React) can force a sign-out.
+  useEffect(() => {
+    setUnauthorizedHandler(signOut);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, signIn, signOut, loading }}>
