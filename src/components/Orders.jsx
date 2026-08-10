@@ -388,9 +388,9 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                         {order.client_name || '—'}
                         {order.load_date ? ` · ${order.load_date}` : ''}
                       </div>
-                      {order.carrier_name && (
-                        <div style={{ fontSize: 12, color: '#8E8E93' }}>{order.carrier_name}</div>
-                      )}
+                      <div style={{ fontSize: 12, color: '#8E8E93', visibility: order.carrier_name ? 'visible' : 'hidden' }}>
+                        {order.carrier_name || '—'}
+                      </div>
                     </div>
                     {/* Right: margin + chevron */}
                     <div style={{ flexShrink: 0, textAlign: 'right', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -495,11 +495,12 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                     <div style={{ fontSize: 13, fontWeight: 600, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {order.client_name}
                     </div>
-                    {order.carrier_name && (
-                      <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {order.carrier_name}
-                      </div>
-                    )}
+                    <div style={{
+                      fontSize: 11.5, color: '#A6AEB8', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      visibility: order.carrier_name ? 'visible' : 'hidden',
+                    }}>
+                      {order.carrier_name || '—'}
+                    </div>
                   </div>
                 </div>
               ) : <div style={{ color: '#A6AEB8', fontSize: 13 }}>—</div>}
