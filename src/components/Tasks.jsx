@@ -3,6 +3,7 @@ import { getTasks, updateTask as apiUpdate, deleteTask as apiDelete } from '../a
 import { ModalOverlay, ModalHeader } from './Modal'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
+import { SlidingTabs } from './SlidingTabs'
 
 const TYPE_COLORS = { call: '#1366F0', reminder: '#D97706', payment: '#1E9E5A', other: '#8A93A0' }
 const TYPE_BG = { call: 'rgba(19,102,240,0.1)', reminder: 'rgba(217,119,6,0.1)', payment: 'rgba(30,158,90,0.1)', other: 'rgba(138,147,160,0.1)' }
@@ -84,15 +85,12 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div className="card" style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div style={{ display: 'flex', gap: 6, flex: 1, overflowX: 'auto', scrollbarWidth: 'none' }}>
-          {[{ k: 'all', l: 'Все' }, { k: 'active', l: 'Активные' }, { k: 'done', l: 'Завершённые' }].map(f => (
-            <button key={f.k} onClick={() => setFilter(f.k)} style={{
-              padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer', flexShrink: 0,
-              fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
-              background: filter === f.k ? '#0E1726' : 'rgba(14,23,38,0.06)',
-              color: filter === f.k ? '#fff' : '#5A6573',
-            }}>{f.l}</button>
-          ))}
+        <div style={{ flex: 1, overflowX: 'auto', scrollbarWidth: 'none' }}>
+          <SlidingTabs
+            options={[{ key: 'all', label: 'Все' }, { key: 'active', label: 'Активные' }, { key: 'done', label: 'Завершённые' }]}
+            value={filter}
+            onChange={setFilter}
+          />
         </div>
         <button className="btn-primary" onClick={onAdd} style={{ flexShrink: 0, padding: isMobile ? '9px 10px' : '11px 18px' }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

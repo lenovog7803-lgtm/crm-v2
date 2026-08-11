@@ -4,6 +4,7 @@ import { fmtMoney, initials, getGradient } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
 import { useToast } from './Toast'
+import { SlidingTabs } from './SlidingTabs'
 
 export default function Finance({ refreshKey }) {
   const isMobile = useIsMobile()
@@ -245,14 +246,11 @@ export default function Finance({ refreshKey }) {
       <div className="card" style={{ padding: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: showAdd ? 12 : 14, flexWrap: 'wrap' }}>
           <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', flex: 1 }}>Платежи</div>
-          {[{ k: 'all', l: 'Все' }, { k: 'income', l: 'Поступления' }, { k: 'expense', l: 'Списания' }].map(f => (
-            <button key={f.k} onClick={() => { setTypeFilter(f.k); setShowAll(false) }} style={{
-              padding: '5px 13px', borderRadius: 99, border: 'none', cursor: 'pointer',
-              fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
-              background: typeFilter === f.k ? '#0E1726' : 'rgba(14,23,38,0.06)',
-              color: typeFilter === f.k ? '#fff' : '#5A6573',
-            }}>{f.l}</button>
-          ))}
+          <SlidingTabs
+            options={[{ key: 'all', label: 'Все' }, { key: 'income', label: 'Поступления' }, { key: 'expense', label: 'Списания' }]}
+            value={typeFilter}
+            onChange={k => { setTypeFilter(k); setShowAll(false) }}
+          />
           <button onClick={() => setShowAdd(v => !v)} style={{
             width: 32, height: 32, borderRadius: 10, border: 'none', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -270,15 +268,12 @@ export default function Finance({ refreshKey }) {
         {showAdd && (
           <form onSubmit={handleAddPayment} style={{ marginBottom: 14, padding: '14px 16px', borderRadius: 14, background: 'rgba(14,23,38,0.03)', border: '1px solid rgba(14,23,38,0.07)' }}>
             {/* Тип */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-              {[{ k: 'income', l: 'Поступление' }, { k: 'expense', l: 'Списание' }].map(t => (
-                <button type="button" key={t.k} onClick={() => { setAddType(t.k); setAddPartyId('') }} style={{
-                  padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer',
-                  fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
-                  background: addType === t.k ? '#0E1726' : 'rgba(14,23,38,0.06)',
-                  color: addType === t.k ? '#fff' : '#5A6573',
-                }}>{t.l}</button>
-              ))}
+            <div style={{ marginBottom: 12 }}>
+              <SlidingTabs
+                options={[{ key: 'income', label: 'Поступление' }, { key: 'expense', label: 'Списание' }]}
+                value={addType}
+                onChange={k => { setAddType(k); setAddPartyId('') }}
+              />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 1fr 1fr', gap: 10, alignItems: 'end' }}>
               {/* Контрагент */}
@@ -385,16 +380,11 @@ export default function Finance({ refreshKey }) {
       <div className="card" style={{ padding: '20px' }}>
         <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Акт сверки</div>
         <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', gap: 6 }}>
-            {[{ k: 'clients', l: 'Клиенты' }, { k: 'carriers', l: 'Перевозчики' }].map(f => (
-              <button key={f.k} onClick={() => { setActPartyType(f.k); setActParty('') }} style={{
-                padding: '6px 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
-                background: actPartyType === f.k ? '#0E1726' : 'rgba(14,23,38,0.06)',
-                color: actPartyType === f.k ? '#fff' : '#5A6573',
-              }}>{f.l}</button>
-            ))}
-          </div>
+          <SlidingTabs
+            options={[{ key: 'clients', label: 'Клиенты' }, { key: 'carriers', label: 'Перевозчики' }]}
+            value={actPartyType}
+            onChange={k => { setActPartyType(k); setActParty('') }}
+          />
           <select value={actParty} onChange={e => setActParty(e.target.value)} style={{ ...iStyle, minWidth: 200 }}>
             <option value="">— Выберите контрагента —</option>
             {actNames.map(n => <option key={n} value={n}>{n}</option>)}
