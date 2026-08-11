@@ -3,6 +3,17 @@ import { getClients, deleteClient as apiDelete } from '../api'
 import { initials, getGradient } from '../utils'
 import { SkeletonCard } from './Skeleton'
 
+// Imported data sometimes has several phone numbers jammed into one field,
+// separated by commas — occasionally with a stray fragment mixed in (e.g.
+// a partial extension left over from a spreadsheet cell). Pick the first
+// token that actually looks like a phone number instead of dumping the
+// raw string into the card.
+function primaryPhone(raw) {
+  if (!raw) return ''
+  const parts = String(raw).split(/[,;]/).map(s => s.trim()).filter(Boolean)
+  return parts.find(p => (p.match(/\d/g) || []).length >= 6) || parts[0] || ''
+}
+
 export default function Clients({ onOpenClient, onAdd, refreshKey, search = '' }) {
   const [clients, setClients] = useState([])
   const [loading, setLoading] = useState(true)
@@ -60,10 +71,12 @@ export default function Clients({ onOpenClient, onAdd, refreshKey, search = '' }
           const contact = client.contact_person || client.contact || ''
           const inn = client.inn || client.unp || ''
           const terms = client.payment_terms || client.terms || ''
+          const phone = primaryPhone(client.phone)
+          const hasStats = inn || terms
           return (
             <div
               key={client.id} className="card"
-              style={{ padding: '22px 22px', cursor: 'pointer', transition: 'transform 0.15s, box-shadow 0.15s' }}
+              style={{ padding: '22px 22px', cursor: 'pointer', display: 'flex', flexDirection: 'column', transition: 'transform 0.15s, box-shadow 0.15s' }}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 50px -20px rgba(20,30,55,0.25)' }}
               onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '' }}
               onClick={() => onOpenClient(client.id)}
@@ -78,29 +91,44 @@ export default function Clients({ onOpenClient, onAdd, refreshKey, search = '' }
                 }}>{initials(client.name)}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 15, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{client.name}</div>
-                  <div style={{ fontSize: 12.5, color: '#A6AEB8', marginTop: 2 }}>{contact}{client.city ? ' · ' + client.city : ''}</div>
+                  {(contact || client.city) && (
+                    <div style={{ fontSize: 12.5, color: '#A6AEB8', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {contact}{contact && client.city ? ' · ' : ''}{client.city}
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10, marginBottom: 14 }}>
-                <div style={{ background: 'rgba(14,23,38,0.04)', borderRadius: 12, padding: '10px 14px' }}>
-                  <div style={{ fontSize: 10.5, color: '#A6AEB8', fontWeight: 600, marginBottom: 4 }}>УНП / ИНН</div>
-                  <div style={{ fontFamily: 'JetBrains Mono', fontWeight: 700, fontSize: 13, color: '#0E1726' }}>{inn || '—'}</div>
+              {/* Missing fields just don't render a tile — a grid of "—"
+                  placeholders reads as noise, not information. */}
+              {hasStats && (
+                <div style={{ display: 'grid', gridTemplateColumns: inn && terms ? 'minmax(0, 1fr) minmax(0, 1fr)' : '1fr', gap: 10, marginBottom: 14 }}>
+                  {inn && (
+                    <div style={{ background: 'rgba(14,23,38,0.04)', borderRadius: 12, padding: '10px 14px', minWidth: 0 }}>
+                      <div style={{ fontSize: 10.5, color: '#A6AEB8', fontWeight: 600, marginBottom: 4 }}>УНП / ИНН</div>
+                      <div style={{ fontFamily: 'JetBrains Mono', fontWeight: 700, fontSize: 13, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inn}</div>
+                    </div>
+                  )}
+                  {terms && (
+                    <div style={{ background: 'rgba(14,23,38,0.04)', borderRadius: 12, padding: '10px 14px', minWidth: 0 }}>
+                      <div style={{ fontSize: 10.5, color: '#A6AEB8', fontWeight: 600, marginBottom: 4 }}>Условия</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{terms}</div>
+                    </div>
+                  )}
                 </div>
-                <div style={{ background: 'rgba(14,23,38,0.04)', borderRadius: 12, padding: '10px 14px' }}>
-                  <div style={{ fontSize: 10.5, color: '#A6AEB8', fontWeight: 600, marginBottom: 4 }}>Условия</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#0E1726' }}>{terms || '—'}</div>
-                </div>
-              </div>
+              )}
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderTop: '1px solid rgba(14,23,38,0.06)' }}>
-                <div>
-                  {client.phone && <div style={{ fontSize: 11, color: '#5A6573', fontWeight: 600 }}>{client.phone}</div>}
-                  {client.email && <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>{client.email}</div>}
+              <div style={{ flex: 1 }} />
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '10px 0', borderTop: '1px solid rgba(14,23,38,0.06)' }}>
+                <div style={{ minWidth: 0, overflow: 'hidden' }}>
+                  {phone && <div style={{ fontSize: 11, color: '#5A6573', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{phone}</div>}
+                  {client.email && <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{client.email}</div>}
+                  {!phone && !client.email && <div style={{ fontSize: 11, color: '#C4CAD4' }}>Нет контактов</div>}
                 </div>
-                <div style={{ display: 'flex', gap: 8 }} onClick={e => e.stopPropagation()}>
-                  {client.phone && (
-                    <a href={`tel:${client.phone}`} onClick={e => e.stopPropagation()} style={{
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }} onClick={e => e.stopPropagation()}>
+                  {phone && (
+                    <a href={`tel:${phone}`} onClick={e => e.stopPropagation()} style={{
                       width: 32, height: 32, borderRadius: 10, background: 'rgba(19,102,240,0.1)', color: '#1366F0',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none',
                     }}>

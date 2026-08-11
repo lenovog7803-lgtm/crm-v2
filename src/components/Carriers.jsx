@@ -3,6 +3,15 @@ import { getCarriers, deleteCarrier as apiDelete } from '../api'
 import { getGradient } from '../utils'
 import { SkeletonCard } from './Skeleton'
 
+// Same cleanup as Clients.jsx — imported phone fields sometimes carry
+// several numbers (and stray fragments) jammed into one comma-separated
+// string; show the first one that actually looks like a phone number.
+function primaryPhone(raw) {
+  if (!raw) return ''
+  const parts = String(raw).split(/[,;]/).map(s => s.trim()).filter(Boolean)
+  return parts.find(p => (p.match(/\d/g) || []).length >= 6) || parts[0] || ''
+}
+
 function StarIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="#D97706" stroke="none">
@@ -67,12 +76,16 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
         {visible.map(carrier => {
           const name = carrier.company_name || carrier.name || '—'
           const driver = carrier.driver_name || carrier.driver || ''
-          const cap = carrier.capacity_tons ? carrier.capacity_tons + ' т' : (carrier.cap || '—')
+          const cap = carrier.capacity_tons ? carrier.capacity_tons + ' т' : (carrier.cap || '')
+          const vehicleType = carrier.vehicle_type || ''
+          const phone = primaryPhone(carrier.phone)
+          const hasStats = cap || vehicleType
+          const hasFooterInfo = carrier.plate || carrier.regions
           const [avA, avB] = getGradient(name)
           return (
             <div
               key={carrier.id} className="card"
-              style={{ padding: '22px 22px', cursor: 'pointer', transition: 'transform 0.15s, box-shadow 0.15s' }}
+              style={{ padding: '22px 22px', cursor: 'pointer', display: 'flex', flexDirection: 'column', transition: 'transform 0.15s, box-shadow 0.15s' }}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 50px -20px rgba(20,30,55,0.25)' }}
               onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '' }}
               onClick={() => onOpenCarrier(carrier.id)}
@@ -91,7 +104,7 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14.5, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
-                  <div style={{ fontSize: 12.5, color: '#A6AEB8', marginTop: 2 }}>{driver}</div>
+                  {driver && <div style={{ fontSize: 12.5, color: '#A6AEB8', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{driver}</div>}
                 </div>
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 4,
@@ -102,35 +115,46 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10, marginBottom: 14 }}>
-                <div style={{ background: 'rgba(14,23,38,0.04)', borderRadius: 12, padding: '10px 14px' }}>
-                  <div style={{ fontSize: 10.5, color: '#A6AEB8', fontWeight: 600, marginBottom: 4 }}>Грузоподъёмность</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#0E1726' }}>{cap}</div>
+              {/* Missing fields just don't render a tile — a grid of "—"
+                  placeholders reads as noise, not information. */}
+              {hasStats && (
+                <div style={{ display: 'grid', gridTemplateColumns: cap && vehicleType ? 'minmax(0, 1fr) minmax(0, 1fr)' : '1fr', gap: 10, marginBottom: 14 }}>
+                  {cap && (
+                    <div style={{ background: 'rgba(14,23,38,0.04)', borderRadius: 12, padding: '10px 14px', minWidth: 0 }}>
+                      <div style={{ fontSize: 10.5, color: '#A6AEB8', fontWeight: 600, marginBottom: 4 }}>Грузоподъёмность</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#0E1726' }}>{cap}</div>
+                    </div>
+                  )}
+                  {vehicleType && (
+                    <div style={{ background: 'rgba(14,23,38,0.04)', borderRadius: 12, padding: '10px 14px', minWidth: 0 }}>
+                      <div style={{ fontSize: 10.5, color: '#A6AEB8', fontWeight: 600, marginBottom: 4 }}>Тип ТС</div>
+                      <div style={{
+                        fontSize: 13, fontWeight: 700, color: '#0E1726',
+                        display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden', textOverflow: 'ellipsis',
+                      }}>{vehicleType}</div>
+                    </div>
+                  )}
                 </div>
-                <div style={{ background: 'rgba(14,23,38,0.04)', borderRadius: 12, padding: '10px 14px' }}>
-                  <div style={{ fontSize: 10.5, color: '#A6AEB8', fontWeight: 600, marginBottom: 4 }}>Тип ТС</div>
-                  <div style={{
-                    fontSize: 13, fontWeight: 700, color: '#0E1726',
-                    display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden', textOverflow: 'ellipsis',
-                  }}>{carrier.vehicle_type || '—'}</div>
-                </div>
-              </div>
+              )}
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderTop: '1px solid rgba(14,23,38,0.06)' }}>
-                <div>
+              <div style={{ flex: 1 }} />
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '10px 0', borderTop: '1px solid rgba(14,23,38,0.06)' }}>
+                <div style={{ minWidth: 0, overflow: 'hidden' }}>
                   {carrier.plate && (
-                    <div style={{ fontSize: 11, color: '#A6AEB8', marginBottom: 2 }}>
+                    <div style={{ fontSize: 11, color: '#A6AEB8', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       Номер: <span style={{ color: '#0E1726', fontFamily: 'JetBrains Mono', fontWeight: 600, fontSize: 12 }}>{carrier.plate}</span>
                     </div>
                   )}
                   {carrier.regions && (
-                    <div style={{ fontSize: 11, color: '#A6AEB8' }}>Регионы: <span style={{ color: '#5A6573', fontWeight: 600 }}>{carrier.regions}</span></div>
+                    <div style={{ fontSize: 11, color: '#A6AEB8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Регионы: <span style={{ color: '#5A6573', fontWeight: 600 }}>{carrier.regions}</span></div>
                   )}
+                  {!hasFooterInfo && <div style={{ fontSize: 11, color: '#C4CAD4' }}>Нет данных</div>}
                 </div>
-                <div style={{ display: 'flex', gap: 8 }} onClick={e => e.stopPropagation()}>
-                  {carrier.phone && (
-                    <a href={`tel:${carrier.phone}`} onClick={e => e.stopPropagation()} style={{
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }} onClick={e => e.stopPropagation()}>
+                  {phone && (
+                    <a href={`tel:${phone}`} onClick={e => e.stopPropagation()} style={{
                       width: 32, height: 32, borderRadius: 10, background: 'rgba(19,102,240,0.1)', color: '#1366F0',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none',
                     }}>
