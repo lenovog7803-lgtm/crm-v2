@@ -129,25 +129,27 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
   const activeKey = ACTIVE_KEYS[page] || page
 
   // A capsule that glides behind the active icon (Telegram-style tab bar)
-  // instead of the icon just swapping color in place.
+  // instead of the icon just swapping color in place. Sized/positioned off
+  // the button's own box now that there's no label underneath pulling the
+  // icon up — full nav height, centered on the icon.
   const btnRefs = useRef({})
   const [pill, setPill] = useState(null)
-  const PILL_W = 46, PILL_H = 28
+  const PILL_SIZE = 44
 
   useLayoutEffect(() => {
     const el = btnRefs.current[activeKey]
-    if (el) setPill({ left: el.offsetLeft + (el.offsetWidth - PILL_W) / 2 })
+    if (el) setPill({ left: el.offsetLeft + (el.offsetWidth - PILL_SIZE) / 2 })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeKey])
 
   return (
     <div className="mobile-nav" style={{
       position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000,
-      alignItems: 'flex-start',
+      alignItems: 'stretch',
       justifyContent: 'space-around',
-      paddingTop: 8,
+      paddingTop: 0,
       paddingBottom: 0,
-      height: 'calc(58px + env(safe-area-inset-bottom))',
+      height: 'calc(54px + env(safe-area-inset-bottom))',
       paddingInline: 4,
       background: 'rgba(251,251,253,0.94)',
       backdropFilter: 'blur(40px) saturate(180%)',
@@ -156,7 +158,8 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
     }}>
       {pill && (
         <div style={{
-          position: 'absolute', left: pill.left, top: 6, width: PILL_W, height: PILL_H,
+          position: 'absolute', left: pill.left, top: '50%', width: PILL_SIZE, height: PILL_SIZE,
+          marginTop: -PILL_SIZE / 2,
           borderRadius: 14, background: 'rgba(19,102,240,0.12)',
           transition: 'left 0.25s var(--ease)', pointerEvents: 'none',
         }} />
@@ -172,23 +175,26 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
             onClick={() => onNav(item.key)}
             style={{
               flex: 1,
-              height: 50,
               border: 'none',
               background: 'none',
               cursor: 'pointer',
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 2,
               position: 'relative',
               color: active ? '#1366F0' : '#8E8E93',
               WebkitTapHighlightColor: 'transparent',
               transition: 'color 0.1s',
-              padding: '0 2px',
+              padding: 0,
             }}
           >
-            <span style={{ position: 'relative', display: 'flex', transform: 'scale(0.85)', transformOrigin: 'center' }}>
+            {/* The little pop of motion the moment a tab becomes active —
+                scale bounces past 1 and settles, via a keyframe rather than
+                a plain transition so it reads as a jump, not just a resize. */}
+            <span style={{
+              position: 'relative', display: 'flex',
+              animation: active ? 'navIconPop 0.3s var(--ease)' : 'none',
+            }}>
               {item.icon(active)}
               {badgeVal > 0 && (
                 <span style={{
@@ -201,15 +207,6 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
                   padding: '0 3px', lineHeight: 1,
                 }}>{badgeVal > 99 ? '99+' : badgeVal}</span>
               )}
-            </span>
-            <span style={{
-              fontSize: 9,
-              fontWeight: active ? 600 : 400,
-              fontFamily: 'Manrope',
-              letterSpacing: '-0.01em',
-              lineHeight: 1,
-            }}>
-              {item.label}
             </span>
           </button>
         )
