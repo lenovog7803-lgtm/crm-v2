@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useLayoutEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../AuthContext'
 import { initials } from '../utils'
@@ -160,6 +160,23 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   const avatarRef = useRef(null)
   const [hiddenMenuPos, setHiddenMenuPos] = useState({ left: 0, bottom: 0 })
 
+  // Sliding active-item indicator — a single pill that glides to the active
+  // nav button instead of each button just toggling its own fill, so
+  // switching sections reads as continuous motion rather than a hard cut.
+  const navButtonRefs = useRef({})
+  const [pillRect, setPillRect] = useState(null)
+  const activeKey = navItems.find(item =>
+    page === item.key ||
+    (item.key === 'orders' && page === 'order-detail') ||
+    (item.key === 'clients' && page === 'client-detail') ||
+    (item.key === 'carriers' && page === 'carrier-detail')
+  )?.key
+
+  useLayoutEffect(() => {
+    const el = navButtonRefs.current[activeKey]
+    if (el) setPillRect({ top: el.offsetTop, height: el.offsetHeight })
+  }, [activeKey, expanded])
+
   const startLongPress = () => {
     // Egor's own call — nobody else, not even the other director account,
     // should be able to reach this menu.
@@ -238,27 +255,34 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
       )}
 
       {/* Nav */}
-      <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4, position: 'relative' }}>
+        {pillRect && (
+          <div style={{
+            position: 'absolute', left: 0, right: 0, top: pillRect.top, height: pillRect.height,
+            borderRadius: 12, background: 'rgba(19,102,240,0.1)',
+            transition: 'top 0.25s var(--ease), height 0.25s var(--ease)',
+            pointerEvents: 'none', zIndex: 0,
+          }} />
+        )}
         {navItems.map(item => {
-          const active = page === item.key || (item.key === 'orders' && page === 'order-detail') || (item.key === 'clients' && page === 'client-detail') || (item.key === 'carriers' && page === 'carrier-detail')
+          const active = item.key === activeKey
           const badgeVal = item.badge ? counts[item.badge] : null
           const badgeColor = item.badgeColor || '#1366F0'
           return (
             <button
               key={item.key}
+              ref={el => { navButtonRefs.current[item.key] = el }}
               onClick={() => onNav(item.key)}
+              className={active ? 'sidebar-nav-btn active' : 'sidebar-nav-btn'}
               style={{
                 height: 44, borderRadius: 12, border: 'none', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', gap: 10, padding: '0 10px',
                 justifyContent: expanded ? 'flex-start' : 'center',
-                background: active ? 'rgba(19,102,240,0.1)' : 'transparent',
                 color: active ? '#1366F0' : '#5A6573',
                 fontFamily: 'Manrope', fontWeight: 600, fontSize: 13.5,
-                transition: 'all 0.15s', whiteSpace: 'nowrap',
-                position: 'relative', textAlign: 'left',
+                whiteSpace: 'nowrap',
+                position: 'relative', zIndex: 1, textAlign: 'left',
               }}
-              onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'rgba(14,23,38,0.05)' }}
-              onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent' }}
             >
               <span style={{ flexShrink: 0, width: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{item.icon}</span>
               {expanded && <span style={{ flex: 1, textAlign: 'left' }}>{item.label}</span>}

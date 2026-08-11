@@ -90,6 +90,15 @@ input[type="number"] {
 .btn-ghost:hover { background: #fff; border-color: rgba(14,23,38,0.25); }
 .btn-ghost:active { transform: scale(0.97); }
 
+/* CSS-native hover instead of onMouseEnter/onMouseLeave mutating
+   e.currentTarget.style directly — a mouseleave that doesn't fire cleanly
+   (programmatic cursor moves, fast pointer travel) left the gray tint
+   stuck on a sidebar item permanently since nothing else ever reset it.
+   :hover can't get stuck; the browser owns it. */
+.sidebar-nav-btn { background: transparent; transition: color 0.15s var(--ease); }
+.sidebar-nav-btn:hover { background: rgba(14,23,38,0.05); }
+.sidebar-nav-btn.active:hover { background: transparent; }
+
 .section-label {
   font-size: 10.5px; font-weight: 700; letter-spacing: 0.12em; color: var(--text-tertiary);
   margin: 8px 0 -4px 4px;

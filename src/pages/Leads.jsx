@@ -5,6 +5,7 @@ import ListView from '../components/leads/ListView'
 import KanbanView from '../components/leads/KanbanView'
 import AnalyticsView from '../components/leads/AnalyticsView'
 import ErrorBoundary from '../components/ErrorBoundary'
+import { SlidingTabs } from '../components/SlidingTabs'
 
 const VIEWS = [
   { id: 'queue',     label: 'Очередь' },
@@ -26,16 +27,7 @@ export default function Leads() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div className="card" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', gap: 6 }}>
-          {VIEWS.map(v => (
-            <button key={v.id} onClick={() => setView(v.id)} style={{
-              padding: '7px 15px', borderRadius: 99, border: 'none', cursor: 'pointer',
-              fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
-              background: view === v.id ? '#0E1726' : 'rgba(14,23,38,0.06)',
-              color: view === v.id ? '#fff' : '#5A6573',
-            }}>{v.label}</button>
-          ))}
-        </div>
+        <SlidingTabs options={VIEWS.map(v => ({ key: v.id, label: v.label }))} value={view} onChange={setView} />
 
         <div style={{ width: 1, height: 24, background: 'rgba(14,23,38,0.1)' }} />
 

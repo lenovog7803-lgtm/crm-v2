@@ -5,6 +5,7 @@ import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
 import { useToast } from './Toast'
 import { EmptyState } from './EmptyState'
+import { SlidingTabs } from './SlidingTabs'
 
 const BULK_STATUSES = [
   { id: 'new', label: 'Новая' },
@@ -238,14 +239,11 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
       <div className="card" style={{ padding: isMobile ? '10px 12px' : '14px 16px' }}>
         {/* Scrollable filter row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
-          {statusChips.map(c => (
-            <button key={c.key} onClick={() => setStatusFilter(c.key)} style={{
-              padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer', flexShrink: 0,
-              fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
-              background: statusFilter === c.key ? '#0E1726' : 'rgba(14,23,38,0.06)',
-              color: statusFilter === c.key ? '#fff' : '#5A6573', transition: 'all 0.15s',
-            }}>{c.label}</button>
-          ))}
+          <SlidingTabs
+            options={statusChips}
+            value={statusChips.some(c => c.key === statusFilter) ? statusFilter : 'all'}
+            onChange={setStatusFilter}
+          />
           <div style={{ width: 1, height: 20, background: 'rgba(14,23,38,0.1)', flexShrink: 0 }} />
           <button onClick={() => setPayFilter(payFilter === 'clientUnpaid' ? null : 'clientUnpaid')} style={{
             padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer', flexShrink: 0,
@@ -462,16 +460,26 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
         </div>
       ) : (
 
-      <div className="card" style={{ overflow: 'hidden' }}>
-        <div style={{
-          display: 'grid', gridTemplateColumns: '140px minmax(0, 1fr) minmax(0, 1fr) 110px 90px 70px',
-          padding: '12px 20px', borderBottom: '1px solid rgba(14,23,38,0.06)',
-          background: 'rgba(14,23,38,0.02)',
-        }}>
-          {['ЗАЯВКА', 'МАРШРУТ', 'КЛИЕНТ', 'МАРЖА', 'ОПЛАТЫ', ''].map(h => (
-            <div key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8' }}>{h}</div>
-          ))}
-        </div>
+      <>
+      {/* Sticky header lives outside the .card's overflow:hidden — that
+          clip is what rounds the row corners, but it also breaks
+          position:sticky for anything inside it (any overflow!=visible
+          ancestor between a sticky element and the true scroll container
+          disables the stick). Splitting it out is what lets the header
+          stay pinned while the rows scroll underneath it. */}
+      <div style={{
+        display: 'grid', gridTemplateColumns: '140px minmax(0, 1fr) minmax(0, 1fr) 110px 90px 70px',
+        padding: '12px 20px',
+        background: 'rgba(247,248,250,0.92)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+        border: '1px solid rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(14,23,38,0.06)',
+        borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0',
+        position: 'sticky', top: 0, zIndex: 2,
+      }}>
+        {['ЗАЯВКА', 'МАРШРУТ', 'КЛИЕНТ', 'МАРЖА', 'ОПЛАТЫ', ''].map(h => (
+          <div key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8' }}>{h}</div>
+        ))}
+      </div>
+      <div className="card" style={{ overflow: 'hidden', borderRadius: '0 0 var(--radius-lg) var(--radius-lg)', borderTop: 'none' }}>
         {loading && (
           <div style={{ padding: '4px 20px' }}>
             {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)}
@@ -620,6 +628,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           <EmptyState {...emptyStateProps} />
         )}
       </div>
+      </>
       )}
 
       {selectMode && selected.size > 0 && (
