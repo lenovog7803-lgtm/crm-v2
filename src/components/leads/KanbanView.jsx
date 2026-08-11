@@ -63,9 +63,12 @@ function KanbanColumn({ stage, items, dragId, overStage, onDragStart, onDragOver
             draggable
             onDragStart={() => onDragStart(l.id)}
             onClick={() => onOpenLead(l)}
+            onMouseEnter={e => { e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.borderColor = 'rgba(19,102,240,0.3)'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 24px -12px rgba(20,30,55,0.25)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.7)'; e.currentTarget.style.borderColor = 'rgba(14,23,38,0.08)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
             style={{
               padding: '10px 12px', borderRadius: 12, background: 'rgba(255,255,255,0.7)',
               border: '1px solid rgba(14,23,38,0.08)', cursor: 'pointer',
+              transition: 'background 0.15s var(--ease), border-color 0.15s var(--ease), transform 0.15s var(--ease), box-shadow 0.15s var(--ease)',
             }}
           >
             <div style={{ fontSize: 12.5, fontWeight: 700, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>

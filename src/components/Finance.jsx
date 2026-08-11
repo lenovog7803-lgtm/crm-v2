@@ -330,10 +330,14 @@ export default function Finance({ refreshKey }) {
           {visible.map((p, i) => {
             const [avA, avB] = getGradient(p.gradKey)
             return (
-              <div key={`${p.kind}-${p.id}`} style={{
-                display: 'flex', alignItems: 'center', gap: 12, padding: '10px 8px', borderRadius: 11,
-                background: i % 2 === 0 ? 'rgba(14,23,38,0.02)' : 'transparent',
-              }}>
+              <div key={`${p.kind}-${p.id}`}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(19,102,240,0.05)'}
+                onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? 'rgba(14,23,38,0.02)' : 'transparent'}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 12, padding: '10px 8px', borderRadius: 11,
+                  background: i % 2 === 0 ? 'rgba(14,23,38,0.02)' : 'transparent',
+                  transition: 'background 0.15s var(--ease)',
+                }}>
                 <div style={{
                   width: 32, height: 32, borderRadius: 10, flexShrink: 0,
                   background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,

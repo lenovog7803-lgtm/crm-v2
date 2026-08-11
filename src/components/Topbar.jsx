@@ -291,8 +291,10 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
                         onClick={() => dismiss(n.id)}
                         style={{
                           display: 'flex', alignItems: 'flex-start', gap: 12,
-                          padding: '11px 16px', cursor: 'pointer',
-                          borderBottom: '1px solid rgba(14,23,38,0.05)', transition: 'background 0.12s',
+                          padding: '11px 16px 11px 13px', cursor: 'pointer',
+                          borderBottom: '1px solid rgba(14,23,38,0.05)',
+                          borderLeft: `3px solid ${accent}`,
+                          transition: 'background 0.12s',
                         }}
                         onMouseEnter={e => e.currentTarget.style.background = `${tint}`}
                         onMouseLeave={e => e.currentTarget.style.background = 'transparent'}

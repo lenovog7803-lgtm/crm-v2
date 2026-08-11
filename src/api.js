@@ -66,7 +66,8 @@ export const login = (login, password) => req('/auth/login', { method: 'POST', b
 
 // Dashboard
 export const getDashboard = (period) => req(`/dashboard?period=${period || 'month'}`);
-export const getDashboardGoals = (period) => req(`/dashboard/goals?period=${period || 'month'}`);
+export const getGoals = (month) => req(`/goals?month=${month}`);
+export const saveGoals = (payload) => req('/goals', { method: 'POST', body: JSON.stringify(payload) });
 
 // Orders
 export const getOrders = (params = {}) => req('/orders?' + new URLSearchParams(params));

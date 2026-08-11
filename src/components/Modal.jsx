@@ -26,6 +26,7 @@ export function ModalOverlay({ onClose, children }) {
         maxWidth: 560,
         boxShadow: '0 30px 80px -20px rgba(14,23,38,0.3)',
         position: 'relative',
+        animation: 'modalIn 0.22s var(--ease) both',
       }}>
         <div style={{ padding: 32 }}>
           {children}

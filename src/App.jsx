@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './index.css'
 
 import { AuthProvider, useAuth } from './AuthContext'
@@ -200,11 +200,23 @@ function MainApp() {
     }
   })
 
+  // Subtle scroll parallax on the aurora orbs — offset via margin, not
+  // transform, since transform is already driven by the floatA/floatB
+  // CSS animations and a running animation's transform value always wins
+  // over one set from JS, so the scroll effect would otherwise be invisible.
+  const orbARef = useRef(null)
+  const orbBRef = useRef(null)
+  const handleScrollParallax = e => {
+    const y = e.currentTarget.scrollTop
+    if (orbARef.current) orbARef.current.style.marginTop = `${Math.min(y * 0.06, 40)}px`
+    if (orbBRef.current) orbBRef.current.style.marginBottom = `${Math.min(y * 0.04, 30)}px`
+  }
+
   return (
     <div className="app-root">
       <div className="aurora-bg">
-        <div className="aurora-orb-a" />
-        <div className="aurora-orb-b" />
+        <div ref={orbARef} className="aurora-orb-a" />
+        <div ref={orbBRef} className="aurora-orb-b" />
       </div>
 
       <div className="app-frame">
@@ -219,7 +231,7 @@ function MainApp() {
 
         <main className="app-main">
           <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={handleSearchChange} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} onOpenPalette={() => setPaletteOpen(true)} />
-          <div className="scroll-area" key={page}>
+          <div className="scroll-area" key={page} onScroll={handleScrollParallax}>
             {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} onMonthsLoaded={setAvailableMonths} preloadedOrders={allOrders} />}
             {page === 'my-dashboard' && <ErrorBoundary><ManagerDashboard /></ErrorBoundary>}
 
@@ -229,6 +241,7 @@ function MainApp() {
                 onAddOrder={() => setShowOrderModal(true)}
                 refreshKey={ordersKey}
                 search={search}
+                onClearSearch={() => handleSearchChange('')}
               />
             )}
             {page === 'order-detail' && (

@@ -4,6 +4,7 @@ import { initials, statusLabel, statusColor, statusBg, getGradient } from '../ut
 import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
 import { useToast } from './Toast'
+import { EmptyState } from './EmptyState'
 
 const BULK_STATUSES = [
   { id: 'new', label: 'Новая' },
@@ -25,7 +26,7 @@ const DOC_FILTER_OPTIONS = [
   { key: '!docs_from_carrier_received', label: 'НЕ получены от перевозчика',  not: true  },
 ]
 
-export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '' }) {
+export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '', onClearSearch }) {
   const { show } = useToast()
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
@@ -38,6 +39,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   const [selected, setSelected] = useState(new Set())
   const [selectMode, setSelectMode] = useState(false)
   const [showStatusMenu, setShowStatusMenu] = useState(false)
+  const [removingIds, setRemovingIds] = useState(new Set())
   const longPressTimer = useRef(null)
   const longPressFired = useRef(false)
   const isMobile = useIsMobile()
@@ -94,10 +96,19 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   useEffect(() => { localStorage.setItem('orders_payFilter', payFilter || '') }, [payFilter])
   useEffect(() => { localStorage.setItem('orders_docFilters', JSON.stringify(docFilters)) }, [docFilters])
 
+  // Scale-and-fade the row out before it actually leaves the list, instead
+  // of having it just vanish the instant the delete request resolves.
+  const animateRemoval = (ids) => new Promise(resolve => {
+    setRemovingIds(prev => { const next = new Set(prev); ids.forEach(id => next.add(id)); return next })
+    setTimeout(resolve, 200)
+  })
+
   const handleDelete = async (e, id) => {
     e.stopPropagation()
     await apiDelete(id).catch(console.error)
+    await animateRemoval([id])
     setOrders(prev => prev.filter(o => o.id !== id))
+    setRemovingIds(prev => { const next = new Set(prev); next.delete(id); return next })
   }
 
   const toggleSelect = (id) => {
@@ -152,12 +163,14 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
     const ok = window.confirm(`Удалить ${ids.length} заявок? Это действие можно отменить в течение нескольких секунд.`)
     if (!ok) return
     await Promise.all(ids.map(id => apiDelete(id)))
+    await animateRemoval(ids)
     show(`Удалено заявок: ${ids.length}`, {
       type: 'info',
       actionLabel: 'Отменить',
       onAction: async () => { await Promise.all(ids.map(id => restoreOrder(id))); loadOrders() },
     })
     clearSelection()
+    setRemovingIds(new Set())
     loadOrders()
   }
 
@@ -177,7 +190,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
     { key: 'all', label: 'Все' },
     { key: 'new', label: 'Новые' },
     { key: 'in_progress', label: 'В пути' },
-    { key: 'delivered', label: 'Выполнено' },
+    { key: 'done', label: 'Выполнено' },
     { key: 'cancelled', label: 'Отменено' },
   ]
 
@@ -193,7 +206,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   }, [orders])
 
   let filtered = [...sortedOrders]
-  if (statusFilter !== 'all') filtered = filtered.filter(o => o.status === statusFilter)
+  if (statusFilter === 'active') filtered = filtered.filter(o => ['new', 'in_progress'].includes(o.status))
+  else if (statusFilter !== 'all') filtered = filtered.filter(o => o.status === statusFilter)
   if (payFilter === 'clientUnpaid') filtered = filtered.filter(o => !o.client_paid)
   if (payFilter === 'carrierUnpaid') filtered = filtered.filter(o => !o.carrier_paid)
   if (payFilter === 'debt') filtered = filtered.filter(o => o.client_paid && !o.carrier_paid)
@@ -211,6 +225,12 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
       (o.cargo && o.cargo.toLowerCase().includes(q))
     )
   }
+
+  const hasActiveFilters = statusFilter !== 'all' || !!payFilter || docFilters.length > 0 || !!search
+  const resetFilters = () => { setStatusFilter('all'); setPayFilter(null); setDocFilters([]); onClearSearch?.() }
+  const emptyStateProps = hasActiveFilters
+    ? { title: 'Ничего не найдено', subtitle: 'Попробуйте изменить фильтры или поисковый запрос', actionLabel: 'Сбросить фильтры', onAction: resetFilters }
+    : { title: 'Пока нет заявок', subtitle: 'Создайте первую заявку, чтобы начать работу', actionLabel: 'Создать заявку', onAction: onAddOrder }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -341,7 +361,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
             </div>
           )}
           {!loading && !loadError && filtered.length === 0 && (
-            <div style={{ padding: 40, textAlign: 'center', color: '#8E8E93', fontSize: 14 }}>Нет заявок</div>
+            <div className="card" style={{ padding: 0 }}><EmptyState {...emptyStateProps} /></div>
           )}
           {!loading && (
             <div className="card" style={{ overflow: 'hidden', padding: 0 }}>
@@ -351,6 +371,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 const overdue = isOverdue(order)
                 const isSelected = selected.has(order.id)
                 const dx = swipe.id === order.id ? swipe.dx : 0
+                const isRemoving = removingIds.has(order.id)
                 return (
                   <div
                     key={order.id}
@@ -363,8 +384,11 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                       cursor: 'pointer',
                       WebkitTapHighlightColor: 'rgba(14,23,38,0.06)',
                       touchAction: 'pan-y',
-                      transform: `translateX(${dx}px)`,
-                      transition: dx === 0 ? 'transform 0.2s ease, background 0.15s' : 'none',
+                      opacity: isRemoving ? 0 : 1,
+                      transform: isRemoving ? `translateX(${dx}px) scale(0.95)` : `translateX(${dx}px)`,
+                      transition: isRemoving ? 'opacity 0.2s var(--ease), transform 0.2s var(--ease)' : (dx === 0 ? 'transform 0.2s ease, background 0.15s' : 'none'),
+                      animation: isRemoving ? 'none' : 'rise 0.3s var(--ease) both',
+                      animationDelay: `${Math.min(i * 20, 240)}ms`,
                     }}
                     onTouchStart={e => { e.currentTarget.style.background = isSelected ? '#EBF2FF' : 'rgba(14,23,38,0.05)'; handleTouchStart(order.id, e) }}
                     onTouchMove={e => handleTouchMove(order.id, e)}
@@ -382,12 +406,22 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                         {isSelected && <span style={{ color: '#fff', fontSize: 12 }}>✓</span>}
                       </div>
                     )}
-                    {/* Status dot */}
-                    <div style={{
-                      width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
-                      background: statusColor(order.status),
-                      boxShadow: `0 0 0 3px ${statusBg(order.status)}`,
-                    }} />
+                    {/* Status dot — overdue rows get a pulsing ring behind it,
+                        a quiet "this needs attention" signal beyond the red tint. */}
+                    <div style={{ position: 'relative', width: 10, height: 10, flexShrink: 0 }}>
+                      {overdue && (
+                        <span style={{
+                          position: 'absolute', inset: 0, borderRadius: '50%',
+                          background: statusColor(order.status),
+                          animation: 'statusPulseRing 1.6s ease-out infinite',
+                        }} />
+                      )}
+                      <div style={{
+                        position: 'relative', width: 10, height: 10, borderRadius: '50%',
+                        background: statusColor(order.status),
+                        boxShadow: `0 0 0 3px ${statusBg(order.status)}`,
+                      }} />
+                    </div>
                     {/* Main info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
@@ -450,6 +484,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           const [avA, avB] = getGradient(order.client_name || '')
           const overdue = isOverdue(order)
           const isSelected = selected.has(order.id)
+          const isRemoving = removingIds.has(order.id)
           return (
             <div
               key={order.id}
@@ -457,11 +492,16 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 display: 'flex', alignItems: 'center',
                 padding: '14px 20px',
                 borderBottom: i < filtered.length - 1 ? '1px solid rgba(14,23,38,0.05)' : 'none',
-                cursor: 'pointer', transition: 'background 0.12s',
+                cursor: 'pointer',
                 background: isSelected ? '#EBF2FF' : (overdue ? 'rgba(200,25,35,0.05)' : 'transparent'),
                 ...(isSelected
-                  ? { outline: '1px solid #1366F0', outlineOffset: -1 }
+                  ? { boxShadow: 'inset 0 0 0 1.5px #1366F0, 0 0 0 4px rgba(19,102,240,0.12)' }
                   : { borderLeft: overdue ? '3px solid rgba(200,25,35,0.5)' : '3px solid transparent' }),
+                opacity: isRemoving ? 0 : 1,
+                transform: isRemoving ? 'scale(0.97)' : 'scale(1)',
+                transition: isRemoving ? 'opacity 0.2s var(--ease), transform 0.2s var(--ease)' : 'background 0.12s',
+                animation: isRemoving ? 'none' : 'rise 0.3s var(--ease) both',
+                animationDelay: `${Math.min(i * 20, 240)}ms`,
               }}
               onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.08)' : 'rgba(14,23,38,0.02)' }}
               onMouseLeave={e => { handleMouseUp(); if (!isSelected) e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.05)' : 'transparent' }}
@@ -485,10 +525,18 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                   {order.order_number || order.id}
                 </div>
                 <div style={{
-                  display: 'inline-flex', marginTop: 4, padding: '2px 8px', borderRadius: 6,
+                  display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 4, padding: '2px 8px', borderRadius: 6,
                   background: statusBg(order.status), color: statusColor(order.status),
                   fontSize: 11, fontWeight: 600,
-                }}>{statusLabel(order.status)}</div>
+                }}>
+                  {overdue && (
+                    <span style={{ position: 'relative', width: 6, height: 6, flexShrink: 0 }}>
+                      <span style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: statusColor(order.status), animation: 'statusPulseRing 1.6s ease-out infinite' }} />
+                      <span style={{ position: 'relative', width: 6, height: 6, borderRadius: '50%', background: statusColor(order.status), display: 'block' }} />
+                    </span>
+                  )}
+                  {statusLabel(order.status)}
+                </div>
               </div>
               <div>
                 <div style={{ fontWeight: 600, fontSize: 13.5, color: '#0E1726' }}>{route}</div>
@@ -569,7 +617,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           </div>
         )}
         {!loading && !loadError && filtered.length === 0 && (
-          <div style={{ padding: '40px', textAlign: 'center', color: '#A6AEB8', fontSize: 14 }}>Нет заявок</div>
+          <EmptyState {...emptyStateProps} />
         )}
       </div>
       )}
