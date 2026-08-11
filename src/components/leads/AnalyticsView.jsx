@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getLeadsAnalytics, getCallsByDay } from '../../api'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
+import { SlidingTabs } from '../SlidingTabs'
 
 const PERIODS = [
   { id: 'week', label: 'Неделя' },
@@ -145,15 +146,8 @@ export default function AnalyticsView() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <div className="card" style={{ padding: '10px 12px', display: 'flex', gap: 6 }}>
-        {PERIODS.map(p => (
-          <button key={p.id} onClick={() => setPeriod(p.id)} style={{
-            padding: '7px 16px', borderRadius: 99, border: 'none', cursor: 'pointer',
-            fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
-            background: period === p.id ? '#0E1726' : 'rgba(14,23,38,0.06)',
-            color: period === p.id ? '#fff' : '#5A6573',
-          }}>{p.label}</button>
-        ))}
+      <div className="card" style={{ padding: '10px 12px' }}>
+        <SlidingTabs options={PERIODS.map(p => ({ key: p.id, label: p.label }))} value={period} onChange={setPeriod} />
       </div>
 
       {/* 1. Звонки против плана */}

@@ -7,18 +7,18 @@ import ScriptPanel from './ScriptPanel'
 import LeadEditModal from './LeadEditModal'
 import { logCall, claimLead } from '../../api'
 import { SkeletonRow } from '../Skeleton'
+import { EmptyState } from '../EmptyState'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { useCelebration } from '../Celebration'
 import { useAuth } from '../../AuthContext'
+import { initials, getGradient } from '../../utils'
 
 const FILTERS_KEY = 'leads_list_filters'
+const ROW_GRID = 'minmax(0, 1.6fr) minmax(0, 1fr) 130px 120px 90px'
 
 function loadFilters() {
   try { return JSON.parse(localStorage.getItem(FILTERS_KEY)) || {} } catch { return {} }
 }
-
-const thStyle = { textAlign: 'left', padding: '10px 14px', fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase' }
-const tdStyle = { padding: '12px 14px', fontSize: 13, color: '#0E1726', borderTop: '1px solid rgba(14,23,38,0.05)' }
 
 export default function ListView({ industry }) {
   const { user } = useAuth()
@@ -119,57 +119,92 @@ export default function ListView({ industry }) {
         </div>
       )}
 
-      {!loading && (
-        <div className="card" style={{ overflow: 'hidden' }}>
+      {!loading && filtered.length === 0 && (
+        <div className="card" style={{ padding: 0 }}>
+          <EmptyState title="Нет лидов по фильтрам" subtitle="Попробуйте изменить стадию или поисковый запрос" />
+        </div>
+      )}
+
+      {!loading && filtered.length > 0 && (
+        <div className="card" style={{ overflow: 'hidden', padding: 0 }}>
+          <div style={{
+            display: 'grid', gridTemplateColumns: ROW_GRID,
+            padding: '12px 20px',
+            borderBottom: '1px solid rgba(14,23,38,0.06)',
+            background: 'rgba(14,23,38,0.02)',
+          }}>
+            {['ЛИД', 'КОНТАКТЫ', 'СТАДИЯ', 'СЛЕДУЮЩИЙ ЗВОНОК', ''].map(h => (
+              <div key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8' }}>{h}</div>
+            ))}
+          </div>
           <div ref={scrollRef} onScroll={handleScroll} style={{ maxHeight: 640, overflowY: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr>
-                  <th style={thStyle}>Компания</th>
-                  <th style={thStyle}>Контакт</th>
-                  <th style={thStyle}>Телефон</th>
-                  <th style={thStyle}>Отрасль</th>
-                  <th style={thStyle}>Город</th>
-                  <th style={thStyle}>Стадия</th>
-                  <th style={thStyle}>Попыток</th>
-                  <th style={thStyle}>Следующий звонок</th>
-                  <th style={thStyle}>Всего звонков</th>
-                  <th style={thStyle}></th>
-                </tr>
-              </thead>
-              <tbody>
-                {visible.map(l => {
-                  const st = stageById(l.stage)
-                  return (
-                    <tr key={l.id} onClick={() => setActiveLead(l)} style={{ cursor: 'pointer' }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.02)'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                    >
-                      <td style={{ ...tdStyle, fontWeight: 600 }}>{l.name}</td>
-                      <td style={tdStyle}>{l.contact_person || '—'}</td>
-                      <td style={{ ...tdStyle, fontFamily: 'JetBrains Mono' }}>{l.phone}</td>
-                      <td style={tdStyle}>{l.industry || '—'}</td>
-                      <td style={tdStyle}>{l.city || '—'}</td>
-                      <td style={tdStyle}><span style={{ padding: '3px 10px', borderRadius: 8, background: st.bg, color: st.color, fontSize: 11, fontWeight: 600 }}>{st.label}</span></td>
-                      <td style={tdStyle}>{l.call_attempts || 0}</td>
-                      <td style={tdStyle}>{l.next_call ? new Date(l.next_call).toLocaleString('ru-RU') : '—'}</td>
-                      <td style={tdStyle}>{l.total_calls || 0}</td>
-                      <td style={tdStyle}>
-                        {!l.assigned_to && (
-                          <button onClick={e => handleClaim(l.id, e)} className="btn-ghost" style={{ padding: '5px 12px', fontSize: 11.5 }}>Взять в работу</button>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+            {visible.map((l, i) => {
+              const st = stageById(l.stage)
+              const [avA, avB] = getGradient(l.name || '')
+              const overdue = l.next_call && l.next_call < now
+              return (
+                <div key={l.id} onClick={() => setActiveLead(l)}
+                  style={{
+                    display: 'grid', gridTemplateColumns: ROW_GRID, alignItems: 'center',
+                    padding: '12px 20px', cursor: 'pointer',
+                    borderBottom: i < visible.length - 1 ? '1px solid rgba(14,23,38,0.05)' : 'none',
+                    borderLeft: overdue ? '3px solid rgba(200,25,35,0.5)' : '3px solid transparent',
+                    background: overdue ? 'rgba(200,25,35,0.03)' : 'transparent',
+                    animation: 'rise 0.3s var(--ease) both', animationDelay: `${Math.min(i * 20, 240)}ms`,
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.06)' : 'rgba(14,23,38,0.02)'}
+                  onMouseLeave={e => e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.03)' : 'transparent'}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                    <div style={{
+                      width: 32, height: 32, borderRadius: 10, flexShrink: 0,
+                      background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: '#fff', fontSize: 11, fontWeight: 700,
+                    }}>{initials(l.name)}</div>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
+                      {l.contact_person && <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.contact_person}</div>}
+                    </div>
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 12.5, fontFamily: 'JetBrains Mono', color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.phone || '—'}</div>
+                    {(l.industry || l.city) && (
+                      <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {[l.industry, l.city].filter(Boolean).join(' · ')}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <span style={{ padding: '3px 10px', borderRadius: 8, background: st.bg, color: st.color, fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}>{st.label}</span>
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    {l.next_call ? (
+                      <>
+                        <div style={{ fontSize: 12, color: overdue ? '#C81923' : '#0E1726', fontWeight: overdue ? 700 : 500 }}>
+                          {new Date(l.next_call).toLocaleDateString('ru-RU')}
+                        </div>
+                        {(l.call_attempts || 0) > 0 && <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 1 }}>{l.call_attempts} попыт.</div>}
+                      </>
+                    ) : <span style={{ fontSize: 12, color: '#C4CAD4' }}>—</span>}
+                  </div>
+                  <div style={{ textAlign: 'right' }} onClick={e => e.stopPropagation()}>
+                    {!l.assigned_to ? (
+                      <button onClick={e => handleClaim(l.id, e)} className="btn-ghost" style={{ padding: '5px 12px', fontSize: 11.5 }}>Взять</button>
+                    ) : (
+                      <svg width="8" height="13" viewBox="0 0 8 13" fill="none" style={{ marginLeft: 'auto' }}>
+                        <path d="M1 1.5L6.5 7L1 12.5" stroke="#C4CAD4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
             {visibleCount < filtered.length && (
               <div style={{ textAlign: 'center', padding: 14, fontSize: 12, color: '#8A93A0' }}>
                 показано {visible.length} из {filtered.length} · докрутите вниз
               </div>
             )}
-            {filtered.length === 0 && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Нет лидов по фильтрам</div>}
           </div>
         </div>
       )}

@@ -11,14 +11,14 @@ export const STAGES = [
 ]
 
 export const OUTCOMES = [
-  { id: 'no_answer',   label: 'Не взял трубку', icon: '📵', color: '#8A93A0', needsComment: false },
-  { id: 'reached',     label: 'Дозвонился',     icon: '📞', color: '#1366F0', needsComment: true },
-  { id: 'interested',  label: 'Заинтересован',  icon: '🔥', color: '#1366F0', needsComment: true },
-  { id: 'thinking',    label: 'Думает',         icon: '🤔', color: '#D97706', needsComment: true },
-  { id: 'kp_sent',     label: 'Отправил КП',    icon: '📤', color: '#7C3AED', needsComment: true },
-  { id: 'negotiation', label: 'Переговоры',     icon: '💬', color: '#7C3AED', needsComment: true },
-  { id: 'won',         label: 'Стал клиентом',  icon: '✅', color: '#1E9E5A', needsComment: true },
-  { id: 'lost',        label: 'Отказ',          icon: '✕',  color: '#E0473B', needsComment: true, needsReason: true },
+  { id: 'no_answer',   label: 'Не взял трубку', color: '#8A93A0', needsComment: false },
+  { id: 'reached',     label: 'Дозвонился',     color: '#1366F0', needsComment: true },
+  { id: 'interested',  label: 'Заинтересован',  color: '#1366F0', needsComment: true },
+  { id: 'thinking',    label: 'Думает',         color: '#D97706', needsComment: true },
+  { id: 'kp_sent',     label: 'Отправил КП',    color: '#7C3AED', needsComment: true },
+  { id: 'negotiation', label: 'Переговоры',     color: '#7C3AED', needsComment: true },
+  { id: 'won',         label: 'Стал клиентом',  color: '#1E9E5A', needsComment: true },
+  { id: 'lost',        label: 'Отказ',          color: '#E0473B', needsComment: true, needsReason: true },
 ]
 
 export const LOST_REASONS = [

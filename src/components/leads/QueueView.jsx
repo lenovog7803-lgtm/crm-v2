@@ -86,15 +86,18 @@ export default function QueueView({ industry, onCounts }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div className="card" style={{ padding: '16px 20px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-          <span style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>
-            {todayCalls} из {DAILY_GOAL} звонков сегодня
-          </span>
-          <span style={{ fontSize: 12.5, fontWeight: 600, color: pct >= 100 ? '#1E9E5A' : '#1366F0' }}>{pct}%</span>
+      <div className="card" style={{ padding: '20px 24px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: -40, right: -40, width: 160, height: 160, borderRadius: '50%', background: 'rgba(19,102,240,0.08)' }} />
+        <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 10 }}>
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#A6AEB8', marginBottom: 4 }}>ЗВОНКИ СЕГОДНЯ</div>
+            <span style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 26, letterSpacing: '-0.02em', color: '#0E1726' }}>{todayCalls}</span>
+            <span style={{ fontSize: 14, color: '#A6AEB8' }}> / {DAILY_GOAL}</span>
+          </div>
+          <span style={{ fontSize: 14, fontWeight: 700, color: pct >= 100 ? '#1E9E5A' : '#1366F0' }}>{pct}%</span>
         </div>
-        <div style={{ height: 8, borderRadius: 99, background: 'rgba(14,23,38,0.07)' }}>
-          <div style={{ height: '100%', borderRadius: 99, background: pct >= 100 ? '#1E9E5A' : '#1366F0', width: `${pct}%`, transition: 'width 0.4s' }} />
+        <div style={{ position: 'relative', height: 8, borderRadius: 99, background: 'rgba(14,23,38,0.07)' }}>
+          <div style={{ height: '100%', borderRadius: 99, background: pct >= 100 ? '#1E9E5A' : '#1366F0', width: `${pct}%`, transition: 'width 0.4s var(--ease)' }} />
         </div>
       </div>
 
@@ -102,7 +105,16 @@ export default function QueueView({ industry, onCounts }) {
 
       {!loading && !lead && (
         <div className="card" style={{ padding: 60, textAlign: 'center' }}>
-          <div style={{ fontSize: 32, marginBottom: 10 }}>🎉</div>
+          <div style={{
+            width: 56, height: 56, borderRadius: 18, margin: '0 auto 16px',
+            background: 'rgba(30,158,90,0.1)', color: '#1E9E5A',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+          </div>
           <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 16, color: '#0E1726' }}>Очередь пуста</div>
           <div style={{ fontSize: 13, color: '#A6AEB8', marginTop: 6 }}>Все звонки на сегодня обработаны</div>
         </div>
@@ -110,8 +122,8 @@ export default function QueueView({ industry, onCounts }) {
 
       {!loading && lead && (
         <>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 12.5, color: '#A6AEB8' }}>{index + 1} из {queue.length} в очереди</span>
+          <div className="card" style={{ padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 12.5, fontWeight: 600, color: '#5A6573' }}>{index + 1} из {queue.length} в очереди</span>
             <div style={{ display: 'flex', gap: 8 }}>
               {!lead.assigned_to && (
                 <button onClick={handleClaim} className="btn-primary" style={{ padding: '8px 14px', fontSize: 12.5 }}>Взять в работу</button>

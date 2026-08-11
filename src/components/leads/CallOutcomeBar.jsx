@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { OUTCOMES, LOST_REASONS, DATE_PRESETS } from '../../constants/leads'
+import { OutcomeIcon } from './OutcomeIcon'
 
 const labelStyle = { fontSize: 10, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8, display: 'block' }
 
@@ -51,13 +52,19 @@ export default function CallOutcomeBar({ lead, onSave, saving }) {
             key={o.id}
             onClick={() => { setOutcome(o.id); setError('') }}
             style={{
-              display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', borderRadius: 12,
+              display: 'flex', alignItems: 'center', gap: 9, padding: '9px 12px', borderRadius: 12,
               background: outcome === o.id ? o.color + '1F' : '#F7F8FA',
               border: `1.5px solid ${outcome === o.id ? o.color + '55' : 'rgba(14,23,38,0.08)'}`,
-              cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s',
+              cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s var(--ease)',
             }}
           >
-            <span style={{ fontSize: 15 }}>{o.icon}</span>
+            <span style={{
+              width: 26, height: 26, borderRadius: 9, flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: outcome === o.id ? o.color : o.color + '1A',
+              color: outcome === o.id ? '#fff' : o.color,
+              transition: 'all 0.15s var(--ease)',
+            }}><OutcomeIcon id={o.id} size={14} /></span>
             <span style={{ fontFamily: 'Manrope', fontSize: 12.5, fontWeight: outcome === o.id ? 700 : 500, color: outcome === o.id ? o.color : '#0E1726' }}>
               {o.label}
             </span>

@@ -460,26 +460,17 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
         </div>
       ) : (
 
-      <>
-      {/* Sticky header lives outside the .card's overflow:hidden — that
-          clip is what rounds the row corners, but it also breaks
-          position:sticky for anything inside it (any overflow!=visible
-          ancestor between a sticky element and the true scroll container
-          disables the stick). Splitting it out is what lets the header
-          stay pinned while the rows scroll underneath it. */}
-      <div style={{
-        display: 'grid', gridTemplateColumns: '140px minmax(0, 1fr) minmax(0, 1fr) 110px 90px 70px',
-        padding: '12px 20px',
-        background: 'rgba(247,248,250,0.92)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-        border: '1px solid rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(14,23,38,0.06)',
-        borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0',
-        position: 'sticky', top: 0, zIndex: 2,
-      }}>
-        {['ЗАЯВКА', 'МАРШРУТ', 'КЛИЕНТ', 'МАРЖА', 'ОПЛАТЫ', ''].map(h => (
-          <div key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8' }}>{h}</div>
-        ))}
-      </div>
-      <div className="card" style={{ overflow: 'hidden', borderRadius: '0 0 var(--radius-lg) var(--radius-lg)', borderTop: 'none' }}>
+      <div className="card" style={{ overflow: 'hidden' }}>
+        <div style={{
+          display: 'grid', gridTemplateColumns: '140px minmax(0, 1fr) minmax(0, 1fr) 110px 90px 70px',
+          padding: '12px 20px',
+          borderBottom: '1px solid rgba(14,23,38,0.06)',
+          background: 'rgba(14,23,38,0.02)',
+        }}>
+          {['ЗАЯВКА', 'МАРШРУТ', 'КЛИЕНТ', 'МАРЖА', 'ОПЛАТЫ', ''].map(h => (
+            <div key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8' }}>{h}</div>
+          ))}
+        </div>
         {loading && (
           <div style={{ padding: '4px 20px' }}>
             {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)}
@@ -628,7 +619,6 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           <EmptyState {...emptyStateProps} />
         )}
       </div>
-      </>
       )}
 
       {selectMode && selected.size > 0 && (

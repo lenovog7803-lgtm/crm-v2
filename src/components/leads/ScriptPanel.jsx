@@ -29,9 +29,18 @@ export default function ScriptPanel({ stage }) {
   }
 
   if (collapsed) {
+    // Fills the same grid column the expanded card would rather than
+    // shrinking to a narrow vertical pill — a tiny button floating in an
+    // otherwise-empty wide column looked broken, not "collapsed".
     return (
-      <button onClick={() => setCollapsed(false)} className="btn-ghost" style={{ writingMode: 'vertical-rl', height: 120 }}>
-        Скрипт
+      <button onClick={() => setCollapsed(false)} className="card" style={{
+        border: 'none', cursor: 'pointer', width: '100%', minHeight: 120,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+      }}>
+        <span style={{ fontFamily: 'Onest', fontWeight: 600, fontSize: 13, color: '#5A6573' }}>Показать скрипт</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A93A0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
       </button>
     )
   }

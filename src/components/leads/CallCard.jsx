@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react'
 import { getCallHistory } from '../../api'
 import { stageById, outcomeById } from '../../constants/leads'
+import { initials, getGradient } from '../../utils'
+import { OutcomeIcon } from './OutcomeIcon'
+
+function NoteIcon(p) {
+  return (
+    <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+      <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z" />
+    </svg>
+  )
+}
 
 const chip = (bg, color) => ({ padding: '4px 11px', borderRadius: 8, background: bg, color, fontSize: 11.5, fontWeight: 600 })
 
@@ -17,6 +28,7 @@ export default function CallCard({ lead, onEdit }) {
   const stage = stageById(lead.stage)
   const attempts = lead.call_attempts || 0
   const cadenceStep = lead.cadence_step || 0
+  const [avA, avB] = getGradient(lead.name || '')
 
   const legacyNotes = (lead.call_notes || []).map((n, i) => ({
     id: `legacy-${i}-${n.date}`,
@@ -31,9 +43,18 @@ export default function CallCard({ lead, onEdit }) {
   return (
     <div className="card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 22, color: '#0E1726' }}>{lead.name}</div>
-          <div style={{ fontFamily: 'JetBrains Mono', fontSize: 17, color: '#1366F0', marginTop: 6 }}>{lead.phone || '—'}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
+          <div style={{
+            width: 50, height: 50, borderRadius: 16, flexShrink: 0,
+            background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fff', fontWeight: 700, fontSize: 16,
+            boxShadow: `0 8px 20px -8px ${avB}80`,
+          }}>{initials(lead.name)}</div>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.name}</div>
+            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 14.5, color: '#1366F0', marginTop: 4 }}>{lead.phone || '—'}</div>
+          </div>
         </div>
         <button onClick={() => onEdit(lead)} className="btn-ghost" style={{ flexShrink: 0 }}>
           Редактировать данные
@@ -88,7 +109,11 @@ export default function CallCard({ lead, onEdit }) {
             if (h.kind === 'note') {
               return (
                 <div key={h.id} style={{ display: 'flex', gap: 10, padding: '8px 12px', background: '#F7F8FA', border: '1px solid rgba(14,23,38,0.08)', borderRadius: 10 }}>
-                  <div style={{ fontSize: 14, flexShrink: 0 }}>📝</div>
+                  <div style={{
+                    width: 24, height: 24, borderRadius: 8, flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(138,147,160,0.15)', color: '#8A93A0',
+                  }}><NoteIcon width={12} height={12} /></div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 11, color: '#8A93A0', fontWeight: 700 }}>
                       {h.author ? `${h.author} · ` : ''}{h.created_at ? new Date(h.created_at).toLocaleString('ru-RU') : ''}
@@ -101,7 +126,11 @@ export default function CallCard({ lead, onEdit }) {
             const o = outcomeById(h.outcome)
             return (
               <div key={h.id} style={{ display: 'flex', gap: 10, padding: '8px 12px', background: '#F7F8FA', border: '1px solid rgba(14,23,38,0.08)', borderRadius: 10 }}>
-                <div style={{ fontSize: 14, flexShrink: 0 }}>{o?.icon || '📞'}</div>
+                <div style={{
+                  width: 24, height: 24, borderRadius: 8, flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: (o?.color || '#8A93A0') + '1A', color: o?.color || '#8A93A0',
+                }}><OutcomeIcon id={o?.id || 'reached'} size={12} /></div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 11, color: o?.color || '#8A93A0', fontWeight: 700 }}>
                     {o?.label || h.outcome} · {new Date(h.created_at).toLocaleString('ru-RU')}
