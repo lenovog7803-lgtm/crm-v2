@@ -284,7 +284,10 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
                 position: 'relative', zIndex: 1, textAlign: 'left',
               }}
             >
-              <span style={{ flexShrink: 0, width: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{item.icon}</span>
+              <span style={{
+                flexShrink: 0, width: 20, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                animation: active ? 'navIconPop 0.3s var(--ease)' : 'none',
+              }}>{item.icon}</span>
               {expanded && <span style={{ flex: 1, textAlign: 'left' }}>{item.label}</span>}
               {expanded && badgeVal > 0 && (
                 <span style={{
