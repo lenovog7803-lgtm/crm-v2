@@ -1,3 +1,5 @@
+import { useRef, useState, useLayoutEffect } from 'react'
+
 const NAV = [
   {
     key: 'dashboard',
@@ -126,6 +128,18 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
   const navList = isManager ? MANAGER_NAV : NAV
   const activeKey = ACTIVE_KEYS[page] || page
 
+  // A capsule that glides behind the active icon (Telegram-style tab bar)
+  // instead of the icon just swapping color in place.
+  const btnRefs = useRef({})
+  const [pill, setPill] = useState(null)
+  const PILL_W = 46, PILL_H = 28
+
+  useLayoutEffect(() => {
+    const el = btnRefs.current[activeKey]
+    if (el) setPill({ left: el.offsetLeft + (el.offsetWidth - PILL_W) / 2 })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeKey])
+
   return (
     <div className="mobile-nav" style={{
       position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000,
@@ -140,6 +154,13 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
       WebkitBackdropFilter: 'blur(40px) saturate(180%)',
       borderTop: '0.5px solid rgba(0,0,0,0.12)',
     }}>
+      {pill && (
+        <div style={{
+          position: 'absolute', left: pill.left, top: 6, width: PILL_W, height: PILL_H,
+          borderRadius: 14, background: 'rgba(19,102,240,0.12)',
+          transition: 'left 0.25s var(--ease)', pointerEvents: 'none',
+        }} />
+      )}
       {navList.map(item => {
         const active = activeKey === item.key
         const badgeVal = item.badge ? counts?.[item.badge] : 0
@@ -147,6 +168,7 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
         return (
           <button
             key={item.key}
+            ref={el => { btnRefs.current[item.key] = el }}
             onClick={() => onNav(item.key)}
             style={{
               flex: 1,
