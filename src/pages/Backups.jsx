@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getBackups, restoreBackup, createBackupNow } from '../api'
 import { useToast } from '../components/Toast'
+import { useEscapeKey } from '../hooks/useEscapeKey'
 
 function reasonLabel(reason) {
   if (reason === 'scheduled') return 'плановый'
@@ -16,6 +17,7 @@ export default function Backups() {
   const [loading, setLoading] = useState(true)
   const [forbidden, setForbidden] = useState(false)
   const [restoreTarget, setRestoreTarget] = useState(null)
+  useEscapeKey(() => setRestoreTarget(null), !!restoreTarget)
   const [confirmWord, setConfirmWord] = useState('')
   const [restoring, setRestoring] = useState(false)
   const [creating, setCreating] = useState(false)
@@ -115,8 +117,8 @@ export default function Backups() {
       ))}
 
       {restoreTarget && (
-        <div onClick={() => setRestoreTarget(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-          <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 440, padding: 26 }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
+          <div style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 440, padding: 26 }}>
             <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 17, color: '#E0473B', marginBottom: 8 }}>Восстановить из бэкапа?</div>
             <div style={{ fontSize: 13, color: '#5A6573', marginBottom: 18, lineHeight: 1.5 }}>
               Это заменит текущие данные снимком от{' '}

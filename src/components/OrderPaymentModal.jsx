@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { markPayment } from '../api'
 import { useToast } from './Toast'
+import { useEscapeKey } from '../hooks/useEscapeKey'
 
 export default function OrderPaymentModal({ order, side, onClose, onSaved }) {
   const { show } = useToast()
+  useEscapeKey(onClose)
   const [ppNumber, setPpNumber] = useState('')
   const [ppDate, setPpDate] = useState(new Date().toISOString().slice(0, 10))
   const [saving, setSaving] = useState(false)
@@ -38,7 +40,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved }) {
   }
 
   return (
-    <div onClick={onClose} style={{
+    <div style={{
       position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)',
       zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24,
     }}>

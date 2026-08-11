@@ -42,7 +42,7 @@ export default function CommandPalette({ open, onClose, onOpenOrder, onOpenClien
   if (!open) return null
 
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 2100, overflowY: 'auto', display: 'grid', padding: '10vh 24px 24px' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 2100, overflowY: 'auto', display: 'grid', padding: '10vh 24px 24px' }}>
       <div onClick={e => e.stopPropagation()} style={{ margin: '0 auto', width: '100%', maxWidth: 560, background: '#FFFFFF', borderRadius: 20, boxShadow: '0 40px 90px rgba(14,23,38,0.35)', overflow: 'hidden', maxHeight: '70vh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '16px 18px', borderBottom: '1px solid #E8EAEE' }}>
           <input

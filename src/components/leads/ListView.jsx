@@ -7,6 +7,7 @@ import ScriptPanel from './ScriptPanel'
 import LeadEditModal from './LeadEditModal'
 import { logCall, claimLead } from '../../api'
 import { SkeletonRow } from '../Skeleton'
+import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { useCelebration } from '../Celebration'
 import { useAuth } from '../../AuthContext'
 
@@ -26,6 +27,7 @@ export default function ListView({ industry }) {
   const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState(() => ({ search: '', stage: '', overdueOnly: false, ...loadFilters() }))
   const [activeLead, setActiveLead] = useState(null)
+  useEscapeKey(() => setActiveLead(null), !!activeLead)
   const [editLead, setEditLead] = useState(null)
   const [saving, setSaving] = useState(false)
   const [visibleCount, setVisibleCount] = useState(10)
@@ -173,8 +175,7 @@ export default function ListView({ industry }) {
       )}
 
       {activeLead && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(10,16,28,0.65)', zIndex: 1000, display: 'grid', padding: 20, overflowY: 'auto' }}
-          onClick={e => { if (e.target === e.currentTarget) setActiveLead(null) }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(10,16,28,0.65)', zIndex: 1000, display: 'grid', padding: 20, overflowY: 'auto' }}>
           <div className="leads-call-modal" style={{ position: 'relative', width: '100%', maxWidth: 1000, margin: 'auto', borderRadius: 24, overflow: 'hidden', boxShadow: '0 40px 90px rgba(10,16,28,0.5)' }}>
             {/* Слой 1 — сплошная плотная подложка под блюром */}
             <div style={{ position: 'absolute', inset: 0, background: '#EEF1F5' }} />

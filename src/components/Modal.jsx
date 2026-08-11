@@ -1,6 +1,8 @@
 import React from 'react'
+import { useEscapeKey } from '../hooks/useEscapeKey'
 
 export function ModalOverlay({ onClose, children }) {
+  useEscapeKey(onClose)
   return (
     <div
       className="modal-overlay"
@@ -15,7 +17,6 @@ export function ModalOverlay({ onClose, children }) {
         padding: 24,
         animation: 'rise 0.2s ease',
       }}
-      onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
       <div className="modal-panel" style={{
         margin: 'auto',

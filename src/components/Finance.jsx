@@ -493,7 +493,7 @@ export default function Finance({ refreshKey }) {
 
       {/* Модалка — детали поступлений */}
       {showInModal && (
-        <div onClick={() => setShowInModal(false)} style={{
+        <div style={{
           position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.4)', backdropFilter: 'blur(8px)',
           zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 16,
         }}>
@@ -542,7 +542,7 @@ export default function Finance({ refreshKey }) {
 
       {/* Модалка — детали списаний */}
       {showOutModal && (
-        <div onClick={() => setShowOutModal(false)} style={{
+        <div style={{
           position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.4)', backdropFilter: 'blur(8px)',
           zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 16,
         }}>

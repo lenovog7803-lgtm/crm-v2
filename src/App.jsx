@@ -139,17 +139,51 @@ function MainApp() {
     }).catch(() => {})
   }, [ordersKey, tasksKey])
 
-  // Navigation
-  const openOrder = id => { setSelectedOrderId(id); setPage('order-detail'); setSearch('') }
-  const openClient = id => { setSelectedClientId(id); setPage('client-detail'); setSearch('') }
-  const openCarrier = id => { setSelectedCarrierId(id); setPage('carrier-detail'); setSearch('') }
+  // Navigation — the app has no router (page is plain state, the URL never
+  // changes), so the browser's back/forward swipe gesture had nowhere to
+  // go: with only one real history entry, swiping back just reloaded the
+  // document instead of moving between in-app pages. Pushing a history
+  // entry on every navigation gives that gesture somewhere to land.
+  const pushNavState = (next) => window.history.pushState(next, '')
+
+  const openOrder = id => {
+    setSelectedOrderId(id); setPage('order-detail'); setSearch('')
+    pushNavState({ page: 'order-detail', selectedOrderId: id, selectedClientId: null, selectedCarrierId: null })
+  }
+  const openClient = id => {
+    setSelectedClientId(id); setPage('client-detail'); setSearch('')
+    pushNavState({ page: 'client-detail', selectedOrderId: null, selectedClientId: id, selectedCarrierId: null })
+  }
+  const openCarrier = id => {
+    setSelectedCarrierId(id); setPage('carrier-detail'); setSearch('')
+    pushNavState({ page: 'carrier-detail', selectedOrderId: null, selectedClientId: null, selectedCarrierId: id })
+  }
 
   const handleNav = key => {
     if (key === 'admin' && !isEgorDir) key = 'tasks'
     if (isManager && !MANAGER_PAGES.includes(key)) key = 'my-dashboard'
     setPage(key)
     setSearch(loadPageSearch(key))
+    pushNavState({ page: key, selectedOrderId: null, selectedClientId: null, selectedCarrierId: null })
   }
+
+  // Baseline history entry so the very first popstate (from the first
+  // back-swipe) has state to restore instead of landing on `null`, then
+  // listen for the browser's back/forward (incl. trackpad/edge swipe) and
+  // replay it as an in-app navigation instead of a real page transition.
+  useEffect(() => {
+    window.history.replaceState({ page, selectedOrderId, selectedClientId, selectedCarrierId }, '')
+    const onPopState = (e) => {
+      if (!e.state) return
+      setPage(e.state.page)
+      setSelectedOrderId(e.state.selectedOrderId ?? null)
+      setSelectedClientId(e.state.selectedClientId ?? null)
+      setSelectedCarrierId(e.state.selectedCarrierId ?? null)
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (role !== 'director' && role !== 'admin') return

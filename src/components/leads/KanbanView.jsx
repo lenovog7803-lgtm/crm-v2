@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { getLeads, updateLead, logCall, claimLead } from '../../api'
 import { useRealtime } from '../../hooks/useRealtime'
+import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { STAGES } from '../../constants/leads'
 import CallCard from './CallCard'
 import CallOutcomeBar from './CallOutcomeBar'
@@ -106,6 +107,7 @@ export default function KanbanView({ industry }) {
   const [editLead, setEditLead] = useState(null)
   const [saving, setSaving] = useState(false)
   const { celebrate } = useCelebration()
+  useEscapeKey(() => setActiveLead(null), !!activeLead)
 
   const loadLeads = (showLoading = true) => {
     if (showLoading) setLoading(true)
@@ -188,8 +190,7 @@ export default function KanbanView({ industry }) {
       </div>
 
       {activeLead && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(10,16,28,0.65)', zIndex: 1000, display: 'grid', padding: 20, overflowY: 'auto' }}
-          onClick={e => { if (e.target === e.currentTarget) setActiveLead(null) }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(10,16,28,0.65)', zIndex: 1000, display: 'grid', padding: 20, overflowY: 'auto' }}>
           <div className="leads-call-modal" style={{ position: 'relative', width: '100%', maxWidth: 1000, margin: 'auto', borderRadius: 24, overflow: 'hidden', boxShadow: '0 40px 90px rgba(10,16,28,0.5)' }}>
             {/* Слой 1 — сплошная плотная подложка под блюром */}
             <div style={{ position: 'absolute', inset: 0, background: '#EEF1F5' }} />

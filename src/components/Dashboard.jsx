@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getDashboard, getOrders, getGoals, saveGoals } from '../api'
 import { useIsMobile } from '../hooks/useIsMobile'
+import { useEscapeKey } from '../hooks/useEscapeKey'
 import { CountUp } from './CountUp'
 import { CircularProgress } from './CircularProgress'
 import { SkeletonCard } from './Skeleton'
@@ -337,11 +338,10 @@ function ChartSVG({ current, prev, labels, mode, todayIdx }) {
 }
 
 function DebtModal({ title, orders, onClose, onOpenOrder }) {
+  useEscapeKey(onClose)
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.45)', backdropFilter: 'blur(8px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 20 }}
-      onClick={onClose}>
-      <div style={{ margin: 'auto', background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(30px)', borderRadius: 24, maxWidth: 560, width: '90%', border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 40px 80px rgba(20,30,55,0.3)', animation: 'modalIn 0.22s var(--ease) both' }}
-        onClick={e => e.stopPropagation()}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.45)', backdropFilter: 'blur(8px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 20 }}>
+      <div style={{ margin: 'auto', background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(30px)', borderRadius: 24, maxWidth: 560, width: '90%', border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 40px 80px rgba(20,30,55,0.3)', animation: 'modalIn 0.22s var(--ease) both' }}>
         <div style={{ padding: 28 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
@@ -385,9 +385,10 @@ function TopRow({ rank, name, value, color, bg }) {
 }
 
 function FullListModal({ title, subtitle, items, valueOf, color, bg, onClose }) {
+  useEscapeKey(onClose)
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 20 }}>
-      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 520, border: '1px solid rgba(14,23,38,0.08)', boxShadow: '0 40px 80px rgba(20,30,55,0.28)', animation: 'modalIn 0.22s var(--ease) both' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 20 }}>
+      <div style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 520, border: '1px solid rgba(14,23,38,0.08)', boxShadow: '0 40px 80px rgba(20,30,55,0.28)', animation: 'modalIn 0.22s var(--ease) both' }}>
         <div style={{ padding: 26 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
             <div>
@@ -419,9 +420,10 @@ const GOAL_META = {
 function GoalEditModal({ goalKey, value, onChange, onClose, onSave }) {
   const meta = GOAL_META[goalKey]
   const [saving, setSaving] = useState(false)
+  useEscapeKey(onClose)
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.45)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 1000, display: 'grid', padding: 20 }}>
-      <div onClick={e => e.stopPropagation()} style={{
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.45)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 1000, display: 'grid', padding: 20 }}>
+      <div style={{
         margin: 'auto', background: 'rgba(255,255,255,0.85)',
         backdropFilter: 'blur(28px) saturate(180%)', WebkitBackdropFilter: 'blur(28px) saturate(180%)',
         borderRadius: 20, width: '100%', maxWidth: 340,
@@ -510,8 +512,6 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
     : null
   const marginUp = marginDiff !== null && marginDiff >= 0
 
-  const netProfit = margin * 0.85
-
   const isMobile = useIsMobile()
 
   // Goals are inherently monthly (backend /goals takes a single YYYY-MM) —
@@ -532,6 +532,16 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
     if (!goalsMonth) { setGoals(null); return }
     getGoals(goalsMonth).then(setGoals).catch(() => setGoals(null))
   }, [goalsMonth])
+
+  // "Чистая прибыль" on the hero card used to be recomputed locally as
+  // margin * 0.85 — a stale multiplier that doesn't match the backend's
+  // actual tax rate (TAX_RATE = 0.20, i.e. margin * 0.8), and calculated
+  // over a looser order set (any date field, cancelled orders included)
+  // than /goals' profit_fact (strict unload_date within the month, no
+  // cancelled orders). That's why this card and "Цели месяца" disagreed.
+  // When the real per-month figure is available, use it directly — one
+  // source of truth instead of two formulas that can drift apart.
+  const netProfit = (goals && goalsMonth) ? goals.profit_fact : margin * 0.8
 
   if (loading) return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

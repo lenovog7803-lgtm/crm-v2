@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { updateLead } from '../../api'
 import { STAGES } from '../../constants/leads'
+import { useEscapeKey } from '../../hooks/useEscapeKey'
 
 const labelStyle = { fontSize: 12, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.05em', marginBottom: 6, display: 'block' }
 const fieldStyle = { width: '100%', background: '#F7F8FA' }
@@ -8,6 +9,7 @@ const fieldStyle = { width: '100%', background: '#F7F8FA' }
 export default function LeadEditModal({ lead, onClose, onSaved }) {
   const [form, setForm] = useState({ ...lead })
   const [saving, setSaving] = useState(false)
+  useEscapeKey(onClose)
 
   const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }))
 
@@ -37,7 +39,6 @@ export default function LeadEditModal({ lead, onClose, onSaved }) {
 
   return (
     <div
-      onClick={e => { if (e.target === e.currentTarget) onClose() }}
       style={{
         position: 'fixed', inset: 0,
         background: 'rgba(14,23,38,0.55)',

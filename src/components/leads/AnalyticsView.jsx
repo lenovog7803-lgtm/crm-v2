@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getLeadsAnalytics, getCallsByDay } from '../../api'
+import { useEscapeKey } from '../../hooks/useEscapeKey'
 
 const PERIODS = [
   { id: 'week', label: 'Неделя' },
@@ -85,6 +86,7 @@ export function FunnelChart({ funnel }) {
 function DayCallsModal({ date, onClose }) {
   const [calls, setCalls] = useState([])
   const [loading, setLoading] = useState(true)
+  useEscapeKey(onClose)
 
   useEffect(() => {
     setLoading(true)
@@ -92,8 +94,8 @@ function DayCallsModal({ date, onClose }) {
   }, [date])
 
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 520, padding: 26 }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
+      <div style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 520, padding: 26 }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 }}>
           <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 17, color: '#0E1726' }}>
             Звонки за {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
