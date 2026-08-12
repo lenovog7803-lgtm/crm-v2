@@ -146,6 +146,7 @@ export const syncToSheets = () => req('/sheets/sync', { method: 'POST' });
 // Trash
 export const getTrash = () => req('/trash');
 export const restoreTrash = (collection, itemId) => req(`/trash/restore/${collection}/${itemId}`, { method: 'POST' });
+export const purgeTrash = () => req('/trash/purge', { method: 'POST' });
 
 // Duplicate order
 export const duplicateOrder = (orderId) => req(`/orders/${orderId}/duplicate`, { method: 'POST' });

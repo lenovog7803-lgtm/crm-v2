@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getTrash, restoreTrash } from '../api'
+import { getTrash, restoreTrash, purgeTrash } from '../api'
 
 const TYPE_LABELS = {
   orders: 'Заявка',
@@ -42,6 +42,9 @@ export default function Trash() {
   const [loading, setLoading] = useState(true)
   const [restoring, setRestoring] = useState(null)
   const [filter, setFilter] = useState('all')
+  const [purgeOpen, setPurgeOpen] = useState(false)
+  const [purgeWord, setPurgeWord] = useState('')
+  const [purging, setPurging] = useState(false)
 
   useEffect(() => {
     setLoading(true)
@@ -55,6 +58,18 @@ export default function Trash() {
       setItems(prev => prev.filter(i => i.id !== item.id))
     } catch (e) { console.error(e) }
     setRestoring(null)
+  }
+
+  const handlePurge = async () => {
+    if (purgeWord.trim().toUpperCase() !== 'УДАЛИТЬ') return
+    setPurging(true)
+    try {
+      await purgeTrash()
+      setItems([])
+      setPurgeOpen(false)
+      setPurgeWord('')
+    } catch (e) { console.error(e) }
+    setPurging(false)
   }
 
   const filtered = filter === 'all' ? items : items.filter(i => i.collection === filter)
@@ -82,7 +97,59 @@ export default function Trash() {
         <div style={{ marginLeft: 'auto', fontFamily: 'Onest', fontWeight: 800, fontSize: 22, color: items.length > 0 ? '#C81923' : '#A6AEB8' }}>
           {items.length}
         </div>
+        {items.length > 0 && (
+          <button
+            onClick={() => setPurgeOpen(true)}
+            style={{
+              padding: '9px 16px', borderRadius: 10, border: '1px solid rgba(200,25,35,0.25)',
+              background: 'rgba(200,25,35,0.06)', color: '#C81923',
+              fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 700, cursor: 'pointer',
+            }}
+          >
+            Очистить корзину
+          </button>
+        )}
       </div>
+
+      {purgeOpen && (
+        <div
+          onClick={() => !purging && setPurgeOpen(false)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, display: 'grid', padding: 24 }}
+        >
+          <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 420, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#C81923', marginBottom: 6 }}>
+              Необратимое действие
+            </div>
+            <div style={{ fontSize: 14, color: '#5A6573', marginBottom: 18 }}>
+              Будут навсегда удалены все {items.length} элементов в корзине. Это нельзя отменить. Введите <b>УДАЛИТЬ</b>, чтобы подтвердить.
+            </div>
+            <input
+              value={purgeWord}
+              onChange={e => setPurgeWord(e.target.value)}
+              placeholder="УДАЛИТЬ"
+              autoFocus
+              style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 14, color: '#0E1726', boxSizing: 'border-box', marginBottom: 22 }}
+            />
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => { setPurgeOpen(false); setPurgeWord('') }} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', fontSize: 14, color: '#5A6573', cursor: 'pointer' }}>
+                Отмена
+              </button>
+              <button
+                onClick={handlePurge}
+                disabled={purging || purgeWord.trim().toUpperCase() !== 'УДАЛИТЬ'}
+                style={{
+                  flex: 2, padding: 13, borderRadius: 12, border: 'none',
+                  background: purgeWord.trim().toUpperCase() === 'УДАЛИТЬ' ? '#C81923' : '#C4CAD4',
+                  color: '#FFFFFF', fontSize: 14, fontWeight: 700,
+                  cursor: purgeWord.trim().toUpperCase() === 'УДАЛИТЬ' && !purging ? 'pointer' : 'default',
+                }}
+              >
+                {purging ? 'Удаляю…' : 'Удалить навсегда'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="card" style={{ padding: '14px 16px', display: 'flex', gap: 8, flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
         <button style={chipStyle('all')} onClick={() => setFilter('all')}>Все ({items.length})</button>
