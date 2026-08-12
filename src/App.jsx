@@ -22,6 +22,7 @@ import Leads from './pages/Leads'
 import Trash from './components/Trash'
 import Backups from './pages/Backups'
 import Admin from './pages/Admin'
+import Kudir from './pages/Kudir'
 import ManagerDashboard from './pages/ManagerDashboard'
 import ErrorBoundary from './components/ErrorBoundary'
 
@@ -161,6 +162,7 @@ function MainApp() {
 
   const handleNav = key => {
     if (key === 'admin' && !isEgorDir) key = 'tasks'
+    if (key === 'kudir' && !isDirector) key = 'tasks'
     if (isManager && !MANAGER_PAGES.includes(key)) key = 'my-dashboard'
     setPage(key)
     setSearch(loadPageSearch(key))
@@ -344,6 +346,7 @@ function MainApp() {
             {page === 'trash' && <Trash />}
             {page === 'backups' && <Backups />}
             {page === 'admin' && isEgorDir && <Admin />}
+            {page === 'kudir' && isDirector && <Kudir />}
           </div>
         </main>
       </div>

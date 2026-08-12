@@ -6,6 +6,7 @@ import { useRealtime } from '../hooks/useRealtime'
 import { useToast } from './Toast'
 import { useCelebration } from './Celebration'
 import OrderPaymentModal from './OrderPaymentModal'
+import CarrierActModal from './CarrierActModal'
 
 const STATUSES = [
   { id: 'new', label: 'Новая', color: '#7C3AED', bg: 'rgba(124,58,237,0.1)' },
@@ -209,6 +210,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
   const [savedOk, setSavedOk] = useState(false)
   const [saveErr, setSaveErr] = useState(false)
   const [duplicating, setDuplicating] = useState(false)
+  const [actModalOpen, setActModalOpen] = useState(false)
 
   useEffect(() => {
     if (!orderId) return
@@ -310,6 +312,12 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     const dateKey = step?.dateKey || key + '_date'
     const current = draft[key] !== undefined ? draft[key] : order[key]
     const newVal = !current
+    // Turning ON "получено от перевозчика" requires the act number first —
+    // the checkbox only ticks once that's confirmed in the modal below.
+    if (key === 'docs_from_carrier_received' && newVal) {
+      setActModalOpen(true)
+      return
+    }
     const now = new Date().toISOString()
     const patch = { [key]: newVal, [dateKey]: newVal ? now : null }
     try {
@@ -317,6 +325,20 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
       await apiUpdate(order.id, patch)
       setOrder(prev => ({ ...prev, ...patch }))
       show(`${step?.label || key}${newVal ? ' — отмечено' : ' — снято'}`, { type: 'success' })
+    } catch (e) {
+      show('Ошибка сохранения: ' + e.message, { type: 'error' })
+    }
+  }
+
+  const confirmCarrierAct = async (actNumber, actDate) => {
+    const now = new Date().toISOString()
+    const patch = { docs_from_carrier_received: true, docs_from_carrier_date: now, carrier_act_number: actNumber, carrier_act_date: actDate }
+    try {
+      lastLocalEditRef.current = Date.now()
+      await apiUpdate(order.id, patch)
+      setOrder(prev => ({ ...prev, ...patch }))
+      show('Получено от перевозчика — отмечено', { type: 'success' })
+      setActModalOpen(false)
     } catch (e) {
       show('Ошибка сохранения: ' + e.message, { type: 'error' })
     }
@@ -688,6 +710,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                         <div style={{ fontSize: 11, color: '#1E9E5A', marginTop: 2 }}>
                           {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })} в{' '}
                           {new Date(date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                          {step.key === 'docs_from_carrier_received' && view.carrier_act_number && ` · акт № ${view.carrier_act_number}`}
                         </div>
                       )}
                     </div>
@@ -889,6 +912,15 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
           side={paymentModal}
           onClose={() => setPaymentModal(null)}
           onSaved={() => { lastLocalEditRef.current = Date.now(); getOrder(order.id).then(setOrder).catch(console.error); setPaymentModal(null) }}
+        />
+      )}
+
+      {actModalOpen && (
+        <CarrierActModal
+          initialValue={order.carrier_act_number}
+          initialDate={order.carrier_act_date}
+          onClose={() => setActModalOpen(false)}
+          onConfirm={confirmCarrierAct}
         />
       )}
     </div>

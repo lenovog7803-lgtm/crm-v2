@@ -143,6 +143,10 @@ export const createCalendarEvent = (data) => req('/google/calendar/event', { met
 // Google Sheets sync
 export const syncToSheets = () => req('/sheets/sync', { method: 'POST' });
 
+// Google Sheets import (Sheets -> CRM, director-only, preview-before-apply)
+export const getImportPreview = () => req('/sync/import_preview');
+export const applyImportFromSheets = () => req('/sync/import_from_sheets', { method: 'POST' });
+
 // Trash
 export const getTrash = () => req('/trash');
 export const restoreTrash = (collection, itemId) => req(`/trash/restore/${collection}/${itemId}`, { method: 'POST' });
@@ -194,3 +198,11 @@ export const getManagerStatsDetail = (id, period) => req(`/admin/manager_stats/$
 // Admin — notifications
 export const getNotifications = () => req('/notifications');
 export const markNotificationRead = (id) => req(`/notifications/${id}/read`, { method: 'POST' });
+
+// KUDiR — journal of income/transit rows created on payment mark (director-only)
+export const getMissingPP = () => req('/kudir/missing_pp');
+export const getKudirEntries = (dateFrom, dateTo) =>
+  req(`/kudir/entries?date_from=${dateFrom || ''}&date_to=${dateTo || ''}`);
+export const updateKudirEntry = (id, data) => req(`/kudir/entries/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const exportKudirUrl = (year, quarter) =>
+  `${BASE}/kudir/export?year=${year}${quarter ? `&quarter=${quarter}` : ''}&token=${encodeURIComponent(token)}`;

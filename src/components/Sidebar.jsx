@@ -112,13 +112,15 @@ const MANAGER_DASHBOARD_ITEM = {
   )
 }
 
-// Not shown in the regular nav — reachable only by egor_dir specifically
-// (his own call, not even the other director account), via a long-press on
-// the profile avatar.
+// Not shown in the regular nav — reachable only via a long-press on the
+// profile avatar. Admin/Backups stay egor_dir-only (his own call); KUDiR
+// opens to any director account, gated by role rather than username since
+// both director logins need to reach the accounting journal.
 const HIDDEN_NAV = [
   {
     key: 'admin',
     label: 'Администрирование',
+    egorOnly: true,
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -128,11 +130,23 @@ const HIDDEN_NAV = [
   {
     key: 'backups',
     label: 'Резервные копии',
+    egorOnly: true,
     icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <ellipse cx="12" cy="5" rx="9" ry="3"/>
         <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
         <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+      </svg>
+    )
+  },
+  {
+    key: 'kudir',
+    label: 'КУДиР',
+    directorOnly: true,
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
       </svg>
     )
   },
@@ -177,10 +191,12 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
     if (el) setPillRect({ top: el.offsetTop, height: el.offsetHeight })
   }, [activeKey, expanded])
 
+  const isDirector = profile.role === 'director' || profile.role === 'admin'
+
   const startLongPress = () => {
-    // Egor's own call — nobody else, not even the other director account,
-    // should be able to reach this menu.
-    if (!isEgorDir) return
+    // Egor's own call for admin/backups; any director account can reach the
+    // menu too, since KUDiR needs to be open to both director logins.
+    if (!isEgorDir && !isDirector) return
     // Only reachable with the sidebar expanded — collapsed, the avatar sits
     // too close to the screen edge for a 200px popup to sit near it without
     // overlapping content awkwardly either way.
@@ -366,7 +382,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
             <div style={{ fontSize: 10.5, fontWeight: 700, color: '#A6AEB8', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '6px 10px 4px' }}>
               Скрытые функции
             </div>
-            {HIDDEN_NAV.map(item => (
+            {HIDDEN_NAV.filter(item => (item.egorOnly ? isEgorDir : true) && (item.directorOnly ? isDirector : true)).map(item => (
               <button
                 key={item.key}
                 onClick={() => { onNav(item.key); setHiddenMenuOpen(false) }}
