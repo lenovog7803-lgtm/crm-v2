@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { markPayment } from '../api'
+import { markPayment, getOrder } from '../api'
 import { useToast } from './Toast'
 import { useEscapeKey } from '../hooks/useEscapeKey'
 
@@ -38,6 +38,17 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
       onSaved?.()
       onClose()
     } catch (e) {
+      // "Failed to fetch" can mean the response never made it back even
+      // though the write landed — check the order before reporting a
+      // failure that the data already contradicts.
+      const paidField = isCarrier ? 'carrier_paid' : 'client_paid'
+      const fresh = await getOrder(order.id).catch(() => null)
+      if (fresh?.[paidField]) {
+        onSaved?.()
+        onClose()
+        setSaving(false)
+        return
+      }
       setError('Ошибка: ' + e.message)
       show('Ошибка: ' + e.message, { type: 'error' })
     }
