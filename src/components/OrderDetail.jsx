@@ -911,6 +911,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
           order={order}
           side={paymentModal}
           onClose={() => setPaymentModal(null)}
+          onBeforeSave={() => { lastLocalEditRef.current = Date.now() }}
           onSaved={() => { lastLocalEditRef.current = Date.now(); getOrder(order.id).then(setOrder).catch(console.error); setPaymentModal(null) }}
         />
       )}

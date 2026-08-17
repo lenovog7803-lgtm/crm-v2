@@ -3,12 +3,13 @@ import { markPayment } from '../api'
 import { useToast } from './Toast'
 import { useEscapeKey } from '../hooks/useEscapeKey'
 
-export default function OrderPaymentModal({ order, side, onClose, onSaved }) {
+export default function OrderPaymentModal({ order, side, onClose, onSaved, onBeforeSave }) {
   const { show } = useToast()
   useEscapeKey(onClose)
   const [ppNumber, setPpNumber] = useState('')
   const [ppDate, setPpDate] = useState(new Date().toISOString().slice(0, 10))
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
 
   const isCarrier = side === 'carrier'
   const amount = isCarrier ? order.carrier_rate : order.client_rate
@@ -16,7 +17,9 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved }) {
 
   const save = async () => {
     setSaving(true)
+    setError('')
     try {
+      onBeforeSave?.()
       await markPayment(order.id, side, { paid: true, pp_number: ppNumber.trim() || null, pp_date: ppDate })
       show(
         isCarrier
@@ -26,6 +29,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved }) {
           type: 'success',
           actionLabel: 'Отменить',
           onAction: async () => {
+            onBeforeSave?.()
             await markPayment(order.id, side, { paid: false })
             onSaved?.()
           },
@@ -34,6 +38,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved }) {
       onSaved?.()
       onClose()
     } catch (e) {
+      setError('Ошибка: ' + e.message)
       show('Ошибка: ' + e.message, { type: 'error' })
     }
     setSaving(false)
@@ -82,6 +87,8 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved }) {
           onChange={e => setPpDate(e.target.value)}
           style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 14, color: '#0E1726', boxSizing: 'border-box', marginBottom: 22 }}
         />
+
+        {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center', marginBottom: 16 }}>{error}</div>}
 
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', fontSize: 14, color: '#5A6573', cursor: 'pointer' }}>

@@ -157,8 +157,11 @@ export const duplicateOrder = (orderId) => req(`/orders/${orderId}/duplicate`, {
 export const syncOrderDocUrls = (orderId) => req(`/orders/${orderId}/sync_doc_urls`, { method: 'POST' });
 
 // Mark order payment (side: 'client' | 'carrier')
+// retries=0: this POST isn't idempotent (mark_payment also writes a KUDiR
+// entry), so a transient failure must not be silently retried — that risks
+// duplicate entries. The caller sees the failure and can retry deliberately.
 export const markPayment = (orderId, side, data) =>
-  req(`/orders/${orderId}/mark_payment?side=${side}`, { method: 'POST', body: JSON.stringify(data) });
+  req(`/orders/${orderId}/mark_payment?side=${side}`, { method: 'POST', body: JSON.stringify(data) }, 0);
 
 // Global search (Cmd+K)
 export const globalSearch = (q) => req(`/search?q=${encodeURIComponent(q)}`);
