@@ -385,7 +385,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 const route = order.route_from && order.route_to ? `${order.route_from} → ${order.route_to}` : (order.route || '—')
                 const overdue = isOverdue(order)
                 const missingClientPP = order.client_paid && !order.client_pp_number && !order.client_payments?.length
-                const flagged = overdue || missingClientPP
+                const missingCarrierPP = order.carrier_paid && !order.carrier_pp_number && !order.carrier_payments?.length
+                const flagged = overdue || missingClientPP || missingCarrierPP
                 const isSelected = selected.has(order.id)
                 const dx = swipe.id === order.id ? swipe.dx : 0
                 const isRemoving = removingIds.has(order.id)
@@ -448,7 +449,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                           {order.order_number || order.id}
                         </span>
                         {overdue && <span style={{ fontSize: 10, color: '#C81923', fontWeight: 700 }}>ПРОСРОЧЕНО</span>}
-                        {missingClientPP && <span style={{ fontSize: 10, color: '#C81923', fontWeight: 700 }}>НЕТ ПП</span>}
+                        {(missingClientPP || missingCarrierPP) && <span style={{ fontSize: 10, color: '#C81923', fontWeight: 700 }}>НЕТ ПП</span>}
                       </div>
                       <div style={{ fontSize: 14, fontWeight: 600, color: '#0E1726', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{route}</div>
                       <div style={{ fontSize: 12, color: '#8E8E93' }}>
@@ -505,7 +506,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           const [avA, avB] = getGradient(order.client_name || '')
           const overdue = isOverdue(order)
           const missingClientPP = order.client_paid && !order.client_pp_number && !order.client_payments?.length
-          const flagged = overdue || missingClientPP
+          const missingCarrierPP = order.carrier_paid && !order.carrier_pp_number && !order.carrier_payments?.length
+          const flagged = overdue || missingClientPP || missingCarrierPP
           const isSelected = selected.has(order.id)
           const isRemoving = removingIds.has(order.id)
           const isFlash = flashOrderId === order.id
@@ -550,7 +552,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                   <div style={{ fontFamily: 'JetBrains Mono', fontWeight: 600, fontSize: 13.5, color: '#1366F0' }}>
                     {order.order_number || order.id}
                   </div>
-                  {missingClientPP && <span style={{ fontSize: 9.5, color: '#C81923', fontWeight: 700 }}>НЕТ ПП</span>}
+                  {(missingClientPP || missingCarrierPP) && <span style={{ fontSize: 9.5, color: '#C81923', fontWeight: 700 }}>НЕТ ПП</span>}
                 </div>
                 <div style={{
                   display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 4, padding: '2px 8px', borderRadius: 6,
