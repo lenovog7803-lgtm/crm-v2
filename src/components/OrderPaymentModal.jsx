@@ -99,6 +99,15 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
           style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 14, color: '#0E1726', boxSizing: 'border-box', marginBottom: 22 }}
         />
 
+        {(!ppNumber.trim() || !ppDate) && (
+          <div style={{
+            background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.25)',
+            borderRadius: 12, padding: '10px 14px', marginBottom: 14, fontSize: 12, color: '#D97706',
+          }}>
+            Без номера ПП и даты эта оплата не попадёт в книгу учёта. Можно сохранить сейчас и дозаполнить позже — заявка появится в списке «Дозаполнить».
+          </div>
+        )}
+
         {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center', marginBottom: 16 }}>{error}</div>}
 
         <div style={{ display: 'flex', gap: 10 }}>
