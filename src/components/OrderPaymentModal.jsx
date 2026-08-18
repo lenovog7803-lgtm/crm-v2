@@ -14,13 +14,16 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
   const who = isCarrier ? order.carrier_name : order.client_name
 
   // Payments already saved on the order from an earlier partial-payment
-  // session — shown read-only (can only be removed, not amount-edited: the
-  // backend only exposes add/delete, no in-place edit). A reopened modal
-  // must not re-default a new row to the full rate on top of these, or
-  // saving would double-count what's already paid.
+  // session — editable inline. The backend only exposes add/delete (no
+  // in-place edit), so committing a change to one of these deletes the old
+  // entry and re-adds it with the new values. A reopened modal must not
+  // re-default a new row to the full rate on top of these, or saving would
+  // double-count what's already paid.
   const savedField = isCarrier ? 'carrier_payments' : 'client_payments'
   const [existingPayments, setExistingPayments] = useState(
-    (order[savedField] || []).filter(p => !String(p.id).startsWith('legacy-'))
+    (order[savedField] || [])
+      .filter(p => !String(p.id).startsWith('legacy-'))
+      .map(p => ({ ...p, _orig: { pp_number: p.pp_number, pp_date: p.pp_date, amount: p.amount } }))
   )
   const existingTotal = existingPayments.reduce((s, p) => s + (Number(p.amount) || 0), 0)
   const remaining = expected - existingTotal
@@ -30,13 +33,42 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
   ])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [removingId, setRemovingId] = useState(null)
+  const [busyId, setBusyId] = useState(null)
 
   const totalEntered = existingTotal + payments.reduce((s, p) => s + (Number(p.amount) || 0), 0)
   const matches = Math.abs(totalEntered - expected) < 0.01
 
+  const updateExisting = (id, field, value) => {
+    setExistingPayments(prev => prev.map(p => (p.id === id ? { ...p, [field]: value } : p)))
+  }
+
+  const isExistingDirty = (p) =>
+    (p.pp_number || '') !== (p._orig.pp_number || '') ||
+    (p.pp_date || '') !== (p._orig.pp_date || '') ||
+    Number(p.amount) !== Number(p._orig.amount)
+
+  const commitExisting = async (p) => {
+    setBusyId(p.id)
+    try {
+      onBeforeSave?.()
+      await deletePayment(order.id, side, p.id)
+      const res = await addPayment(order.id, side, {
+        pp_number: (p.pp_number || '').trim(),
+        pp_date: p.pp_date || today(),
+        amount: Number(p.amount) || 0,
+      })
+      const created = res.payments?.[res.payments.length - 1]
+      setExistingPayments(prev => prev.map(x => (x.id === p.id
+        ? { ...created, _orig: { pp_number: created.pp_number, pp_date: created.pp_date, amount: created.amount } }
+        : x)))
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+    setBusyId(null)
+  }
+
   const removeExisting = async (paymentId) => {
-    setRemovingId(paymentId)
+    setBusyId(paymentId)
     try {
       onBeforeSave?.()
       await deletePayment(order.id, side, paymentId)
@@ -44,7 +76,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
     } catch (e) {
       show('Ошибка: ' + e.message, { type: 'error' })
     }
-    setRemovingId(null)
+    setBusyId(null)
   }
 
   const addRow = () => {
@@ -158,28 +190,55 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
             </button>
           </div>
 
-          {existingPayments.map(p => (
-            <div key={p.id} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center', opacity: removingId === p.id ? 0.5 : 1 }}>
-              <div style={{ width: 90, padding: '9px 10px', borderRadius: 10, background: '#F0F2F5', fontSize: 12, color: '#5A6573', boxSizing: 'border-box' }}>
-                {p.pp_number || '—'}
+          {existingPayments.map(p => {
+            const dirty = isExistingDirty(p)
+            const busy = busyId === p.id
+            return (
+              <div key={p.id} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center', opacity: busy ? 0.5 : 1 }}>
+                <input
+                  value={p.pp_number}
+                  onChange={e => updateExisting(p.id, 'pp_number', e.target.value)}
+                  disabled={busy}
+                  placeholder="№ ПП"
+                  style={{ width: 90, padding: '9px 10px', borderRadius: 10, border: `1px solid ${dirty ? '#1366F0' : '#E8EAEE'}`, background: '#FFFFFF', fontSize: 12, color: '#0E1726', boxSizing: 'border-box' }}
+                />
+                <input
+                  type="date"
+                  value={p.pp_date}
+                  onChange={e => updateExisting(p.id, 'pp_date', e.target.value)}
+                  disabled={busy}
+                  style={{ width: 130, padding: '9px 10px', borderRadius: 10, border: `1px solid ${dirty ? '#1366F0' : '#E8EAEE'}`, background: '#FFFFFF', fontSize: 12, color: '#0E1726', boxSizing: 'border-box' }}
+                />
+                <input
+                  type="number"
+                  value={p.amount}
+                  onChange={e => updateExisting(p.id, 'amount', e.target.value === '' ? '' : Number(e.target.value))}
+                  disabled={busy}
+                  style={{ flex: 1, padding: '9px 10px', borderRadius: 10, border: `1px solid ${dirty ? '#1366F0' : '#E8EAEE'}`, background: '#FFFFFF', fontSize: 12, color: '#0E1726', boxSizing: 'border-box', minWidth: 0 }}
+                />
+                {dirty && (
+                  <button
+                    onClick={() => commitExisting(p)}
+                    disabled={busy}
+                    title="Сохранить изменения"
+                    type="button"
+                    style={{ width: 24, height: 24, border: 'none', background: 'transparent', color: '#1E9E5A', fontSize: 15, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}
+                  >
+                    ✓
+                  </button>
+                )}
+                <button
+                  onClick={() => removeExisting(p.id)}
+                  disabled={busy}
+                  title="Удалить сохранённый платёж"
+                  type="button"
+                  style={{ width: 24, height: 24, border: 'none', background: 'transparent', color: '#E0473B', fontSize: 16, cursor: 'pointer', flexShrink: 0 }}
+                >
+                  ×
+                </button>
               </div>
-              <div style={{ width: 130, padding: '9px 10px', borderRadius: 10, background: '#F0F2F5', fontSize: 12, color: '#5A6573', boxSizing: 'border-box' }}>
-                {p.pp_date}
-              </div>
-              <div style={{ flex: 1, padding: '9px 10px', borderRadius: 10, background: '#F0F2F5', fontSize: 12, color: '#5A6573', boxSizing: 'border-box', minWidth: 0 }}>
-                {(Number(p.amount) || 0).toLocaleString('ru-RU')} Br · сохранено
-              </div>
-              <button
-                onClick={() => removeExisting(p.id)}
-                disabled={removingId === p.id}
-                title="Удалить сохранённый платёж"
-                type="button"
-                style={{ width: 24, height: 24, border: 'none', background: 'transparent', color: '#E0473B', fontSize: 16, cursor: 'pointer', flexShrink: 0 }}
-              >
-                ×
-              </button>
-            </div>
-          ))}
+            )
+          })}
 
           {payments.map(p => (
             <div key={p.id} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center' }}>

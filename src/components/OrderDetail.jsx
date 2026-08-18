@@ -134,7 +134,9 @@ function ClickableName({ name, onClick }) {
   )
 }
 
-function PaymentButton({ type, order, onClick }) {
+const LONG_PRESS_MS = 2000
+
+function PaymentButton({ type, order, onClick, onLongPress }) {
   const isCarrier = type === 'carrier'
   const isPaid = isCarrier ? order.carrier_paid : order.client_paid
   const date = isCarrier ? order.carrier_paid_date : order.client_paid_date
@@ -144,9 +146,41 @@ function PaymentButton({ type, order, onClick }) {
   const label = isCarrier ? 'Платим перевозчику' : 'Получаем от клиента'
   const accent = isPaid ? '#1E9E5A' : (isCarrier ? '#E0473B' : '#0E1726')
 
+  // Long press (2s) opens the PP editor regardless of paid state; a plain
+  // tap keeps its existing meaning (mark / unmark). longPressFired guards
+  // the click handler that mouseup/touchend fires right after the timer.
+  const longPressTimer = useRef(null)
+  const longPressFired = useRef(false)
+  const startPress = () => {
+    longPressFired.current = false
+    longPressTimer.current = setTimeout(() => {
+      longPressFired.current = true
+      onLongPress?.()
+    }, LONG_PRESS_MS)
+  }
+  const cancelPress = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current)
+      longPressTimer.current = null
+    }
+  }
+  const handleClick = () => {
+    if (longPressFired.current) {
+      longPressFired.current = false
+      return
+    }
+    onClick()
+  }
+
   return (
     <div
-      onClick={onClick}
+      onClick={handleClick}
+      onMouseDown={startPress}
+      onMouseUp={cancelPress}
+      onTouchStart={startPress}
+      onTouchEnd={cancelPress}
+      onTouchCancel={cancelPress}
+      title={`Нажмите чтобы ${isPaid ? 'снять отметку' : 'отметить'} · удерживайте ${LONG_PRESS_MS / 1000} сек чтобы отредактировать ПП`}
       style={{
         flex: 1, padding: '14px 18px', borderRadius: 14, cursor: 'pointer',
         background: isPaid ? 'rgba(30,158,90,0.08)' : (isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(14,23,38,0.04)'),
@@ -154,9 +188,10 @@ function PaymentButton({ type, order, onClick }) {
           ? `2px solid ${isPaid ? 'rgba(30,158,90,0.28)' : 'rgba(224,71,59,0.35)'}`
           : `1px solid ${isPaid ? 'rgba(30,158,90,0.25)' : 'rgba(14,23,38,0.08)'}`,
         transition: 'all 0.2s',
+        userSelect: 'none', WebkitUserSelect: 'none',
       }}
       onMouseEnter={e => { if (!isPaid) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.09)' : 'rgba(14,23,38,0.07)' }}
-      onMouseLeave={e => { if (!isPaid) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(14,23,38,0.04)' }}
+      onMouseLeave={e => { cancelPress(); if (!isPaid) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(14,23,38,0.04)' }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{
@@ -698,8 +733,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
           <div className="card" style={{ padding: '20px 20px' }}>
             <SLabel>ОПЛАТА</SLabel>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <PaymentButton type="client" order={view} onClick={() => handlePayment('client')} />
-              <PaymentButton type="carrier" order={view} onClick={() => handlePayment('carrier')} />
+              <PaymentButton type="client" order={view} onClick={() => handlePayment('client')} onLongPress={() => setPaymentModal('client')} />
+              <PaymentButton type="carrier" order={view} onClick={() => handlePayment('carrier')} onLongPress={() => setPaymentModal('carrier')} />
             </div>
           </div>
 

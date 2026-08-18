@@ -384,7 +384,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 const margin = (order.client_rate || 0) - (order.carrier_rate || 0)
                 const route = order.route_from && order.route_to ? `${order.route_from} → ${order.route_to}` : (order.route || '—')
                 const overdue = isOverdue(order)
-                const missingClientPP = order.client_paid && !order.client_pp_number
+                const missingClientPP = order.client_paid && !order.client_pp_number && !order.client_payments?.length
                 const flagged = overdue || missingClientPP
                 const isSelected = selected.has(order.id)
                 const dx = swipe.id === order.id ? swipe.dx : 0
@@ -504,7 +504,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           const route = order.route_from && order.route_to ? `${order.route_from} → ${order.route_to}` : (order.route || '—')
           const [avA, avB] = getGradient(order.client_name || '')
           const overdue = isOverdue(order)
-          const missingClientPP = order.client_paid && !order.client_pp_number
+          const missingClientPP = order.client_paid && !order.client_pp_number && !order.client_payments?.length
           const flagged = overdue || missingClientPP
           const isSelected = selected.has(order.id)
           const isRemoving = removingIds.has(order.id)
