@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, restoreTrash, markPayment, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers, getOrderHistory } from '../api'
+import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, restoreTrash, markPayment, addPayment, deletePayment, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers, getOrderHistory } from '../api'
 import { fmtMoney, initials, getGradient, fmtDate } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useRealtime } from '../hooks/useRealtime'
@@ -139,6 +139,7 @@ function PaymentButton({ type, order, onClick }) {
   const isPaid = isCarrier ? order.carrier_paid : order.client_paid
   const date = isCarrier ? order.carrier_paid_date : order.client_paid_date
   const ppNumber = isCarrier ? order.carrier_pp_number : order.client_pp_number
+  const payments = (isCarrier ? order.carrier_payments : order.client_payments) || []
   const amount = isCarrier ? (order.carrier_rate || 0) : (order.client_rate || 0)
   const label = isCarrier ? 'Платим перевозчику' : 'Получаем от клиента'
   const accent = isPaid ? '#1E9E5A' : (isCarrier ? '#E0473B' : '#0E1726')
@@ -179,7 +180,9 @@ function PaymentButton({ type, order, onClick }) {
           {isPaid && date ? (
             <div style={{ fontSize: 11, color: '#1E9E5A', marginTop: 2 }}>
               {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}
-              {ppNumber && ` · ПП №${ppNumber}`}
+              {payments.length > 1
+                ? ` · ${payments.length} ПП`
+                : (ppNumber || payments[0]?.pp_number) && ` · ПП №${ppNumber || payments[0].pp_number}`}
             </div>
           ) : (
             <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>
@@ -354,8 +357,38 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
       setPaymentModal(side) // открыть модалку ввода ПП
       return
     }
-    // снятие отметки — без модалки, простое действие + тост с отменой
     const paidField = side === 'client' ? 'client_paid' : 'carrier_paid'
+    const paymentsField = side === 'client' ? 'client_payments' : 'carrier_payments'
+    const existingPayments = (order[paymentsField] || []).filter(p => !String(p.id).startsWith('legacy-'))
+
+    // Заявки с несколькими частичными ПП (payments/{side} endpoints) —
+    // снятие отметки должно удалить каждый ПП по отдельности, иначе
+    // client_payments/строки книги остаются висеть при client_paid=false.
+    if (existingPayments.length) {
+      try {
+        lastLocalEditRef.current = Date.now()
+        for (const p of existingPayments) {
+          await deletePayment(order.id, side, p.id)
+        }
+        setOrder(prev => ({ ...prev, [paidField]: false, [paymentsField]: [] }))
+        show('Отметка оплаты снята', {
+          type: 'info',
+          actionLabel: 'Отменить',
+          onAction: async () => {
+            lastLocalEditRef.current = Date.now()
+            for (const p of existingPayments) {
+              await addPayment(order.id, side, { pp_number: p.pp_number || '', pp_date: p.pp_date || '', amount: p.amount || 0 })
+            }
+            getOrder(order.id).then(setOrder).catch(console.error)
+          },
+        })
+      } catch (e) {
+        show('Ошибка: ' + e.message, { type: 'error' })
+      }
+      return
+    }
+
+    // снятие отметки — без модалки, простое действие + тост с отменой
     const prevPPNumber = side === 'client' ? order.client_pp_number : order.carrier_pp_number
     const prevPPDate = side === 'client' ? order.client_pp_date : order.carrier_pp_date
     try {

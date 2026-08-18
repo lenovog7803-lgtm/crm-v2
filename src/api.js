@@ -163,6 +163,14 @@ export const syncOrderDocUrls = (orderId) => req(`/orders/${orderId}/sync_doc_ur
 export const markPayment = (orderId, side, data) =>
   req(`/orders/${orderId}/mark_payment?side=${side}`, { method: 'POST', body: JSON.stringify(data) }, 0);
 
+// Partial payments (multiple PPs per order side, must sum to the order's rate)
+// retries=0: same non-idempotency reasoning as markPayment above — each call
+// also writes a KUDiR row, so a retried POST could double it.
+export const addPayment = (orderId, side, data) =>
+  req(`/orders/${orderId}/payments/${side}`, { method: 'POST', body: JSON.stringify(data) }, 0);
+export const deletePayment = (orderId, side, paymentId) =>
+  req(`/orders/${orderId}/payments/${side}/${paymentId}`, { method: 'DELETE' }, 0);
+
 // Global search (Cmd+K)
 export const globalSearch = (q) => req(`/search?q=${encodeURIComponent(q)}`);
 
