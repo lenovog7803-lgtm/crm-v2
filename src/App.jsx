@@ -166,7 +166,11 @@ function MainApp() {
     if (isManager && !MANAGER_PAGES.includes(key)) key = 'my-dashboard'
     setPage(key)
     setSearch(loadPageSearch(key))
-    pushNavState({ page: key, selectedOrderId: null, selectedClientId: null, selectedCarrierId: null })
+    // Keeps the previously-selected order/client/carrier id alive in the
+    // pushed history entry (instead of nulling it) so a physical back/swipe
+    // gesture lands the list scrolled back to the same row as the in-app
+    // "Назад" button does, not just at the top.
+    pushNavState({ page: key, selectedOrderId, selectedClientId, selectedCarrierId })
   }
 
   // Baseline history entry so the very first popstate (from the first
@@ -278,6 +282,7 @@ function MainApp() {
                 refreshKey={ordersKey}
                 search={search}
                 onClearSearch={() => handleSearchChange('')}
+                scrollToOrderId={selectedOrderId}
               />
             )}
             {page === 'order-detail' && (

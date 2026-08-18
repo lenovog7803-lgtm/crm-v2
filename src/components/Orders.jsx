@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { getOrders, deleteOrder as apiDelete, updateOrder, restoreOrder } from '../api'
-import { initials, statusLabel, statusColor, statusBg, getGradient } from '../utils'
+import { initials, statusLabel, statusColor, statusBg, getGradient, fmtDate } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
 import { useToast } from './Toast'
@@ -27,10 +27,16 @@ const DOC_FILTER_OPTIONS = [
   { key: '!docs_from_carrier_received', label: 'НЕ получены от перевозчика',  not: true  },
 ]
 
-export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '', onClearSearch }) {
+export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '', onClearSearch, scrollToOrderId }) {
   const { show } = useToast()
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
+  // Return-from-detail scroll restore: the row the user last opened gets
+  // scrolled into view and briefly flashed once per mount, instead of
+  // always landing back at the top of the list.
+  const scrollTargetRef = useRef(null)
+  const hasScrolledToTarget = useRef(false)
+  const [flashOrderId, setFlashOrderId] = useState(null)
   const [statusFilter, setStatusFilter] = useState(() => localStorage.getItem('orders_statusFilter') || 'all')
   const [payFilter, setPayFilter] = useState(() => localStorage.getItem('orders_payFilter') || null)
   const [docFilters, setDocFilters] = useState(() => {
@@ -92,6 +98,17 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   }
 
   useEffect(() => { loadOrders() }, [refreshKey])
+
+  useEffect(() => {
+    if (loading || !scrollToOrderId || hasScrolledToTarget.current) return
+    const el = scrollTargetRef.current
+    if (!el) return
+    hasScrolledToTarget.current = true
+    el.scrollIntoView({ block: 'center' })
+    setFlashOrderId(scrollToOrderId)
+    const t = setTimeout(() => setFlashOrderId(null), 1400)
+    return () => clearTimeout(t)
+  }, [loading, scrollToOrderId])
 
   useEffect(() => { localStorage.setItem('orders_statusFilter', statusFilter) }, [statusFilter])
   useEffect(() => { localStorage.setItem('orders_payFilter', payFilter || '') }, [payFilter])
@@ -370,15 +387,17 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 const isSelected = selected.has(order.id)
                 const dx = swipe.id === order.id ? swipe.dx : 0
                 const isRemoving = removingIds.has(order.id)
+                const isFlash = flashOrderId === order.id
                 return (
                   <div
                     key={order.id}
+                    ref={order.id === scrollToOrderId ? scrollTargetRef : null}
                     onClick={() => { if (selectMode) toggleSelect(order.id); else onOpenOrder(order.id) }}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '13px 16px',
                       borderBottom: i < filtered.length - 1 ? '0.5px solid rgba(14,23,38,0.1)' : 'none',
-                      background: isSelected ? '#EBF2FF' : (overdue ? 'rgba(200,25,35,0.03)' : 'transparent'),
+                      background: isFlash ? 'rgba(19,102,240,0.14)' : (isSelected ? '#EBF2FF' : (overdue ? 'rgba(200,25,35,0.03)' : 'transparent')),
                       cursor: 'pointer',
                       WebkitTapHighlightColor: 'rgba(14,23,38,0.06)',
                       touchAction: 'pan-y',
@@ -431,7 +450,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                       <div style={{ fontSize: 14, fontWeight: 600, color: '#0E1726', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{route}</div>
                       <div style={{ fontSize: 12, color: '#8E8E93' }}>
                         {order.client_name || '—'}
-                        {order.load_date ? ` · ${order.load_date}` : ''}
+                        {order.load_date ? ` · ${fmtDate(order.load_date)}` : ''}
                       </div>
                       <div style={{ fontSize: 12, color: '#8E8E93', visibility: order.carrier_name ? 'visible' : 'hidden' }}>
                         {order.carrier_name || '—'}
@@ -484,15 +503,17 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           const overdue = isOverdue(order)
           const isSelected = selected.has(order.id)
           const isRemoving = removingIds.has(order.id)
+          const isFlash = flashOrderId === order.id
           return (
             <div
               key={order.id}
+              ref={order.id === scrollToOrderId ? scrollTargetRef : null}
               style={{
                 display: 'flex', alignItems: 'center',
                 padding: '14px 20px',
                 borderBottom: i < filtered.length - 1 ? '1px solid rgba(14,23,38,0.05)' : 'none',
                 cursor: 'pointer',
-                background: isSelected ? '#EBF2FF' : (overdue ? 'rgba(200,25,35,0.05)' : 'transparent'),
+                background: isFlash ? 'rgba(19,102,240,0.14)' : (isSelected ? '#EBF2FF' : (overdue ? 'rgba(200,25,35,0.05)' : 'transparent')),
                 ...(isSelected
                   ? { boxShadow: 'inset 0 0 0 1.5px #1366F0, 0 0 0 4px rgba(19,102,240,0.12)' }
                   : { borderLeft: overdue ? '3px solid rgba(200,25,35,0.5)' : '3px solid transparent' }),
@@ -540,7 +561,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
               <div>
                 <div style={{ fontWeight: 600, fontSize: 13.5, color: '#0E1726' }}>{route}</div>
                 <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 2 }}>
-                  {order.load_date || '—'}{order.weight_tons ? ` · ${order.weight_tons} т` : ''}
+                  {fmtDate(order.load_date) || '—'}{order.weight_tons ? ` · ${order.weight_tons} т` : ''}
                 </div>
               </div>
               {order.client_name ? (
