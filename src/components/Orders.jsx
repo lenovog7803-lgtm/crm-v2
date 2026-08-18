@@ -384,6 +384,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 const margin = (order.client_rate || 0) - (order.carrier_rate || 0)
                 const route = order.route_from && order.route_to ? `${order.route_from} → ${order.route_to}` : (order.route || '—')
                 const overdue = isOverdue(order)
+                const missingClientPP = order.client_paid && !order.client_pp_number
+                const flagged = overdue || missingClientPP
                 const isSelected = selected.has(order.id)
                 const dx = swipe.id === order.id ? swipe.dx : 0
                 const isRemoving = removingIds.has(order.id)
@@ -397,7 +399,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '13px 16px',
                       borderBottom: i < filtered.length - 1 ? '0.5px solid rgba(14,23,38,0.1)' : 'none',
-                      background: isFlash ? 'rgba(19,102,240,0.14)' : (isSelected ? '#EBF2FF' : (overdue ? 'rgba(200,25,35,0.03)' : 'transparent')),
+                      background: isFlash ? 'rgba(19,102,240,0.14)' : (isSelected ? '#EBF2FF' : (flagged ? 'rgba(200,25,35,0.03)' : 'transparent')),
                       cursor: 'pointer',
                       WebkitTapHighlightColor: 'rgba(14,23,38,0.06)',
                       touchAction: 'pan-y',
@@ -409,7 +411,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                     }}
                     onTouchStart={e => { e.currentTarget.style.background = isSelected ? '#EBF2FF' : 'rgba(14,23,38,0.05)'; handleTouchStart(order.id, e) }}
                     onTouchMove={e => handleTouchMove(order.id, e)}
-                    onTouchEnd={e => { e.currentTarget.style.background = isSelected ? '#EBF2FF' : (overdue ? 'rgba(200,25,35,0.03)' : 'transparent'); handleTouchEnd(order.id) }}
+                    onTouchEnd={e => { e.currentTarget.style.background = isSelected ? '#EBF2FF' : (flagged ? 'rgba(200,25,35,0.03)' : 'transparent'); handleTouchEnd(order.id) }}
                   >
                     {/* Selection checkbox — shown once select mode is on, or while actively swiping past the threshold */}
                     {(selectMode || dx > 60) && (
@@ -446,6 +448,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                           {order.order_number || order.id}
                         </span>
                         {overdue && <span style={{ fontSize: 10, color: '#C81923', fontWeight: 700 }}>ПРОСРОЧЕНО</span>}
+                        {missingClientPP && <span style={{ fontSize: 10, color: '#C81923', fontWeight: 700 }}>НЕТ ПП</span>}
                       </div>
                       <div style={{ fontSize: 14, fontWeight: 600, color: '#0E1726', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{route}</div>
                       <div style={{ fontSize: 12, color: '#8E8E93' }}>
@@ -501,6 +504,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           const route = order.route_from && order.route_to ? `${order.route_from} → ${order.route_to}` : (order.route || '—')
           const [avA, avB] = getGradient(order.client_name || '')
           const overdue = isOverdue(order)
+          const missingClientPP = order.client_paid && !order.client_pp_number
+          const flagged = overdue || missingClientPP
           const isSelected = selected.has(order.id)
           const isRemoving = removingIds.has(order.id)
           const isFlash = flashOrderId === order.id
@@ -513,18 +518,18 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 padding: '14px 20px',
                 borderBottom: i < filtered.length - 1 ? '1px solid rgba(14,23,38,0.05)' : 'none',
                 cursor: 'pointer',
-                background: isFlash ? 'rgba(19,102,240,0.14)' : (isSelected ? '#EBF2FF' : (overdue ? 'rgba(200,25,35,0.05)' : 'transparent')),
+                background: isFlash ? 'rgba(19,102,240,0.14)' : (isSelected ? '#EBF2FF' : (flagged ? 'rgba(200,25,35,0.05)' : 'transparent')),
                 ...(isSelected
                   ? { boxShadow: 'inset 0 0 0 1.5px #1366F0, 0 0 0 4px rgba(19,102,240,0.12)' }
-                  : { borderLeft: overdue ? '3px solid rgba(200,25,35,0.5)' : '3px solid transparent' }),
+                  : { borderLeft: flagged ? '3px solid rgba(200,25,35,0.5)' : '3px solid transparent' }),
                 opacity: isRemoving ? 0 : 1,
                 transform: isRemoving ? 'scale(0.97)' : 'scale(1)',
                 transition: isRemoving ? 'opacity 0.2s var(--ease), transform 0.2s var(--ease)' : 'background 0.12s',
                 animation: isRemoving ? 'none' : 'rise 0.3s var(--ease) both',
                 animationDelay: `${Math.min(i * 20, 240)}ms`,
               }}
-              onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.08)' : 'rgba(14,23,38,0.02)' }}
-              onMouseLeave={e => { handleMouseUp(); if (!isSelected) e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.05)' : 'transparent' }}
+              onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = flagged ? 'rgba(200,25,35,0.08)' : 'rgba(14,23,38,0.02)' }}
+              onMouseLeave={e => { handleMouseUp(); if (!isSelected) e.currentTarget.style.background = flagged ? 'rgba(200,25,35,0.05)' : 'transparent' }}
               onMouseDown={() => handleMouseDown(order.id)}
               onMouseUp={handleMouseUp}
               onClick={e => handleRowClick(order, e)}
@@ -541,8 +546,11 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
               )}
               <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '140px minmax(0, 1fr) minmax(0, 1fr) 110px 90px 70px', alignItems: 'center' }}>
               <div>
-                <div style={{ fontFamily: 'JetBrains Mono', fontWeight: 600, fontSize: 13.5, color: '#1366F0' }}>
-                  {order.order_number || order.id}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <div style={{ fontFamily: 'JetBrains Mono', fontWeight: 600, fontSize: 13.5, color: '#1366F0' }}>
+                    {order.order_number || order.id}
+                  </div>
+                  {missingClientPP && <span style={{ fontSize: 9.5, color: '#C81923', fontWeight: 700 }}>НЕТ ПП</span>}
                 </div>
                 <div style={{
                   display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 4, padding: '2px 8px', borderRadius: 6,
