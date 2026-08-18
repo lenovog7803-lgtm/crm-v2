@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getOrders, getClients, getCarriers, getPaymentsIn, getPaymentsOut, createPaymentIn, createPaymentOut, deletePaymentIn, deletePaymentOut, generateReconciliation, getReconciliationHistory } from '../api'
-import { fmtMoney, initials, getGradient } from '../utils'
+import { fmtMoney, initials, getGradient, fmtDate } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
 import { useToast } from './Toast'
@@ -347,7 +347,7 @@ export default function Finance({ refreshKey }) {
                     {p.order_number ? <span style={{ color: '#1366F0', fontFamily: 'JetBrains Mono' }}> · {p.order_number}</span> : ''}
                   </div>
                 </div>
-                <div style={{ fontSize: 11.5, color: '#A6AEB8', flexShrink: 0 }}>{p.date || '—'}</div>
+                <div style={{ fontSize: 11.5, color: '#A6AEB8', flexShrink: 0 }}>{fmtDate(p.date) || '—'}</div>
                 <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: p.kind === 'income' ? '#1E9E5A' : '#1366F0', flexShrink: 0 }}>
                   {p.kind === 'income' ? '+' : '-'}{(p.amount || 0).toLocaleString('ru-RU')} BYN
                 </div>
@@ -404,7 +404,7 @@ export default function Finance({ refreshKey }) {
                 <tr key={row.id} style={{ borderBottom: '1px solid rgba(14,23,38,0.04)' }}>
                   <td style={{ padding: '10px 12px', color: '#A6AEB8' }}>{row.n}</td>
                   <td style={{ padding: '10px 12px', fontFamily: 'JetBrains Mono', fontSize: 12, color: '#1366F0' }}>{row.order_number || '—'}</td>
-                  <td style={{ padding: '10px 12px', color: '#5A6573' }}>{row.unload_date || '—'}</td>
+                  <td style={{ padding: '10px 12px', color: '#5A6573' }}>{fmtDate(row.unload_date) || '—'}</td>
                   <td style={{ padding: '10px 12px', color: '#1E9E5A', fontWeight: 700 }}>{(row.amt || 0).toLocaleString('ru-RU')} BYN</td>
                   <td style={{ padding: '10px 12px', fontWeight: 700, color: row.balance >= 0 ? '#1E9E5A' : '#C81923' }}>{row.balance.toLocaleString('ru-RU')} BYN</td>
                 </tr>
@@ -471,7 +471,7 @@ export default function Finance({ refreshKey }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
               {recHistory.slice(0, 5).map((r, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12.5 }}>
-                  <span style={{ color: '#5A6573' }}>{r.date || r.created_at?.slice(0, 10)}</span>
+                  <span style={{ color: '#5A6573' }}>{fmtDate(r.date || r.created_at)}</span>
                   <span style={{ fontWeight: 600, color: '#0E1726', flex: 1 }}>{r.counterparty_name || r.counterparty_id}</span>
                   {r.url && <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: '#1366F0', fontWeight: 600, textDecoration: 'none' }}>Открыть</a>}
                 </div>

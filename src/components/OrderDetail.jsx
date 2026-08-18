@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, restoreTrash, markPayment, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers, getOrderHistory } from '../api'
-import { fmtMoney, initials, getGradient } from '../utils'
+import { fmtMoney, initials, getGradient, fmtDate } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useRealtime } from '../hooks/useRealtime'
 import { useToast } from './Toast'
@@ -610,11 +610,11 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
               </div>
               <div>
                 <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Загрузка</div>
-                <div style={{ fontWeight: 600, fontSize: 13 }}>{view.load_date || '—'}</div>
+                <div style={{ fontWeight: 600, fontSize: 13 }}>{fmtDate(view.load_date) || '—'}</div>
               </div>
               <div>
                 <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Выгрузка</div>
-                <div style={{ fontWeight: 600, fontSize: 13 }}>{view.unload_date || '—'}</div>
+                <div style={{ fontWeight: 600, fontSize: 13 }}>{fmtDate(view.unload_date) || '—'}</div>
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)', gap: isMobile ? 8 : 24, marginTop: isMobile ? 14 : 22, paddingTop: isMobile ? 14 : 18, borderTop: '1px solid rgba(255,255,255,0.1)' }}>

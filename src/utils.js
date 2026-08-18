@@ -1,5 +1,15 @@
 export const fmtMoney = n => (n || 0).toLocaleString('ru-RU') + ' BYN'
 
+// Display-only date formatter: "2026-08-18" or "2026-08-18T11:14:22Z" -> "18.08.2026".
+// Never use this on values bound to <input type="date">, which require ISO.
+export const fmtDate = d => {
+  if (!d) return ''
+  const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/)
+  if (!m) return d
+  const [, y, mo, day] = m
+  return `${day}.${mo}.${y}`
+}
+
 const LEGAL_FORMS = new Set(['ООО','ОАО','ЗАО','ПАО','АО','ИП','ЧУП','ЧПУП','УП','РУП','СООО','ОДО','КУП','РУПП','ТОО','СП','НП','ФЛ'])
 export const initials = name => {
   const words = (name || '').replace(/[«»"']/g, '').split(/\s+/).filter(Boolean)

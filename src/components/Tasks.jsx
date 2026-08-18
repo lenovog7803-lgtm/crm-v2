@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getTasks, updateTask as apiUpdate, deleteTask as apiDelete } from '../api'
 import { ModalOverlay, ModalHeader } from './Modal'
+import { fmtDate } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
 import { SlidingTabs } from './SlidingTabs'
@@ -152,7 +153,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
                   fontSize: 11, fontWeight: 600,
                 }}>{TYPE_LABELS[typeKey] || typeKey}</span>
                 {task.due_date && (
-                  <span style={{ fontSize: 12, color: '#A6AEB8', minWidth: 80 }}>{task.due_date}</span>
+                  <span style={{ fontSize: 12, color: '#A6AEB8', minWidth: 80 }}>{fmtDate(task.due_date)}</span>
                 )}
                 <button onClick={e => { e.stopPropagation(); handleDelete(task.id) }} style={{
                   width: 28, height: 28, borderRadius: 8, border: 'none', cursor: 'pointer',

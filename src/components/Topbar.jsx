@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useToast } from './Toast'
+import { fmtDate } from '../utils'
 
 const PAGE_META = {
   dashboard: { title: 'Дашборд', subtitle: 'Обзор бизнеса' },
@@ -378,7 +379,7 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 12.5, fontWeight: 600, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</div>
-                      <div style={{ fontSize: 11, color: '#C81923', marginTop: 2 }}>Просрочено · {item.date}</div>
+                      <div style={{ fontSize: 11, color: '#C81923', marginTop: 2 }}>Просрочено · {fmtDate(item.date)}</div>
                     </div>
                   </div>
                 ))}

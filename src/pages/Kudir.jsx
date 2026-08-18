@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { getMissingPP, getKudirEntries, updateKudirEntry, exportKudirUrl, updateOrder } from '../api'
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
-import { fmtMoney } from '../utils'
+import { fmtMoney, fmtDate } from '../utils'
 
 const TABS = [
   { key: 'backfill', label: 'Дозаполнить' },
@@ -230,7 +230,7 @@ function EntryRow({ entry }) {
 
   return (
     <tr style={{ borderTop: '1px solid #F0F1F4' }}>
-      <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{entry.entry_date}</td>
+      <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{fmtDate(entry.entry_date)}</td>
       <td style={{ padding: '10px 12px' }}>{entry.document_ref}</td>
       <td style={{ padding: '10px 12px' }}>{entry.content}</td>
       <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 600, color: entry.income_amount != null ? '#1E9E5A' : '#A6AEB8' }}>
