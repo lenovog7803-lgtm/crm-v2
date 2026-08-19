@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getOrders, getClients, getCarriers, getPaymentsIn, getPaymentsOut, createPaymentIn, createPaymentOut, deletePaymentIn, deletePaymentOut, generateReconciliation, getReconciliationHistory } from '../api'
+import { getOrders, getClients, getCarriers, getPaymentsIn, getPaymentsOut, createPaymentIn, createPaymentOut, deletePaymentIn, deletePaymentOut, generateReconciliation, getReconciliationHistory, getClientPPLedger, addClientPPEntry, deleteClientPPEntry } from '../api'
 import { fmtMoney, initials, getGradient, fmtDate } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
@@ -39,6 +39,7 @@ export default function Finance({ refreshKey }) {
   const [recPeriod, setRecPeriod] = useState('month')
   const [recLoading, setRecLoading] = useState(false)
   const [recHistory, setRecHistory] = useState([])
+  const [showLedger, setShowLedger] = useState(false)
 
   const loadPayments = () => Promise.all([
     getPaymentsIn().catch(() => []),
@@ -431,21 +432,32 @@ export default function Finance({ refreshKey }) {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5, flex: 1 }}>
             <label style={{ fontSize: 11, fontWeight: 600, color: '#A6AEB8' }}>{recType === 'client' ? 'Клиент' : 'Перевозчик'}</label>
-            <select
-              value={recPartyId}
-              onChange={e => {
-                const id = e.target.value
-                const item = recList.find(x => x.id === id)
-                setRecPartyId(id)
-                setRecPartyName(item ? (item[recLabelKey] || item.name || '') : '')
-              }}
-              style={{ ...iStyle, minWidth: 200 }}
-            >
-              <option value="">— Выберите —</option>
-              {recList.map(item => (
-                <option key={item.id} value={item.id}>{item[recLabelKey] || item.name}</option>
-              ))}
-            </select>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <select
+                value={recPartyId}
+                onChange={e => {
+                  const id = e.target.value
+                  const item = recList.find(x => x.id === id)
+                  setRecPartyId(id)
+                  setRecPartyName(item ? (item[recLabelKey] || item.name || '') : '')
+                }}
+                style={{ ...iStyle, minWidth: 200 }}
+              >
+                <option value="">— Выберите —</option>
+                {recList.map(item => (
+                  <option key={item.id} value={item.id}>{item[recLabelKey] || item.name}</option>
+                ))}
+              </select>
+              {recType === 'client' && recPartyId && (
+                <button onClick={() => setShowLedger(true)} style={{
+                  width: 26, height: 26, borderRadius: 8, border: '1px solid #1366F0',
+                  background: 'transparent', color: '#1366F0', fontSize: 15, fontWeight: 700,
+                  cursor: 'pointer', marginLeft: 8, lineHeight: 1,
+                }} title="Список платежей клиента для акта сверки">
+                  +
+                </button>
+              )}
+            </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             <label style={{ fontSize: 11, fontWeight: 600, color: '#A6AEB8' }}>Период</label>
@@ -578,6 +590,83 @@ export default function Finance({ refreshKey }) {
           </div>
         </div>
       )}
+
+      {/* Журнал платежей клиента для акта сверки */}
+      {showLedger && (
+        <ClientPPLedgerModal
+          clientId={recPartyId}
+          clientName={recPartyName}
+          onClose={() => setShowLedger(false)}
+        />
+      )}
+    </div>
+  )
+}
+
+function ClientPPLedgerModal({ clientId, clientName, onClose }) {
+  const [entries, setEntries] = useState([])
+  const [ppNumber, setPpNumber] = useState('')
+  const [ppDate, setPpDate] = useState(new Date().toISOString().slice(0, 10))
+  const [amount, setAmount] = useState('')
+  const { show } = useToast()
+
+  const load = () => getClientPPLedger(clientId).then(r => setEntries(r.entries || []))
+  useEffect(() => { load() }, [clientId])
+
+  const total = entries.reduce((s, e) => s + Number(e.amount || 0), 0)
+
+  const add = async () => {
+    if (!ppNumber.trim() || !ppDate || !amount) {
+      show('Заполните номер ПП, дату и сумму', { type: 'error' })
+      return
+    }
+    await addClientPPEntry(clientId, {
+      pp_number: ppNumber.trim(), pp_date: ppDate, amount: Number(amount),
+    })
+    setPpNumber(''); setAmount('')
+    load()
+  }
+
+  const remove = async (id) => {
+    await deleteClientPPEntry(clientId, id)
+    load()
+  }
+
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
+      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 520, padding: 26 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
+          <div>
+            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 17, color: '#0E1726' }}>Платежи клиента</div>
+            <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>{clientName} · всего {total.toLocaleString('ru-RU')} Br</div>
+          </div>
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #E8EAEE', background: '#F7F8FA', cursor: 'pointer', fontSize: 18, color: '#8A93A0' }}>×</button>
+        </div>
+
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+          <input value={ppNumber} onChange={e => setPpNumber(e.target.value)} placeholder="№ ПП" style={{ width: 90, padding: '9px 10px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 12 }} />
+          <input type="date" value={ppDate} onChange={e => setPpDate(e.target.value)} style={{ width: 130, padding: '9px 10px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 12 }} />
+          <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Сумма" style={{ flex: 1, padding: '9px 10px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 12 }} />
+          <button onClick={add} style={{ width: 34, height: 34, borderRadius: 10, background: '#1366F0', color: '#fff', border: 'none', fontSize: 16, cursor: 'pointer' }}>+</button>
+        </div>
+
+        <div style={{ maxHeight: '45vh', overflowY: 'auto' }}>
+          {entries.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 30, fontSize: 13, color: '#8A93A0' }}>Платежей пока нет</div>
+          ) : entries.map(e => (
+            <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: '1px solid #F0F1F4' }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 500, color: '#0E1726' }}>ПП № {e.pp_number}</div>
+                <div style={{ fontSize: 11, color: '#8A93A0' }}>{new Date(e.pp_date).toLocaleDateString('ru-RU')}</div>
+              </div>
+              <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, fontWeight: 700, color: '#1E9E5A' }}>
+                {Number(e.amount).toLocaleString('ru-RU')} Br
+              </div>
+              <button onClick={() => remove(e.id)} style={{ border: 'none', background: 'transparent', color: '#E0473B', fontSize: 15, cursor: 'pointer' }}>×</button>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

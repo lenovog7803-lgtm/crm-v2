@@ -128,6 +128,11 @@ export const deletePaymentOut = (id) => req(`/payments/out/${id}`, { method: 'DE
 export const generateReconciliation = (data) => req('/reconciliation/generate', { method: 'POST', body: JSON.stringify(data) });
 export const getReconciliationHistory = (params = {}) => req('/reconciliation/history?' + new URLSearchParams(params));
 
+// Client PP ledger — persistent payment list feeding the reconciliation act
+export const getClientPPLedger = (clientId) => req(`/client_pp_ledger/${clientId}`);
+export const addClientPPEntry = (clientId, data) => req(`/client_pp_ledger/${clientId}`, { method: 'POST', body: JSON.stringify(data) });
+export const deleteClientPPEntry = (clientId, entryId) => req(`/client_pp_ledger/${clientId}/${entryId}`, { method: 'DELETE' });
+
 // Document generation — endpoint: POST /orders/{id}/docs/{kind}?regenerate=true
 export const generateClientDoc  = (orderId, regen = true) => req(`/orders/${orderId}/docs/client?regenerate=${regen}`,  { method: 'POST' });
 export const generateCarrierDoc = (orderId, regen = true) => req(`/orders/${orderId}/docs/carrier?regenerate=${regen}`, { method: 'POST' });
