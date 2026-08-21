@@ -481,7 +481,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       )].sort().reverse()
       onMonthsLoaded && onMonthsLoaded(months)
     } else {
-      getOrders({ limit: 2000 }).then(r => {
+      getOrders({ limit: 2000, light: true }).then(r => {
         const arr = Array.isArray(r) ? r : (r?.orders || r?.data || [])
         setAllOrders(arr)
         const months = [...new Set(

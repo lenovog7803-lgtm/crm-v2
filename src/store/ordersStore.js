@@ -30,7 +30,11 @@ export async function getOrdersFromCache(forceRefresh = false) {
   if (!forceRefresh && cachedOrders && !isStale) {
     return cachedOrders
   }
-  const result = await getOrders()
+  // light=true: server returns only the ~25 fields the list overview,
+  // dashboard and app-shell (overdue/counts) actually read — order detail
+  // pages fetch their own full record separately via getOrder(id), so this
+  // never has to carry every field just for the list view.
+  const result = await getOrders({ light: true })
   cachedOrders = Array.isArray(result) ? result : (result?.orders || [])
   cachedAt = Date.now()
   notify()

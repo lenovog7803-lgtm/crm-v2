@@ -52,7 +52,7 @@ export default function Finance({ refreshKey }) {
   useEffect(() => {
     setLoading(true)
     Promise.all([
-      getOrders({ limit: 2000 }).catch(() => []),
+      getOrders({ limit: 2000, light: true }).catch(() => []),
       getClients().catch(() => []),
       getCarriers().catch(() => []),
       getPaymentsIn().catch(() => []),
