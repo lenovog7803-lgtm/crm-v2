@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { getOrders, deleteOrder as apiDelete, updateOrder, restoreOrder } from '../api'
+import { deleteOrder as apiDelete, updateOrder, restoreOrder } from '../api'
+import { getOrdersFromCache, getCachedOrdersSnapshot, invalidateOrdersCache, subscribeOrders } from '../store/ordersStore'
 import { initials, statusLabel, statusColor, statusBg, getGradient, fmtDate } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
@@ -84,10 +85,13 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
 
   const [loadError, setLoadError] = useState(false)
 
+  // Forced reload — used by retry buttons and after bulk actions, where the
+  // data really did just change and a fresh fetch is warranted.
   const loadOrders = () => {
+    invalidateOrdersCache()
     setLoading(true)
     setLoadError(false)
-    return getOrders()
+    return getOrdersFromCache(true)
       .then(r => setOrders(Array.isArray(r) ? r : []))
       .catch(e => {
         console.error(e)
@@ -97,7 +101,34 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { loadOrders() }, [refreshKey])
+  // Cache-first mount/refreshKey effect: a fresh, still-valid cache (e.g.
+  // returning from an order's detail page seconds later) renders instantly
+  // with no spinner; only an empty/stale/invalidated cache goes to network.
+  useEffect(() => {
+    let cancelled = false
+    const cached = getCachedOrdersSnapshot()
+    if (cached) {
+      setOrders(cached)
+      setLoading(false)
+    } else {
+      setLoading(true)
+    }
+    setLoadError(false)
+    getOrdersFromCache()
+      .then(r => { if (!cancelled) setOrders(Array.isArray(r) ? r : []) })
+      .catch(e => {
+        if (cancelled) return
+        console.error(e)
+        setLoadError(true)
+        show('Не удалось загрузить заявки: ' + e.message, { type: 'error' })
+      })
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
+  }, [refreshKey])
+
+  // Picks up point-patches (e.g. a websocket order_updated) applied to the
+  // shared cache even while this component stays mounted between them.
+  useEffect(() => subscribeOrders(data => { if (data) setOrders(data) }), [])
 
   useEffect(() => {
     if (loading || !scrollToOrderId || hasScrolledToTarget.current) return

@@ -5,7 +5,8 @@ import { AuthProvider, useAuth } from './AuthContext'
 import { ToastProvider, useToast } from './components/Toast'
 import { CelebrationProvider } from './components/Celebration'
 import Login from './pages/Login'
-import { getDashboard, getOrders, getTasks, getNotifications, markNotificationRead } from './api'
+import { getDashboard, getTasks, getNotifications, markNotificationRead } from './api'
+import { getOrdersFromCache, invalidateOrdersCache, patchOrderInCache } from './store/ordersStore'
 
 import Sidebar from './components/Sidebar'
 import Topbar from './components/Topbar'
@@ -117,7 +118,7 @@ function MainApp() {
   useEffect(() => {
     const today = new Date().toISOString().slice(0, 10)
     Promise.all([
-      getOrders({ limit: 2000 }).catch(() => []),
+      getOrdersFromCache().catch(() => []),
       getTasks().catch(() => []),
     ]).then(([ordersRaw, tasks]) => {
       const orders = Array.isArray(ordersRaw) ? ordersRaw : (ordersRaw?.orders || [])
@@ -231,11 +232,19 @@ function MainApp() {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
-  // One shared connection covers Dashboard + Orders — both already refetch
-  // off ordersKey, so a single bump here silently refreshes both instead of
-  // opening a redundant WebSocket per page.
+  // One shared connection covers Dashboard + Orders. order_updated carries
+  // the changed fields (patch) and is applied in place to the shared cache
+  // and to allOrders — no network round-trip, so a busy team doesn't force
+  // everyone else's list to reload on every edit. payment_marked touches
+  // more (payment arrays, computed status, KUDiR) — still a full refetch.
   useRealtime((event) => {
-    if (event.type === 'order_updated' || event.type === 'payment_marked') {
+    if (event.type === 'order_updated') {
+      patchOrderInCache(event.order_id, event.patch)
+      if (event.patch) {
+        setAllOrders(prev => prev.map(o => (o.id === event.order_id ? { ...o, ...event.patch } : o)))
+      }
+    } else if (event.type === 'payment_marked') {
+      invalidateOrdersCache()
       setOrdersKey(k => k + 1)
     }
   })
@@ -289,7 +298,7 @@ function MainApp() {
               <OrderDetail
                 orderId={selectedOrderId}
                 onBack={() => handleNav('orders')}
-                onDelete={() => { setOrdersKey(k => k + 1) }}
+                onDelete={() => { invalidateOrdersCache(); setOrdersKey(k => k + 1) }}
                 onOpenClient={id => openClient(id)}
                 onOpenCarrier={id => openCarrier(id)}
                 onOpenOrder={id => openOrder(id)}
@@ -362,7 +371,7 @@ function MainApp() {
       {showOrderModal && (
         <CreateOrderModal
           onClose={() => { setShowOrderModal(false); setDuplicateData(null); setEditOrderData(null) }}
-          onSuccess={() => { setShowOrderModal(false); setDuplicateData(null); setEditOrderData(null); setOrdersKey(k => k + 1) }}
+          onSuccess={() => { setShowOrderModal(false); setDuplicateData(null); setEditOrderData(null); invalidateOrdersCache(); setOrdersKey(k => k + 1) }}
           initialData={editOrderData || duplicateData}
           editOrderId={editOrderData?.id}
         />
