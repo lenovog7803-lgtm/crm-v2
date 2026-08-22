@@ -47,6 +47,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   const [selected, setSelected] = useState(new Set())
   const [selectMode, setSelectMode] = useState(false)
   const [showStatusMenu, setShowStatusMenu] = useState(false)
+  const [showCorrespondenceModal, setShowCorrespondenceModal] = useState(false)
   const [removingIds, setRemovingIds] = useState(new Set())
   const longPressTimer = useRef(null)
   const longPressFired = useRef(false)
@@ -198,14 +199,6 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   }
 
   const clearSelection = () => { setSelected(new Set()); setSelectMode(false); setShowStatusMenu(false) }
-
-  const handleBulkMarkPaid = async () => {
-    const ids = [...selected]
-    await Promise.all(ids.map(id => updateOrder(id, { client_paid: true, client_paid_date: new Date().toISOString() })))
-    show(`Отмечено оплаченными: ${ids.length}`, { type: 'success' })
-    clearSelection()
-    loadOrders()
-  }
 
   const handleBulkDelete = async () => {
     const ids = [...selected]
@@ -713,12 +706,114 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
             <span style={{ fontSize: 13, color: '#0E1726', fontWeight: 700 }}>Выбрано: {selected.size}</span>
             <div style={{ width: 1, height: 20, background: 'rgba(14,23,38,0.12)' }} />
             <button onClick={() => setShowStatusMenu(v => !v)} style={bulkBtnStyle} onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>Сменить статус</button>
-            <button onClick={handleBulkMarkPaid} style={bulkBtnStyle} onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>Отметить оплаченными</button>
+            <button onClick={() => setShowCorrespondenceModal(true)} style={bulkBtnStyle} onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>Корреспонденция</button>
             <button onClick={handleBulkDelete} style={{ ...bulkBtnStyle, color: '#C81923' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(200,25,35,0.08)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>Удалить</button>
             <button onClick={clearSelection} style={{ ...bulkBtnStyle, color: '#8A93A0' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>Отмена</button>
           </div>
         </div>
       )}
+
+      {showCorrespondenceModal && (
+        <CorrespondenceModal
+          orderIds={[...selected]}
+          onClose={() => setShowCorrespondenceModal(false)}
+          onSaved={() => { clearSelection(); loadOrders() }}
+        />
+      )}
+    </div>
+  )
+}
+
+const CORRESPONDENCE_OPTIONS = [
+  { id: 'to_client',    label: 'Отправлено клиенту',      field: 'docs_to_client_sent',       dateField: 'docs_to_client_date' },
+  { id: 'from_client',  label: 'Получено от клиента',     field: 'docs_from_client_received', dateField: 'docs_from_client_date' },
+  { id: 'to_carrier',   label: 'Отправлено перевозчику',  field: 'docs_to_carrier_sent',      dateField: 'docs_to_carrier_date' },
+  { id: 'from_carrier', label: 'Получено от перевозчика', field: 'docs_from_carrier_received',dateField: 'docs_from_carrier_date' },
+]
+
+function CorrespondenceModal({ orderIds, onClose, onSaved }) {
+  const [type, setType] = useState(null)
+  const [date, setDate] = useState(() => {
+    const d = new Date()
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+    return d.toISOString().slice(0, 16)
+  })
+  const [saving, setSaving] = useState(false)
+  const { show } = useToast()
+
+  const save = async () => {
+    if (!type) { show('Выберите тип корреспонденции', { type: 'error' }); return }
+    setSaving(true)
+    const opt = CORRESPONDENCE_OPTIONS.find(o => o.id === type)
+    const isoDate = new Date(date).toISOString()
+    try {
+      await Promise.all(orderIds.map(id => updateOrder(id, {
+        [opt.field]: true,
+        [opt.dateField]: isoDate,
+      })))
+      show(`Отмечено «${opt.label}» для ${orderIds.length} заявок`, { type: 'success' })
+      onSaved?.()
+      onClose()
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+    setSaving(false)
+  }
+
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
+      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 440, padding: 26 }}>
+        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 17, color: '#0E1726', marginBottom: 4 }}>
+          Отметить корреспонденцию
+        </div>
+        <div style={{ fontSize: 12, color: '#8A93A0', marginBottom: 18 }}>
+          Заявок выбрано: {orderIds.length}
+        </div>
+
+        <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>
+          Тип
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 18 }}>
+          {CORRESPONDENCE_OPTIONS.map(o => (
+            <button
+              key={o.id}
+              onClick={() => setType(o.id)}
+              style={{
+                padding: '12px 14px', borderRadius: 12, cursor: 'pointer', textAlign: 'left', fontSize: 13,
+                background: type === o.id ? 'rgba(19,102,240,0.1)' : '#F7F8FA',
+                border: `1.5px solid ${type === o.id ? '#1366F0' : '#E8EAEE'}`,
+                fontWeight: type === o.id ? 600 : 400,
+                color: type === o.id ? '#1366F0' : '#0E1726',
+              }}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
+          Дата и время
+        </div>
+        <input
+          type="datetime-local"
+          value={date}
+          onChange={e => setDate(e.target.value)}
+          style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 14, marginBottom: 22, boxSizing: 'border-box' }}
+        />
+
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', color: '#5A6573', cursor: 'pointer' }}>
+            Отмена
+          </button>
+          <button
+            onClick={save}
+            disabled={saving || !type}
+            style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: type ? '#1366F0' : '#E8EAEE', color: type ? '#FFFFFF' : '#8A93A0', fontWeight: 700, cursor: type ? 'pointer' : 'not-allowed' }}
+          >
+            {saving ? 'Сохраняю…' : 'Отметить'}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
