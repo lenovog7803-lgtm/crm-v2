@@ -139,6 +139,7 @@ const LONG_PRESS_MS = 2000
 function PaymentButton({ type, order, onClick, onLongPress }) {
   const isCarrier = type === 'carrier'
   const isPaid = isCarrier ? order.carrier_paid : order.client_paid
+  const isCash = isCarrier ? order.carrier_cash : order.client_cash
   const date = isCarrier ? order.carrier_paid_date : order.client_paid_date
   const ppNumber = isCarrier ? order.carrier_pp_number : order.client_pp_number
   const payments = (isCarrier ? order.carrier_payments : order.client_payments) || []
@@ -230,9 +231,11 @@ function PaymentButton({ type, order, onClick, onLongPress }) {
           {isPaid && date ? (
             <div style={{ fontSize: 11, color: '#1E9E5A', marginTop: 2 }}>
               {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}
-              {payments.length > 1
-                ? ` · ${payments.length} ПП`
-                : (ppNumber || payments[0]?.pp_number) && ` · ПП №${ppNumber || payments[0].pp_number}`}
+              {isCash
+                ? ' · наличными'
+                : payments.length > 1
+                  ? ` · ${payments.length} ПП`
+                  : (ppNumber || payments[0]?.pp_number) && ` · ПП №${ppNumber || payments[0].pp_number}`}
             </div>
           ) : hasUnmatchedPayment ? (
             <div style={{ fontSize: 11, color: '#D97706', marginTop: 2, fontWeight: 600 }}>
@@ -447,18 +450,31 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     }
 
     // снятие отметки — без модалки, простое действие + тост с отменой
+    const cashField = side === 'client' ? 'client_cash' : 'carrier_cash'
+    const wasCash = !!order[cashField]
     const prevPPNumber = side === 'client' ? order.client_pp_number : order.carrier_pp_number
     const prevPPDate = side === 'client' ? order.client_pp_date : order.carrier_pp_date
     try {
       lastLocalEditRef.current = Date.now()
-      await markPayment(order.id, side, { paid: false })
-      setOrder(prev => ({ ...prev, [paidField]: false }))
+      if (wasCash) {
+        // Cash has no ПП to hand back to markPayment — clear both flags
+        // directly, or the stale client_cash:true would keep suppressing
+        // the "нет ПП" checks after this order gets un-cash-marked.
+        await apiUpdate(order.id, { [paidField]: false, [cashField]: false })
+      } else {
+        await markPayment(order.id, side, { paid: false })
+      }
+      setOrder(prev => ({ ...prev, [paidField]: false, ...(wasCash ? { [cashField]: false } : {}) }))
       show('Отметка оплаты снята', {
         type: 'info',
         actionLabel: 'Отменить',
         onAction: async () => {
           lastLocalEditRef.current = Date.now()
-          await markPayment(order.id, side, { paid: true, pp_number: prevPPNumber || null, pp_date: prevPPDate || null })
+          if (wasCash) {
+            await apiUpdate(order.id, { [paidField]: true, [cashField]: true })
+          } else {
+            await markPayment(order.id, side, { paid: true, pp_number: prevPPNumber || null, pp_date: prevPPDate || null })
+          }
           getOrder(order.id).then(setOrder).catch(console.error)
         },
       })

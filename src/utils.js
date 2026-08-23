@@ -10,6 +10,8 @@ export const fmtMoney = n => (n || 0).toLocaleString('ru-RU') + ' BYN'
 export const hasUnreconciledPayment = (order, side) => {
   const paid = side === 'client' ? order.client_paid : order.carrier_paid
   if (paid) return false
+  // Cash has no ПП to reconcile against a rate — never flag it.
+  if (side === 'client' ? order.client_cash : order.carrier_cash) return false
   const payments = (side === 'client' ? order.client_payments : order.carrier_payments) || []
   const legacyPpNumber = side === 'client' ? order.client_pp_number : order.carrier_pp_number
   return !!legacyPpNumber || payments.some(p => (Number(p.amount) || 0) > 0 || (p.pp_number || '').trim())

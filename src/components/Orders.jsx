@@ -408,8 +408,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 const margin = (order.client_rate || 0) - (order.carrier_rate || 0)
                 const route = order.route_from && order.route_to ? `${order.route_from} → ${order.route_to}` : (order.route || '—')
                 const overdue = isOverdue(order)
-                const missingClientPP = order.client_paid && !order.client_pp_number && !(order.client_payments || []).some(p => p.pp_number)
-                const missingCarrierPP = order.carrier_paid && !order.carrier_pp_number && !(order.carrier_payments || []).some(p => p.pp_number)
+                const missingClientPP = order.client_paid && !order.client_cash && !order.client_pp_number && !(order.client_payments || []).some(p => p.pp_number)
+                const missingCarrierPP = order.carrier_paid && !order.carrier_cash && !order.carrier_pp_number && !(order.carrier_payments || []).some(p => p.pp_number)
                 const unreconciled = hasUnreconciledPayment(order, 'client') || hasUnreconciledPayment(order, 'carrier')
                 const flagged = overdue || missingClientPP || missingCarrierPP || unreconciled
                 const isSelected = selected.has(order.id)

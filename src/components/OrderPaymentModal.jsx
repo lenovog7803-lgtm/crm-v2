@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { addPayment, deletePayment, getOrder } from '../api'
+import { addPayment, deletePayment, getOrder, updateOrder } from '../api'
 import { useToast } from './Toast'
 import { useEscapeKey } from '../hooks/useEscapeKey'
 
@@ -34,6 +34,15 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [busyId, setBusyId] = useState(null)
+
+  // Cash has no ПП number/date to record — checking this swaps the whole
+  // ПП-entry section for a single date field, and skips both the "нет ПП"
+  // and "сумма не сходится" checks for this side everywhere else in the app.
+  const cashField = isCarrier ? 'carrier_cash' : 'client_cash'
+  const [isCash, setIsCash] = useState(!!order[cashField])
+  const [cashDate, setCashDate] = useState(
+    (isCarrier ? order.carrier_paid_date : order.client_paid_date)?.slice(0, 10) || today()
+  )
 
   const totalEntered = existingTotal + payments.reduce((s, p) => s + (Number(p.amount) || 0), 0)
   const matches = Math.abs(totalEntered - expected) < 0.01
@@ -97,7 +106,31 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
     setPayments(prev => prev.filter(p => p.id !== id))
   }
 
+  const saveCash = async () => {
+    setSaving(true)
+    setError('')
+    try {
+      onBeforeSave?.()
+      const paidField = isCarrier ? 'carrier_paid' : 'client_paid'
+      const dateField = isCarrier ? 'carrier_paid_date' : 'client_paid_date'
+      await updateOrder(order.id, { [paidField]: true, [cashField]: true, [dateField]: cashDate })
+      show(
+        isCarrier
+          ? `Отмечено наличными: перевозчику ${who} — ${expected.toLocaleString('ru-RU')} Br`
+          : `Отмечено наличными: от клиента ${who} — ${expected.toLocaleString('ru-RU')} Br`,
+        { type: 'success' }
+      )
+      onSaved?.()
+      onClose()
+    } catch (e) {
+      setError('Ошибка: ' + e.message)
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+    setSaving(false)
+  }
+
   const save = async () => {
+    if (isCash) return saveCash()
     setSaving(true)
     setError('')
     const createdIds = []
@@ -175,6 +208,38 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
           {expected.toLocaleString('ru-RU')} Br
         </div>
 
+        <label style={{
+          display: 'flex', alignItems: 'center', gap: 9, marginBottom: 18, cursor: 'pointer',
+          padding: '10px 12px', borderRadius: 12, background: isCash ? '#FFF7E8' : '#F7F8FA',
+          border: `1px solid ${isCash ? '#F0B84D' : '#E8EAEE'}`,
+        }}>
+          <input
+            type="checkbox"
+            checked={isCash}
+            onChange={e => setIsCash(e.target.checked)}
+            style={{ width: 16, height: 16, accentColor: '#D97706', cursor: 'pointer' }}
+          />
+          <span style={{ fontSize: 13, fontWeight: 600, color: isCash ? '#8A5A00' : '#5A6573' }}>
+            Оплачено наличными
+          </span>
+        </label>
+
+        {isCash ? (
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>
+              Дата получения
+            </div>
+            <input
+              type="date"
+              value={cashDate}
+              onChange={e => setCashDate(e.target.value)}
+              style={{ width: '100%', padding: '9px 10px', borderRadius: 10, border: '1px solid #E8EAEE', background: '#FFFFFF', fontSize: 13, color: '#0E1726', boxSizing: 'border-box' }}
+            />
+            <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 6 }}>
+              Без номера ПП — эта заявка не будет попадать в проверки «нет ПП» и «сумма не сходится».
+            </div>
+          </div>
+        ) : (
         <div style={{ marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
@@ -286,6 +351,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
             </div>
           )}
         </div>
+        )}
 
         {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center', marginBottom: 16 }}>{error}</div>}
 
@@ -296,9 +362,9 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
           <button
             onClick={save}
             disabled={saving}
-            style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: matches ? (isCarrier ? '#E0473B' : '#1366F0') : '#D97706', color: '#FFFFFF', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
+            style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: isCash || matches ? (isCarrier ? '#E0473B' : '#1366F0') : '#D97706', color: '#FFFFFF', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
           >
-            {saving ? 'Сохраняю…' : matches ? 'Подтвердить оплату' : 'Сохранить (суммы не совпадают)'}
+            {saving ? 'Сохраняю…' : isCash ? 'Подтвердить оплату наличными' : matches ? 'Подтвердить оплату' : 'Сохранить (суммы не совпадают)'}
           </button>
         </div>
       </div>
