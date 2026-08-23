@@ -140,9 +140,17 @@ function PaymentButton({ type, order, onClick, onLongPress }) {
   const isCarrier = type === 'carrier'
   const isPaid = isCarrier ? order.carrier_paid : order.client_paid
   const isCash = isCarrier ? order.carrier_cash : order.client_cash
-  const date = isCarrier ? order.carrier_paid_date : order.client_paid_date
   const ppNumber = isCarrier ? order.carrier_pp_number : order.client_pp_number
   const payments = (isCarrier ? order.carrier_payments : order.client_payments) || []
+  // The legacy {side}_paid_date field is only ever set once, the first time
+  // the order becomes fully paid (see add_payment in server.py) — editing an
+  // existing PP's date afterwards updates the payments array but never that
+  // field, so it silently goes stale. The array is the live source of truth
+  // once it has entries; only fall back to the legacy field for orders still
+  // on the old single-payment shape (no array entries at all).
+  const date = payments.length
+    ? payments.reduce((latest, p) => (p.pp_date && (!latest || p.pp_date > latest) ? p.pp_date : latest), '')
+    : (isCarrier ? order.carrier_paid_date : order.client_paid_date)
   const amount = isCarrier ? (order.carrier_rate || 0) : (order.client_rate || 0)
   const label = isCarrier ? 'Платим перевозчику' : 'Получаем от клиента'
   // Money can be recorded (PP number + date saved) without the order ever
@@ -228,14 +236,14 @@ function PaymentButton({ type, order, onClick, onLongPress }) {
             <span style={{ fontSize: 13, color: accent }}>{isCarrier ? '↑' : '↓'}</span>
             <span style={{ fontSize: 13, fontWeight: 600, color: isPaid ? '#1E9E5A' : accent }}>{label}</span>
           </div>
-          {isPaid && date ? (
+          {isPaid ? (
             <div style={{ fontSize: 11, color: '#1E9E5A', marginTop: 2 }}>
-              {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}
+              {date ? new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : 'дата не указана'}
               {isCash
                 ? ' · наличными'
                 : payments.length > 1
                   ? ` · ${payments.length} ПП`
-                  : (ppNumber || payments[0]?.pp_number) && ` · ПП №${ppNumber || payments[0].pp_number}`}
+                  : (ppNumber || payments[0]?.pp_number) ? ` · ПП №${ppNumber || payments[0].pp_number}` : ' · номер ПП не указан'}
             </div>
           ) : hasUnmatchedPayment ? (
             <div style={{ fontSize: 11, color: '#D97706', marginTop: 2, fontWeight: 600 }}>
