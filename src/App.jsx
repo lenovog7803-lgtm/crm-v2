@@ -6,7 +6,7 @@ import { ToastProvider, useToast } from './components/Toast'
 import { CelebrationProvider } from './components/Celebration'
 import Login from './pages/Login'
 import { getDashboard, getTasks, getNotifications, markNotificationRead } from './api'
-import { getOrdersFromCache, invalidateOrdersCache, patchOrderInCache } from './store/ordersStore'
+import { getOrdersFromCache, invalidateOrdersCache, refreshOrdersInBackground, patchOrderInCache } from './store/ordersStore'
 
 import Sidebar from './components/Sidebar'
 import Topbar from './components/Topbar'
@@ -244,8 +244,11 @@ function MainApp() {
         setAllOrders(prev => prev.map(o => (o.id === event.order_id ? { ...o, ...event.patch } : o)))
       }
     } else if (event.type === 'payment_marked') {
-      invalidateOrdersCache()
-      setOrdersKey(k => k + 1)
+      // Refetches in place instead of nulling the cache + remounting the
+      // list — a mounted Orders view keeps showing the current rows and
+      // swaps to the updated ones once they land, rather than blocking on
+      // a fresh fetch every time anyone (including you) marks a payment.
+      refreshOrdersInBackground()
     }
   })
 

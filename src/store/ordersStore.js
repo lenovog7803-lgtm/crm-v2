@@ -46,6 +46,24 @@ export function invalidateOrdersCache() {
   cachedAt = 0
 }
 
+// Refetches without ever dropping cachedOrders to null first — a mounted
+// Orders list keeps showing the last-known rows the whole time and only
+// swaps to the new ones once they land (via notify()), instead of a
+// remount finding an empty cache and blocking on a fresh fetch. Used for
+// events like payment_marked, where the change is real but nobody's
+// staring at a spinner for it — a few more seconds of the old numbers
+// beats a multi-second freeze on a slow backend.
+export async function refreshOrdersInBackground() {
+  try {
+    const result = await getOrders({ light: true })
+    cachedOrders = Array.isArray(result) ? result : (result?.orders || [])
+    cachedAt = Date.now()
+    notify()
+  } catch (e) {
+    console.error('[ordersStore] background refresh failed:', e)
+  }
+}
+
 // Point-update a single order in place (e.g. from a websocket order_updated
 // event) without refetching the whole list. No-op if nothing is cached yet.
 export function patchOrderInCache(orderId, patch) {
