@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { deleteOrder as apiDelete, updateOrder, restoreOrder } from '../api'
 import { getOrdersFromCache, getCachedOrdersSnapshot, invalidateOrdersCache, subscribeOrders } from '../store/ordersStore'
-import { initials, statusLabel, statusColor, statusBg, getGradient, fmtDate } from '../utils'
+import { initials, statusLabel, statusColor, statusBg, getGradient, fmtDate, hasUnreconciledPayment } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
 import { useToast } from './Toast'
@@ -409,7 +409,9 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 const route = order.route_from && order.route_to ? `${order.route_from} → ${order.route_to}` : (order.route || '—')
                 const overdue = isOverdue(order)
                 const missingClientPP = order.client_paid && !order.client_pp_number && !(order.client_payments || []).some(p => p.pp_number)
-                const flagged = overdue || missingClientPP
+                const missingCarrierPP = order.carrier_paid && !order.carrier_pp_number && !(order.carrier_payments || []).some(p => p.pp_number)
+                const unreconciled = hasUnreconciledPayment(order, 'client') || hasUnreconciledPayment(order, 'carrier')
+                const flagged = overdue || missingClientPP || missingCarrierPP || unreconciled
                 const isSelected = selected.has(order.id)
                 const dx = swipe.id === order.id ? swipe.dx : 0
                 const isRemoving = removingIds.has(order.id)
@@ -472,7 +474,9 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                           {order.order_number || order.id}
                         </span>
                         {overdue && <span style={{ fontSize: 10, color: '#C81923', fontWeight: 700 }}>ПРОСРОЧЕНО</span>}
-                        {missingClientPP && <span style={{ fontSize: 10, color: '#C81923', fontWeight: 700 }}>НЕТ ПП</span>}
+                        {missingClientPP && <span style={{ fontSize: 10, color: '#C81923', fontWeight: 700 }}>НЕТ ПП КЛИЕНТА</span>}
+                        {missingCarrierPP && <span style={{ fontSize: 10, color: '#C81923', fontWeight: 700 }}>НЕТ ПП ПЕРЕВОЗЧИКА</span>}
+                        {unreconciled && <span style={{ fontSize: 10, color: '#D97706', fontWeight: 700 }}>ПРОВЕРЬТЕ ОПЛАТУ</span>}
                       </div>
                       <div style={{ fontSize: 14, fontWeight: 600, color: '#0E1726', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{route}</div>
                       <div style={{ fontSize: 12, color: '#8E8E93' }}>
@@ -490,8 +494,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                           {margin.toLocaleString('ru-RU')}
                         </div>
                         <div style={{ display: 'flex', gap: 3, justifyContent: 'flex-end', marginTop: 3 }}>
-                          <span style={{ width: 18, height: 18, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, background: order.client_paid ? 'rgba(30,158,90,0.15)' : 'rgba(14,23,38,0.07)', color: order.client_paid ? '#1E9E5A' : '#C4CAD4' }}>К</span>
-                          <span style={{ width: 18, height: 18, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, background: order.carrier_paid ? 'rgba(124,58,237,0.15)' : 'rgba(14,23,38,0.07)', color: order.carrier_paid ? '#7C3AED' : '#C4CAD4' }}>П</span>
+                          <span style={{ width: 18, height: 18, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, background: order.client_paid ? 'rgba(30,158,90,0.15)' : (hasUnreconciledPayment(order, 'client') ? 'rgba(217,119,6,0.18)' : 'rgba(14,23,38,0.07)'), color: order.client_paid ? '#1E9E5A' : (hasUnreconciledPayment(order, 'client') ? '#D97706' : '#C4CAD4') }} title={hasUnreconciledPayment(order, 'client') ? 'Есть введённый ПП от клиента, но сумма не сошлась со ставкой' : undefined}>К</span>
+                          <span style={{ width: 18, height: 18, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, background: order.carrier_paid ? 'rgba(124,58,237,0.15)' : (hasUnreconciledPayment(order, 'carrier') ? 'rgba(217,119,6,0.18)' : 'rgba(14,23,38,0.07)'), color: order.carrier_paid ? '#7C3AED' : (hasUnreconciledPayment(order, 'carrier') ? '#D97706' : '#C4CAD4') }} title={hasUnreconciledPayment(order, 'carrier') ? 'Есть введённый ПП перевозчику, но сумма не сошлась со ставкой' : undefined}>П</span>
                         </div>
                       </div>
                       <svg width="8" height="13" viewBox="0 0 8 13" fill="none">
@@ -529,7 +533,9 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           const [avA, avB] = getGradient(order.client_name || '')
           const overdue = isOverdue(order)
           const missingClientPP = order.client_paid && !order.client_pp_number && !(order.client_payments || []).some(p => p.pp_number)
-          const flagged = overdue || missingClientPP
+          const missingCarrierPP = order.carrier_paid && !order.carrier_pp_number && !(order.carrier_payments || []).some(p => p.pp_number)
+          const unreconciled = hasUnreconciledPayment(order, 'client') || hasUnreconciledPayment(order, 'carrier')
+          const flagged = overdue || missingClientPP || missingCarrierPP || unreconciled
           const isSelected = selected.has(order.id)
           const isRemoving = removingIds.has(order.id)
           const isFlash = flashOrderId === order.id
@@ -574,7 +580,9 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                   <div style={{ fontFamily: 'JetBrains Mono', fontWeight: 600, fontSize: 13.5, color: '#1366F0' }}>
                     {order.order_number || order.id}
                   </div>
-                  {missingClientPP && <span style={{ fontSize: 9.5, color: '#C81923', fontWeight: 700 }}>НЕТ ПП</span>}
+                  {missingClientPP && <span style={{ fontSize: 9.5, color: '#C81923', fontWeight: 700 }}>НЕТ ПП КЛИЕНТА</span>}
+                  {missingCarrierPP && <span style={{ fontSize: 9.5, color: '#C81923', fontWeight: 700 }}>НЕТ ПП ПЕРЕВОЗЧИКА</span>}
+                  {unreconciled && <span style={{ fontSize: 9.5, color: '#D97706', fontWeight: 700 }}>ПРОВЕРЬТЕ ОПЛАТУ</span>}
                 </div>
                 <div style={{
                   display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 4, padding: '2px 8px', borderRadius: 6,
@@ -628,15 +636,15 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 <span style={{
                   width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 11, fontWeight: 700,
-                  background: order.client_paid ? 'rgba(30,158,90,0.15)' : 'rgba(14,23,38,0.07)',
-                  color: order.client_paid ? '#1E9E5A' : '#A6AEB8',
-                }}>К</span>
+                  background: order.client_paid ? 'rgba(30,158,90,0.15)' : (hasUnreconciledPayment(order, 'client') ? 'rgba(217,119,6,0.18)' : 'rgba(14,23,38,0.07)'),
+                  color: order.client_paid ? '#1E9E5A' : (hasUnreconciledPayment(order, 'client') ? '#D97706' : '#A6AEB8'),
+                }} title={hasUnreconciledPayment(order, 'client') ? 'Есть введённый ПП от клиента, но сумма не сошлась со ставкой' : undefined}>К</span>
                 <span style={{
                   width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 11, fontWeight: 700,
-                  background: order.carrier_paid ? 'rgba(124,58,237,0.15)' : 'rgba(14,23,38,0.07)',
-                  color: order.carrier_paid ? '#7C3AED' : '#A6AEB8',
-                }}>П</span>
+                  background: order.carrier_paid ? 'rgba(124,58,237,0.15)' : (hasUnreconciledPayment(order, 'carrier') ? 'rgba(217,119,6,0.18)' : 'rgba(14,23,38,0.07)'),
+                  color: order.carrier_paid ? '#7C3AED' : (hasUnreconciledPayment(order, 'carrier') ? '#D97706' : '#A6AEB8'),
+                }} title={hasUnreconciledPayment(order, 'carrier') ? 'Есть введённый ПП перевозчику, но сумма не сошлась со ставкой' : undefined}>П</span>
               </div>
               <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }} onClick={e => e.stopPropagation()}>
                 <button onClick={e => handleDelete(e, order.id)} style={{

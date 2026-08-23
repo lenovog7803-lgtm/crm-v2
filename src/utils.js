@@ -1,5 +1,20 @@
 export const fmtMoney = n => (n || 0).toLocaleString('ru-RU') + ' BYN'
 
+// A payment can be entered (PP number/date/amount saved on the order) without
+// the paid boolean ever flipping true, if the sum of all entries for that
+// side doesn't exactly match the order's rate (bank fee, rounding, wrong
+// rate, typo) — the backend only sets client_paid/carrier_paid once the sum
+// reconciles exactly. Left undetected, the order looks completely untouched
+// ("unpaid") everywhere in the UI even though money was already sent, which
+// is how a payment gets sent twice. Surfacing this distinctly is the fix.
+export const hasUnreconciledPayment = (order, side) => {
+  const paid = side === 'client' ? order.client_paid : order.carrier_paid
+  if (paid) return false
+  const payments = (side === 'client' ? order.client_payments : order.carrier_payments) || []
+  const legacyPpNumber = side === 'client' ? order.client_pp_number : order.carrier_pp_number
+  return !!legacyPpNumber || payments.some(p => (Number(p.amount) || 0) > 0 || (p.pp_number || '').trim())
+}
+
 // Display-only date formatter: "2026-08-18" or "2026-08-18T11:14:22Z" -> "18.08.2026".
 // Never use this on values bound to <input type="date">, which require ISO.
 export const fmtDate = d => {

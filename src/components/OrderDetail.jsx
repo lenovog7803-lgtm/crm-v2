@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, restoreTrash, markPayment, addPayment, deletePayment, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers, getOrderHistory } from '../api'
-import { fmtMoney, initials, getGradient, fmtDate } from '../utils'
+import { fmtMoney, initials, getGradient, fmtDate, hasUnreconciledPayment } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useRealtime } from '../hooks/useRealtime'
 import { useToast } from './Toast'
@@ -144,7 +144,15 @@ function PaymentButton({ type, order, onClick, onLongPress }) {
   const payments = (isCarrier ? order.carrier_payments : order.client_payments) || []
   const amount = isCarrier ? (order.carrier_rate || 0) : (order.client_rate || 0)
   const label = isCarrier ? 'Платим перевозчику' : 'Получаем от клиента'
-  const accent = isPaid ? '#1E9E5A' : (isCarrier ? '#E0473B' : '#0E1726')
+  // Money can be recorded (PP number + date saved) without the order ever
+  // flipping to isPaid — the backend only sets that flag once the sum of
+  // all PP entries matches the rate to the kopeck (bank fee, wrong rate on
+  // the order, intentional partial payment, etc). Without this branch the
+  // tile would show the same blank "нажмите чтобы отметить" as a genuinely
+  // untouched order, hiding a real payment and inviting a duplicate transfer.
+  const enteredTotal = payments.reduce((s, p) => s + (Number(p.amount) || 0), 0)
+  const hasUnmatchedPayment = hasUnreconciledPayment(order, type)
+  const accent = isPaid ? '#1E9E5A' : hasUnmatchedPayment ? '#D97706' : (isCarrier ? '#E0473B' : '#0E1726')
 
   // Long press (2s) opens the PP editor regardless of paid state; a plain
   // tap keeps its existing meaning (mark / unmark). longPressFired guards
@@ -180,24 +188,30 @@ function PaymentButton({ type, order, onClick, onLongPress }) {
       onTouchStart={startPress}
       onTouchEnd={cancelPress}
       onTouchCancel={cancelPress}
-      title={`Нажмите чтобы ${isPaid ? 'снять отметку' : 'отметить'} · удерживайте ${LONG_PRESS_MS / 1000} сек чтобы отредактировать ПП`}
+      title={
+        hasUnmatchedPayment
+          ? `Уже внесено ${enteredTotal.toLocaleString('ru-RU')} из ${amount.toLocaleString('ru-RU')} Br — нажмите чтобы открыть ПП`
+          : `Нажмите чтобы ${isPaid ? 'снять отметку' : 'отметить'} · удерживайте ${LONG_PRESS_MS / 1000} сек чтобы отредактировать ПП`
+      }
       style={{
         flex: 1, padding: '14px 18px', borderRadius: 14, cursor: 'pointer',
-        background: isPaid ? 'rgba(30,158,90,0.08)' : (isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(14,23,38,0.04)'),
-        border: isCarrier
-          ? `2px solid ${isPaid ? 'rgba(30,158,90,0.28)' : 'rgba(224,71,59,0.35)'}`
-          : `1px solid ${isPaid ? 'rgba(30,158,90,0.25)' : 'rgba(14,23,38,0.08)'}`,
+        background: isPaid ? 'rgba(30,158,90,0.08)' : hasUnmatchedPayment ? 'rgba(217,119,6,0.08)' : (isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(14,23,38,0.04)'),
+        border: isPaid
+          ? (isCarrier ? '2px solid rgba(30,158,90,0.28)' : '1px solid rgba(30,158,90,0.25)')
+          : hasUnmatchedPayment
+            ? '2px solid rgba(217,119,6,0.4)'
+            : (isCarrier ? '2px solid rgba(224,71,59,0.35)' : '1px solid rgba(14,23,38,0.08)'),
         transition: 'all 0.2s',
         userSelect: 'none', WebkitUserSelect: 'none',
       }}
-      onMouseEnter={e => { if (!isPaid) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.09)' : 'rgba(14,23,38,0.07)' }}
-      onMouseLeave={e => { cancelPress(); if (!isPaid) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(14,23,38,0.04)' }}
+      onMouseEnter={e => { if (!isPaid && !hasUnmatchedPayment) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.09)' : 'rgba(14,23,38,0.07)' }}
+      onMouseLeave={e => { cancelPress(); if (!isPaid && !hasUnmatchedPayment) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(14,23,38,0.04)' }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{
           width: 22, height: 22, borderRadius: 7, flexShrink: 0,
           background: isPaid ? '#1E9E5A' : 'transparent',
-          border: `2px solid ${isPaid ? '#1E9E5A' : '#C4CAD4'}`,
+          border: `2px solid ${isPaid ? '#1E9E5A' : hasUnmatchedPayment ? '#D97706' : '#C4CAD4'}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transition: 'all 0.2s',
         }}>
@@ -206,6 +220,7 @@ function PaymentButton({ type, order, onClick, onLongPress }) {
               <polyline points="20 6 9 17 4 12" />
             </svg>
           )}
+          {hasUnmatchedPayment && <span style={{ color: '#D97706', fontSize: 13, fontWeight: 700, lineHeight: 1 }}>!</span>}
         </div>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -218,6 +233,14 @@ function PaymentButton({ type, order, onClick, onLongPress }) {
               {payments.length > 1
                 ? ` · ${payments.length} ПП`
                 : (ppNumber || payments[0]?.pp_number) && ` · ПП №${ppNumber || payments[0].pp_number}`}
+            </div>
+          ) : hasUnmatchedPayment ? (
+            <div style={{ fontSize: 11, color: '#D97706', marginTop: 2, fontWeight: 600 }}>
+              Внесено {enteredTotal.toLocaleString('ru-RU')} из {amount.toLocaleString('ru-RU')} Br
+              {payments.length > 1
+                ? ` · ${payments.length} ПП`
+                : (ppNumber || payments[0]?.pp_number) && ` · ПП №${ppNumber || payments[0].pp_number}`}
+              {' — сумма не сходится'}
             </div>
           ) : (
             <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>
