@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getMissingPP, getKudirEntries, updateKudirEntry, exportKudirUrl, updateOrder } from '../api'
+import { getMissingPP, getKudirEntries, updateKudirEntry, unlockKudirEntry, exportKudirUrl, updateOrder } from '../api'
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
 import { fmtMoney, fmtDate } from '../utils'
@@ -143,19 +143,24 @@ function BookTab() {
   const [totalIncome, setTotalIncome] = useState(0)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    setLoading(true)
+  const load = (silent = false) => {
+    if (!silent) setLoading(true)
     const q = quarter === 'all' ? null : Number(quarter)
     const qStartMonth = q ? (q - 1) * 3 + 1 : 1
     const qEndMonth = q ? qStartMonth + 2 : 12
     const lastDay = new Date(year, qEndMonth, 0).getDate()
     const dateFrom = `${year}-${String(qStartMonth).padStart(2, '0')}-01`
     const dateTo = `${year}-${String(qEndMonth).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
-    getKudirEntries(dateFrom, dateTo)
+    return getKudirEntries(dateFrom, dateTo)
       .then(r => { setEntries(r.entries || []); setTotalIncome(r.total_income || 0) })
       .catch(e => show('Ошибка загрузки: ' + e.message, { type: 'error' }))
-      .finally(() => setLoading(false))
-  }, [year, quarter])
+      .finally(() => { if (!silent) setLoading(false) })
+  }
+  // Row edits refetch silently — no full-table spinner flash for saving
+  // one field, just the row's lock badge appearing once the response lands.
+  const reloadSilently = () => load(true)
+
+  useEffect(() => { load() }, [year, quarter])
 
   const download = () => {
     window.open(exportKudirUrl(year, quarter === 'all' ? null : Number(quarter)), '_blank')
@@ -201,7 +206,7 @@ function BookTab() {
               <tr><td colSpan={5} style={{ padding: 24, textAlign: 'center', color: '#A6AEB8' }}>Нет записей за период</td></tr>
             ) : (
               entries.map(e => (
-                <EntryRow key={e.id} entry={e} />
+                <EntryRow key={e.id} entry={e} onChanged={reloadSilently} />
               ))
             )}
           </tbody>
@@ -211,40 +216,126 @@ function BookTab() {
   )
 }
 
-function EntryRow({ entry }) {
-  const { show } = useToast()
-  const [note, setNote] = useState(entry.note || '')
-  const [saving, setSaving] = useState(false)
+// Any cell in a row can be hand-corrected — once you touch one, the whole
+// row is marked manually_edited on the backend and the order-driven
+// auto-sync stops overwriting it on the next payment change. "Снять
+// правку" reverts that so the row goes back to being computed from the
+// order automatically.
+const cellInputStyle = {
+  width: '100%', border: '1px solid transparent', background: 'transparent',
+  padding: '6px 8px', borderRadius: 8, fontSize: 12, fontFamily: 'Manrope', color: '#0E1726',
+  boxSizing: 'border-box',
+}
+const focusCell = e => { e.target.style.border = '1px solid #E0473B4D'; e.target.style.background = '#fff' }
+const blurCell = e => { e.target.style.border = '1px solid transparent'; e.target.style.background = 'transparent' }
 
-  const save = async () => {
-    if (note === (entry.note || '')) return
-    setSaving(true)
+function EntryRow({ entry, onChanged }) {
+  const { show } = useToast()
+  const [fields, setFields] = useState({
+    entry_date: (entry.entry_date || '').slice(0, 10),
+    document_ref: entry.document_ref || '',
+    content: entry.content || '',
+    income_amount: entry.income_amount,
+    note: entry.note || '',
+  })
+  const [saving, setSaving] = useState(null) // which field key is saving
+
+  const save = async (key, value) => {
+    const orig = key === 'entry_date' ? (entry.entry_date || '').slice(0, 10) : (entry[key] ?? (key === 'income_amount' ? null : ''))
+    if (value === orig) return
+    setSaving(key)
     try {
-      await updateKudirEntry(entry.id, { note })
-      show('Примечание сохранено', { type: 'success' })
+      await updateKudirEntry(entry.id, { [key]: key === 'income_amount' ? (value === '' ? null : Number(value)) : value })
+      show('Сохранено', { type: 'success' })
+      onChanged?.()
     } catch (e) {
       show('Ошибка сохранения: ' + e.message, { type: 'error' })
     }
-    setSaving(false)
+    setSaving(null)
   }
 
+  const revert = async () => {
+    try {
+      await unlockKudirEntry(entry.id)
+      show('Правка снята — строка снова считается автоматически', { type: 'info' })
+      onChanged?.()
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+  }
+
+  const locked = !!entry.manually_edited
+
   return (
-    <tr style={{ borderTop: '1px solid #F0F1F4' }}>
-      <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{fmtDate(entry.entry_date)}</td>
-      <td style={{ padding: '10px 12px' }}>{entry.document_ref}</td>
-      <td style={{ padding: '10px 12px' }}>{entry.content}</td>
-      <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 600, color: entry.income_amount != null ? '#1E9E5A' : '#A6AEB8' }}>
-        {entry.income_amount != null ? fmtMoney(entry.income_amount) : '—'}
+    <tr style={{ borderTop: '1px solid #F0F1F4', background: locked ? 'rgba(19,102,240,0.03)' : 'transparent' }}>
+      <td style={{ padding: '6px 12px', whiteSpace: 'nowrap' }}>
+        <input
+          type="date"
+          value={fields.entry_date}
+          onChange={e => setFields(f => ({ ...f, entry_date: e.target.value }))}
+          onFocus={focusCell}
+          onBlur={e => { blurCell(e); save('entry_date', fields.entry_date) }}
+          disabled={saving === 'entry_date'}
+          style={cellInputStyle}
+        />
       </td>
       <td style={{ padding: '6px 12px' }}>
         <input
-          value={note}
-          onChange={e => setNote(e.target.value)}
-          onBlur={save}
-          disabled={saving}
-          style={{ ...inputStyle, width: '100%', border: '1px solid transparent', background: 'transparent' }}
-          onFocus={e => { e.target.style.border = '1px solid #E0473B4D'; e.target.style.background = '#fff' }}
+          value={fields.document_ref}
+          onChange={e => setFields(f => ({ ...f, document_ref: e.target.value }))}
+          onFocus={focusCell}
+          onBlur={e => { blurCell(e); save('document_ref', fields.document_ref) }}
+          disabled={saving === 'document_ref'}
+          style={cellInputStyle}
         />
+      </td>
+      <td style={{ padding: '6px 12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {locked && (
+            <span title="Отредактировано вручную — не пересчитывается автоматически" style={{ fontSize: 13, flexShrink: 0 }}>🔒</span>
+          )}
+          <input
+            value={fields.content}
+            onChange={e => setFields(f => ({ ...f, content: e.target.value }))}
+            onFocus={focusCell}
+            onBlur={e => { blurCell(e); save('content', fields.content) }}
+            disabled={saving === 'content'}
+            style={cellInputStyle}
+          />
+        </div>
+      </td>
+      <td style={{ padding: '6px 12px', textAlign: 'right' }}>
+        <input
+          type="number"
+          value={fields.income_amount ?? ''}
+          onChange={e => setFields(f => ({ ...f, income_amount: e.target.value }))}
+          onFocus={focusCell}
+          onBlur={e => { blurCell(e); save('income_amount', fields.income_amount) }}
+          disabled={saving === 'income_amount'}
+          style={{ ...cellInputStyle, textAlign: 'right', fontWeight: 600, color: fields.income_amount != null && fields.income_amount !== '' ? '#1E9E5A' : '#A6AEB8' }}
+          placeholder="—"
+        />
+      </td>
+      <td style={{ padding: '6px 12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <input
+            value={fields.note}
+            onChange={e => setFields(f => ({ ...f, note: e.target.value }))}
+            onFocus={focusCell}
+            onBlur={e => { blurCell(e); save('note', fields.note) }}
+            disabled={saving === 'note'}
+            style={cellInputStyle}
+          />
+          {locked && (
+            <button
+              onClick={revert}
+              title="Снять ручную правку — строка снова будет пересчитываться автоматически"
+              style={{ flexShrink: 0, border: 'none', background: 'transparent', color: '#A6AEB8', fontSize: 10, cursor: 'pointer', padding: '2px 4px', whiteSpace: 'nowrap' }}
+            >
+              снять
+            </button>
+          )}
+        </div>
       </td>
     </tr>
   )

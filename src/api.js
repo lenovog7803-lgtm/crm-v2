@@ -220,5 +220,6 @@ export const getMissingPP = () => req('/kudir/missing_pp');
 export const getKudirEntries = (dateFrom, dateTo) =>
   req(`/kudir/entries?date_from=${dateFrom || ''}&date_to=${dateTo || ''}`);
 export const updateKudirEntry = (id, data) => req(`/kudir/entries/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const unlockKudirEntry = (id) => req(`/kudir/entries/${id}/unlock`, { method: 'POST' });
 export const exportKudirUrl = (year, quarter) =>
   `${BASE}/kudir/export?year=${year}${quarter ? `&quarter=${quarter}` : ''}&token=${encodeURIComponent(token)}`;
