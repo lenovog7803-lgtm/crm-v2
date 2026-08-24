@@ -156,6 +156,11 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   const handleDelete = async (e, id) => {
     e.stopPropagation()
     await apiDelete(id).catch(console.error)
+    // Without this the shared orders cache still holds the pre-delete list,
+    // so the very next cache read (navigating away and back, a live update
+    // elsewhere) resurrects the row — the delete looks like it "undoes
+    // itself" even though the server-side soft-delete stuck.
+    invalidateOrdersCache()
     await animateRemoval([id])
     setOrders(prev => prev.filter(o => o.id !== id))
     setRemovingIds(prev => { const next = new Set(prev); next.delete(id); return next })
@@ -410,8 +415,10 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 const overdue = isOverdue(order)
                 const missingClientPP = order.client_paid && !order.client_cash && !order.client_pp_number && !(order.client_payments || []).some(p => p.pp_number)
                 const missingCarrierPP = order.carrier_paid && !order.carrier_cash && !order.carrier_pp_number && !(order.carrier_payments || []).some(p => p.pp_number)
+                const missingClientDate = order.client_paid && !order.client_cash && !missingClientPP && !order.client_paid_date
+                const missingCarrierDate = order.carrier_paid && !order.carrier_cash && !missingCarrierPP && !order.carrier_paid_date
                 const unreconciled = hasUnreconciledPayment(order, 'client') || hasUnreconciledPayment(order, 'carrier')
-                const flagged = overdue || missingClientPP || missingCarrierPP || unreconciled
+                const flagged = overdue || missingClientPP || missingCarrierPP || missingClientDate || missingCarrierDate || unreconciled
                 const isSelected = selected.has(order.id)
                 const dx = swipe.id === order.id ? swipe.dx : 0
                 const isRemoving = removingIds.has(order.id)
@@ -476,6 +483,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                         {overdue && <span style={{ fontSize: 10, color: '#C81923', fontWeight: 700 }}>ПРОСРОЧЕНО</span>}
                         {missingClientPP && <span style={{ fontSize: 10, color: '#C81923', fontWeight: 700 }}>НЕТ ПП КЛИЕНТА</span>}
                         {missingCarrierPP && <span style={{ fontSize: 10, color: '#C81923', fontWeight: 700 }}>НЕТ ПП ПЕРЕВОЗЧИКА</span>}
+                        {missingClientDate && <span style={{ fontSize: 10, color: '#D97706', fontWeight: 700 }}>НЕТ ДАТЫ КЛИЕНТА</span>}
+                        {missingCarrierDate && <span style={{ fontSize: 10, color: '#D97706', fontWeight: 700 }}>НЕТ ДАТЫ ПЕРЕВОЗЧИКА</span>}
                         {unreconciled && <span style={{ fontSize: 10, color: '#D97706', fontWeight: 700 }}>ПРОВЕРЬТЕ ОПЛАТУ</span>}
                       </div>
                       <div style={{ fontSize: 14, fontWeight: 600, color: '#0E1726', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{route}</div>
@@ -532,10 +541,12 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           const route = order.route_from && order.route_to ? `${order.route_from} → ${order.route_to}` : (order.route || '—')
           const [avA, avB] = getGradient(order.client_name || '')
           const overdue = isOverdue(order)
-          const missingClientPP = order.client_paid && !order.client_pp_number && !(order.client_payments || []).some(p => p.pp_number)
-          const missingCarrierPP = order.carrier_paid && !order.carrier_pp_number && !(order.carrier_payments || []).some(p => p.pp_number)
+          const missingClientPP = order.client_paid && !order.client_cash && !order.client_pp_number && !(order.client_payments || []).some(p => p.pp_number)
+          const missingCarrierPP = order.carrier_paid && !order.carrier_cash && !order.carrier_pp_number && !(order.carrier_payments || []).some(p => p.pp_number)
+          const missingClientDate = order.client_paid && !order.client_cash && !missingClientPP && !order.client_paid_date
+          const missingCarrierDate = order.carrier_paid && !order.carrier_cash && !missingCarrierPP && !order.carrier_paid_date
           const unreconciled = hasUnreconciledPayment(order, 'client') || hasUnreconciledPayment(order, 'carrier')
-          const flagged = overdue || missingClientPP || missingCarrierPP || unreconciled
+          const flagged = overdue || missingClientPP || missingCarrierPP || missingClientDate || missingCarrierDate || unreconciled
           const isSelected = selected.has(order.id)
           const isRemoving = removingIds.has(order.id)
           const isFlash = flashOrderId === order.id
@@ -582,6 +593,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                   </div>
                   {missingClientPP && <span style={{ fontSize: 9.5, color: '#C81923', fontWeight: 700 }}>НЕТ ПП КЛИЕНТА</span>}
                   {missingCarrierPP && <span style={{ fontSize: 9.5, color: '#C81923', fontWeight: 700 }}>НЕТ ПП ПЕРЕВОЗЧИКА</span>}
+                  {missingClientDate && <span style={{ fontSize: 9.5, color: '#D97706', fontWeight: 700 }}>НЕТ ДАТЫ КЛИЕНТА</span>}
+                  {missingCarrierDate && <span style={{ fontSize: 9.5, color: '#D97706', fontWeight: 700 }}>НЕТ ДАТЫ ПЕРЕВОЗЧИКА</span>}
                   {unreconciled && <span style={{ fontSize: 9.5, color: '#D97706', fontWeight: 700 }}>ПРОВЕРЬТЕ ОПЛАТУ</span>}
                 </div>
                 <div style={{
