@@ -142,6 +142,7 @@ function BookTab() {
   const [entries, setEntries] = useState([])
   const [totalIncome, setTotalIncome] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
 
   const load = (silent = false) => {
     if (!silent) setLoading(true)
@@ -166,6 +167,21 @@ function BookTab() {
     window.open(exportKudirUrl(year, quarter === 'all' ? null : Number(quarter)), '_blank')
   }
 
+  // Counterparty lives in free text, not its own column — the client's name
+  // sits in `content` ("Оплата от X…"), the carrier's in `note` ("… —
+  // перевозчику Y"). Matching both against one search box covers either
+  // side without needing a schema change.
+  const needle = search.trim().toLowerCase()
+  const filteredEntries = needle
+    ? entries.filter(e => (
+        (e.content || '').toLowerCase().includes(needle) ||
+        (e.note || '').toLowerCase().includes(needle) ||
+        (e.order_number || '').toLowerCase().includes(needle) ||
+        (e.document_ref || '').toLowerCase().includes(needle)
+      ))
+    : entries
+  const filteredIncome = filteredEntries.reduce((s, e) => s + (e.income_amount || 0), 0)
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div className="card" style={{ padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
@@ -175,6 +191,16 @@ function BookTab() {
           onChange={v => setYear(Number(v))}
         />
         <SlidingTabs options={QUARTERS} value={quarter} onChange={setQuarter} />
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Поиск по контрагенту или заявке…"
+          style={{
+            flex: '1 1 220px', minWidth: 180, padding: '9px 12px', borderRadius: 10,
+            border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 13, color: '#0E1726',
+            boxSizing: 'border-box',
+          }}
+        />
         <button
           onClick={download}
           style={{ marginLeft: 'auto', padding: '9px 16px', borderRadius: 10, background: '#1366F0', color: '#fff', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
@@ -184,8 +210,12 @@ function BookTab() {
       </div>
 
       <div className="card" style={{ padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ fontSize: 13, color: '#5A6573' }}>Записей: {entries.length}</div>
-        <div style={{ fontSize: 14, fontWeight: 700, color: '#1E9E5A' }}>Доход за период: {fmtMoney(totalIncome)}</div>
+        <div style={{ fontSize: 13, color: '#5A6573' }}>
+          {needle ? `Найдено: ${filteredEntries.length} из ${entries.length}` : `Записей: ${entries.length}`}
+        </div>
+        <div style={{ fontSize: 14, fontWeight: 700, color: '#1E9E5A' }}>
+          {needle ? `Доход по найденному: ${fmtMoney(filteredIncome)}` : `Доход за период: ${fmtMoney(totalIncome)}`}
+        </div>
       </div>
 
       <div className="card" style={{ padding: 0, overflow: 'auto' }}>
@@ -202,10 +232,12 @@ function BookTab() {
           <tbody>
             {loading ? (
               <tr><td colSpan={5} style={{ padding: 24, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</td></tr>
-            ) : entries.length === 0 ? (
-              <tr><td colSpan={5} style={{ padding: 24, textAlign: 'center', color: '#A6AEB8' }}>Нет записей за период</td></tr>
+            ) : filteredEntries.length === 0 ? (
+              <tr><td colSpan={5} style={{ padding: 24, textAlign: 'center', color: '#A6AEB8' }}>
+                {needle ? 'Ничего не найдено' : 'Нет записей за период'}
+              </td></tr>
             ) : (
-              entries.map(e => (
+              filteredEntries.map(e => (
                 <EntryRow key={e.id} entry={e} onChanged={reloadSilently} />
               ))
             )}
