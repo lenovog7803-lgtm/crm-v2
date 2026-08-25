@@ -6,7 +6,7 @@ import { ToastProvider, useToast } from './components/Toast'
 import { CelebrationProvider } from './components/Celebration'
 import Login from './pages/Login'
 import { getDashboard, getTasks, getNotifications, markNotificationRead } from './api'
-import { getOrdersFromCache, invalidateOrdersCache, refreshOrdersInBackground, patchOrderInCache } from './store/ordersStore'
+import { getOrdersFromCache, invalidateOrdersCache, refreshOrdersInBackground, patchOrderInCache, subscribeOrders } from './store/ordersStore'
 
 import Sidebar from './components/Sidebar'
 import Topbar from './components/Topbar'
@@ -141,6 +141,13 @@ function MainApp() {
     }).catch(() => {})
   }, [ordersKey, tasksKey])
 
+  // Keeps allOrders (what Dashboard reads via preloadedOrders) in sync with
+  // the shared ordersStore cache. Without this, a payment_marked websocket
+  // event only refreshes the cache Orders.jsx reads from — Dashboard's copy
+  // stayed frozen at mount time, so a just-paid order kept showing as still
+  // awaiting client payment until a full page reload.
+  useEffect(() => subscribeOrders(data => { if (data) setAllOrders(data) }), [])
+
   // Navigation — the app has no router (page is plain state, the URL never
   // changes), so the browser's back/forward swipe gesture had nowhere to
   // go: with only one real history entry, swiping back just reloaded the
@@ -234,15 +241,13 @@ function MainApp() {
 
   // One shared connection covers Dashboard + Orders. order_updated carries
   // the changed fields (patch) and is applied in place to the shared cache
-  // and to allOrders — no network round-trip, so a busy team doesn't force
-  // everyone else's list to reload on every edit. payment_marked touches
-  // more (payment arrays, computed status, KUDiR) — still a full refetch.
+  // — the subscribeOrders() effect above mirrors that into allOrders, so no
+  // network round-trip forces everyone else's list to reload on every edit.
+  // payment_marked touches more (payment arrays, computed status, KUDiR) —
+  // still a full refetch.
   useRealtime((event) => {
     if (event.type === 'order_updated') {
       patchOrderInCache(event.order_id, event.patch)
-      if (event.patch) {
-        setAllOrders(prev => prev.map(o => (o.id === event.order_id ? { ...o, ...event.patch } : o)))
-      }
     } else if (event.type === 'payment_marked') {
       // Refetches in place instead of nulling the cache + remounting the
       // list — a mounted Orders view keeps showing the current rows and
