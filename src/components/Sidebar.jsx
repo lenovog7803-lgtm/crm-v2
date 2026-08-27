@@ -240,10 +240,15 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
           width: 44, height: 44, borderRadius: 14,
           background: 'linear-gradient(135deg, #0E1726 0%, #1C2740 100%)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#fff', fontFamily: 'Onest', fontWeight: 800, fontSize: 16,
           flexShrink: 0,
           boxShadow: '0 6px 18px -6px rgba(14,23,38,0.5)',
-        }}>А2</div>
+        }}>
+          <img
+            src="/logo.svg"
+            alt="AV2"
+            style={{ height: 32, objectFit: 'contain' }}
+          />
+        </div>
         {expanded && (
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 15, color: '#0E1726', letterSpacing: '-0.01em', whiteSpace: 'nowrap' }}>А2 Group</div>
