@@ -88,9 +88,11 @@ function ReportCard({ r }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 18 }}>
         <Stat label="Выручка" value={money(r.revenue)} color="#1366F0" bg="rgba(19,102,240,0.08)"
-          sub={r.orders_count != null ? `${int(r.orders_count)} заявок` : null} />
+          sub="по дате создания заявок" />
         <Stat label="Маржа" value={money(r.margin)} color="#1E9E5A" bg="rgba(30,158,90,0.08)" />
-        <Stat label="Доставлено" value={int(r.delivered)} color="#1E9E5A" bg="rgba(30,158,90,0.08)" />
+        <Stat label="Создано заявок" value={int(r.orders_count)} color="#1366F0" bg="rgba(19,102,240,0.08)" />
+        <Stat label="Доставлено" value={int(r.delivered)} color="#1E9E5A" bg="rgba(30,158,90,0.08)"
+          sub="по дате выгрузки" />
         <Stat label="Просрочка перевозчикам" value={int(r.overdue_carrier_count)} color="#E0473B" bg="rgba(224,71,59,0.08)"
           sub={money(r.overdue_carrier_sum)} />
         <Stat label="Должники (клиенты)" value={int(r.debtors_count)} color="#D97706" bg="rgba(217,119,6,0.08)"
