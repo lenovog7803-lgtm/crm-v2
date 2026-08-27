@@ -238,15 +238,13 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, paddingLeft: 2 }}>
         <div style={{
           width: 44, height: 44, borderRadius: 14,
-          background: 'linear-gradient(135deg, #0E1726 0%, #1C2740 100%)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
-          boxShadow: '0 6px 18px -6px rgba(14,23,38,0.5)',
         }}>
           <img
-            src="/logo.svg"
-            alt="AV2"
-            style={{ height: 32, objectFit: 'contain' }}
+            src="/apple-touch-icon.png"
+            alt="A2"
+            style={{ width: 38, height: 38, objectFit: 'contain' }}
           />
         </div>
         {expanded && (
