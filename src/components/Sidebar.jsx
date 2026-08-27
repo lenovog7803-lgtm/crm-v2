@@ -238,14 +238,14 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, paddingLeft: 2 }}>
         <div style={{
           width: 44, height: 44, borderRadius: 14,
-          background: '#0E1726',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
-          boxShadow: '0 6px 18px -6px rgba(14,23,38,0.5)',
         }}>
-          <span style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 17, letterSpacing: '-0.01em', color: '#fff' }}>
-            A<span style={{ color: '#F0891F' }}>2</span>
-          </span>
+          <img
+            src="/logo-mark.svg"
+            alt="AV2"
+            style={{ height: 30, objectFit: 'contain' }}
+          />
         </div>
         {expanded && (
           <div style={{ flex: 1, minWidth: 0 }}>
