@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { getReports, runReport } from '../api'
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
-import BotSubscribeSection from '../components/BotSubscribeSection'
 import { fmtMoney } from '../utils'
 
 const TABS = [
@@ -153,8 +152,15 @@ export default function Reports() {
   const runNow = async () => {
     setRunning(true)
     try {
-      await runReport(tab)
-      show('Отчёт сформирован и отправлен в Telegram', { type: 'success' })
+      const r = await runReport(tab)
+      if (r.sent > 0) {
+        show(`Отчёт сформирован, отправлен в Telegram (${r.sent} из ${r.targets})`, { type: 'success' })
+      } else if (!r.token_configured) {
+        show('Отчёт сформирован, но в Telegram не ушёл: не задан A2_INFO_BOT_TOKEN на сервере', { type: 'error' })
+      } else {
+        const err = (r.delivery || []).map(d => d.error).filter(Boolean)[0]
+        show('Отчёт сформирован, но в Telegram не ушёл' + (err ? `: ${err}` : ' (нет получателей)'), { type: 'error' })
+      }
       load()
     } catch (e) {
       show('Ошибка: ' + e.message, { type: 'error' })
@@ -177,8 +183,6 @@ export default function Reports() {
           </button>
         </div>
       </div>
-
-      <BotSubscribeSection />
 
       {loading ? (
         <div className="card" style={{ padding: 24, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>Загрузка…</div>
