@@ -8,12 +8,24 @@ const TABS = [
   { key: 'daily', label: 'Ежедневные' },
   { key: 'weekly', label: 'Еженедельные' },
   { key: 'monthly', label: 'Ежемесячные' },
+  { key: 'quarterly', label: 'Квартальные' },
+  { key: 'yearly', label: 'Годовые' },
 ]
 
-const PERIOD_LABEL = { daily: 'за сегодня', weekly: 'за неделю', monthly: 'за месяц' }
+const PERIOD_LABEL = {
+  daily: 'за день', weekly: 'за неделю', monthly: 'за месяц',
+  quarterly: 'за квартал', yearly: 'за год',
+}
 
 const money = v => fmtMoney(Math.round(Number(v) || 0))
 const int = v => Math.round(Number(v) || 0).toLocaleString('ru-RU')
+
+function ddmmyyyy(iso) {
+  if (!iso) return '—'
+  const d = new Date(iso)
+  if (isNaN(d)) return String(iso).slice(0, 10)
+  return d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })
+}
 
 function fmtStamp(iso) {
   if (!iso) return '—'
@@ -22,6 +34,11 @@ function fmtStamp(iso) {
   return d.toLocaleString('ru-RU', {
     day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
   })
+}
+
+function rowTitle(r) {
+  const date = ddmmyyyy(r.generated_at)
+  return r.period === 'daily' ? `Отчёт за ${date}` : `Отчёт ${PERIOD_LABEL[r.period] || r.period} · ${date}`
 }
 
 // Same stat-tile pattern as the dashboard KPI grid — label + big number on a
@@ -72,28 +89,31 @@ function LegList({ title, items }) {
   )
 }
 
-function ReportCard({ r }) {
+function ReportBody({ r }) {
   const topClients = Array.isArray(r.top_clients) ? r.top_clients : []
   const loads = Array.isArray(r.tomorrow_loads) ? r.tomorrow_loads : []
   const unloads = Array.isArray(r.tomorrow_unloads) ? r.tomorrow_unloads : []
   const hasTomorrow = r.tomorrow_date != null && (loads.length || unloads.length || r.period === 'daily')
+  const total = int(r.orders_count)
   return (
-    <div className="card" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>
-          Отчёт {PERIOD_LABEL[r.period] || r.period}
-        </div>
-        <div style={{ fontSize: 12, color: '#A6AEB8' }}>{fmtStamp(r.generated_at)}</div>
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18, padding: '18px 20px 20px' }}>
+      <div style={{ fontSize: 12, color: '#A6AEB8' }}>Сформирован: {fmtStamp(r.generated_at)}</div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 18 }}>
         <Stat label="Выручка" value={money(r.revenue)} color="#1366F0" bg="rgba(19,102,240,0.08)"
           sub={r.basis === 'unload' ? 'по дате выгрузки' : 'по дате создания заявок'} />
-        <Stat label="Маржа" value={money(r.margin)} color="#1E9E5A" bg="rgba(30,158,90,0.08)" />
+        <Stat label="Маржа" value={money(r.margin)} color="#1E9E5A" bg="rgba(30,158,90,0.08)"
+          sub={r.avg_margin != null ? `в среднем ${money(r.avg_margin)}/заявка` : null} />
+        <Stat label="Прибыль" value={money(r.net_profit)} color="#1E9E5A" bg="rgba(30,158,90,0.08)"
+          sub="маржа − налог 20%" />
         <Stat label={r.basis === 'unload' ? 'Заявок (по выгрузке)' : 'Создано заявок'}
-          value={int(r.orders_count)} color="#1366F0" bg="rgba(19,102,240,0.08)" />
+          value={total} color="#1366F0" bg="rgba(19,102,240,0.08)" />
         <Stat label="Доставлено" value={int(r.delivered)} color="#1E9E5A" bg="rgba(30,158,90,0.08)"
           sub="по дате выгрузки" />
+        <Stat label="Оплачено клиентами" value={`${int(r.client_paid_count)} из ${total}`}
+          color="#1E9E5A" bg="rgba(30,158,90,0.08)" sub={money(r.client_paid_sum)} />
+        <Stat label="Оплачено перевозчикам" value={`${int(r.carrier_paid_count)} из ${total}`}
+          color="#1366F0" bg="rgba(19,102,240,0.08)" sub={money(r.carrier_paid_sum)} />
         <Stat label="Просрочка перевозчикам" value={int(r.overdue_carrier_count)} color="#E0473B" bg="rgba(224,71,59,0.08)"
           sub={money(r.overdue_carrier_sum)} />
         <Stat label="Должники (клиенты)" value={int(r.debtors_count)} color="#D97706" bg="rgba(217,119,6,0.08)"
@@ -101,16 +121,6 @@ function ReportCard({ r }) {
         <Stat label="Звонки" value={int(r.calls_total)} color="#7C3AED" bg="rgba(124,58,237,0.08)"
           sub={`стали клиентами: ${int(r.calls_won)}`} />
       </div>
-
-      {hasTomorrow && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, borderTop: '1px solid #F0F1F4', paddingTop: 14 }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 13, color: '#0E1726' }}>
-            Завтра{r.tomorrow_date ? ` (${r.tomorrow_date})` : ''}
-          </div>
-          <LegList title="Загрузки" items={loads} />
-          <LegList title="Выгрузки" items={unloads} />
-        </div>
-      )}
 
       {topClients.length > 0 && (
         <div>
@@ -131,6 +141,46 @@ function ReportCard({ r }) {
           </div>
         </div>
       )}
+
+      {hasTomorrow && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, borderTop: '1px solid #F0F1F4', paddingTop: 14 }}>
+          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 13, color: '#0E1726' }}>
+            Завтра{r.tomorrow_date ? ` (${r.tomorrow_date})` : ''}
+          </div>
+          <LegList title="Загрузки" items={loads} />
+          <LegList title="Выгрузки" items={unloads} />
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ReportRow({ r }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          gap: 12, padding: '14px 18px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, minWidth: 0, flexWrap: 'wrap' }}>
+          <span style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>{rowTitle(r)}</span>
+          <span style={{ fontSize: 12.5, color: '#8A93A0' }}>
+            выручка {money(r.revenue)} · маржа {money(r.margin)}
+          </span>
+        </div>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, color: '#1366F0', fontSize: 12.5, fontWeight: 600 }}>
+          {open ? 'Свернуть' : 'Открыть'}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+            style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </span>
+      </button>
+      {open && <div style={{ borderTop: '1px solid #F0F1F4' }}><ReportBody r={r} /></div>}
     </div>
   )
 }
@@ -175,27 +225,28 @@ export default function Reports() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
         <h1 style={{ fontFamily: 'Onest', fontSize: 20, fontWeight: 800, color: '#0E1726', margin: 0 }}>Отчёты</h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <SlidingTabs options={TABS} value={tab} onChange={setTab} />
-          <button
-            onClick={runNow}
-            disabled={running}
-            style={{ padding: '7px 15px', borderRadius: 99, border: 'none', cursor: running ? 'default' : 'pointer', fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600, background: '#0E1726', color: '#fff', opacity: running ? 0.6 : 1, whiteSpace: 'nowrap' }}
-          >
-            {running ? '…' : 'Сформировать сейчас'}
-          </button>
-        </div>
+        <button
+          onClick={runNow}
+          disabled={running}
+          style={{ padding: '7px 15px', borderRadius: 99, border: 'none', cursor: running ? 'default' : 'pointer', fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600, background: '#0E1726', color: '#fff', opacity: running ? 0.6 : 1, whiteSpace: 'nowrap' }}
+        >
+          {running ? '…' : 'Сформировать сейчас'}
+        </button>
+      </div>
+
+      <div className="card" style={{ padding: '10px 12px', overflowX: 'auto' }}>
+        <SlidingTabs options={TABS} value={tab} onChange={setTab} />
       </div>
 
       {loading ? (
         <div className="card" style={{ padding: 24, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>Загрузка…</div>
       ) : reports.length === 0 ? (
         <div className="card" style={{ padding: 32, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>
-          Отчётов пока нет. Они формируются автоматически в 21:00 по Минску (ежедневный — каждый день, еженедельный — в пятницу, ежемесячный — в последний день месяца)
-          либо по кнопке «Сформировать сейчас».
+          Отчётов пока нет. Формируются автоматически в 21:00 по Минску (день — каждый день, неделя — в пятницу,
+          месяц/квартал/год — в последний день периода) либо по кнопке «Сформировать сейчас».
         </div>
       ) : (
-        reports.map(r => <ReportCard key={r.id || r.generated_at} r={r} />)
+        reports.map(r => <ReportRow key={r.id || r.generated_at} r={r} />)
       )}
     </div>
   )
