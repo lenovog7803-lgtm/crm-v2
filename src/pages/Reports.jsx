@@ -184,7 +184,7 @@ export default function Reports() {
         <div className="card" style={{ padding: 24, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>Загрузка…</div>
       ) : reports.length === 0 ? (
         <div className="card" style={{ padding: 32, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>
-          Отчётов пока нет. Они формируются автоматически (ежедневный — в 9:00, еженедельный — в пятницу, ежемесячный — в конце месяца)
+          Отчётов пока нет. Они формируются автоматически в 21:00 по Минску (ежедневный — каждый день, еженедельный — в пятницу, ежемесячный — в последний день месяца)
           либо по кнопке «Сформировать сейчас».
         </div>
       ) : (
