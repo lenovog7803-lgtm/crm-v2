@@ -91,7 +91,9 @@ export const updateCarrier = (id, data) => req(`/carriers/${id}`, { method: 'PUT
 export const deleteCarrier = (id) => req(`/carriers/${id}`, { method: 'DELETE' });
 
 // Tasks
-export const getTasks = () => req('/tasks');
+// status defaults to 'pending' on the backend now — pass 'all' for the
+// "Завершённые" tab, or an explicit status ('done'/'pending').
+export const getTasks = (status) => req('/tasks' + (status ? `?status=${status}` : ''));
 export const createTask = (data) => req('/tasks', { method: 'POST', body: JSON.stringify(data) });
 export const updateTask = (id, data) => req(`/tasks/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const deleteTask = (id) => req(`/tasks/${id}`, { method: 'DELETE' });
@@ -214,6 +216,14 @@ export const getManagerStatsDetail = (id, period) => req(`/admin/manager_stats/$
 // Admin — notifications
 export const getNotifications = () => req('/notifications');
 export const markNotificationRead = (id) => req(`/notifications/${id}/read`, { method: 'POST' });
+
+// Reports — daily/weekly/monthly digests (director-only hidden page)
+export const getReports = (period) => req('/reports' + (period ? `?period=${period}` : ''));
+export const runReport = (period) => req(`/reports/run?period=${period || 'daily'}`, { method: 'POST' });
+
+// А2 Инфо СРМ — Telegram bot subscription (per-user chat_id)
+export const subscribeBot = (chatId) => req('/bot/subscribe', { method: 'POST', body: JSON.stringify({ chat_id: chatId }) });
+export const getBotSubscription = () => req('/bot/subscription');
 
 // KUDiR — journal of income/transit rows created on payment mark (director-only)
 export const getMissingPP = () => req('/kudir/missing_pp');

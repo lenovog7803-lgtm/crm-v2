@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getTasks, updateTask as apiUpdate, deleteTask as apiDelete } from '../api'
+import BotSubscribeSection from './BotSubscribeSection'
 import { ModalOverlay, ModalHeader } from './Modal'
 import { fmtDate } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
@@ -22,12 +23,15 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
+  const [showBot, setShowBot] = useState(false)
   const [editTask, setEditTask] = useState(null)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     setLoading(true)
-    getTasks()
+    // 'all' — this page has its own Все/Активные/Завершённые filter, so it
+    // needs completed rows too (the backend default is pending-only now).
+    getTasks('all')
       .then(r => setTasks(Array.isArray(r) ? r : []))
       .catch(console.error)
       .finally(() => setLoading(false))
@@ -93,6 +97,15 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
             onChange={setFilter}
           />
         </div>
+        <button
+          onClick={() => setShowBot(v => !v)}
+          title="Уведомления в Telegram"
+          style={{ flexShrink: 0, background: 'none', border: '1px solid rgba(14,23,38,0.12)', borderRadius: 10, cursor: 'pointer', color: showBot ? '#1366F0' : '#8A93A0', padding: '8px 10px', display: 'flex', alignItems: 'center' }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21.5 4.5 2.5 12l6 2.5M21.5 4.5 18 20l-9.5-5.5M21.5 4.5 8.5 14.5" />
+          </svg>
+        </button>
         <button className="btn-primary" onClick={onAdd} style={{ flexShrink: 0, padding: isMobile ? '9px 10px' : '11px 18px' }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
@@ -100,6 +113,8 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
           {!isMobile && 'Новая задача'}
         </button>
       </div>
+
+      {showBot && <BotSubscribeSection />}
 
       <div className="card" style={{ overflow: 'hidden' }}>
         {loading && (
