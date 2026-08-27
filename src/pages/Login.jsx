@@ -24,9 +24,7 @@ export default function Login() {
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#EDEFF3' }}>
       <div style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(24px)', borderRadius: 24, padding: 40, width: 380, border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 20px 60px rgba(20,30,55,0.15)' }}>
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ width: 56, height: 56, borderRadius: 16, background: 'linear-gradient(145deg,#0E1726,#2A3343)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 8px 20px rgba(14,23,38,0.4)' }}>
-            <span style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 22, color: '#fff' }}>А2</span>
-          </div>
+          <img src="/logo-full.svg" alt="AV2" style={{ height: 64, margin: '0 auto 16px', display: 'block' }} />
           <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 24, color: '#0E1726' }}>А2 Group CRM</div>
           <div style={{ fontSize: 13, color: '#8A93A0', marginTop: 4 }}>Войдите в систему</div>
         </div>
