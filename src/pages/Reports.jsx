@@ -125,11 +125,11 @@ function ReportBody({ r }) {
       {(r.period === 'quarterly' || r.period === 'yearly') && (
         <div style={{ borderTop: '1px solid #F0F1F4', paddingTop: 14 }}>
           <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 13, color: '#0E1726', marginBottom: 12 }}>
-            Налог по КУДиР <span style={{ color: '#8A93A0', fontWeight: 400 }}>(по оплатам, поступившим в периоде)</span>
+            Налог по КУДиР <span style={{ color: '#8A93A0', fontWeight: 400 }}>(по фактическим датам оплат в книге)</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 18 }}>
-            <Stat label="Оплачено клиентами в периоде" value={int(r.kudir_paid_count)} color="#1366F0" bg="rgba(19,102,240,0.08)" sub="заявок" />
-            <Stat label="Налоговая база (их маржа)" value={money(r.kudir_income)} color="#0E1726" />
+            <Stat label="Строк дохода в книге" value={int(r.kudir_rows_count)} color="#1366F0" bg="rgba(19,102,240,0.08)" sub="за период" />
+            <Stat label="Доход по книге (графа 4)" value={money(r.kudir_income)} color="#0E1726" />
             <Stat label={`Налог к уплате (${Math.round((r.tax_rate ?? 0.2) * 100)}%)`} value={money(r.kudir_tax)} color="#E0473B" bg="rgba(224,71,59,0.08)" />
           </div>
         </div>
