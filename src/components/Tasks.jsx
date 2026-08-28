@@ -21,7 +21,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
   const isMobile = useIsMobile()
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState('all')
+  const [filter, setFilter] = useState('active')
   const [editTask, setEditTask] = useState(null)
   const [saving, setSaving] = useState(false)
 
@@ -90,7 +90,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
       <div className="card" style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ flex: 1, overflowX: 'auto', scrollbarWidth: 'none' }}>
           <SlidingTabs
-            options={[{ key: 'all', label: 'Все' }, { key: 'active', label: 'Активные' }, { key: 'done', label: 'Завершённые' }]}
+            options={[{ key: 'active', label: 'Активные' }, { key: 'all', label: 'Все' }, { key: 'done', label: 'Завершённые' }]}
             value={filter}
             onChange={setFilter}
           />
