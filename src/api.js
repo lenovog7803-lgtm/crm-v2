@@ -220,6 +220,7 @@ export const markNotificationRead = (id) => req(`/notifications/${id}/read`, { m
 // Reports — daily/weekly/monthly digests (director-only hidden page)
 export const getReports = (period) => req('/reports' + (period ? `?period=${period}` : ''));
 export const runReport = (period) => req(`/reports/run?period=${period || 'daily'}`, { method: 'POST' });
+export const runMorningBriefing = () => req('/reports/morning', { method: 'POST' });
 
 // А2 Инфо СРМ — Telegram bot subscription (per-user chat_id)
 export const subscribeBot = (chatId) => req('/bot/subscribe', { method: 'POST', body: JSON.stringify({ chat_id: chatId }) });

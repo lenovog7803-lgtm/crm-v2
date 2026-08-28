@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { getReports, runReport } from '../api'
+import { getReports, runReport, runMorningBriefing } from '../api'
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
 import { fmtMoney } from '../utils'
@@ -191,6 +191,7 @@ export default function Reports() {
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(true)
   const [running, setRunning] = useState(false)
+  const [morning, setMorning] = useState(false)
 
   const load = useCallback(() => {
     setLoading(true)
@@ -221,17 +222,43 @@ export default function Reports() {
     setRunning(false)
   }
 
+  const sendMorning = async () => {
+    setMorning(true)
+    try {
+      const r = await runMorningBriefing()
+      const head = `Утренняя сводка: загрузок ${r.loads}, выгрузок ${r.unloads}, задач ${r.tasks}`
+      if (r.sent > 0) show(`${head} — отправлено в Telegram`, { type: 'success' })
+      else if (!r.token_configured) show(`${head}. В Telegram не ушло: не задан A2_INFO_BOT_TOKEN`, { type: 'error' })
+      else {
+        const err = (r.delivery || []).map(d => d.error).filter(Boolean)[0]
+        show(`${head}. В Telegram не ушло${err ? ': ' + err : ''}`, { type: 'error' })
+      }
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+    setMorning(false)
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
         <h1 style={{ fontFamily: 'Onest', fontSize: 20, fontWeight: 800, color: '#0E1726', margin: 0 }}>Отчёты</h1>
-        <button
-          onClick={runNow}
-          disabled={running}
-          style={{ padding: '7px 15px', borderRadius: 99, border: 'none', cursor: running ? 'default' : 'pointer', fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600, background: '#0E1726', color: '#fff', opacity: running ? 0.6 : 1, whiteSpace: 'nowrap' }}
-        >
-          {running ? '…' : 'Сформировать сейчас'}
-        </button>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button
+            onClick={sendMorning}
+            disabled={morning}
+            style={{ padding: '7px 15px', borderRadius: 99, border: '1px solid rgba(14,23,38,0.14)', cursor: morning ? 'default' : 'pointer', fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600, background: '#fff', color: '#0E1726', opacity: morning ? 0.6 : 1, whiteSpace: 'nowrap' }}
+          >
+            {morning ? '…' : 'Утренняя сводка'}
+          </button>
+          <button
+            onClick={runNow}
+            disabled={running}
+            style={{ padding: '7px 15px', borderRadius: 99, border: 'none', cursor: running ? 'default' : 'pointer', fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600, background: '#0E1726', color: '#fff', opacity: running ? 0.6 : 1, whiteSpace: 'nowrap' }}
+          >
+            {running ? '…' : 'Сформировать сейчас'}
+          </button>
+        </div>
       </div>
 
       <div className="card" style={{ padding: '10px 12px', overflowX: 'auto' }}>
@@ -244,6 +271,7 @@ export default function Reports() {
         <div className="card" style={{ padding: 32, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>
           Отчётов пока нет. Формируются автоматически в 21:00 по Минску (день — каждый день, неделя — в пятницу,
           месяц/квартал/год — в последний день периода) либо по кнопке «Сформировать сейчас».
+          В 09:00 отдельно приходит утренняя сводка: загрузки/выгрузки на сегодня и задачи на сегодня.
         </div>
       ) : (
         reports.map(r => <ReportRow key={r.id || r.generated_at} r={r} />)
