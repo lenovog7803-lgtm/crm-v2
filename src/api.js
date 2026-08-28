@@ -222,6 +222,10 @@ export const getReports = (period) => req('/reports' + (period ? `?period=${peri
 export const runReport = (period) => req(`/reports/run?period=${period || 'daily'}`, { method: 'POST' });
 export const runMorningBriefing = () => req('/reports/morning', { method: 'POST' });
 
+// Bot private mode — when on, the bot only messages the listed chat_ids
+export const getBotPrivate = () => req('/bot/private');
+export const setBotPrivate = (chatIds) => req('/bot/private', { method: 'POST', body: JSON.stringify({ chat_ids: chatIds }) });
+
 // А2 Инфо СРМ — Telegram bot subscription (per-user chat_id)
 export const subscribeBot = (chatId) => req('/bot/subscribe', { method: 'POST', body: JSON.stringify({ chat_id: chatId }) });
 export const getBotSubscription = () => req('/bot/subscription');

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { getReports, runReport, runMorningBriefing } from '../api'
+import { getReports, runReport, runMorningBriefing, getBotPrivate, setBotPrivate, getBotSubscription } from '../api'
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
 import { fmtMoney } from '../utils'
@@ -205,6 +205,34 @@ export default function Reports() {
   const [loading, setLoading] = useState(true)
   const [running, setRunning] = useState(false)
   const [morning, setMorning] = useState(false)
+  const [priv, setPriv] = useState(null)      // { private, chat_ids, env_locked }
+  const [myChat, setMyChat] = useState('')
+  const [privBusy, setPrivBusy] = useState(false)
+
+  useEffect(() => {
+    getBotPrivate().then(setPriv).catch(() => {})
+    getBotSubscription().then(r => setMyChat(r.chat_id || '')).catch(() => {})
+  }, [])
+
+  const togglePrivate = async () => {
+    if (priv?.env_locked) { show('Приватный список задан на сервере (env)', { type: 'info' }); return }
+    setPrivBusy(true)
+    try {
+      if (priv?.private) {
+        await setBotPrivate('')
+        setPriv({ ...priv, private: false, chat_ids: [] })
+        show('Бот снова пишет всем подписчикам', { type: 'success' })
+      } else {
+        if (!myChat) { show('Сначала подключите свой chat_id (напишите /start боту)', { type: 'error' }); setPrivBusy(false); return }
+        await setBotPrivate([myChat])
+        setPriv({ ...priv, private: true, chat_ids: [myChat] })
+        show('Приватный режим включён — бот пишет только вам', { type: 'success' })
+      }
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+    setPrivBusy(false)
+  }
 
   const load = useCallback(() => {
     setLoading(true)
@@ -257,6 +285,18 @@ export default function Reports() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
         <h1 style={{ fontFamily: 'Onest', fontSize: 20, fontWeight: 800, color: '#0E1726', margin: 0 }}>Отчёты</h1>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {priv && (
+            <button
+              onClick={togglePrivate}
+              disabled={privBusy}
+              title={priv.env_locked ? 'Задано на сервере' : (priv.private ? 'Бот пишет только вам' : 'Бот пишет всем подписчикам')}
+              style={{ padding: '7px 13px', borderRadius: 99, cursor: privBusy || priv.env_locked ? 'default' : 'pointer', fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600, whiteSpace: 'nowrap', opacity: privBusy ? 0.6 : 1,
+                border: priv.private ? 'none' : '1px solid rgba(14,23,38,0.14)',
+                background: priv.private ? '#1E9E5A' : '#fff', color: priv.private ? '#fff' : '#5A6573' }}
+            >
+              {priv.private ? '🔒 Только я' : '🔓 Все подписчики'}
+            </button>
+          )}
           <button
             onClick={sendMorning}
             disabled={morning}
