@@ -226,7 +226,7 @@ export default function Reports() {
     setMorning(true)
     try {
       const r = await runMorningBriefing()
-      const head = `Утренняя сводка: загрузок ${r.loads}, выгрузок ${r.unloads}, задач ${r.tasks}`
+      const head = `Утренняя сводка: загрузок ${r.loads}, выгрузок ${r.unloads}`
       if (r.sent > 0) show(`${head} — отправлено в Telegram`, { type: 'success' })
       else if (!r.token_configured) show(`${head}. В Telegram не ушло: не задан A2_INFO_BOT_TOKEN`, { type: 'error' })
       else {
@@ -271,7 +271,8 @@ export default function Reports() {
         <div className="card" style={{ padding: 32, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>
           Отчётов пока нет. Формируются автоматически в 21:00 по Минску (день — каждый день, неделя — в пятницу,
           месяц/квартал/год — в последний день периода) либо по кнопке «Сформировать сейчас».
-          В 09:00 отдельно приходит утренняя сводка: загрузки/выгрузки на сегодня и задачи на сегодня.
+          В 09:00 приходит утренняя сводка с загрузками/выгрузками на сегодня. По каждой задаче
+          сообщение приходит в назначенное ей время.
         </div>
       ) : (
         reports.map(r => <ReportRow key={r.id || r.generated_at} r={r} />)
