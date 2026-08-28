@@ -52,6 +52,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
       title: task.title || task.description || '',
       description: task.description || '',
       due_date: task.due_date || '',
+      due_time: task.due_time || '',
       task_type: task.task_type || 'other',
       status: task.status || 'pending',
     })
@@ -65,6 +66,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
         title: editTask.title,
         description: editTask.description,
         due_date: editTask.due_date,
+        due_time: editTask.due_time,
         task_type: editTask.task_type,
         status: editTask.status,
       })
@@ -155,7 +157,9 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
                   fontSize: 11, fontWeight: 600,
                 }}>{TYPE_LABELS[typeKey] || typeKey}</span>
                 {task.due_date && (
-                  <span style={{ fontSize: 12, color: '#A6AEB8', minWidth: 80 }}>{fmtDate(task.due_date)}</span>
+                  <span style={{ fontSize: 12, color: '#A6AEB8', minWidth: 80 }}>
+                    {fmtDate(task.due_date)}{task.due_time ? ` ${task.due_time}` : ''}
+                  </span>
                 )}
                 <button onClick={e => { e.stopPropagation(); handleDelete(task.id) }} style={{
                   width: 28, height: 28, borderRadius: 8, border: 'none', cursor: 'pointer',
@@ -216,14 +220,25 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
                 </select>
               </div>
             </div>
-            <div>
-              <label style={labelStyle}>СРОК</label>
-              <input
-                type="date"
-                value={editTask.due_date}
-                onChange={e => setEditTask(p => ({ ...p, due_date: e.target.value }))}
-                style={inputStyle}
-              />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div>
+                <label style={labelStyle}>СРОК</label>
+                <input
+                  type="date"
+                  value={editTask.due_date}
+                  onChange={e => setEditTask(p => ({ ...p, due_date: e.target.value }))}
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>ВРЕМЯ</label>
+                <input
+                  type="time"
+                  value={editTask.due_time}
+                  onChange={e => setEditTask(p => ({ ...p, due_time: e.target.value }))}
+                  style={inputStyle}
+                />
+              </div>
             </div>
             <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
               <button onClick={() => setEditTask(null)} style={{

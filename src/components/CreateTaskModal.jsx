@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { ModalOverlay, ModalHeader } from './Modal'
-import { createTask, getManagers } from '../api'
+import { createTask, getAllUsers } from '../api'
 import { useAuth } from '../AuthContext'
+
+const ROLE_LABEL = { admin: 'директор', director: 'директор', manager: 'менеджер' }
 
 export default function CreateTaskModal({ onClose, onSuccess }) {
   const { user } = useAuth()
@@ -9,16 +11,16 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
   const isDirector = role === 'director' || role === 'admin'
 
   const [form, setForm] = useState({
-    title: '', task_type: 'call', due_date: '', description: '', assigned_user_id: '',
+    title: '', task_type: 'call', due_date: '', due_time: '', description: '', assigned_user_id: '',
   })
-  const [managers, setManagers] = useState([])
+  const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
   useEffect(() => {
     if (!isDirector) return
-    getManagers().then(r => setManagers(r.managers || r || [])).catch(() => {})
+    getAllUsers().then(r => setUsers(r.users || r || [])).catch(() => {})
   }, [isDirector])
 
   const handleSubmit = async e => {
@@ -58,18 +60,29 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
             <input className="form-input" type="date" value={form.due_date} onChange={e => set('due_date', e.target.value)} />
           </div>
         </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
+          <div className="form-field">
+            <label className="form-label">ВРЕМЯ</label>
+            <input className="form-input" type="time" value={form.due_time} onChange={e => set('due_time', e.target.value)} />
+          </div>
+          {isDirector && (
+            <div className="form-field">
+              <label className="form-label">НАЗНАЧИТЬ</label>
+              <select className="form-input" value={form.assigned_user_id} onChange={e => set('assigned_user_id', e.target.value)}>
+                <option value="">Не назначать</option>
+                {users.map(u => (
+                  <option key={u.id} value={u.id}>{u.name}{u.role ? ` · ${ROLE_LABEL[u.role] || u.role}` : ''}</option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
         <div className="form-field">
           <label className="form-label">ОПИСАНИЕ</label>
           <input className="form-input" placeholder="Напр. Заявка №А2-2847 · БелСталь" value={form.description} onChange={e => set('description', e.target.value)} />
         </div>
-        {isDirector && managers.length > 0 && (
-          <div className="form-field">
-            <label className="form-label">НАЗНАЧИТЬ МЕНЕДЖЕРУ</label>
-            <select className="form-input" value={form.assigned_user_id} onChange={e => set('assigned_user_id', e.target.value)}>
-              <option value="">Не назначать</option>
-              {managers.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-            </select>
-          </div>
+        {form.due_time && !form.due_date && (
+          <div style={{ fontSize: 11.5, color: '#8A93A0' }}>Укажите дату — уведомление придёт в этот день в {form.due_time}.</div>
         )}
         {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center' }}>{error}</div>}
         <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
