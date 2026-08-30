@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, restoreTrash, markPayment, addPayment, deletePayment, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers, getOrderHistory } from '../api'
+import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, restoreTrash, markPayment, addPayment, deletePayment, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers, getOrderHistory, getGoogleAuthUrl } from '../api'
 import { fmtMoney, initials, getGradient, fmtDate, hasUnreconciledPayment } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useRealtime } from '../hooks/useRealtime'
@@ -314,6 +314,24 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
       })
   }
 
+  const [gAuthBusy, setGAuthBusy] = useState(false)
+  const reauthGoogle = async () => {
+    setGAuthBusy(true)
+    // Открываем вкладку сразу (в обработчике клика), иначе всплывашку
+    // заблокирует браузер после await.
+    const w = window.open('', '_blank')
+    try {
+      const r = await getGoogleAuthUrl()
+      if (w) w.location = r.auth_url
+      else window.location.href = r.auth_url
+      show('Войдите в Google в открывшейся вкладке, затем повторите генерацию', { type: 'info' })
+    } catch (e) {
+      if (w) w.close()
+      show('Не удалось получить ссылку авторизации: ' + (e.message || e), { type: 'error' })
+    }
+    setGAuthBusy(false)
+  }
+
   const handleGenerate = async (type) => {
     console.log('[DOC] Generating type:', type, 'for order:', orderId)
     setDocLoading(prev => ({ ...prev, [type]: true }))
@@ -334,7 +352,14 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
       }
     } catch (e) {
       console.error('[DOC] Error:', e)
-      show('Ошибка генерации: ' + (e.message || e), { type: 'error' })
+      const msg = String(e.message || e)
+      const tokenIssue = /token|invalid_grant|авторизац|google-токен/i.test(msg)
+      show(
+        tokenIssue
+          ? 'Google-токен истёк. Нажмите 🔑 в блоке «Документы», авторизуйтесь и повторите.'
+          : 'Ошибка генерации: ' + msg,
+        { type: 'error' }
+      )
     }
     setDocLoading(prev => ({ ...prev, [type]: false }))
   }
@@ -916,6 +941,23 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
           <div className="card" style={{ padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 14 }}>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', flex: 1 }}>ДОКУМЕНТЫ</div>
+              <button
+                onClick={reauthGoogle}
+                disabled={gAuthBusy}
+                title="Обновить токен Google (переавторизация) — если генерация документов выдаёт ошибку токена"
+                style={{
+                  width: 30, height: 30, borderRadius: 9, border: 'none', cursor: gAuthBusy ? 'default' : 'pointer',
+                  background: 'rgba(217,119,6,0.1)', color: '#D97706',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 6,
+                  transition: 'background 0.15s', opacity: gAuthBusy ? 0.6 : 1,
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(217,119,6,0.18)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(217,119,6,0.1)'}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3" />
+                </svg>
+              </button>
               <button
                 onClick={refreshDocs}
                 title="Обновить ссылки на документы"

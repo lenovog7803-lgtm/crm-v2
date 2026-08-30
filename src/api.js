@@ -141,6 +141,9 @@ export const generateCarrierDoc = (orderId, regen = true) => req(`/orders/${orde
 export const generateAct        = (orderId, regen = true) => req(`/orders/${orderId}/docs/act?regenerate=${regen}`,     { method: 'POST' });
 export const generateAllActs = (clientId) => req(`/clients/${clientId}/generate_acts`, { method: 'POST' });
 
+// Google OAuth — re-authorize when the stored refresh token expires/revokes
+export const getGoogleAuthUrl = () => req('/auth/google/start');
+
 // Google Tasks
 export const createGoogleTask = (data) => req('/google/tasks', { method: 'POST', body: JSON.stringify(data) });
 
