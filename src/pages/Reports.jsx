@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { getReports, runReport, runMorningBriefing } from '../api'
+import { getReports, runReport, runMorningBriefing, runTaskReminders } from '../api'
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
 import { fmtMoney } from '../utils'
@@ -205,6 +205,7 @@ export default function Reports() {
   const [loading, setLoading] = useState(true)
   const [running, setRunning] = useState(false)
   const [morning, setMorning] = useState(false)
+  const [taskRem, setTaskRem] = useState(false)
 
   const load = useCallback(() => {
     setLoading(true)
@@ -252,11 +253,32 @@ export default function Reports() {
     setMorning(false)
   }
 
+  const sendTaskReminders = async () => {
+    setTaskRem(true)
+    try {
+      const r = await runTaskReminders()
+      if (r.sent > 0) show(`Отправлено напоминаний по задачам: ${r.sent}`, { type: 'success' })
+      else if (r.tried > 0 && !r.token_configured) show('Не задан A2_INFO_BOT_TOKEN на сервере', { type: 'error' })
+      else if (r.tried > 0) show('Не удалось отправить (проверьте бота)', { type: 'error' })
+      else show('Задач к отправке сейчас нет', { type: 'info' })
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+    setTaskRem(false)
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
         <h1 style={{ fontFamily: 'Onest', fontSize: 20, fontWeight: 800, color: '#0E1726', margin: 0 }}>Отчёты</h1>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button
+            onClick={sendTaskReminders}
+            disabled={taskRem}
+            style={{ padding: '7px 15px', borderRadius: 99, border: '1px solid rgba(14,23,38,0.14)', cursor: taskRem ? 'default' : 'pointer', fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600, background: '#fff', color: '#0E1726', opacity: taskRem ? 0.6 : 1, whiteSpace: 'nowrap' }}
+          >
+            {taskRem ? '…' : 'Напоминания по задачам'}
+          </button>
           <button
             onClick={sendMorning}
             disabled={morning}

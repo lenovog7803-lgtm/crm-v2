@@ -224,6 +224,7 @@ export const markNotificationRead = (id) => req(`/notifications/${id}/read`, { m
 export const getReports = (period) => req('/reports' + (period ? `?period=${period}` : ''));
 export const runReport = (period) => req(`/reports/run?period=${period || 'daily'}`, { method: 'POST' });
 export const runMorningBriefing = () => req('/reports/morning', { method: 'POST' });
+export const runTaskReminders = () => req('/tasks/run_reminders', { method: 'POST' });
 
 // Bot private mode — when on, the bot only messages the listed chat_ids
 export const getBotPrivate = () => req('/bot/private');
