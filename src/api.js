@@ -135,6 +135,11 @@ export const getClientPPLedger = (clientId) => req(`/client_pp_ledger/${clientId
 export const addClientPPEntry = (clientId, data) => req(`/client_pp_ledger/${clientId}`, { method: 'POST', body: JSON.stringify(data) });
 export const deleteClientPPEntry = (clientId, entryId) => req(`/client_pp_ledger/${clientId}/${entryId}`, { method: 'DELETE' });
 
+// Carrier PP ledger — same, mirrored for carriers
+export const getCarrierPPLedger = (carrierId) => req(`/carrier_pp_ledger/${carrierId}`);
+export const addCarrierPPEntry = (carrierId, data) => req(`/carrier_pp_ledger/${carrierId}`, { method: 'POST', body: JSON.stringify(data) });
+export const deleteCarrierPPEntry = (carrierId, entryId) => req(`/carrier_pp_ledger/${carrierId}/${entryId}`, { method: 'DELETE' });
+
 // Document generation — endpoint: POST /orders/{id}/docs/{kind}?regenerate=true
 export const generateClientDoc  = (orderId, regen = true) => req(`/orders/${orderId}/docs/client?regenerate=${regen}`,  { method: 'POST' });
 export const generateCarrierDoc = (orderId, regen = true) => req(`/orders/${orderId}/docs/carrier?regenerate=${regen}`, { method: 'POST' });

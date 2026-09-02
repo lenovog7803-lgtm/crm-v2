@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getOrders, getClients, getCarriers, getPaymentsIn, getPaymentsOut, createPaymentIn, createPaymentOut, deletePaymentIn, deletePaymentOut, generateReconciliation, getReconciliationHistory, getClientPPLedger, addClientPPEntry, deleteClientPPEntry } from '../api'
+import { getOrders, getClients, getCarriers, getPaymentsIn, getPaymentsOut, createPaymentIn, createPaymentOut, deletePaymentIn, deletePaymentOut, generateReconciliation, getReconciliationHistory, getClientPPLedger, addClientPPEntry, deleteClientPPEntry, getCarrierPPLedger, addCarrierPPEntry, deleteCarrierPPEntry } from '../api'
 import { fmtMoney, initials, getGradient, fmtDate } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
@@ -433,27 +433,19 @@ export default function Finance({ refreshKey }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5, flex: 1 }}>
             <label style={{ fontSize: 11, fontWeight: 600, color: '#A6AEB8' }}>{recType === 'client' ? 'Клиент' : 'Перевозчик'}</label>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <select
+              <PartySearchSelect
+                items={recList}
+                labelKey={recLabelKey}
                 value={recPartyId}
-                onChange={e => {
-                  const id = e.target.value
-                  const item = recList.find(x => x.id === id)
-                  setRecPartyId(id)
-                  setRecPartyName(item ? (item[recLabelKey] || item.name || '') : '')
-                }}
-                style={{ ...iStyle, minWidth: 200 }}
-              >
-                <option value="">— Выберите —</option>
-                {recList.map(item => (
-                  <option key={item.id} value={item.id}>{item[recLabelKey] || item.name}</option>
-                ))}
-              </select>
-              {recType === 'client' && recPartyId && (
+                onChange={(id, name) => { setRecPartyId(id); setRecPartyName(name) }}
+                placeholder={`Поиск: ${recType === 'client' ? 'клиент' : 'перевозчик'}...`}
+              />
+              {recPartyId && (
                 <button onClick={() => setShowLedger(true)} style={{
                   width: 26, height: 26, borderRadius: 8, border: '1px solid #1366F0',
                   background: 'transparent', color: '#1366F0', fontSize: 15, fontWeight: 700,
                   cursor: 'pointer', marginLeft: 8, lineHeight: 1,
-                }} title="Список платежей клиента для акта сверки">
+                }} title={`Список платежей ${recType === 'client' ? 'клиента' : 'перевозчику'} для акта сверки`}>
                   +
                 </button>
               )}
@@ -591,11 +583,12 @@ export default function Finance({ refreshKey }) {
         </div>
       )}
 
-      {/* Журнал платежей клиента для акта сверки */}
+      {/* Журнал платежей клиента/перевозчику для акта сверки */}
       {showLedger && (
-        <ClientPPLedgerModal
-          clientId={recPartyId}
-          clientName={recPartyName}
+        <PPLedgerModal
+          type={recType}
+          entityId={recPartyId}
+          entityName={recPartyName}
           onClose={() => setShowLedger(false)}
         />
       )}
@@ -603,15 +596,60 @@ export default function Finance({ refreshKey }) {
   )
 }
 
-function ClientPPLedgerModal({ clientId, clientName, onClose }) {
+// Комбобокс с поиском по названию — обычный <select> неудобен, когда
+// перевозчиков/клиентов в списке сотни.
+function PartySearchSelect({ items, labelKey, value, onChange, placeholder }) {
+  const [query, setQuery] = useState('')
+  const [open, setOpen] = useState(false)
+  const selected = items.find(i => i.id === value)
+  const q = query.trim().toLowerCase()
+  const filtered = q ? items.filter(i => (i[labelKey] || i.name || '').toLowerCase().includes(q)) : items
+
+  return (
+    <div style={{ position: 'relative', minWidth: 200, flex: 1 }}>
+      <input
+        value={open ? query : (selected ? (selected[labelKey] || selected.name || '') : '')}
+        onChange={e => { setQuery(e.target.value); setOpen(true) }}
+        onFocus={() => { setQuery(''); setOpen(true) }}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        placeholder={placeholder}
+        style={{ height: 36, padding: '0 10px', fontSize: 13, borderRadius: 10, border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)', fontFamily: 'Manrope', color: '#0E1726', outline: 'none', width: '100%', boxSizing: 'border-box' }}
+      />
+      {open && (
+        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, maxHeight: 240, overflowY: 'auto', background: '#fff', border: '1px solid #E8EAEE', borderRadius: 10, boxShadow: '0 8px 24px rgba(14,23,38,0.14)', zIndex: 20 }}>
+          {filtered.length === 0 ? (
+            <div style={{ padding: '10px 12px', fontSize: 12.5, color: '#8A93A0' }}>Ничего не найдено</div>
+          ) : filtered.slice(0, 200).map(item => (
+            <div
+              key={item.id}
+              onMouseDown={() => { onChange(item.id, item[labelKey] || item.name || ''); setOpen(false); setQuery('') }}
+              style={{ padding: '8px 12px', fontSize: 12.5, cursor: 'pointer', color: '#0E1726' }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#F7F8FA' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+            >
+              {item[labelKey] || item.name}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function PPLedgerModal({ type, entityId, entityName, onClose }) {
   const [entries, setEntries] = useState([])
   const [ppNumber, setPpNumber] = useState('')
   const [ppDate, setPpDate] = useState(new Date().toISOString().slice(0, 10))
   const [amount, setAmount] = useState('')
   const { show } = useToast()
 
-  const load = () => getClientPPLedger(clientId).then(r => setEntries(r.entries || []))
-  useEffect(() => { load() }, [clientId])
+  const getLedger = type === 'client' ? getClientPPLedger : getCarrierPPLedger
+  const addEntry = type === 'client' ? addClientPPEntry : addCarrierPPEntry
+  const deleteEntry = type === 'client' ? deleteClientPPEntry : deleteCarrierPPEntry
+  const accentColor = type === 'client' ? '#1E9E5A' : '#E0473B'
+
+  const load = () => getLedger(entityId).then(r => setEntries(r.entries || []))
+  useEffect(() => { load() }, [entityId, type])
 
   const total = entries.reduce((s, e) => s + Number(e.amount || 0), 0)
 
@@ -620,7 +658,7 @@ function ClientPPLedgerModal({ clientId, clientName, onClose }) {
       show('Заполните номер ПП, дату и сумму', { type: 'error' })
       return
     }
-    await addClientPPEntry(clientId, {
+    await addEntry(entityId, {
       pp_number: ppNumber.trim(), pp_date: ppDate, amount: Number(amount),
     })
     setPpNumber(''); setAmount('')
@@ -628,7 +666,7 @@ function ClientPPLedgerModal({ clientId, clientName, onClose }) {
   }
 
   const remove = async (id) => {
-    await deleteClientPPEntry(clientId, id)
+    await deleteEntry(entityId, id)
     load()
   }
 
@@ -637,8 +675,8 @@ function ClientPPLedgerModal({ clientId, clientName, onClose }) {
       <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 520, padding: 26 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
           <div>
-            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 17, color: '#0E1726' }}>Платежи клиента</div>
-            <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>{clientName} · всего {total.toLocaleString('ru-RU')} Br</div>
+            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 17, color: '#0E1726' }}>{type === 'client' ? 'Платежи клиента' : 'Платежи перевозчику'}</div>
+            <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>{entityName} · всего {total.toLocaleString('ru-RU')} Br</div>
           </div>
           <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #E8EAEE', background: '#F7F8FA', cursor: 'pointer', fontSize: 18, color: '#8A93A0' }}>×</button>
         </div>
@@ -659,7 +697,7 @@ function ClientPPLedgerModal({ clientId, clientName, onClose }) {
                 <div style={{ fontSize: 13, fontWeight: 500, color: '#0E1726' }}>ПП № {e.pp_number}</div>
                 <div style={{ fontSize: 11, color: '#8A93A0' }}>{new Date(e.pp_date).toLocaleDateString('ru-RU')}</div>
               </div>
-              <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, fontWeight: 700, color: '#1E9E5A' }}>
+              <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, fontWeight: 700, color: accentColor }}>
                 {Number(e.amount).toLocaleString('ru-RU')} Br
               </div>
               <button onClick={() => remove(e.id)} style={{ border: 'none', background: 'transparent', color: '#E0473B', fontSize: 15, cursor: 'pointer' }}>×</button>
