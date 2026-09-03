@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getMissingPP, getKudirEntries, updateKudirEntry, unlockKudirEntry, exportKudirUrl, updateOrder, resyncKudir, resyncKudirStatus } from '../api'
+import { getMissingPP, getKudirEntries, updateKudirEntry, unlockKudirEntry, exportKudirUrl, updateOrder, resyncKudir, resyncKudirStatus, resyncKudirCancel } from '../api'
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
 import { fmtMoney, fmtDate } from '../utils'
@@ -183,13 +183,18 @@ function BookTab() {
       if (r.already_running) setResyncMsg(`Уже идёт: ${r.done} из ${r.total}`)
       else setResyncMsg(`В работе: 0 из ${r.orders_queued}`)
 
-      // Опрос статуса раз в 2 с, пока не done (или пока не устанем ждать).
-      for (let i = 0; i < 150; i++) {
+      // Опрос статуса раз в 2 с, пока не done/cancelled.
+      for (let i = 0; i < 600; i++) {
         await new Promise(res => setTimeout(res, 2000))
         let st
         try { st = await resyncKudirStatus() } catch { continue }
         if (st.status === 'running') {
           setResyncMsg(`В работе: ${st.done} из ${st.total}`)
+        } else if (st.status === 'cancelled') {
+          show(`Пересчёт остановлен на ${st.done} из ${st.total}`, { type: 'info' })
+          setResyncMsg('')
+          load()
+          break
         } else if (st.status === 'done') {
           const errs = st.errors ? `, ошибок ${st.errors}` : ''
           show(`Книга пересчитана: ${st.done} заявок${errs}`, { type: 'success' })
@@ -203,6 +208,16 @@ function BookTab() {
       setResyncMsg('')
     }
     setResyncing(false)
+  }
+
+  const cancelResync = async () => {
+    try {
+      await resyncKudirCancel()
+      setResyncMsg('Останавливаю…')
+      show('Пересчёт будет остановлен', { type: 'info' })
+    } catch (e) {
+      show('Не удалось остановить: ' + e.message, { type: 'error' })
+    }
   }
 
   // Counterparty lives in free text, not its own column — the client's name
@@ -247,6 +262,14 @@ function BookTab() {
         >
           {resyncing ? (resyncMsg || 'Пересчёт…') : 'Пересчитать'}
         </button>
+        {resyncing && (
+          <button
+            onClick={cancelResync}
+            style={{ padding: '9px 14px', borderRadius: 10, background: '#fff', color: '#E0473B', border: '1px solid rgba(224,71,59,0.4)', fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
+          >
+            Остановить
+          </button>
+        )}
         <button
           onClick={download}
           style={{ padding: '9px 16px', borderRadius: 10, background: '#1366F0', color: '#fff', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
