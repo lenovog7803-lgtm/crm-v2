@@ -897,11 +897,14 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                         <div style={{ fontSize: 11, color: '#1E9E5A', marginTop: 2 }}>
                           {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })} в{' '}
                           {new Date(date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
-                          {step.key === 'docs_from_carrier_received' && view.carrier_act_number && (
-                            String(view.carrier_act_number).trim().toUpperCase() === 'Б/Н'
-                              ? ' · акт б/н'
-                              : ` · акт № ${view.carrier_act_number}`
-                          )}
+                        </div>
+                      )}
+                      {isCarrierDocs && view.carrier_act_number && (
+                        <div style={{ fontSize: 11.5, color: '#1E9E5A', fontWeight: 700, marginTop: 2 }}>
+                          {String(view.carrier_act_number).trim().toUpperCase() === 'Б/Н'
+                            ? 'Акт б/н'
+                            : `Акт № ${view.carrier_act_number}`}
+                          {view.carrier_act_date && ` от ${new Date(view.carrier_act_date).toLocaleDateString('ru-RU')}`}
                         </div>
                       )}
                       {isCarrierDocs && (
