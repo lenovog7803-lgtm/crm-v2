@@ -38,14 +38,28 @@ export default function CarrierActModal({ initialValue, initialDate, onClose, on
         <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
           Номер акта
         </div>
-        <input
-          value={value}
-          onChange={e => setValue(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter') confirm() }}
-          placeholder="напр. 214"
-          autoFocus
-          style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 14, color: '#0E1726', boxSizing: 'border-box', marginBottom: 16 }}
-        />
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16 }}>
+          <input
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') confirm() }}
+            placeholder="напр. 214"
+            autoFocus
+            style={{ flex: 1, minWidth: 0, padding: '11px 14px', borderRadius: 12, border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 14, color: '#0E1726', boxSizing: 'border-box' }}
+          />
+          <button
+            type="button"
+            onClick={() => setValue('Б/Н')}
+            style={{
+              padding: '11px 14px', borderRadius: 12, border: '1px solid #E8EAEE', whiteSpace: 'nowrap',
+              background: value.trim().toUpperCase() === 'Б/Н' ? 'rgba(19,102,240,0.1)' : '#F7F8FA',
+              color: value.trim().toUpperCase() === 'Б/Н' ? '#1366F0' : '#5A6573',
+              fontSize: 12, fontWeight: 700, cursor: 'pointer',
+            }}
+          >
+            Акт Б/Н
+          </button>
+        </div>
 
         <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
           Дата акта

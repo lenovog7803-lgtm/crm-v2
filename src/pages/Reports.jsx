@@ -89,8 +89,42 @@ function LegList({ title, items }) {
   )
 }
 
+// «Пришло от клиентов» / «Ушло перевозчикам» — живые деньги за период из
+// журналов ПП. В Telegram список режется до 15, в интерфейсе — целиком.
+function MoneyList({ title, items, accent = '#0E1726' }) {
+  const total = items.reduce((s, row) => s + (Number(row[1]) || 0), 0)
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10, marginBottom: 8 }}>
+        <div style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600 }}>{title}</div>
+        <div style={{ fontSize: 12.5, fontWeight: 700, color: accent, flexShrink: 0 }}>{money(total)}</div>
+      </div>
+      {items.length === 0 ? (
+        <div style={{ fontSize: 12.5, color: '#8A93A0' }}>нет</div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {items.map(([name, sum], i) => (
+            <div key={i} style={{
+              display: 'flex', justifyContent: 'space-between', gap: 12,
+              padding: '7px 0', borderBottom: i < items.length - 1 ? '1px solid #F0F1F4' : 'none',
+              fontSize: 13, color: '#0E1726',
+            }}>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name || '—'}</span>
+              <span style={{ fontWeight: 600, flexShrink: 0 }}>{money(sum)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function ReportBody({ r }) {
   const topClients = Array.isArray(r.top_clients) ? r.top_clients : []
+  const incomeBreakdown = Array.isArray(r.income_breakdown) ? r.income_breakdown : []
+  const expenseBreakdown = Array.isArray(r.expense_breakdown) ? r.expense_breakdown : []
+  const hasBreakdown = ['weekly', 'monthly', 'quarterly'].includes(r.period)
+    && (incomeBreakdown.length > 0 || expenseBreakdown.length > 0)
   const loads = Array.isArray(r.tomorrow_loads) ? r.tomorrow_loads : []
   const unloads = Array.isArray(r.tomorrow_unloads) ? r.tomorrow_unloads : []
   const hasTomorrow = r.tomorrow_date != null && (loads.length || unloads.length || r.period === 'daily')
@@ -132,6 +166,16 @@ function ReportBody({ r }) {
             <Stat label="Доход по книге (графа 4)" value={money(r.kudir_income)} color="#0E1726" />
             <Stat label={`Налог к уплате (${Math.round((r.tax_rate ?? 0.2) * 100)}%)`} value={money(r.kudir_tax)} color="#E0473B" bg="rgba(224,71,59,0.08)" />
           </div>
+        </div>
+      )}
+
+      {hasBreakdown && (
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24,
+          borderTop: '1px solid #F0F1F4', paddingTop: 14,
+        }}>
+          <MoneyList title="Пришло от клиентов" items={incomeBreakdown} accent="#1E9E5A" />
+          <MoneyList title="Ушло перевозчикам" items={expenseBreakdown} accent="#1366F0" />
         </div>
       )}
 
