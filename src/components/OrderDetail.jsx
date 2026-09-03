@@ -430,17 +430,19 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
   }
 
   const confirmCarrierAct = async (actNumber, actDate) => {
-    // Long-pressing an already-received step just edits the act — keep the
-    // original "получено" timestamp instead of stamping it to now.
+    // Editing the act on an already-received step must touch ONLY the act
+    // fields — never re-send docs_from_carrier_received / _date, so the
+    // "получено" date can't move. Setting the step for the first time still
+    // stamps the received date to now.
     const alreadyReceived = !!order.docs_from_carrier_received
-    const patch = {
-      docs_from_carrier_received: true,
-      docs_from_carrier_date: alreadyReceived
-        ? (order.docs_from_carrier_date || new Date().toISOString())
-        : new Date().toISOString(),
-      carrier_act_number: actNumber,
-      carrier_act_date: actDate,
-    }
+    const patch = alreadyReceived
+      ? { carrier_act_number: actNumber, carrier_act_date: actDate }
+      : {
+          docs_from_carrier_received: true,
+          docs_from_carrier_date: new Date().toISOString(),
+          carrier_act_number: actNumber,
+          carrier_act_date: actDate,
+        }
     try {
       lastLocalEditRef.current = Date.now()
       await apiUpdate(order.id, patch)
