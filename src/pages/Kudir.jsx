@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getMissingPP, getKudirEntries, updateKudirEntry, unlockKudirEntry, exportKudirUrl, updateOrder } from '../api'
+import { getMissingPP, getKudirEntries, updateKudirEntry, unlockKudirEntry, exportKudirUrl, updateOrder, resyncKudir } from '../api'
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
 import { fmtMoney, fmtDate } from '../utils'
@@ -143,6 +143,7 @@ function BookTab() {
   const [totalIncome, setTotalIncome] = useState(0)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [resyncing, setResyncing] = useState(false)
 
   const load = (silent = false) => {
     if (!silent) setLoading(true)
@@ -165,6 +166,23 @@ function BookTab() {
 
   const download = () => {
     window.open(exportKudirUrl(year, quarter === 'all' ? null : Number(quarter)), '_blank')
+  }
+
+  // Прогоняет книгу заново по всем заявкам: снимает строки заявок с
+  // оплатой налом от клиента, пересчитывает маржу там, где перевозчику
+  // заплачено налом (его стоимость в расход не идёт), и правит
+  // формулировку «Акт б/н». Ручные правки (🔒) не трогает.
+  const resync = async () => {
+    if (resyncing) return
+    setResyncing(true)
+    try {
+      const r = await resyncKudir()
+      show(`Книга пересчитана: обработано заявок ${r.orders_processed}`, { type: 'success' })
+      load()
+    } catch (e) {
+      show('Ошибка пересчёта: ' + e.message, { type: 'error' })
+    }
+    setResyncing(false)
   }
 
   // Counterparty lives in free text, not its own column — the client's name
@@ -202,8 +220,16 @@ function BookTab() {
           }}
         />
         <button
+          onClick={resync}
+          disabled={resyncing}
+          title="Пересчитать книгу по всем заявкам (нал, «Акт б/н», группировка ПП). Ручные правки не трогает."
+          style={{ marginLeft: 'auto', padding: '9px 16px', borderRadius: 10, background: '#fff', color: '#0E1726', border: '1px solid #E8EAEE', fontSize: 13, fontWeight: 600, cursor: resyncing ? 'default' : 'pointer', opacity: resyncing ? 0.6 : 1 }}
+        >
+          {resyncing ? 'Пересчёт…' : 'Пересчитать'}
+        </button>
+        <button
           onClick={download}
-          style={{ marginLeft: 'auto', padding: '9px 16px', borderRadius: 10, background: '#1366F0', color: '#fff', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+          style={{ padding: '9px 16px', borderRadius: 10, background: '#1366F0', color: '#fff', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
         >
           Скачать
         </button>
