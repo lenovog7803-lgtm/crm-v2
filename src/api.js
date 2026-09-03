@@ -246,5 +246,6 @@ export const getKudirEntries = (dateFrom, dateTo) =>
 export const updateKudirEntry = (id, data) => req(`/kudir/entries/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
 export const unlockKudirEntry = (id) => req(`/kudir/entries/${id}/unlock`, { method: 'POST' });
 export const resyncKudir = () => req('/kudir/resync', { method: 'POST' });
+export const resyncKudirStatus = () => req('/kudir/resync/status');
 export const exportKudirUrl = (year, quarter) =>
   `${BASE}/kudir/export?year=${year}${quarter ? `&quarter=${quarter}` : ''}&token=${encodeURIComponent(token)}`;

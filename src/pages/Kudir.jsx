@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getMissingPP, getKudirEntries, updateKudirEntry, unlockKudirEntry, exportKudirUrl, updateOrder, resyncKudir } from '../api'
+import { getMissingPP, getKudirEntries, updateKudirEntry, unlockKudirEntry, exportKudirUrl, updateOrder, resyncKudir, resyncKudirStatus } from '../api'
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
 import { fmtMoney, fmtDate } from '../utils'
@@ -144,6 +144,7 @@ function BookTab() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [resyncing, setResyncing] = useState(false)
+  const [resyncMsg, setResyncMsg] = useState('')
 
   const load = (silent = false) => {
     if (!silent) setLoading(true)
@@ -171,16 +172,35 @@ function BookTab() {
   // Прогоняет книгу заново по всем заявкам: снимает строки заявок с
   // оплатой налом от клиента, пересчитывает маржу там, где перевозчику
   // заплачено налом (его стоимость в расход не идёт), и правит
-  // формулировку «Акт б/н». Ручные правки (🔒) не трогает.
+  // формулировку «Акт б/н». Ручные правки (🔒) не трогает. Крутится на
+  // сервере в фоне — эндпоинт отвечает сразу, дальше опрашиваем статус.
   const resync = async () => {
     if (resyncing) return
     setResyncing(true)
+    setResyncMsg('Запуск…')
     try {
       const r = await resyncKudir()
-      show(`Книга пересчитана: обработано заявок ${r.orders_processed}`, { type: 'success' })
-      load()
+      if (r.already_running) setResyncMsg(`Уже идёт: ${r.done} из ${r.total}`)
+      else setResyncMsg(`В работе: 0 из ${r.orders_queued}`)
+
+      // Опрос статуса раз в 2 с, пока не done (или пока не устанем ждать).
+      for (let i = 0; i < 150; i++) {
+        await new Promise(res => setTimeout(res, 2000))
+        let st
+        try { st = await resyncKudirStatus() } catch { continue }
+        if (st.status === 'running') {
+          setResyncMsg(`В работе: ${st.done} из ${st.total}`)
+        } else if (st.status === 'done') {
+          const errs = st.errors ? `, ошибок ${st.errors}` : ''
+          show(`Книга пересчитана: ${st.done} заявок${errs}`, { type: 'success' })
+          setResyncMsg('')
+          load()
+          break
+        }
+      }
     } catch (e) {
       show('Ошибка пересчёта: ' + e.message, { type: 'error' })
+      setResyncMsg('')
     }
     setResyncing(false)
   }
@@ -223,9 +243,9 @@ function BookTab() {
           onClick={resync}
           disabled={resyncing}
           title="Пересчитать книгу по всем заявкам (нал, «Акт б/н», группировка ПП). Ручные правки не трогает."
-          style={{ marginLeft: 'auto', padding: '9px 16px', borderRadius: 10, background: '#fff', color: '#0E1726', border: '1px solid #E8EAEE', fontSize: 13, fontWeight: 600, cursor: resyncing ? 'default' : 'pointer', opacity: resyncing ? 0.6 : 1 }}
+          style={{ marginLeft: 'auto', padding: '9px 16px', borderRadius: 10, background: '#fff', color: '#0E1726', border: '1px solid #E8EAEE', fontSize: 13, fontWeight: 600, cursor: resyncing ? 'default' : 'pointer', opacity: resyncing ? 0.6 : 1, whiteSpace: 'nowrap' }}
         >
-          {resyncing ? 'Пересчёт…' : 'Пересчитать'}
+          {resyncing ? (resyncMsg || 'Пересчёт…') : 'Пересчитать'}
         </button>
         <button
           onClick={download}
