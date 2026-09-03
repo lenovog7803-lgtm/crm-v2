@@ -296,6 +296,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
   // broadcast reaches every connected client, including the one that made
   // the edit, and it shouldn't tell you your own save was "another user".
   const lastLocalEditRef = useRef(0)
+  const docLongPressTimer = useRef(null)
+  const docLongPressFired = useRef(false)
 
   useRealtime((event) => {
     if (event.type === 'order_updated' && event.order_id === orderId) {
@@ -453,8 +455,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
   // Long-press (2 с) on «Получено от перевозчика» opens the act modal so
   // the carrier's act number can be entered/fixed any time, not only at the
   // moment the step is first ticked. A plain tap keeps toggling the step.
-  const docLongPressTimer = useRef(null)
-  const docLongPressFired = useRef(false)
+  // (Refs declared up top with the other hooks — must run before the
+  // `if (loading) return` early exit.)
   const startDocPress = (step) => {
     if (step.key !== 'docs_from_carrier_received') return
     docLongPressFired.current = false
