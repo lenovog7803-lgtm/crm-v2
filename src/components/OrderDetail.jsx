@@ -428,17 +428,53 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
   }
 
   const confirmCarrierAct = async (actNumber, actDate) => {
-    const now = new Date().toISOString()
-    const patch = { docs_from_carrier_received: true, docs_from_carrier_date: now, carrier_act_number: actNumber, carrier_act_date: actDate }
+    // Long-pressing an already-received step just edits the act — keep the
+    // original "получено" timestamp instead of stamping it to now.
+    const alreadyReceived = !!order.docs_from_carrier_received
+    const patch = {
+      docs_from_carrier_received: true,
+      docs_from_carrier_date: alreadyReceived
+        ? (order.docs_from_carrier_date || new Date().toISOString())
+        : new Date().toISOString(),
+      carrier_act_number: actNumber,
+      carrier_act_date: actDate,
+    }
     try {
       lastLocalEditRef.current = Date.now()
       await apiUpdate(order.id, patch)
       setOrder(prev => ({ ...prev, ...patch }))
-      show('Получено от перевозчика — отмечено', { type: 'success' })
+      show(alreadyReceived ? 'Акт перевозчика обновлён' : 'Получено от перевозчика — отмечено', { type: 'success' })
       setActModalOpen(false)
     } catch (e) {
       show('Ошибка сохранения: ' + e.message, { type: 'error' })
     }
+  }
+
+  // Long-press (2 с) on «Получено от перевозчика» opens the act modal so
+  // the carrier's act number can be entered/fixed any time, not only at the
+  // moment the step is first ticked. A plain tap keeps toggling the step.
+  const docLongPressTimer = useRef(null)
+  const docLongPressFired = useRef(false)
+  const startDocPress = (step) => {
+    if (step.key !== 'docs_from_carrier_received') return
+    docLongPressFired.current = false
+    docLongPressTimer.current = setTimeout(() => {
+      docLongPressFired.current = true
+      setActModalOpen(true)
+    }, LONG_PRESS_MS)
+  }
+  const cancelDocPress = () => {
+    if (docLongPressTimer.current) {
+      clearTimeout(docLongPressTimer.current)
+      docLongPressTimer.current = null
+    }
+  }
+  const handleDocClick = (step) => {
+    if (docLongPressFired.current) {
+      docLongPressFired.current = false
+      return
+    }
+    handleDocToggle(step.key)
   }
 
   const handleFieldChange = (field, value) => {
@@ -817,19 +853,26 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
               {DOC_STEPS.map(step => {
                 const isDone = !!view[step.key]
                 const date = view[step.dateKey]
+                const isCarrierDocs = step.key === 'docs_from_carrier_received'
                 return (
                   <div
                     key={step.key}
-                    onClick={() => handleDocToggle(step.key)}
+                    onClick={() => handleDocClick(step)}
+                    onMouseDown={() => startDocPress(step)}
+                    onMouseUp={cancelDocPress}
+                    onTouchStart={() => startDocPress(step)}
+                    onTouchEnd={cancelDocPress}
+                    onTouchCancel={cancelDocPress}
+                    title={isCarrierDocs ? `Нажмите чтобы отметить · удерживайте ${LONG_PRESS_MS / 1000} сек чтобы вписать акт от перевозчика` : undefined}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '12px 14px', borderRadius: 12, cursor: 'pointer',
                       background: isDone ? 'rgba(30,158,90,0.06)' : 'rgba(14,23,38,0.03)',
                       border: `1px solid ${isDone ? 'rgba(30,158,90,0.2)' : 'rgba(14,23,38,0.07)'}`,
-                      transition: 'all 0.2s',
+                      transition: 'all 0.2s', userSelect: 'none', WebkitUserSelect: 'none',
                     }}
                     onMouseEnter={e => { if (!isDone) e.currentTarget.style.background = 'rgba(14,23,38,0.06)' }}
-                    onMouseLeave={e => { if (!isDone) e.currentTarget.style.background = 'rgba(14,23,38,0.03)' }}
+                    onMouseLeave={e => { cancelDocPress(); if (!isDone) e.currentTarget.style.background = 'rgba(14,23,38,0.03)' }}
                   >
                     <div style={{
                       width: 20, height: 20, borderRadius: 6, flexShrink: 0,
@@ -855,6 +898,11 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                               ? ' · акт б/н'
                               : ` · акт № ${view.carrier_act_number}`
                           )}
+                        </div>
+                      )}
+                      {isCarrierDocs && (
+                        <div style={{ fontSize: 10.5, color: '#A6AEB8', marginTop: 2 }}>
+                          удерживайте, чтобы {view.carrier_act_number ? 'изменить' : 'вписать'} акт от перевозчика
                         </div>
                       )}
                     </div>
