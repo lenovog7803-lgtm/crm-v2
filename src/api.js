@@ -185,6 +185,10 @@ export const addPayment = (orderId, side, data) =>
   req(`/orders/${orderId}/payments/${side}`, { method: 'POST', body: JSON.stringify(data) }, 0);
 export const deletePayment = (orderId, side, paymentId) =>
   req(`/orders/${orderId}/payments/${side}/${paymentId}`, { method: 'DELETE' }, 0);
+// Возврат оплаты стороны из серверного снимка payment_undo (после случайного
+// снятия отметки) — восстанавливает ПП, даты и флаг «оплачено».
+export const restorePayment = (orderId, side) =>
+  req(`/orders/${orderId}/payments/${side}/restore`, { method: 'POST' }, 0);
 
 // Global search (Cmd+K)
 export const globalSearch = (q) => req(`/search?q=${encodeURIComponent(q)}`);

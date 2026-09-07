@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, restoreTrash, markPayment, addPayment, deletePayment, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers, getOrderHistory, getGoogleAuthUrl } from '../api'
+import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, restoreTrash, markPayment, addPayment, deletePayment, restorePayment, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers, getOrderHistory, getGoogleAuthUrl } from '../api'
 import { fmtMoney, initials, getGradient, fmtDate, hasUnreconciledPayment } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useRealtime } from '../hooks/useRealtime'
@@ -136,11 +136,15 @@ function ClickableName({ name, onClick }) {
 
 const LONG_PRESS_MS = 2000
 
-function PaymentButton({ type, order, onClick, onLongPress }) {
+function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
   const isCarrier = type === 'carrier'
   const isPaid = isCarrier ? order.carrier_paid : order.client_paid
   const isCash = isCarrier ? order.carrier_cash : order.client_cash
   const ppNumber = isCarrier ? order.carrier_pp_number : order.client_pp_number
+  // Снимок для возврата после случайного снятия оплаты (пишется сервером).
+  const undo = order.payment_undo?.[type]
+  const undoPP = undo && (undo[`${type}_pp_number`] || (undo[`${type}_payments`] || [])[0]?.pp_number)
+  const undoDate = undo && (undo[`${type}_pp_date`] || undo[`${type}_paid_date`] || (undo[`${type}_payments`] || [])[0]?.pp_date)
   const payments = (isCarrier ? order.carrier_payments : order.client_payments) || []
   // The legacy {side}_paid_date field is only ever set once, the first time
   // the order becomes fully paid (see add_payment in server.py) — editing an
@@ -257,6 +261,21 @@ function PaymentButton({ type, order, onClick, onLongPress }) {
             <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>
               {isCarrier ? 'Сумма к перечислению — нажмите чтобы отметить' : 'Нажмите чтобы отметить'}
             </div>
+          )}
+          {!isPaid && undo && (
+            <button
+              onClick={e => { e.stopPropagation(); onRestore?.() }}
+              onMouseDown={e => e.stopPropagation()}
+              onTouchStart={e => e.stopPropagation()}
+              title="Вернуть оплату, снятую по ошибке — восстановит номер ПП, даты и отметку"
+              style={{
+                marginTop: 5, padding: '4px 9px', borderRadius: 8, cursor: 'pointer',
+                border: '1px solid rgba(19,102,240,0.35)', background: 'rgba(19,102,240,0.08)',
+                color: '#1366F0', fontSize: 11, fontWeight: 700, fontFamily: 'inherit',
+              }}
+            >
+              ↩ Вернуть{undoPP ? ` ПП №${undoPP}` : ' оплату'}{undoDate ? ` от ${new Date(undoDate).toLocaleDateString('ru-RU')}` : ''}
+            </button>
           )}
         </div>
         <div style={{ fontFamily: 'JetBrains Mono', fontSize: isCarrier ? 18 : 16, fontWeight: 700, color: isPaid ? '#1E9E5A' : accent, flexShrink: 0 }}>
@@ -485,6 +504,19 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     setDraft(d => ({ ...d, [field]: value }))
   }
 
+  // Возврат оплаты стороны из серверного снимка (payment_undo) — работает
+  // и через недели после снятия, пока снимок цел.
+  const restorePaymentSide = async (side) => {
+    try {
+      lastLocalEditRef.current = Date.now()
+      const updated = await restorePayment(order.id, side)
+      setOrder(updated)
+      show('ПП возвращён', { type: 'success' })
+    } catch (e) {
+      show('Не удалось вернуть: ' + e.message, { type: 'error' })
+    }
+  }
+
   const handlePayment = async (side) => {
     const isPaid = side === 'client' ? order.client_paid : order.carrier_paid
     if (!isPaid) {
@@ -494,6 +526,16 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     const paidField = side === 'client' ? 'client_paid' : 'carrier_paid'
     const paymentsField = side === 'client' ? 'client_payments' : 'carrier_payments'
     const existingPayments = (order[paymentsField] || []).filter(p => !String(p.id).startsWith('legacy-'))
+    const who = side === 'client' ? 'клиента' : 'перевозчика'
+
+    // Подтверждение перед снятием, если есть что терять (номер ПП). Один
+    // лишний клик, зато случайный тап больше ничего не убирает молча.
+    const ppShown = side === 'client'
+      ? (order.client_pp_number || existingPayments[0]?.pp_number)
+      : (order.carrier_pp_number || existingPayments[0]?.pp_number)
+    if (ppShown && !window.confirm(
+      `Снять отметку оплаты ${who}? ПП №${ppShown} будет убран (можно вернуть кнопкой «↩ Вернуть»).`
+    )) return
 
     // Заявки с несколькими частичными ПП (payments/{side} endpoints) —
     // снятие отметки должно удалить каждый ПП по отдельности, иначе
@@ -504,17 +546,11 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
         for (const p of existingPayments) {
           await deletePayment(order.id, side, p.id)
         }
-        setOrder(prev => ({ ...prev, [paidField]: false, [paymentsField]: [] }))
+        getOrder(order.id).then(setOrder).catch(console.error)
         show('Отметка оплаты снята', {
           type: 'info',
           actionLabel: 'Отменить',
-          onAction: async () => {
-            lastLocalEditRef.current = Date.now()
-            for (const p of existingPayments) {
-              await addPayment(order.id, side, { pp_number: p.pp_number || '', pp_date: p.pp_date || '', amount: p.amount || 0 })
-            }
-            getOrder(order.id).then(setOrder).catch(console.error)
-          },
+          onAction: () => restorePaymentSide(side),
         })
       } catch (e) {
         show('Ошибка: ' + e.message, { type: 'error' })
@@ -525,8 +561,6 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     // снятие отметки — без модалки, простое действие + тост с отменой
     const cashField = side === 'client' ? 'client_cash' : 'carrier_cash'
     const wasCash = !!order[cashField]
-    const prevPPNumber = side === 'client' ? order.client_pp_number : order.carrier_pp_number
-    const prevPPDate = side === 'client' ? order.client_pp_date : order.carrier_pp_date
     try {
       lastLocalEditRef.current = Date.now()
       if (wasCash) {
@@ -537,19 +571,11 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
       } else {
         await markPayment(order.id, side, { paid: false })
       }
-      setOrder(prev => ({ ...prev, [paidField]: false, ...(wasCash ? { [cashField]: false } : {}) }))
+      getOrder(order.id).then(setOrder).catch(console.error)
       show('Отметка оплаты снята', {
         type: 'info',
         actionLabel: 'Отменить',
-        onAction: async () => {
-          lastLocalEditRef.current = Date.now()
-          if (wasCash) {
-            await apiUpdate(order.id, { [paidField]: true, [cashField]: true })
-          } else {
-            await markPayment(order.id, side, { paid: true, pp_number: prevPPNumber || null, pp_date: prevPPDate || null })
-          }
-          getOrder(order.id).then(setOrder).catch(console.error)
-        },
+        onAction: () => restorePaymentSide(side),
       })
     } catch (e) {
       show('Ошибка: ' + e.message, { type: 'error' })
@@ -845,8 +871,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
           <div className="card" style={{ padding: '20px 20px' }}>
             <SLabel>ОПЛАТА</SLabel>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <PaymentButton type="client" order={view} onClick={() => handlePayment('client')} onLongPress={() => setPaymentModal('client')} />
-              <PaymentButton type="carrier" order={view} onClick={() => handlePayment('carrier')} onLongPress={() => setPaymentModal('carrier')} />
+              <PaymentButton type="client" order={view} onClick={() => handlePayment('client')} onLongPress={() => setPaymentModal('client')} onRestore={() => restorePaymentSide('client')} />
+              <PaymentButton type="carrier" order={view} onClick={() => handlePayment('carrier')} onLongPress={() => setPaymentModal('carrier')} onRestore={() => restorePaymentSide('carrier')} />
             </div>
           </div>
 
