@@ -27,6 +27,14 @@ import Kudir from './pages/Kudir'
 import Reports from './pages/Reports'
 import ManagerDashboard from './pages/ManagerDashboard'
 import ErrorBoundary from './components/ErrorBoundary'
+import FleetTrips from './pages/fleet/FleetTrips'
+import FleetTripDetail from './pages/fleet/FleetTripDetail'
+import FleetClients from './pages/fleet/FleetClients'
+import FleetClientDetail from './pages/fleet/FleetClientDetail'
+import FleetOrderDetail from './pages/fleet/FleetOrderDetail'
+import FleetDashboard from './pages/fleet/FleetDashboard'
+import FleetAnalytics from './pages/fleet/FleetAnalytics'
+import FleetVehicles from './pages/fleet/FleetVehicles'
 
 import CreateOrderModal from './components/CreateOrderModal'
 import CreateTaskModal from './components/CreateTaskModal'
@@ -77,10 +85,17 @@ function MainApp() {
   // one — director-only pages redirect here instead.
   const MANAGER_PAGES = ['my-dashboard', 'tasks', 'leads', 'order-detail', 'client-detail', 'carrier-detail']
 
-  const [page, setPage] = useState(() => isManager ? 'my-dashboard' : 'dashboard')
+  const fleetMode = (() => { try { return localStorage.getItem('crm_mode') === 'fleet' } catch { return false } })()
+  const [page, setPage] = useState(() =>
+    isManager ? 'my-dashboard' : (fleetMode && isDirector ? 'fleet-trips' : 'dashboard')
+  )
   const [selectedOrderId, setSelectedOrderId] = useState(null)
   const [selectedClientId, setSelectedClientId] = useState(null)
   const [selectedCarrierId, setSelectedCarrierId] = useState(null)
+  const [selectedFleetTripId, setSelectedFleetTripId] = useState(null)
+  const [selectedFleetClientId, setSelectedFleetClientId] = useState(null)
+  const [selectedFleetOrderId, setSelectedFleetOrderId] = useState(null)
+  const [fleetOrderReturn, setFleetOrderReturn] = useState('fleet-trips')
   const [sidebarExpanded, setSidebarExpanded] = useState(true)
 
   // Modal visibility
@@ -167,6 +182,18 @@ function MainApp() {
   const openCarrier = id => {
     setSelectedCarrierId(id); setPage('carrier-detail'); setSearch('')
     pushNavState({ page: 'carrier-detail', selectedOrderId: null, selectedClientId: null, selectedCarrierId: id })
+  }
+  const openFleetTrip = id => {
+    setSelectedFleetTripId(id); setPage('fleet-trip-detail'); setSearch('')
+    pushNavState({ page: 'fleet-trip-detail', selectedOrderId: null, selectedClientId: null, selectedCarrierId: null })
+  }
+  const openFleetClient = id => {
+    setSelectedFleetClientId(id); setPage('fleet-client-detail'); setSearch('')
+    pushNavState({ page: 'fleet-client-detail', selectedOrderId: null, selectedClientId: null, selectedCarrierId: null })
+  }
+  const openFleetOrder = (id, from = 'fleet-trip-detail') => {
+    setSelectedFleetOrderId(id); setFleetOrderReturn(from); setPage('fleet-order-detail'); setSearch('')
+    pushNavState({ page: 'fleet-order-detail', selectedOrderId: null, selectedClientId: null, selectedCarrierId: null })
   }
 
   const handleNav = key => {
@@ -365,6 +392,39 @@ function MainApp() {
                 onOpenOrder={id => openOrder(id)}
               />
             )}
+
+            {/* ── Свой автопарк ── */}
+            {page === 'fleet-trips' && <ErrorBoundary><FleetTrips onOpenTrip={openFleetTrip} /></ErrorBoundary>}
+            {page === 'fleet-trip-detail' && (
+              <ErrorBoundary>
+                <FleetTripDetail
+                  tripId={selectedFleetTripId}
+                  onBack={() => handleNav('fleet-trips')}
+                  onOpenOrder={id => openFleetOrder(id, 'fleet-trip-detail')}
+                />
+              </ErrorBoundary>
+            )}
+            {page === 'fleet-clients' && <ErrorBoundary><FleetClients onOpenClient={openFleetClient} /></ErrorBoundary>}
+            {page === 'fleet-client-detail' && (
+              <ErrorBoundary>
+                <FleetClientDetail
+                  clientId={selectedFleetClientId}
+                  onBack={() => handleNav('fleet-clients')}
+                  onOpenOrder={id => openFleetOrder(id, 'fleet-client-detail')}
+                />
+              </ErrorBoundary>
+            )}
+            {page === 'fleet-order-detail' && (
+              <ErrorBoundary>
+                <FleetOrderDetail
+                  orderId={selectedFleetOrderId}
+                  onBack={() => setPage(fleetOrderReturn)}
+                />
+              </ErrorBoundary>
+            )}
+            {page === 'fleet-vehicles' && <ErrorBoundary><FleetVehicles /></ErrorBoundary>}
+            {page === 'fleet-dashboard' && <ErrorBoundary><FleetDashboard onOpenTrip={openFleetTrip} onOpenClient={openFleetClient} onNav={handleNav} /></ErrorBoundary>}
+            {page === 'fleet-analytics' && <ErrorBoundary><FleetAnalytics onBack={() => handleNav('fleet-dashboard')} /></ErrorBoundary>}
 
             {page === 'leads' && <Leads />}
             {page === 'trash' && <Trash />}

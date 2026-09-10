@@ -16,6 +16,14 @@ const PAGE_META = {
   'carrier-detail': { title: 'Перевозчик', subtitle: 'Карточка перевозчика' },
   leads: { title: 'База обзвона', subtitle: 'Лиды и потенциальные клиенты' },
   backups: { title: 'Резервные копии', subtitle: 'Автоматические снимки базы' },
+  'fleet-dashboard': { title: 'Дашборд', subtitle: 'Свой автопарк' },
+  'fleet-analytics': { title: 'Аналитика', subtitle: 'Свой автопарк' },
+  'fleet-trips': { title: 'Рейсы', subtitle: 'Свой автопарк' },
+  'fleet-trip-detail': { title: 'Рейс', subtitle: 'Свой автопарк' },
+  'fleet-clients': { title: 'Клиенты', subtitle: 'Свой автопарк' },
+  'fleet-client-detail': { title: 'Клиент', subtitle: 'Свой автопарк' },
+  'fleet-order-detail': { title: 'Загрузка', subtitle: 'Свой автопарк' },
+  'fleet-vehicles': { title: 'Машины и водители', subtitle: 'Свой автопарк' },
 }
 
 const PERIOD_OPTIONS = [

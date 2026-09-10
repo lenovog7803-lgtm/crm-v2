@@ -1,7 +1,8 @@
-import React, { useRef, useState, useLayoutEffect } from 'react'
+import React, { useRef, useState, useEffect, useLayoutEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../AuthContext'
 import { initials } from '../utils'
+import { SlidingTabs } from './SlidingTabs'
 
 const HIDDEN_MENU_WIDTH = 200
 
@@ -93,6 +94,49 @@ const NAV = [
   },
 ]
 
+// «Свой автопарк» — параллельный набор пунктов, тот же сайдбар. Показывается
+// только директору / аккаунту с fleet_access, переключается тумблером внизу.
+const truckIcon = (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="1" y="3" width="15" height="13" rx="1"/>
+    <path d="M16 8h4l3 3v5h-7V8z"/>
+    <circle cx="5.5" cy="18.5" r="2.5"/>
+    <circle cx="18.5" cy="18.5" r="2.5"/>
+  </svg>
+)
+const FLEET_NAV = [
+  {
+    key: 'fleet-dashboard', label: 'Дашборд',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+    )
+  },
+  { key: 'fleet-trips', label: 'Рейсы', icon: truckIcon },
+  {
+    key: 'fleet-clients', label: 'Клиенты',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    )
+  },
+  {
+    key: 'fleet-vehicles', label: 'Машины и водители',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
+        <circle cx="7" cy="17" r="2"/>
+        <path d="M9 17h6"/>
+        <circle cx="17" cy="17" r="2"/>
+      </svg>
+    )
+  },
+]
+
 // Managers only work leads and tasks — everything else (finance, clients,
 // carriers, admin) stays director-only until per-manager scoping exists for
 // those sections too. The business dashboard is director-only too (it's
@@ -177,9 +221,28 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   const userRole = roleLabel(profile.role, profile.position)
   const userInitials = initials(userName)
   const isEgorDir = user?.username === 'egor_dir'
+  const isDirectorRole = profile.role === 'director' || profile.role === 'admin'
+  const canFleet = isDirectorRole || profile.fleet_access === true
+
+  // Режим сайдбара: экспедирование / свой автопарк. Тумблер виден только
+  // тем, у кого есть доступ к автопарку; остальным сайдбар — как был.
+  const [mode, setMode] = useState(() => {
+    try { return canFleet && localStorage.getItem('crm_mode') === 'fleet' ? 'fleet' : 'forwarding' }
+    catch { return 'forwarding' }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('crm_mode', mode) } catch { /* private mode */ }
+  }, [mode])
+
+  const switchMode = (next) => {
+    if (next === mode) return
+    setMode(next)
+    onNav(next === 'fleet' ? 'fleet-trips' : 'dashboard')
+  }
+
   const navItems = profile.role === 'manager'
     ? [MANAGER_DASHBOARD_ITEM, ...NAV.filter(item => MANAGER_NAV_KEYS.includes(item.key))]
-    : NAV
+    : (canFleet && mode === 'fleet') ? FLEET_NAV : NAV
 
   const [hiddenMenuOpen, setHiddenMenuOpen] = useState(false)
   const longPressTimer = useRef(null)
@@ -195,7 +258,10 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
     page === item.key ||
     (item.key === 'orders' && page === 'order-detail') ||
     (item.key === 'clients' && page === 'client-detail') ||
-    (item.key === 'carriers' && page === 'carrier-detail')
+    (item.key === 'carriers' && page === 'carrier-detail') ||
+    (item.key === 'fleet-trips' && (page === 'fleet-trip-detail' || page === 'fleet-order-detail')) ||
+    (item.key === 'fleet-clients' && page === 'fleet-client-detail') ||
+    (item.key === 'fleet-dashboard' && page === 'fleet-analytics')
   )?.key
 
   useLayoutEffect(() => {
@@ -337,6 +403,32 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
           )
         })}
       </nav>
+
+      {/* Переключатель режима — только для директора / аккаунта с fleet_access */}
+      {canFleet && expanded && (
+        <div style={{ paddingTop: 12, borderTop: '1px solid rgba(14,23,38,0.08)', marginBottom: 12 }}>
+          <SlidingTabs
+            options={[{ key: 'forwarding', label: 'Экспедиция' }, { key: 'fleet', label: 'Автопарк' }]}
+            value={mode}
+            onChange={switchMode}
+            fontSize={12}
+          />
+        </div>
+      )}
+      {canFleet && !expanded && (
+        <button
+          onClick={() => switchMode(mode === 'fleet' ? 'forwarding' : 'fleet')}
+          title={mode === 'fleet' ? 'К экспедированию' : 'К автопарку'}
+          style={{
+            marginBottom: 10, height: 40, borderRadius: 12, border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: mode === 'fleet' ? 'rgba(19,102,240,0.1)' : 'rgba(14,23,38,0.05)',
+            color: mode === 'fleet' ? '#1366F0' : '#5A6573',
+          }}
+        >
+          {truckIcon}
+        </button>
+      )}
 
       {/* User */}
       <div style={{

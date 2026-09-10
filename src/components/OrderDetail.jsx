@@ -436,13 +436,37 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
       setActModalOpen(true)
       return
     }
+    // Снятие любой отметки — всегда с подтверждением; потом можно вернуть
+    // тем же нажатием на кнопку «Отменить» в тосте (дата восстановится).
+    const prevDate = draft[dateKey] !== undefined ? draft[dateKey] : order[dateKey]
+    if (!newVal && !window.confirm(
+      `Снять отметку «${step?.label || key}»? Дату можно вернуть кнопкой «Отменить».`
+    )) return
     const now = new Date().toISOString()
     const patch = { [key]: newVal, [dateKey]: newVal ? now : null }
     try {
       lastLocalEditRef.current = Date.now()
       await apiUpdate(order.id, patch)
       setOrder(prev => ({ ...prev, ...patch }))
-      show(`${step?.label || key}${newVal ? ' — отмечено' : ' — снято'}`, { type: 'success' })
+      if (newVal) {
+        show(`${step?.label || key} — отмечено`, { type: 'success' })
+      } else {
+        show(`${step?.label || key} — снято`, {
+          type: 'info',
+          actionLabel: 'Отменить',
+          onAction: async () => {
+            const restore = { [key]: true, [dateKey]: prevDate || now }
+            try {
+              lastLocalEditRef.current = Date.now()
+              await apiUpdate(order.id, restore)
+              setOrder(prev => ({ ...prev, ...restore }))
+              show(`${step?.label || key} — возвращено`, { type: 'success' })
+            } catch (e) {
+              show('Не удалось вернуть: ' + e.message, { type: 'error' })
+            }
+          },
+        })
+      }
     } catch (e) {
       show('Ошибка сохранения: ' + e.message, { type: 'error' })
     }
@@ -584,6 +608,9 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
 
   const handleDelete = async () => {
     const deletedId = order.id
+    if (!window.confirm(
+      `Удалить заявку ${order.order_number || ''}? Её можно будет восстановить кнопкой «Отменить» или из Корзины.`
+    )) return
     try {
       await apiDelete(deletedId)
       onDelete(deletedId)

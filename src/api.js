@@ -254,3 +254,55 @@ export const resyncKudirStatus = () => req('/kudir/resync/status');
 export const resyncKudirCancel = () => req('/kudir/resync/cancel', { method: 'POST' });
 export const exportKudirUrl = (year, quarter) =>
   `${BASE}/kudir/export?year=${year}${quarter ? `&quarter=${quarter}` : ''}&token=${encodeURIComponent(token)}`;
+
+// ── Свой автопарк (fleet) — параллельный раздел, свои коллекции fleet_* ──
+export const getFleetDashboard = (month) => req('/fleet/dashboard' + (month ? `?month=${month}` : ''));
+export const getFleetTrips = () => req('/fleet/trips');
+export const createFleetTrip = (data) => req('/fleet/trips', { method: 'POST', body: JSON.stringify(data) });
+export const getFleetTrip = (id) => req(`/fleet/trips/${id}`);
+export const updateFleetTrip = (id, data) => req(`/fleet/trips/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const deleteFleetTrip = (id) => req(`/fleet/trips/${id}`, { method: 'DELETE' });
+
+export const createFleetOrder = (tripId, data) => req(`/fleet/trips/${tripId}/orders`, { method: 'POST', body: JSON.stringify(data) });
+export const getFleetOrder = (id) => req(`/fleet/orders/${id}`);
+export const updateFleetOrder = (id, data) => req(`/fleet/orders/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const deleteFleetOrder = (id) => req(`/fleet/orders/${id}`, { method: 'DELETE' });
+export const generateFleetDoc = (id, kind) => req(`/fleet/orders/${id}/generate_doc?kind=${kind}`, { method: 'POST' });
+
+export const getFleetClients = () => req('/fleet/clients');
+export const getFleetClient = (id) => req(`/fleet/clients/${id}`);
+export const getFleetClientOrders = (id) => req(`/fleet/clients/${id}/orders`);
+export const createFleetClient = (data) => req('/fleet/clients', { method: 'POST', body: JSON.stringify(data) });
+export const updateFleetClient = (id, data) => req(`/fleet/clients/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const deleteFleetClient = (id) => req(`/fleet/clients/${id}`, { method: 'DELETE' });
+
+export const getFleetVehicles = () => req('/fleet/vehicles');
+export const createFleetVehicle = (data) => req('/fleet/vehicles', { method: 'POST', body: JSON.stringify(data) });
+export const updateFleetVehicle = (id, data) => req(`/fleet/vehicles/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const deleteFleetVehicle = (id) => req(`/fleet/vehicles/${id}`, { method: 'DELETE' });
+
+export const getFleetDrivers = () => req('/fleet/drivers');
+export const createFleetDriver = (data) => req('/fleet/drivers', { method: 'POST', body: JSON.stringify(data) });
+export const updateFleetDriver = (id, data) => req(`/fleet/drivers/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const deleteFleetDriver = (id) => req(`/fleet/drivers/${id}`, { method: 'DELETE' });
+
+// ── Финансы автопарка ──
+export const addFleetOrderPayment = (orderId, data) => req(`/fleet/orders/${orderId}/payments`, { method: 'POST', body: JSON.stringify(data) });
+export const deleteFleetOrderPayment = (orderId, payId) => req(`/fleet/orders/${orderId}/payments/${payId}`, { method: 'DELETE' });
+export const addFleetDriverPayout = (tripId, data) => req(`/fleet/trips/${tripId}/driver_payout`, { method: 'POST', body: JSON.stringify(data) });
+export const deleteFleetDriverPayout = (tripId, payoutId) => req(`/fleet/trips/${tripId}/driver_payout/${payoutId}`, { method: 'DELETE' });
+
+// ── Мелочи автопарка ──
+export const duplicateFleetTrip = (id) => req(`/fleet/trips/${id}/duplicate`, { method: 'POST' });
+export const duplicateFleetOrder = (id) => req(`/fleet/orders/${id}/duplicate`, { method: 'POST' });
+export const addFleetComment = (entity, id, text) => req(`/fleet/${entity}/${id}/comments`, { method: 'POST', body: JSON.stringify({ text }) });
+export const deleteFleetComment = (entity, id, commentId) => req(`/fleet/${entity}/${id}/comments/${commentId}`, { method: 'DELETE' });
+export const fleetExportUrl = (month) => `${BASE}/fleet/export${month ? `?month=${month}&` : '?'}token=${encodeURIComponent(token)}`;
+
+// ── Аналитика / акт сверки автопарка ──
+export const getFleetAnalytics = (params = {}) => req('/fleet/analytics?' + new URLSearchParams(params));
+export const getFleetReconciliation = (clientId, params = {}) => req(`/fleet/clients/${clientId}/reconciliation?` + new URLSearchParams(params));
+
+// ── Telegram-сводка автопарка ──
+export const previewFleetBriefing = () => req('/fleet/briefing/preview');
+export const sendFleetBriefing = () => req('/fleet/briefing', { method: 'POST' });

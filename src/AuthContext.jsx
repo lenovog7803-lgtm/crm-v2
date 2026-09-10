@@ -4,8 +4,8 @@ import { login as apiLogin, setToken, getToken, pingServer, setUnauthorizedHandl
 const AuthContext = createContext(null);
 
 const USER_PROFILES = {
-  egor_dir:   { name: 'Егор',   role: 'director' },
-  polina_dir: { name: 'Полина', role: 'director' },
+  egor_dir:   { name: 'Егор',   role: 'director', fleet_access: true },
+  polina_dir: { name: 'Полина', role: 'director', fleet_access: true },
 }
 
 export function AuthProvider({ children }) {
