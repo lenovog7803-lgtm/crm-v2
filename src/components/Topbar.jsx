@@ -40,6 +40,11 @@ const fmtMonth = m => {
   const [y, mo] = m.split('-')
   return `${MONTH_RU[parseInt(mo) - 1]} ${y}`
 }
+const fmtQuarter = q => {
+  if (!q) return q
+  const [y, qn] = q.split('-Q')
+  return `${qn} квартал ${y}`
+}
 
 export default function Topbar({ page, onSignOut, period = 'month', onPeriodChange, availableMonths = [], search = '', onSearchChange, overdueItems = [], onOpenOrder, onNav, onOpenPalette }) {
   const { notifications, dismiss } = useToast()
@@ -86,6 +91,13 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
 
   const fixedIds = new Set(['month', 'last_month', 'quarter', 'year', 'all'])
   const extraMonths = availableMonths.filter(m => !fixedIds.has(m))
+  // Конкретные кварталы ("2026-Q3") — выводятся отдельным блоком между
+  // относительными пунктами (Текущий месяц…Всё время) и списком месяцев,
+  // от новых к старым, выведены из тех же доступных месяцев.
+  const extraQuarters = Array.from(new Set(extraMonths.map(m => {
+    const [y, mo] = m.split('-')
+    return `${y}-Q${Math.floor((parseInt(mo, 10) - 1) / 3) + 1}`
+  }))).sort().reverse()
 
   return (
     <div className="topbar-mobile" style={{
@@ -186,6 +198,8 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
           }}
         >
           {PERIOD_OPTIONS.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+          {extraQuarters.length > 0 && <option disabled>──────────</option>}
+          {extraQuarters.map(q => <option key={q} value={q}>{fmtQuarter(q)}</option>)}
           {extraMonths.length > 0 && <option disabled>──────────</option>}
           {extraMonths.map(m => <option key={m} value={m}>{fmtMonth(m)}</option>)}
         </select>

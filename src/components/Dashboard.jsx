@@ -33,6 +33,11 @@ function filterByPeriod(orders, period) {
     }
     if (period === 'year') return d.getFullYear() === now.getFullYear()
     if (/^\d{4}-\d{2}$/.test(period)) return (raw || '').slice(0, 7) === period
+    if (/^\d{4}-Q[1-4]$/.test(period)) {
+      const year = parseInt(period.slice(0, 4), 10)
+      const q = parseInt(period.slice(6), 10)
+      return d.getFullYear() === year && Math.floor(d.getMonth() / 3) + 1 === q
+    }
     return true
   })
 }
@@ -184,6 +189,32 @@ function buildChartData(orders, period) {
       current: Array.from({ length: 12 }, (_, m) => byMonth[m] || 0),
       prev: Array.from({ length: 12 }, (_, m) => prevByMonth[m] || 0),
       labels: MONTH_RU_SHORT,
+      mode: 'months',
+    }
+  }
+
+  // Конкретный квартал из списка периодов ("2026-Q3") — как relative
+  // 'quarter' выше, но для выбранных года/квартала, а не текущего.
+  if (/^\d{4}-Q[1-4]$/.test(period)) {
+    const year = parseInt(period.slice(0, 4), 10)
+    const q = parseInt(period.slice(6), 10)
+    const qStart = (q - 1) * 3
+    const months = Array.from({ length: 3 }, (_, i) => qStart + i)
+    const byMonth = {}; const prevByMonth = {}
+    orders.forEach(o => {
+      const dateStr = o.load_date || o.unload_date || ''
+      if (!dateStr) return
+      const d = new Date(dateStr)
+      if (isNaN(d)) return
+      const key = d.getMonth()
+      const val = (o.client_rate || 0) - (o.carrier_rate || 0)
+      if (d.getFullYear() === year) byMonth[key] = (byMonth[key] || 0) + val
+      else if (d.getFullYear() === year - 1) prevByMonth[key] = (prevByMonth[key] || 0) + val
+    })
+    return {
+      current: months.map(m => byMonth[m] || 0),
+      prev: months.map(m => prevByMonth[m] || 0),
+      labels: months.map(m => MONTH_RU_SHORT[m]),
       mode: 'months',
     }
   }
