@@ -136,6 +136,15 @@ function Overview({ state, reload, onGoSettings, onGoReplies, replies }) {
         </div>
       </div>
 
+      {state.health && state.health.status !== 'ok' && (
+        <div className="card" style={{ padding: 16, border: `1px solid ${state.health.status === 'stop' ? 'rgba(224,71,59,0.4)' : 'rgba(217,119,6,0.4)'}` }}>
+          <div style={{ fontWeight: 700, fontSize: 14, color: state.health.status === 'stop' ? '#E0473B' : '#D97706' }}>
+            {state.health.status === 'stop' ? '⛔️ Защита: рассылка будет остановлена' : state.health.status === 'paused' ? '⏸ Пауза' : '⚠️ Темп снижен'}
+          </div>
+          <div style={{ fontSize: 13, color: '#5A6573', marginTop: 4 }}>{state.health.reason}</div>
+        </div>
+      )}
+
       {replies.length > 0 && (
         <div className="card" style={{ padding: 18, border: '1px solid rgba(14,159,110,0.3)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 10 }}>
@@ -152,7 +161,10 @@ function Overview({ state, reload, onGoSettings, onGoReplies, replies }) {
       )}
 
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-        <Stat label="Отправлено сегодня" value={`${state.sent_today} / ${state.limit}`} hint="дневной лимит" />
+        <Stat label="Отправлено сегодня" value={`${state.sent_today} / ${state.limit}`}
+          hint={state.health?.auto ? `разгон: день ${state.health.day}, потолок ${state.health.cap}` : 'дневной лимит'} />
+        <Stat label="Возвраты за 7 дней" value={`${state.health?.bounce_rate ?? 0}%`}
+          hint={`${state.health?.bounced_7d ?? 0} из ${state.health?.sent_7d ?? 0} · норма до 4%`} />
         <Stat label="В очереди" value={state.queue_new} hint={state.queue_follow ? `+ ${state.queue_follow} напоминаний` : 'новых адресов'} />
         <Stat label="Контактов" value={state.total} hint={`с email: ${state.with_email}`} />
         <Stat label="Ответили" value={state.groups?.answered ?? 0} hint={counts.deal ? `сделок: ${counts.deal}` : (state.with_email ? `${Math.round(100 * (state.groups?.answered || 0) / Math.max(1, (state.total - (counts.new || 0))))}% от отправленных` : undefined)} />
@@ -583,6 +595,7 @@ function Settings({ settings, onSaved }) {
       const payload = {}
       FIELDS.forEach(([, fs]) => fs.forEach(([k]) => { payload[k] = s[k] }))
       payload.weekdays_only = !!s.weekdays_only
+      payload.auto_limit = !!s.auto_limit
       payload.transport = s.transport || 'smtp'
       payload.followup_enabled = !!s.followup_enabled
       if (settings.password_from_env) delete payload.password
@@ -684,7 +697,7 @@ function Settings({ settings, onSaved }) {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 12 }}>
               {fs.map(([k, l, type]) => (
                 <div key={k}>
-                  <div style={labelStyle}>{k === 'login' && transport === 'gmail_api' ? 'Ваш Gmail' : k === 'password' && transport === 'gmail_api' ? 'Пароль приложения (для IMAP)' : l}</div>
+                  <div style={labelStyle}>{k === 'login' && transport === 'gmail_api' ? 'Ваш Gmail' : k === 'password' && transport === 'gmail_api' ? 'Пароль приложения (для IMAP)' : k === 'daily_limit' && s.auto_limit ? 'Максимум писем в день' : l}</div>
                   <input
                     type={type || 'text'}
                     value={s[k] ?? ''}
@@ -700,6 +713,9 @@ function Settings({ settings, onSaved }) {
         ))}
         <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', fontSize: 13, color: '#0E1726' }}>
           <label style={{ display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer' }}>
+            <input type="checkbox" checked={!!s.auto_limit} onChange={e => set('auto_limit', e.target.checked)} /> Автоматический разгон и защита от бана
+          </label>
+          <label style={{ display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer' }}>
             <input type="checkbox" checked={!!s.weekdays_only} onChange={e => set('weekdays_only', e.target.checked)} /> Только будни
           </label>
           <label style={{ display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer' }}>
@@ -708,6 +724,7 @@ function Settings({ settings, onSaved }) {
         </div>
         <div style={{ fontSize: 12, color: '#8A93A0', lineHeight: 1.6 }}>
           Для Яндекса и Gmail нужен не обычный пароль, а «пароль приложения» из настроек безопасности почты.
+          {s.auto_limit && <><br />Разгон: лимит растёт сам по дням отправки — 5 → 10 → 15 → 20 → 30 → 40 (не выше «Максимума»). Возвратов больше 4% за неделю — темп вдвое ниже, больше 8% — рассылка остановится сама, придёт сообщение в Telegram и задача. Если почта ограничит отправку — пауза до завтра.</>}
         </div>
         <div><button className="btn-primary" onClick={save} disabled={busy}>Сохранить</button></div>
       </div>
