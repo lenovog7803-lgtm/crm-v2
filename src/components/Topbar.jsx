@@ -15,6 +15,7 @@ const PAGE_META = {
   carriers: { title: 'Перевозчики', subtitle: 'База перевозчиков' },
   'carrier-detail': { title: 'Перевозчик', subtitle: 'Карточка перевозчика' },
   leads: { title: 'База обзвона', subtitle: 'Лиды и потенциальные клиенты' },
+  mailing: { title: 'Рассылка', subtitle: 'Холодные письма по базе' },
   backups: { title: 'Резервные копии', subtitle: 'Автоматические снимки базы' },
   'fleet-dashboard': { title: 'Дашборд', subtitle: 'Свой автопарк' },
   'fleet-analytics': { title: 'Аналитика', subtitle: 'Свой автопарк' },

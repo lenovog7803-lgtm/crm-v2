@@ -306,3 +306,31 @@ export const getFleetReconciliation = (clientId, params = {}) => req(`/fleet/cli
 // ── Telegram-сводка автопарка ──
 export const previewFleetBriefing = () => req('/fleet/briefing/preview');
 export const sendFleetBriefing = () => req('/fleet/briefing', { method: 'POST' });
+
+// Рассылка (backend/mailing.py)
+export const getMailingState = () => req('/mailing/state');
+export const startMailing = () => req('/mailing/start', { method: 'POST' });
+export const stopMailing = () => req('/mailing/stop', { method: 'POST' });
+export const checkMailingInbox = () => req('/mailing/check-inbox', { method: 'POST' }, 0);
+export const getMailingContacts = (q = '', status = '') => req('/mailing/contacts?' + new URLSearchParams({ q, status }));
+export const addMailingContact = (data) => req('/mailing/contacts', { method: 'POST', body: JSON.stringify(data) });
+export const updateMailingContact = (id, data) => req(`/mailing/contacts/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const deleteMailingContact = (id) => req(`/mailing/contacts/${id}`, { method: 'DELETE' });
+export const mailingContactsFromLeads = (industry) => req('/mailing/contacts/from-leads', { method: 'POST', body: JSON.stringify({ industry }) });
+export const getMailingSettings = () => req('/mailing/settings');
+export const saveMailingSettings = (data) => req('/mailing/settings', { method: 'PUT', body: JSON.stringify(data) });
+export const testMailingConnection = () => req('/mailing/test-connection', { method: 'POST' }, 0);
+export const previewMailing = (data) => req('/mailing/preview', { method: 'POST', body: JSON.stringify(data) });
+export const sendMailingTestEmail = (to) => req('/mailing/test-email', { method: 'POST', body: JSON.stringify({ to }) }, 0);
+// multipart — без JSON Content-Type, браузер сам выставит boundary
+export async function importMailingContacts(file) {
+  const fd = new FormData();
+  fd.append('file', file);
+  const res = await fetch(BASE + '/mailing/contacts/import', {
+    method: 'POST', body: fd,
+    headers: { 'Authorization': token ? `Bearer ${token}` : '' },
+  });
+  if (res.status === 401) { onUnauthorized?.(); throw new Error('Сессия истекла — войдите заново'); }
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}

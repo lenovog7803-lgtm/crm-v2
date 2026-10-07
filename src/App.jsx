@@ -25,6 +25,7 @@ import Backups from './pages/Backups'
 import Admin from './pages/Admin'
 import Kudir from './pages/Kudir'
 import Reports from './pages/Reports'
+import Mailing from './pages/Mailing'
 import ManagerDashboard from './pages/ManagerDashboard'
 import ErrorBoundary from './components/ErrorBoundary'
 import FleetTrips from './pages/fleet/FleetTrips'
@@ -200,6 +201,7 @@ function MainApp() {
     if (key === 'admin' && !isEgorDir) key = 'tasks'
     if (key === 'kudir' && !isDirector) key = 'tasks'
     if (key === 'reports' && !isDirector) key = 'tasks'
+    if (key === 'mailing' && !isDirector) key = 'tasks'
     if (isManager && !MANAGER_PAGES.includes(key)) key = 'my-dashboard'
     setPage(key)
     setSearch(loadPageSearch(key))
@@ -432,6 +434,7 @@ function MainApp() {
             {page === 'admin' && isEgorDir && <Admin />}
             {page === 'kudir' && isDirector && <Kudir />}
             {page === 'reports' && isDirector && <Reports />}
+            {page === 'mailing' && isDirector && <ErrorBoundary><Mailing /></ErrorBoundary>}
           </div>
         </main>
       </div>
