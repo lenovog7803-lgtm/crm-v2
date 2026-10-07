@@ -5,6 +5,7 @@ import {
   importMailingContacts, mailingContactsFromLeads,
   getMailingSettings, saveMailingSettings, testMailingConnection, previewMailing, sendMailingTestEmail,
   startMailingGoogle, disconnectMailingGoogle,
+  getMailingReplies, resolveMailingReply, markMailingRepliesSeen,
 } from '../api'
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
@@ -26,12 +27,27 @@ const STATUS = {
   skip: { label: 'Пропуск', color: '#A6AEB8', bg: 'rgba(14,23,38,0.04)' },
 }
 
-const TABS = [
+const tabsWith = (newReplies) => [
   { key: 'overview', label: 'Обзор' },
+  { key: 'replies', label: newReplies ? `Ответы · ${newReplies}` : 'Ответы' },
   { key: 'contacts', label: 'Контакты' },
   { key: 'letter', label: 'Письмо' },
   { key: 'settings', label: 'Настройки' },
 ]
+
+// Быстрые фильтры контактов — счётчики приходят из /mailing/state (groups)
+const GROUPS = [
+  { key: '', label: 'Все' },
+  { key: 'answered', label: 'Ответили' },
+  { key: 'waiting', label: 'Ждём ответа' },
+  { key: 'silent', label: 'Молчат после напоминания' },
+  { key: 'failed', label: 'Не дошло' },
+]
+
+const gmailLink = (login, email) =>
+  `https://mail.google.com/mail/${login ? `?authuser=${encodeURIComponent(login)}` : ''}#search/${encodeURIComponent(`from:${email}`)}`
+
+const fmtTs = (ts) => (ts || '').replace('T', ' ').slice(0, 16)
 
 const inputStyle = {
   width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: 10,
@@ -60,7 +76,7 @@ function Stat({ label, value, hint }) {
 }
 
 // ---------------- Обзор ----------------
-function Overview({ state, reload, onGoSettings }) {
+function Overview({ state, reload, onGoSettings, onGoReplies, replies }) {
   const { show } = useToast()
   const [busy, setBusy] = useState(false)
 
@@ -120,11 +136,26 @@ function Overview({ state, reload, onGoSettings }) {
         </div>
       </div>
 
+      {replies.length > 0 && (
+        <div className="card" style={{ padding: 18, border: '1px solid rgba(14,159,110,0.3)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+            <div style={{ ...sectionTitle, marginBottom: 0 }}>🔔 Новые ответы: {replies.length}</div>
+            <button className="btn-ghost" onClick={onGoReplies}>Разобрать →</button>
+          </div>
+          {replies.slice(0, 3).map(c => (
+            <div key={c.id} style={{ padding: '8px 0', borderTop: '1px solid rgba(14,23,38,0.05)', fontSize: 13 }}>
+              <b style={{ color: '#0E1726' }}>{c.company || c.email}</b>
+              <span style={{ color: '#5A6573' }}> — {(c.reply_snippet || 'ответ без текста').slice(0, 140)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         <Stat label="Отправлено сегодня" value={`${state.sent_today} / ${state.limit}`} hint="дневной лимит" />
         <Stat label="В очереди" value={state.queue_new} hint={state.queue_follow ? `+ ${state.queue_follow} напоминаний` : 'новых адресов'} />
         <Stat label="Контактов" value={state.total} hint={`с email: ${state.with_email}`} />
-        <Stat label="Ответили" value={(counts.replied || 0) + (counts.interested || 0) + (counts.deal || 0)} hint={counts.deal ? `сделок: ${counts.deal}` : undefined} />
+        <Stat label="Ответили" value={state.groups?.answered ?? 0} hint={counts.deal ? `сделок: ${counts.deal}` : (state.with_email ? `${Math.round(100 * (state.groups?.answered || 0) / Math.max(1, (state.total - (counts.new || 0))))}% от отправленных` : undefined)} />
       </div>
 
       <div className="card" style={{ padding: 18 }}>
@@ -158,22 +189,120 @@ function Overview({ state, reload, onGoSettings }) {
   )
 }
 
+// ---------------- Ответы ----------------
+const RESOLVE = [
+  { status: 'interested', label: 'Интерес', color: '#0E9F6E' },
+  { status: 'deal', label: 'Сделка', color: '#047857' },
+  { status: 'refused', label: 'Отказ', color: '#E0473B' },
+]
+
+function Replies({ login, onChanged }) {
+  const { show } = useToast()
+  const [onlyNew, setOnlyNew] = useState(true)
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [busyId, setBusyId] = useState(null)
+
+  const load = () => {
+    setLoading(true)
+    getMailingReplies(onlyNew)
+      .then(r => setItems(Array.isArray(r) ? r : []))
+      .catch(e => show('Ошибка загрузки: ' + e.message, { type: 'error' }))
+      .finally(() => setLoading(false))
+  }
+  useEffect(load, [onlyNew]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const resolve = async (c, status) => {
+    setBusyId(c.id)
+    try {
+      const r = await resolveMailingReply(c.id, status)
+      const label = RESOLVE.find(x => x.status === status)?.label
+      show(r.lead_created ? `${label}: лид создан в «Базе обзвона»` : r.lead_id && status !== 'refused' ? `${label}: лид в «Базе обзвона» обновлён` : `Отмечено: ${label}`, { type: 'success' })
+      setItems(list => onlyNew ? list.filter(x => x.id !== c.id) : list.map(x => x.id === c.id ? { ...x, status, reply_seen: true } : x))
+      onChanged?.()
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+    setBusyId(null)
+  }
+
+  const seenAll = async () => {
+    try {
+      await markMailingRepliesSeen(items.map(c => c.id))
+      setItems([])
+      onChanged?.()
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+        <SlidingTabs options={[{ key: 'new', label: 'Новые' }, { key: 'all', label: 'Все ответы' }]} value={onlyNew ? 'new' : 'all'} onChange={k => setOnlyNew(k === 'new')} />
+        {onlyNew && items.length > 0 && <button className="btn-ghost" onClick={seenAll}>Отметить все просмотренными</button>}
+      </div>
+      <div style={{ fontSize: 12, color: '#8A93A0' }}>
+        «Интерес» и «Сделка» добавляют компанию в «Базу обзвона» (или обновляют её лид) — дальше работа идёт там. Ответы проверяются каждые 15 минут, о новых приходит сообщение в Telegram.
+      </div>
+
+      {loading && <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
+      {!loading && items.length === 0 && (
+        <div className="card" style={{ padding: 30, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>
+          {onlyNew ? 'Новых ответов нет' : 'Ответов пока нет'}
+        </div>
+      )}
+      {items.map(c => (
+        <div key={c.id} className="card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10, borderLeft: c.reply_seen === false ? '3px solid #0E9F6E' : undefined }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+            <div>
+              <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>{c.company || c.email}</div>
+              <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>
+                {[c.contact_name, c.email, c.city].filter(Boolean).join(' · ')} · ответ {fmtTs(c.replied_at)}
+              </div>
+            </div>
+            <span style={{ alignSelf: 'flex-start', padding: '3px 9px', borderRadius: 99, background: (STATUS[c.status] || STATUS.replied).bg, color: (STATUS[c.status] || STATUS.replied).color, fontSize: 11.5, fontWeight: 600 }}>
+              {(STATUS[c.status] || STATUS.replied).label}
+            </span>
+          </div>
+          {c.reply_subject && <div style={{ fontSize: 12.5, fontWeight: 600, color: '#5A6573' }}>{c.reply_subject}</div>}
+          <div style={{ whiteSpace: 'pre-wrap', fontSize: 13, color: '#0E1726', lineHeight: 1.55, background: '#F7F8FA', borderRadius: 12, padding: 12, maxHeight: 220, overflowY: 'auto' }}>
+            {c.reply_snippet || 'Текст ответа не удалось прочитать — откройте письмо в Gmail.'}
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            {RESOLVE.map(b => (
+              <button key={b.status} className="btn-ghost" disabled={busyId === c.id}
+                onClick={() => resolve(c, b.status)}
+                style={c.status === b.status ? { background: b.color, color: '#fff', borderColor: b.color } : { color: b.color }}>
+                {b.label}
+              </button>
+            ))}
+            <a className="btn-ghost" href={gmailLink(login, c.email)} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>Открыть в Gmail ↗</a>
+            {c.lead_id && <span style={{ fontSize: 12, color: '#8A93A0' }}>есть в «Базе обзвона»</span>}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ---------------- Контакты ----------------
 const EMPTY_CONTACT = { company: '', email: '', contact_name: '', city: '', priority: '' }
 
-function Contacts({ onChanged }) {
+function Contacts({ onChanged, groups = {}, login }) {
   const { show } = useToast()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [q, setQ] = useState('')
   const [status, setStatus] = useState('')
+  const [group, setGroup] = useState('')
   const [form, setForm] = useState(null)
   const [busy, setBusy] = useState(false)
   const fileRef = useRef(null)
 
   const load = () => {
     setLoading(true)
-    getMailingContacts(q, status)
+    getMailingContacts(q, status, group)
       .then(r => setItems(Array.isArray(r) ? r : []))
       .catch(e => show('Ошибка загрузки: ' + e.message, { type: 'error' }))
       .finally(() => setLoading(false))
@@ -182,7 +311,7 @@ function Contacts({ onChanged }) {
     const t = setTimeout(load, 250)
     return () => clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q, status])
+  }, [q, status, group])
 
   const after = (msg) => { show(msg, { type: 'success' }); load(); onChanged?.() }
 
@@ -245,6 +374,20 @@ function Contacts({ onChanged }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        {GROUPS.map(g => {
+          const active = group === g.key
+          const n = g.key ? groups[g.key] : undefined
+          return (
+            <button key={g.key} onClick={() => { setGroup(g.key); setStatus('') }}
+              style={{ padding: '7px 13px', borderRadius: 99, cursor: 'pointer', fontSize: 12.5, fontWeight: 600, fontFamily: 'Manrope',
+                border: active ? '1px solid #1366F0' : '1px solid rgba(14,23,38,0.12)',
+                background: active ? 'rgba(19,102,240,0.1)' : 'rgba(255,255,255,0.7)', color: active ? '#1366F0' : '#5A6573' }}>
+              {g.label}{n !== undefined ? ` · ${n}` : ''}
+            </button>
+          )
+        })}
+      </div>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
         <input value={q} onChange={e => setQ(e.target.value)} placeholder="Поиск: компания, email, город" style={{ ...inputStyle, width: 260 }} />
         <select value={status} onChange={e => setStatus(e.target.value)} style={{ ...inputStyle, width: 170 }}>
@@ -298,6 +441,7 @@ function Contacts({ onChanged }) {
                 <td style={{ padding: '10px 14px', color: '#5A6573' }}>
                   {c.email || <span style={{ color: '#C4CAD4' }}>нет email</span>}
                   {c.last_error && <div style={{ fontSize: 11, color: '#E0473B' }}>{c.last_error}</div>}
+                  {c.replied_at && <div><a href={gmailLink(login, c.email)} target="_blank" rel="noreferrer" style={{ fontSize: 11.5, color: '#1366F0' }}>переписка в Gmail ↗</a></div>}
                 </td>
                 <td style={{ padding: '10px 14px', color: '#5A6573' }}>{c.city || ''}</td>
                 <td style={{ padding: '10px 14px', color: '#5A6573' }}>{c.priority || ''}</td>
@@ -594,8 +738,12 @@ export default function Mailing() {
   const [tab, setTab] = useState('overview')
   const [state, setState] = useState(null)
   const [settings, setSettings] = useState(null)
+  const [newReplies, setNewReplies] = useState([])
 
-  const loadState = () => getMailingState().then(setState).catch(e => show('Ошибка загрузки рассылки: ' + e.message, { type: 'error' }))
+  const loadState = () => {
+    getMailingReplies(true).then(r => setNewReplies(Array.isArray(r) ? r : [])).catch(() => {})
+    return getMailingState().then(setState).catch(e => show('Ошибка загрузки рассылки: ' + e.message, { type: 'error' }))
+  }
   const loadSettings = () => getMailingSettings().then(setSettings).catch(e => show('Ошибка загрузки настроек: ' + e.message, { type: 'error' }))
 
   useEffect(() => {
@@ -615,14 +763,15 @@ export default function Mailing() {
           <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 20, color: '#0E1726' }}>Рассылка</div>
           <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>Письма по базе с дневным лимитом, напоминанием и проверкой ответов</div>
         </div>
-        <SlidingTabs options={TABS} value={tab} onChange={setTab} />
+        <SlidingTabs options={tabsWith(state?.replies_new)} value={tab} onChange={setTab} />
       </div>
 
       {(!state || !settings) && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
       {state && settings && (
         <>
-          {tab === 'overview' && <Overview state={state} reload={loadState} onGoSettings={() => setTab('settings')} />}
-          {tab === 'contacts' && <Contacts onChanged={loadState} />}
+          {tab === 'overview' && <Overview state={state} reload={loadState} onGoSettings={() => setTab('settings')} onGoReplies={() => setTab('replies')} replies={newReplies} />}
+          {tab === 'replies' && <Replies login={settings.login} onChanged={loadState} />}
+          {tab === 'contacts' && <Contacts onChanged={loadState} groups={state.groups} login={settings.login} />}
           {tab === 'letter' && <Letter key={settings.body} settings={settings} onSaved={reloadAll} />}
           {tab === 'settings' && <Settings settings={settings} onSaved={reloadAll} />}
         </>

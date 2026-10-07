@@ -5,7 +5,7 @@ import { AuthProvider, useAuth } from './AuthContext'
 import { ToastProvider, useToast } from './components/Toast'
 import { CelebrationProvider } from './components/Celebration'
 import Login from './pages/Login'
-import { getDashboard, getTasks, getNotifications, markNotificationRead } from './api'
+import { getDashboard, getTasks, getNotifications, markNotificationRead, getMailingState } from './api'
 import { getOrdersFromCache, invalidateOrdersCache, refreshOrdersInBackground, patchOrderInCache, subscribeOrders } from './store/ordersStore'
 
 import Sidebar from './components/Sidebar'
@@ -157,6 +157,18 @@ function MainApp() {
       setCounts(c => ({ ...c, newLeads: d.new_leads || 0 }))
     }).catch(() => {})
   }, [ordersKey, tasksKey])
+
+  // Счётчик новых ответов на рассылку в меню — раз в 2 минуты и при уходе со страницы рассылки
+  useEffect(() => {
+    if (!isDirector) return
+    const load = () => getMailingState()
+      .then(s => setCounts(c => ({ ...c, newReplies: s.replies_new || 0 })))
+      .catch(() => {})
+    load()
+    const t = setInterval(load, 120000)
+    return () => clearInterval(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDirector, page === 'mailing'])
 
   // Keeps allOrders (what Dashboard reads via preloadedOrders) in sync with
   // the shared ordersStore cache. Without this, a payment_marked websocket

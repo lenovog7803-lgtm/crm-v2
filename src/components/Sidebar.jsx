@@ -94,6 +94,8 @@ const NAV = [
   },  {
     key: 'mailing',
     label: 'Рассылка',
+    badge: 'newReplies',
+    badgeColor: '#0E9F6E',
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="4" width="20" height="16" rx="2"/>
