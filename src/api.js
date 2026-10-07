@@ -322,6 +322,9 @@ export const saveMailingSettings = (data) => req('/mailing/settings', { method: 
 export const testMailingConnection = () => req('/mailing/test-connection', { method: 'POST' }, 0);
 export const previewMailing = (data) => req('/mailing/preview', { method: 'POST', body: JSON.stringify(data) });
 export const sendMailingTestEmail = (to) => req('/mailing/test-email', { method: 'POST', body: JSON.stringify({ to }) }, 0);
+// Свой Gmail рассылки — отдельно от Google-аккаунта CRM (Документы/Календарь не трогает)
+export const startMailingGoogle = () => req('/mailing/google/start');
+export const disconnectMailingGoogle = () => req('/mailing/google', { method: 'DELETE' });
 // multipart — без JSON Content-Type, браузер сам выставит boundary
 export async function importMailingContacts(file) {
   const fd = new FormData();

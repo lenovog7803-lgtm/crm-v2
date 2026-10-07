@@ -4,6 +4,7 @@ import {
   getMailingContacts, addMailingContact, updateMailingContact, deleteMailingContact,
   importMailingContacts, mailingContactsFromLeads,
   getMailingSettings, saveMailingSettings, testMailingConnection, previewMailing, sendMailingTestEmail,
+  startMailingGoogle, disconnectMailingGoogle,
 } from '../api'
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
@@ -438,6 +439,7 @@ function Settings({ settings, onSaved }) {
       const payload = {}
       FIELDS.forEach(([, fs]) => fs.forEach(([k]) => { payload[k] = s[k] }))
       payload.weekdays_only = !!s.weekdays_only
+      payload.transport = s.transport || 'smtp'
       payload.followup_enabled = !!s.followup_enabled
       if (settings.password_from_env) delete payload.password
       await saveMailingSettings(payload)
@@ -448,6 +450,34 @@ function Settings({ settings, onSaved }) {
     }
     setBusy(false)
   }
+
+  // Render free не выпускает SMTP — «Через Google» шлёт по HTTPS через Gmail API.
+  // Gmail рассылки подключается отдельно и может быть любым — Google-аккаунт
+  // CRM (Документы/Календарь/Задачи) при этом не меняется.
+  const connectGoogle = async () => {
+    try {
+      await saveMailingSettings({ transport: 'gmail_api' })
+      set('transport', 'gmail_api')
+      const r = await startMailingGoogle()
+      window.open(r.auth_url, '_blank')
+      show('После подключения в открывшемся окне вернитесь сюда и обновите страницу', { type: 'info' })
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+  }
+
+  const disconnectGoogle = async () => {
+    if (!window.confirm('Отключить Gmail от рассылки? Google-аккаунт CRM это не затронет.')) return
+    try {
+      await disconnectMailingGoogle()
+      show('Gmail рассылки отключён', { type: 'success' })
+      onSaved?.()
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+  }
+
+  const transport = s.transport || 'smtp'
 
   const testConn = async () => {
     setBusy(true)
@@ -474,6 +504,30 @@ function Settings({ settings, onSaved }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div className="card" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <div>
+          <div style={sectionTitle}>Способ отправки</div>
+          <SlidingTabs
+            options={[{ key: 'gmail_api', label: 'Через Google (Gmail)' }, { key: 'smtp', label: 'SMTP по паролю приложения' }]}
+            value={transport}
+            onChange={k => set('transport', k)}
+          />
+          {transport === 'gmail_api' && (
+            <div style={{ marginTop: 12, padding: 14, borderRadius: 14, background: 'rgba(19,102,240,0.06)', border: '1px solid rgba(19,102,240,0.14)' }}>
+              <div style={{ fontSize: 12.5, color: '#5A6573', lineHeight: 1.6 }}>
+                Письма уходят через Gmail по HTTPS — работает на любом хостинге. Можно выбрать любой Gmail, не обязательно
+                тот, что подключён к CRM: Документы, Календарь и Задачи останутся на прежнем аккаунте.
+                Пароль приложения ниже нужен только для проверки ответов по IMAP.
+              </div>
+              <div style={{ marginTop: 10, fontSize: 13, fontWeight: 600, color: settings.gmail_connected ? '#0E9F6E' : '#8A93A0' }}>
+                {settings.gmail_connected ? `Подключён: ${settings.gmail_connected}` : 'Gmail ещё не подключён'}
+              </div>
+              <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
+                <button className="btn-ghost" onClick={connectGoogle}>{settings.gmail_connected ? 'Подключить другой Gmail' : 'Подключить Gmail для рассылки'}</button>
+                {settings.gmail_connected && <button className="btn-ghost" onClick={disconnectGoogle}>Отключить</button>}
+              </div>
+            </div>
+          )}
+        </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           <span style={{ fontSize: 12.5, color: '#8A93A0' }}>Заполнить серверы:</span>
           {Object.entries(PRESETS).map(([name, p]) => (
@@ -486,7 +540,7 @@ function Settings({ settings, onSaved }) {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 12 }}>
               {fs.map(([k, l, type]) => (
                 <div key={k}>
-                  <div style={labelStyle}>{l}</div>
+                  <div style={labelStyle}>{k === 'login' && transport === 'gmail_api' ? 'Ваш Gmail' : k === 'password' && transport === 'gmail_api' ? 'Пароль приложения (для IMAP)' : l}</div>
                   <input
                     type={type || 'text'}
                     value={s[k] ?? ''}
