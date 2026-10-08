@@ -60,7 +60,7 @@ const sectionTitle = { fontFamily: 'Onest', fontWeight: 700, fontSize: 15, color
 
 // ---------------- Обзор ----------------
 // В стиле дашборда CRM: hero-карточки с градиентом, KPI-полоса, кольцевой прогресс, CountUp.
-const RAMP_STEPS = [{ until: 3, lim: 5 }, { until: 7, lim: 10 }, { until: 12, lim: 15 }, { until: 18, lim: 20 }, { until: 25, lim: 30 }, { until: Infinity, lim: 40 }]
+const RAMP_STEPS = [{ until: 3, lim: 5 }, { until: 7, lim: 10 }, { until: 12, lim: 15 }, { until: Infinity, lim: 20 }]
 const LOG_ICON = { 'письмо': '✉️', 'напоминание': '🔁', 'ответ': '💬', 'возврат': '↩️', 'тест': '🧪', 'автостоп': '⛔️', 'проверка почты': '📥' }
 
 const heroBase = {
@@ -230,7 +230,7 @@ function Overview({ state, reload, onGoSettings, onGoReplies, onGoContacts, repl
         <div className="card" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18 }}>
             <div style={{ position: 'relative', flexShrink: 0 }}>
-              <CircularProgress pct={h.auto ? Math.min(100, ((h.day || 1) / 26) * 100) : 100} color="#1366F0" size={56} />
+              <CircularProgress pct={h.auto ? Math.min(100, ((h.day || 1) / 13) * 100) : 100} color="#1366F0" size={56} />
               <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#1366F0' }}>
                 {h.auto ? `д.${h.day || 1}` : '—'}
               </div>
@@ -850,7 +850,7 @@ function Settings({ settings, onSaved }) {
         </div>
         <div style={{ fontSize: 12, color: '#8A93A0', lineHeight: 1.6 }}>
           Для Яндекса и Gmail нужен не обычный пароль, а «пароль приложения» из настроек безопасности почты.
-          {s.auto_limit && <><br />Разгон: лимит растёт сам по дням отправки — 5 → 10 → 15 → 20 → 30 → 40 (не выше «Максимума»). Возвратов больше 4% за неделю — темп вдвое ниже, больше 8% — рассылка остановится сама, придёт сообщение в Telegram и задача. Если почта ограничит отправку — пауза до завтра.</>}
+          {s.auto_limit && <><br />Разгон: лимит растёт сам по дням отправки — 5 → 10 → 15 → 20 (не выше «Максимума»; больше 20 одинаковых писем в день не шлём). Возвратов больше 4% за неделю — темп вдвое ниже, больше 8% — рассылка остановится сама, придёт сообщение в Telegram и задача. Если почта ограничит отправку — пауза до завтра.</>}
         </div>
         <div><button className="btn-primary" onClick={save} disabled={busy}>Сохранить</button></div>
       </div>
