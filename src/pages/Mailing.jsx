@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import {
   getMailingState, startMailing, stopMailing, checkMailingInbox,
-  getMailingContacts, addMailingContact, updateMailingContact, deleteMailingContact,
-  importMailingContacts, mailingContactsFromLeads,
-  getMailingSettings, saveMailingSettings, testMailingConnection, previewMailing, sendMailingTestEmail,
-  startMailingGoogle, disconnectMailingGoogle,
-  getMailingReplies, resolveMailingReply, markMailingRepliesSeen,
+  getMailingContacts, addMailingContact, updateMailingContact, deleteMailingContact, importMailingContacts,
+  getMailingReplies, resolveMailingReply, markMailingRepliesSeen, previewMailing,
+  getMailingCampaigns, createMailingCampaign, updateMailingCampaign, deleteMailingCampaign,
+  getMailboxes, createMailbox, saveMailbox, deleteMailbox, testMailboxConnection, sendMailboxTestEmail,
+  startMailboxGoogle, disconnectMailboxGoogle,
+  getSuppliers, updateSupplier, deleteSupplier,
 } from '../api'
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
@@ -15,7 +16,8 @@ import { useIsMobile } from '../hooks/useIsMobile'
 
 // «Рассылка» — холодные письма по базе. Вся логика (лимиты, рабочие часы,
 // паузы, напоминания, проверка ответов) живёт в backend/mailing.py, здесь
-// только управление и просмотр.
+// только управление и просмотр. Направления (кампании) — свой текст и свои
+// контакты; почтовые ящики — подключение, подпись, лимиты и разгон.
 
 const STATUS = {
   new: { label: 'Новый', color: '#5A6573', bg: 'rgba(14,23,38,0.06)' },
@@ -30,12 +32,15 @@ const STATUS = {
   skip: { label: 'Пропуск', color: '#A6AEB8', bg: 'rgba(14,23,38,0.04)' },
 }
 
-const tabsWith = (newReplies) => [
+const tabsWith = (newReplies, withSuppliers) => [
   { key: 'overview', label: 'Обзор' },
   { key: 'replies', label: newReplies ? `Ответы · ${newReplies}` : 'Ответы' },
   { key: 'contacts', label: 'Контакты' },
+  ...(withSuppliers ? [{ key: 'suppliers', label: 'Поставщики' }] : []),
   { key: 'settings', label: 'Настройки' },
 ]
+
+const KIND_LABEL = { sale: 'продажа', purchase: 'закупка' }
 
 // Быстрые фильтры контактов — счётчики приходят из /mailing/state (groups)
 const GROUPS = [
@@ -70,7 +75,7 @@ const heroBase = {
 const kicker = (color) => ({ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color, marginBottom: 8 })
 const bigNum = (color, size) => ({ fontFamily: 'Onest', fontWeight: 800, fontSize: size, letterSpacing: '-0.03em', lineHeight: 1, color })
 
-function Overview({ state, reload, onGoSettings, onGoReplies, onGoContacts, replies }) {
+function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoContacts, replies }) {
   const { show } = useToast()
   const isMobile = useIsMobile()
   const [busy, setBusy] = useState(false)
@@ -79,9 +84,10 @@ function Overview({ state, reload, onGoSettings, onGoReplies, onGoContacts, repl
   const toggle = async () => {
     setBusy(true)
     try {
-      if (state.running) await stopMailing()
-      else await startMailing()
-      show(state.running ? 'Рассылка остановлена' : 'Рассылка запущена', { type: 'success' })
+      if (state.running) await stopMailing(campaignId)
+      else await startMailing(campaignId)
+      const what = state.campaign ? `«${state.campaign.name}»` : 'Все направления'
+      show(state.running ? `${what}: остановлено` : `${what}: запущено`, { type: 'success' })
       reload()
     } catch (e) {
       show('Ошибка: ' + e.message, { type: 'error' })
@@ -134,7 +140,7 @@ function Overview({ state, reload, onGoSettings, onGoReplies, onGoContacts, repl
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {!state.configured && (
         <div className="card" style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-          <div style={{ fontSize: 13, color: '#5A6573' }}>Почта ещё не подключена — без неё рассылку не запустить.</div>
+          <div style={{ fontSize: 13, color: '#5A6573' }}>Почта {state.mailboxes?.length === 1 ? `«${state.mailboxes[0].name}» ` : ''}ещё не подключена — без неё рассылку не запустить.</div>
           <button className="btn-ghost" onClick={onGoSettings}>Подключить почту →</button>
         </div>
       )}
@@ -150,7 +156,7 @@ function Overview({ state, reload, onGoSettings, onGoReplies, onGoContacts, repl
               <span style={{ width: 8, height: 8, borderRadius: 99, background: state.running ? '#5BE89B' : 'rgba(255,255,255,0.35)',
                 boxShadow: state.running ? '0 0 0 4px rgba(91,232,155,0.2)' : 'none' }} />
               <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.5)' }}>
-                {state.running ? 'РАБОТАЕТ' : 'ОСТАНОВЛЕНА'}
+                {state.running ? 'РАБОТАЕТ' : 'ОСТАНОВЛЕНО'}{state.campaign ? ` · ${state.campaign.name.toUpperCase()}` : ' · ВСЕ НАПРАВЛЕНИЯ'}
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
@@ -196,7 +202,7 @@ function Overview({ state, reload, onGoSettings, onGoReplies, onGoContacts, repl
         <div style={{ ...heroBase, padding: isMobile ? '16px 18px' : '26px 24px', background: healthCard.bg,
           border: '1px solid rgba(255,255,255,0.6)', boxShadow: `0 16px 40px -16px ${healthCard.shadow}` }}>
           <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
-          <div style={kicker(healthCard.ink)}>ЗДОРОВЬЕ ЯЩИКА</div>
+          <div style={kicker(healthCard.ink)}>ЗДОРОВЬЕ ЯЩИКА{state.mailboxes?.length ? ` · ${(state.mailboxes.find(m => m.health?.status === h.status) || state.mailboxes[0]).login || ''}` : ''}</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
             <span style={bigNum(healthCard.deep, isMobile ? 28 : 34)}>{h.bounce_rate ?? 0}%</span>
             <span style={{ fontSize: 12, color: healthCard.ink, fontWeight: 600 }}>возвратов</span>
@@ -327,6 +333,16 @@ function Overview({ state, reload, onGoSettings, onGoReplies, onGoContacts, repl
   )
 }
 
+function CampaignTag({ name, kind }) {
+  const purchase = kind === 'purchase'
+  return (
+    <span style={{ display: 'inline-block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 11, fontWeight: 700,
+      background: purchase ? 'rgba(217,119,6,0.1)' : 'rgba(19,102,240,0.08)', color: purchase ? '#B45309' : '#1366F0' }}>
+      {name}
+    </span>
+  )
+}
+
 // ---------------- Ответы ----------------
 const RESOLVE = [
   { status: 'interested', label: 'Интерес', color: '#0E9F6E' },
@@ -334,7 +350,7 @@ const RESOLVE = [
   { status: 'refused', label: 'Отказ', color: '#E0473B' },
 ]
 
-function Replies({ login, onChanged }) {
+function Replies({ campaignId, loginFor, onChanged }) {
   const { show } = useToast()
   const [onlyNew, setOnlyNew] = useState(true)
   const [items, setItems] = useState([])
@@ -343,19 +359,19 @@ function Replies({ login, onChanged }) {
 
   const load = () => {
     setLoading(true)
-    getMailingReplies(onlyNew)
+    getMailingReplies(onlyNew, campaignId)
       .then(r => setItems(Array.isArray(r) ? r : []))
       .catch(e => show('Ошибка загрузки: ' + e.message, { type: 'error' }))
       .finally(() => setLoading(false))
   }
-  useEffect(load, [onlyNew]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(load, [onlyNew, campaignId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const resolve = async (c, status) => {
     setBusyId(c.id)
     try {
       const r = await resolveMailingReply(c.id, status)
       const label = RESOLVE.find(x => x.status === status)?.label
-      show(r.lead_created ? `${label}: лид создан в «Базе обзвона»` : r.lead_id && status !== 'refused' ? `${label}: лид в «Базе обзвона» обновлён` : `Отмечено: ${label}`, { type: 'success' })
+      show(r.supplier_created ? `${label}: добавлен в «Поставщики»` : r.supplier_id ? `${label}: карточка поставщика обновлена` : `Отмечено: ${label}`, { type: 'success' })
       setItems(list => onlyNew ? list.filter(x => x.id !== c.id) : list.map(x => x.id === c.id ? { ...x, status, reply_seen: true } : x))
       onChanged?.()
     } catch (e) {
@@ -381,7 +397,7 @@ function Replies({ login, onChanged }) {
         {onlyNew && items.length > 0 && <button className="btn-ghost" onClick={seenAll}>Отметить все просмотренными</button>}
       </div>
       <div style={{ fontSize: 12, color: '#8A93A0' }}>
-        «Интерес» и «Сделка» добавляют компанию в «Базу обзвона» (или обновляют её лид) — дальше работа идёт там. Ответы проверяются каждые 15 минут, о новых приходит сообщение в Telegram.
+        Ответы проверяются каждые 15 минут, о новых приходит сообщение в Telegram. В направлениях «закупка» кнопки «Интерес» и «Сделка» заводят карточку во вкладке «Поставщики».
       </div>
 
       {loading && <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
@@ -395,6 +411,7 @@ function Replies({ login, onChanged }) {
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
             <div>
               <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>{c.company || c.email}</div>
+              {!campaignId && c.campaign_name && <CampaignTag name={c.campaign_name} kind={c.campaign_kind} />}
               <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>
                 {[c.contact_name, c.email, c.city].filter(Boolean).join(' · ')} · ответ {fmtTs(c.replied_at)}
               </div>
@@ -415,8 +432,8 @@ function Replies({ login, onChanged }) {
                 {b.label}
               </button>
             ))}
-            <a className="btn-ghost" href={gmailLink(login, c.email)} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>Открыть в Gmail ↗</a>
-            {c.lead_id && <span style={{ fontSize: 12, color: '#8A93A0' }}>есть в «Базе обзвона»</span>}
+            <a className="btn-ghost" href={gmailLink(loginFor(c.campaign_id), c.email)} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>Открыть в Gmail ↗</a>
+            {c.supplier_id && <span style={{ fontSize: 12, color: '#8A93A0' }}>есть в «Поставщиках»</span>}
           </div>
         </div>
       ))}
@@ -427,7 +444,7 @@ function Replies({ login, onChanged }) {
 // ---------------- Контакты ----------------
 const EMPTY_CONTACT = { company: '', email: '', contact_name: '', city: '', priority: '' }
 
-function Contacts({ onChanged, groups = {}, login, initialGroup = '' }) {
+function Contacts({ campaignId, campaignName, onChanged, groups = {}, loginFor, initialGroup = '' }) {
   const { show } = useToast()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -440,7 +457,7 @@ function Contacts({ onChanged, groups = {}, login, initialGroup = '' }) {
 
   const load = () => {
     setLoading(true)
-    getMailingContacts(q, status, group)
+    getMailingContacts(q, status, group, campaignId)
       .then(r => setItems(Array.isArray(r) ? r : []))
       .catch(e => show('Ошибка загрузки: ' + e.message, { type: 'error' }))
       .finally(() => setLoading(false))
@@ -449,14 +466,14 @@ function Contacts({ onChanged, groups = {}, login, initialGroup = '' }) {
     const t = setTimeout(load, 250)
     return () => clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q, status, group])
+  }, [q, status, group, campaignId])
 
   const after = (msg) => { show(msg, { type: 'success' }); load(); onChanged?.() }
 
   const save = async () => {
     setBusy(true)
     try {
-      await addMailingContact(form)
+      await addMailingContact({ ...form, campaign_id: campaignId })
       setForm(null)
       after('Контакт добавлен')
     } catch (e) {
@@ -491,21 +508,10 @@ function Contacts({ onChanged, groups = {}, login, initialGroup = '' }) {
     if (!file) return
     setBusy(true)
     try {
-      const r = await importMailingContacts(file)
-      after(`Добавлено: ${r.added}, пропущено (уже есть): ${r.skipped}`)
+      const r = await importMailingContacts(file, campaignId)
+      after(`В «${campaignName}» добавлено: ${r.added}, пропущено (уже есть): ${r.skipped}`)
     } catch (err) {
       show('Ошибка импорта: ' + err.message, { type: 'error' })
-    }
-    setBusy(false)
-  }
-
-  const fromLeads = async () => {
-    setBusy(true)
-    try {
-      const r = await mailingContactsFromLeads()
-      after(`Из базы обзвона добавлено: ${r.added}, пропущено: ${r.skipped}`)
-    } catch (e) {
-      show('Ошибка: ' + e.message, { type: 'error' })
     }
     setBusy(false)
   }
@@ -533,10 +539,15 @@ function Contacts({ onChanged, groups = {}, login, initialGroup = '' }) {
           {Object.entries(STATUS).map(([k, s]) => <option key={k} value={k}>{s.label}</option>)}
         </select>
         <div style={{ flex: 1 }} />
-        <button className="btn-ghost" onClick={fromLeads} disabled={busy}>Из базы обзвона</button>
-        <button className="btn-ghost" onClick={() => fileRef.current?.click()} disabled={busy}>Импорт xlsx</button>
-        <input ref={fileRef} type="file" accept=".xlsx" onChange={onFile} style={{ display: 'none' }} />
-        <button className="btn-primary" onClick={() => setForm({ ...EMPTY_CONTACT })}>+ Контакт</button>
+        {campaignId ? (
+          <>
+            <button className="btn-ghost" onClick={() => fileRef.current?.click()} disabled={busy}>Импорт xlsx</button>
+            <input ref={fileRef} type="file" accept=".xlsx" onChange={onFile} style={{ display: 'none' }} />
+            <button className="btn-primary" onClick={() => setForm({ ...EMPTY_CONTACT })}>+ Контакт</button>
+          </>
+        ) : (
+          <span style={{ fontSize: 12.5, color: '#8A93A0' }}>Чтобы добавить контакты, выберите направление вверху</span>
+        )}
       </div>
 
       {form && (
@@ -564,7 +575,7 @@ function Contacts({ onChanged, groups = {}, login, initialGroup = '' }) {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
             <tr style={{ textAlign: 'left', color: '#8A93A0', fontSize: 11.5 }}>
-              {['Компания', 'Email', 'Город', 'Пр.', 'Статус', 'Отправлено', ''].map(h => (
+              {['Компания', ...(campaignId ? [] : ['Направление']), 'Email', 'Город', 'Пр.', 'Статус', 'Отправлено', ''].map(h => (
                 <th key={h} style={{ padding: '12px 14px', fontWeight: 600, borderBottom: '1px solid rgba(14,23,38,0.07)' }}>{h}</th>
               ))}
             </tr>
@@ -576,10 +587,11 @@ function Contacts({ onChanged, groups = {}, login, initialGroup = '' }) {
                   {c.company || '—'}
                   {c.contact_name && <div style={{ fontSize: 11.5, color: '#8A93A0', fontWeight: 400 }}>{c.contact_name}</div>}
                 </td>
+                {!campaignId && <td style={{ padding: '10px 14px', color: '#5A6573', fontSize: 12, whiteSpace: 'nowrap' }}>{c.campaign_name}</td>}
                 <td style={{ padding: '10px 14px', color: '#5A6573' }}>
                   {c.email || <span style={{ color: '#C4CAD4' }}>нет email</span>}
                   {c.last_error && <div style={{ fontSize: 11, color: '#E0473B' }}>{c.last_error}</div>}
-                  {c.replied_at && <div><a href={gmailLink(login, c.email)} target="_blank" rel="noreferrer" style={{ fontSize: 11.5, color: '#1366F0' }}>переписка в Gmail ↗</a></div>}
+                  {c.replied_at && <div><a href={gmailLink(loginFor(c.campaign_id), c.email)} target="_blank" rel="noreferrer" style={{ fontSize: 11.5, color: '#1366F0' }}>переписка в Gmail ↗</a></div>}
                 </td>
                 <td style={{ padding: '10px 14px', color: '#5A6573' }}>{c.city || ''}</td>
                 <td style={{ padding: '10px 14px', color: '#5A6573' }}>{c.priority || ''}</td>
@@ -605,7 +617,7 @@ function Contacts({ onChanged, groups = {}, login, initialGroup = '' }) {
         {loading && <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
         {!loading && items.length === 0 && (
           <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>
-            Контактов нет. Загрузите xlsx (колонки «Компания», «Email», «Город», «Приоритет») или перенесите из базы обзвона.
+            Контактов нет. Загрузите xlsx: колонки «Компания», «Email», «Имя контакта», «Город», «Приоритет».
           </div>
         )}
       </div>
@@ -613,22 +625,26 @@ function Contacts({ onChanged, groups = {}, login, initialGroup = '' }) {
   )
 }
 
-// ---------------- Письмо ----------------
+// ---------------- Настройки направления (письмо) ----------------
 const VARS = ['{приветствие}', '{компания}', '{имя_контакта}', '{моё_имя}', '{моя_компания}', '{телефон}']
 
-function Letter({ settings, onSaved }) {
+function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
   const { show } = useToast()
-  const [subjects, setSubjects] = useState((settings.subjects || []).join('\n'))
-  const [body, setBody] = useState(settings.body || '')
-  const [followup, setFollowup] = useState(settings.followup_body || '')
+  const [c, setC] = useState({ ...campaign, subjects: (campaign.subjects || []).join('\n') })
   const [preview, setPreview] = useState(null)
   const [busy, setBusy] = useState(false)
+  const set = (k, v) => setC(prev => ({ ...prev, [k]: v }))
+
+  const payload = () => ({
+    name: c.name, kind: c.kind, mailbox_id: c.mailbox_id, subjects: c.subjects, body: c.body,
+    followup_body: c.followup_body, followup_enabled: !!c.followup_enabled, followup_days: c.followup_days,
+  })
 
   const save = async () => {
     setBusy(true)
     try {
-      await saveMailingSettings({ subjects, body, followup_body: followup })
-      show('Письмо сохранено', { type: 'success' })
+      await updateMailingCampaign(campaign.id, payload())
+      show('Направление сохранено', { type: 'success' })
       onSaved?.()
     } catch (e) {
       show('Ошибка: ' + e.message, { type: 'error' })
@@ -638,44 +654,92 @@ function Letter({ settings, onSaved }) {
 
   const doPreview = async () => {
     try {
-      setPreview(await previewMailing({ subjects, body, followup_body: followup }))
+      setPreview(await previewMailing({ campaign_id: campaign.id, mailbox_id: c.mailbox_id, subjects: c.subjects, body: c.body, followup_body: c.followup_body }))
     } catch (e) {
       show('Ошибка: ' + e.message, { type: 'error' })
     }
   }
 
-  const area = (value, set, rows) => (
-    <textarea value={value} onChange={e => set(e.target.value)} rows={rows} style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }} />
+  const remove = async () => {
+    if (!window.confirm(`Удалить направление «${campaign.name}»? Контакты и ответы в нём перестанут показываться.`)) return
+    try {
+      await deleteMailingCampaign(campaign.id)
+      show('Направление удалено', { type: 'success' })
+      onDeleted?.()
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+  }
+
+  const area = (k, rows) => (
+    <textarea value={c[k] || ''} onChange={e => set(k, e.target.value)} rows={rows} style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }} />
   )
+  const hasBlanks = /\[[^\]\n]{2,}\]/.test(`${c.subjects} ${c.body} ${c.followup_enabled ? c.followup_body : ''}`)
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 16, alignItems: 'start' }}>
       <div className="card" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}>
+          <div>
+            <div style={labelStyle}>Название</div>
+            <input value={c.name || ''} onChange={e => set('name', e.target.value)} style={inputStyle} />
+          </div>
+          <div>
+            <div style={labelStyle}>Тип</div>
+            <select value={c.kind} onChange={e => set('kind', e.target.value)} style={inputStyle}>
+              <option value="sale">Продажа — ищем клиентов</option>
+              <option value="purchase">Закупка — ищем поставщиков</option>
+            </select>
+          </div>
+          <div>
+            <div style={labelStyle}>С какой почты</div>
+            <select value={c.mailbox_id || 'main'} onChange={e => set('mailbox_id', e.target.value)} style={inputStyle}>
+              {mailboxes.map(m => <option key={m.id} value={m.id}>{m.login || m.name}</option>)}
+            </select>
+          </div>
+        </div>
+        {hasBlanks && (
+          <div style={{ padding: '10px 12px', borderRadius: 12, background: 'rgba(217,119,6,0.08)', color: '#B45309', fontSize: 12.5, fontWeight: 600 }}>
+            В тексте остались [заготовки в квадратных скобках] — замените их своим текстом, иначе направление не запустится.
+          </div>
+        )}
         <div>
           <div style={labelStyle}>Темы письма — по одной на строку, выбирается случайно</div>
-          {area(subjects, setSubjects, 3)}
+          {area('subjects', 3)}
         </div>
         <div>
           <div style={labelStyle}>Текст письма</div>
-          {area(body, setBody, 14)}
+          {area('body', 14)}
         </div>
-        <div>
-          <div style={labelStyle}>Текст напоминания (уходит ответом в ту же цепочку)</div>
-          {area(followup, setFollowup, 7)}
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', fontSize: 13, color: '#0E1726' }}>
+          <label style={{ display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer' }}>
+            <input type="checkbox" checked={!!c.followup_enabled} onChange={e => set('followup_enabled', e.target.checked)} /> Отправлять напоминание через
+          </label>
+          <input type="number" min={1} value={c.followup_days ?? 4} onChange={e => set('followup_days', e.target.value)} style={{ ...inputStyle, width: 70 }} />
+          <span>дней</span>
         </div>
+        {c.followup_enabled && (
+          <div>
+            <div style={labelStyle}>Текст напоминания (уходит ответом в ту же цепочку)</div>
+            {area('followup_body', 7)}
+          </div>
+        )}
         <div style={{ fontSize: 12, color: '#8A93A0', lineHeight: 1.6 }}>
           Подставляются: {VARS.map(v => <code key={v} style={{ background: 'rgba(14,23,38,0.05)', padding: '1px 5px', borderRadius: 5, marginRight: 4 }}>{v}</code>)}
+          <br />Имя, компания и телефон берутся из подписи выбранной почты.
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button className="btn-ghost" onClick={doPreview}>Предпросмотр</button>
           <button className="btn-primary" onClick={save} disabled={busy}>Сохранить</button>
+          <div style={{ flex: 1 }} />
+          <button className="btn-ghost" onClick={remove} style={{ color: '#E0473B' }}>Удалить направление</button>
         </div>
       </div>
 
       <div className="card" style={{ padding: 18 }}>
         <div style={sectionTitle}>Предпросмотр</div>
         {!preview && <div style={{ fontSize: 13, color: '#A6AEB8' }}>Нажмите «Предпросмотр», чтобы увидеть письмо для одной из компаний.</div>}
-        {preview && [['Письмо', preview.first], ['Напоминание', preview.follow]].map(([title, p]) => (
+        {preview && [['Письмо', preview.first], ...(c.followup_enabled ? [['Напоминание', preview.follow]] : [])].map(([title, p]) => (
           <div key={title} style={{ marginBottom: 18 }}>
             <div style={labelStyle}>{title}{preview.company ? ` · ${preview.company}` : ''}</div>
             <div style={{ fontWeight: 700, fontSize: 13.5, color: '#0E1726', marginBottom: 8 }}>{p.subject}</div>
@@ -687,17 +751,17 @@ function Letter({ settings, onSaved }) {
   )
 }
 
-// ---------------- Настройки ----------------
+// ---------------- Настройки почты (ящик) ----------------
 const FIELDS = [
   ['Почта', [
-    ['login', 'Email отправителя'], ['password', 'Пароль приложения', 'password'], ['from_name', 'Имя в поле «От кого»'],
+    ['name', 'Название ящика'], ['login', 'Email отправителя'], ['password', 'Пароль приложения', 'password'], ['from_name', 'Имя в поле «От кого»'],
     ['smtp_host', 'SMTP сервер'], ['smtp_port', 'SMTP порт', 'number'],
     ['imap_host', 'IMAP сервер'], ['imap_port', 'IMAP порт', 'number'],
   ]],
   ['Подпись', [['my_name', 'Ваше имя'], ['my_company', 'Компания'], ['phone', 'Телефон']]],
   ['Режим отправки', [
     ['daily_limit', 'Писем в день', 'number'], ['min_delay', 'Пауза от, сек', 'number'], ['max_delay', 'Пауза до, сек', 'number'],
-    ['hour_start', 'Начало, час (Мск)', 'number'], ['hour_end', 'Конец, час (Мск)', 'number'], ['followup_days', 'Напоминание через, дней', 'number'],
+    ['hour_start', 'Начало, час (Мск)', 'number'], ['hour_end', 'Конец, час (Мск)', 'number'],
   ]],
 ]
 
@@ -707,9 +771,9 @@ const PRESETS = {
   'Mail.ru': { smtp_host: 'smtp.mail.ru', smtp_port: 465, imap_host: 'imap.mail.ru', imap_port: 993 },
 }
 
-function Settings({ settings, onSaved }) {
+function MailboxSettings({ mailbox, onSaved, onDeleted }) {
   const { show } = useToast()
-  const [s, setS] = useState(settings)
+  const [s, setS] = useState(mailbox)
   const [busy, setBusy] = useState(false)
   const [testTo, setTestTo] = useState('')
   const [conn, setConn] = useState(null)
@@ -723,10 +787,9 @@ function Settings({ settings, onSaved }) {
       payload.weekdays_only = !!s.weekdays_only
       payload.auto_limit = !!s.auto_limit
       payload.transport = s.transport || 'smtp'
-      payload.followup_enabled = !!s.followup_enabled
-      if (settings.password_from_env) delete payload.password
-      await saveMailingSettings(payload)
-      show('Настройки сохранены', { type: 'success' })
+      if (mailbox.password_from_env) delete payload.password
+      await saveMailbox(mailbox.id, payload)
+      show('Почта сохранена', { type: 'success' })
       onSaved?.()
     } catch (e) {
       show('Ошибка: ' + e.message, { type: 'error' })
@@ -735,13 +798,11 @@ function Settings({ settings, onSaved }) {
   }
 
   // Render free не выпускает SMTP — «Через Google» шлёт по HTTPS через Gmail API.
-  // Gmail рассылки подключается отдельно и может быть любым — Google-аккаунт
-  // CRM (Документы/Календарь/Задачи) при этом не меняется.
+  // У каждого ящика рассылки свой Gmail — Google-аккаунт CRM (Документы/Календарь) не меняется.
   const connectGoogle = async () => {
     try {
-      await saveMailingSettings({ transport: 'gmail_api' })
+      const r = await startMailboxGoogle(mailbox.id)
       set('transport', 'gmail_api')
-      const r = await startMailingGoogle()
       window.open(r.auth_url, '_blank')
       show('После подключения в открывшемся окне вернитесь сюда и обновите страницу', { type: 'info' })
     } catch (e) {
@@ -750,11 +811,22 @@ function Settings({ settings, onSaved }) {
   }
 
   const disconnectGoogle = async () => {
-    if (!window.confirm('Отключить Gmail от рассылки? Google-аккаунт CRM это не затронет.')) return
+    if (!window.confirm('Отключить Gmail от этого ящика рассылки? Google-аккаунт CRM это не затронет.')) return
     try {
-      await disconnectMailingGoogle()
-      show('Gmail рассылки отключён', { type: 'success' })
+      await disconnectMailboxGoogle(mailbox.id)
+      show('Gmail отключён', { type: 'success' })
       onSaved?.()
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+  }
+
+  const remove = async () => {
+    if (!window.confirm(`Удалить ящик «${mailbox.login || mailbox.name}» из рассылки?`)) return
+    try {
+      await deleteMailbox(mailbox.id)
+      show('Ящик удалён', { type: 'success' })
+      onDeleted?.()
     } catch (e) {
       show('Ошибка: ' + e.message, { type: 'error' })
     }
@@ -766,7 +838,7 @@ function Settings({ settings, onSaved }) {
     setBusy(true)
     setConn(null)
     try {
-      setConn(await testMailingConnection())
+      setConn(await testMailboxConnection(mailbox.id))
     } catch (e) {
       show('Ошибка: ' + e.message, { type: 'error' })
     }
@@ -776,7 +848,7 @@ function Settings({ settings, onSaved }) {
   const testEmail = async () => {
     setBusy(true)
     try {
-      await sendMailingTestEmail(testTo)
+      await sendMailboxTestEmail(mailbox.id, testTo)
       show('Пробное письмо отправлено — проверьте ящик', { type: 'success' })
     } catch (e) {
       show('Ошибка: ' + e.message, { type: 'error' })
@@ -787,6 +859,9 @@ function Settings({ settings, onSaved }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div className="card" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 18 }}>
+        {mailbox.campaigns?.length > 0 && (
+          <div style={{ fontSize: 12.5, color: '#5A6573' }}>С этой почты идут: <b>{mailbox.campaigns.join(', ')}</b></div>
+        )}
         <div>
           <div style={sectionTitle}>Способ отправки</div>
           <SlidingTabs
@@ -797,16 +872,15 @@ function Settings({ settings, onSaved }) {
           {transport === 'gmail_api' && (
             <div style={{ marginTop: 12, padding: 14, borderRadius: 14, background: 'rgba(19,102,240,0.06)', border: '1px solid rgba(19,102,240,0.14)' }}>
               <div style={{ fontSize: 12.5, color: '#5A6573', lineHeight: 1.6 }}>
-                Письма уходят через Gmail по HTTPS — работает на любом хостинге. Можно выбрать любой Gmail, не обязательно
-                тот, что подключён к CRM: Документы, Календарь и Задачи останутся на прежнем аккаунте.
-                Пароль приложения ниже нужен только для проверки ответов по IMAP.
+                Письма уходят через Gmail по HTTPS — работает на любом хостинге. Новый Gmail сначала добавьте в «Test users»
+                проекта Google (как janisozalins@gmail.com). Пароль приложения ниже нужен только для проверки ответов по IMAP.
               </div>
-              <div style={{ marginTop: 10, fontSize: 13, fontWeight: 600, color: settings.gmail_connected ? '#0E9F6E' : '#8A93A0' }}>
-                {settings.gmail_connected ? `Подключён: ${settings.gmail_connected}` : 'Gmail ещё не подключён'}
+              <div style={{ marginTop: 10, fontSize: 13, fontWeight: 600, color: mailbox.gmail_connected ? '#0E9F6E' : '#8A93A0' }}>
+                {mailbox.gmail_connected ? `Подключён: ${mailbox.gmail_connected}` : 'Gmail ещё не подключён'}
               </div>
               <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
-                <button className="btn-ghost" onClick={connectGoogle}>{settings.gmail_connected ? 'Подключить другой Gmail' : 'Подключить Gmail для рассылки'}</button>
-                {settings.gmail_connected && <button className="btn-ghost" onClick={disconnectGoogle}>Отключить</button>}
+                <button className="btn-ghost" onClick={connectGoogle}>{mailbox.gmail_connected ? 'Подключить другой Gmail' : 'Подключить Gmail'}</button>
+                {mailbox.gmail_connected && <button className="btn-ghost" onClick={disconnectGoogle}>Отключить</button>}
               </div>
             </div>
           )}
@@ -827,8 +901,8 @@ function Settings({ settings, onSaved }) {
                   <input
                     type={type || 'text'}
                     value={s[k] ?? ''}
-                    disabled={k === 'password' && settings.password_from_env}
-                    placeholder={k === 'password' && settings.password_from_env ? 'задан в MAIL_PASSWORD на сервере' : ''}
+                    disabled={k === 'password' && mailbox.password_from_env}
+                    placeholder={k === 'password' && mailbox.password_from_env ? 'задан в MAIL_PASSWORD на сервере' : ''}
                     onChange={e => set(k, e.target.value)}
                     style={inputStyle}
                   />
@@ -844,15 +918,16 @@ function Settings({ settings, onSaved }) {
           <label style={{ display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer' }}>
             <input type="checkbox" checked={!!s.weekdays_only} onChange={e => set('weekdays_only', e.target.checked)} /> Только будни
           </label>
-          <label style={{ display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer' }}>
-            <input type="checkbox" checked={!!s.followup_enabled} onChange={e => set('followup_enabled', e.target.checked)} /> Отправлять напоминание
-          </label>
         </div>
         <div style={{ fontSize: 12, color: '#8A93A0', lineHeight: 1.6 }}>
           Для Яндекса и Gmail нужен не обычный пароль, а «пароль приложения» из настроек безопасности почты.
-          {s.auto_limit && <><br />Разгон: лимит растёт сам по дням отправки — 5 → 10 → 15 → 20 (не выше «Максимума»; больше 20 одинаковых писем в день не шлём). Возвратов больше 4% за неделю — темп вдвое ниже, больше 8% — рассылка остановится сама, придёт сообщение в Telegram и задача. Если почта ограничит отправку — пауза до завтра.</>}
+          {s.auto_limit && <><br />Разгон: лимит этого ящика растёт сам по дням отправки — 5 → 10 → 15 → 20 (не выше «Максимума»). Лимит общий на все направления этой почты. Возвратов больше 4% за неделю — темп вдвое ниже, больше 8% — направления этой почты остановятся сами, придёт сообщение в Telegram и задача.</>}
         </div>
-        <div><button className="btn-primary" onClick={save} disabled={busy}>Сохранить</button></div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn-primary" onClick={save} disabled={busy}>Сохранить</button>
+          <div style={{ flex: 1 }} />
+          {mailbox.id !== 'main' && <button className="btn-ghost" onClick={remove} style={{ color: '#E0473B' }}>Удалить ящик</button>}
+        </div>
       </div>
 
       <div className="card" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -861,8 +936,8 @@ function Settings({ settings, onSaved }) {
           <button className="btn-ghost" onClick={testConn} disabled={busy}>Проверить подключение</button>
           {conn && (
             <span style={{ fontSize: 12.5, color: '#5A6573' }}>
-              SMTP: <b style={{ color: conn.smtp === 'ok' ? '#0E9F6E' : '#E0473B' }}>{conn.smtp}</b>
-              {conn.imap && <> · IMAP: <b style={{ color: conn.imap === 'ok' ? '#0E9F6E' : '#E0473B' }}>{conn.imap}</b></>}
+              Отправка: <b style={{ color: conn.smtp === 'ok' ? '#0E9F6E' : '#E0473B' }}>{conn.smtp}</b>
+              {conn.imap && <> · Ответы (IMAP): <b style={{ color: conn.imap === 'ok' ? '#0E9F6E' : '#E0473B' }}>{conn.imap}</b></>}
             </span>
           )}
         </div>
@@ -875,60 +950,321 @@ function Settings({ settings, onSaved }) {
   )
 }
 
-function SettingsPage({ settings, onSaved, initialSection = 'mail' }) {
-  const [section, setSection] = useState(initialSection)
+const chip = (active) => ({
+  padding: '7px 13px', borderRadius: 99, cursor: 'pointer', fontSize: 12.5, fontWeight: 600, fontFamily: 'Manrope',
+  border: active ? '1px solid #1366F0' : '1px solid rgba(14,23,38,0.12)',
+  background: active ? 'rgba(19,102,240,0.1)' : 'rgba(255,255,255,0.7)', color: active ? '#1366F0' : '#5A6573',
+  display: 'inline-flex', alignItems: 'center', gap: 7,
+})
+
+function SettingsPage({ campaign, mailboxes, onSaved, onCampaignDeleted }) {
+  const { show } = useToast()
+  const [section, setSection] = useState(campaign ? 'campaign' : 'mail')
+  const [mid, setMid] = useState(campaign?.mailbox_id || 'main')
+  const mailbox = mailboxes.find(m => m.id === mid) || mailboxes[0]
+
+  const addMailbox = async () => {
+    try {
+      const mb = await createMailbox({})
+      show('Ящик добавлен — подключите к нему Gmail', { type: 'success' })
+      setMid(mb.id)
+      onSaved?.()
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <SlidingTabs options={[{ key: 'mail', label: 'Почта и отправка' }, { key: 'letter', label: 'Текст письма' }]} value={section} onChange={setSection} />
-      {section === 'mail' && <Settings settings={settings} onSaved={onSaved} />}
-      {section === 'letter' && <Letter key={settings.body} settings={settings} onSaved={onSaved} />}
+      <SlidingTabs options={[{ key: 'campaign', label: 'Направление и письмо' }, { key: 'mail', label: 'Почта' }]} value={section} onChange={setSection} />
+      {section === 'campaign' && (campaign
+        ? <CampaignSettings key={campaign.id} campaign={campaign} mailboxes={mailboxes} onSaved={onSaved} onDeleted={onCampaignDeleted} />
+        : <div className="card" style={{ padding: 24, color: '#8A93A0', fontSize: 13 }}>Выберите направление вверху страницы — у каждого своё письмо и своя почта.</div>)}
+      {section === 'mail' && (
+        <>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            {mailboxes.map(m => (
+              <button key={m.id} onClick={() => setMid(m.id)} style={chip(m.id === mailbox?.id)}>
+                <span style={{ width: 7, height: 7, borderRadius: 99, background: m.configured ? '#0E9F6E' : '#C4CAD4' }} />
+                {m.login || m.name}
+              </button>
+            ))}
+            <button onClick={addMailbox} style={{ ...chip(false), borderStyle: 'dashed' }}>+ Почта</button>
+          </div>
+          {mailbox && <MailboxSettings key={mailbox.id + (mailbox.gmail_connected || '')} mailbox={mailbox} onSaved={onSaved}
+            onDeleted={() => { setMid('main'); onSaved?.() }} />}
+        </>
+      )}
+    </div>
+  )
+}
+
+// ---------------- Поставщики (ответы направлений «закупка») ----------------
+const SUP_STAGES = {
+  interested: { label: 'Интерес', color: '#0E9F6E', bg: 'rgba(14,159,110,0.12)' },
+  negotiation: { label: 'Переговоры', color: '#7C3AED', bg: 'rgba(124,58,237,0.1)' },
+  deal: { label: 'Работаем', color: '#047857', bg: 'rgba(4,120,87,0.16)' },
+  refused: { label: 'Отказ', color: '#8A93A0', bg: 'rgba(14,23,38,0.05)' },
+}
+
+function SupplierCard({ s, onChange, onRemove }) {
+  const { show } = useToast()
+  const [note, setNote] = useState('')
+  const [phone, setPhone] = useState(s.phone || '')
+  const st = SUP_STAGES[s.stage] || SUP_STAGES.interested
+
+  const patch = async (data) => {
+    try {
+      onChange(await updateSupplier(s.id, data))
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+  }
+
+  return (
+    <div className="card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+        <div>
+          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>{s.company}</div>
+          <CampaignTag name={s.product} kind="purchase" />
+          <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 4 }}>{[s.contact_name, s.email, s.city, s.site].filter(Boolean).join(' · ')}</div>
+        </div>
+        <select value={s.stage} onChange={e => patch({ stage: e.target.value })}
+          style={{ alignSelf: 'flex-start', border: 'none', background: st.bg, color: st.color, borderRadius: 99, padding: '5px 10px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>
+          {Object.entries(SUP_STAGES).map(([k, x]) => <option key={k} value={k}>{x.label}</option>)}
+        </select>
+      </div>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+        <input value={phone} onChange={e => setPhone(e.target.value)} onBlur={() => phone !== (s.phone || '') && patch({ phone })}
+          placeholder="Телефон" style={{ ...inputStyle, width: 180 }} />
+        <a className="btn-ghost" href={gmailLink('', s.email)} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>Переписка в Gmail ↗</a>
+        <div style={{ flex: 1 }} />
+        <button onClick={onRemove} title="Убрать из списка" style={{ border: 'none', background: 'transparent', color: '#C4CAD4', cursor: 'pointer', fontSize: 14 }}>✕</button>
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <input value={note} onChange={e => setNote(e.target.value)} placeholder="Заметка: цена, условия, договорённости…"
+          onKeyDown={e => { if (e.key === 'Enter' && note.trim()) { patch({ note }); setNote('') } }} style={inputStyle} />
+        <button className="btn-ghost" disabled={!note.trim()} onClick={() => { patch({ note }); setNote('') }}>Добавить</button>
+      </div>
+      {(s.notes || []).length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 220, overflowY: 'auto' }}>
+          {s.notes.map((n, i) => (
+            <div key={i} style={{ fontSize: 12.5, color: '#0E1726', background: '#F7F8FA', borderRadius: 10, padding: '8px 10px', whiteSpace: 'pre-wrap' }}>
+              {n.text}
+              <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 3 }}>{n.author} · {fmtTs(n.date)}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function Suppliers({ campaignId }) {
+  const { show } = useToast()
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [q, setQ] = useState('')
+  const [stage, setStage] = useState('')
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setLoading(true)
+      getSuppliers({ campaign_id: campaignId || '', stage, q })
+        .then(r => setItems(Array.isArray(r) ? r : []))
+        .catch(e => show('Ошибка загрузки: ' + e.message, { type: 'error' }))
+        .finally(() => setLoading(false))
+    }, 250)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [campaignId, stage, q])
+
+  const remove = async (s) => {
+    if (!window.confirm(`Убрать «${s.company}» из поставщиков?`)) return
+    try {
+      await deleteSupplier(s.id)
+      setItems(list => list.filter(x => x.id !== s.id))
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+        {[['', 'Все'], ...Object.entries(SUP_STAGES).map(([k, x]) => [k, x.label])].map(([k, l]) => (
+          <button key={k} onClick={() => setStage(k)} style={chip(stage === k)}>{l}</button>
+        ))}
+        <div style={{ flex: 1 }} />
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Поиск: компания, товар, email" style={{ ...inputStyle, width: 240 }} />
+      </div>
+      <div style={{ fontSize: 12, color: '#8A93A0' }}>
+        Сюда попадают поставщики, ответившие на направления «закупка», когда во «Ответах» нажимаете «Интерес» или «Сделка».
+      </div>
+      {loading && <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
+      {!loading && items.length === 0 && (
+        <div className="card" style={{ padding: 30, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>Поставщиков пока нет</div>
+      )}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 14 }}>
+        {items.map(s => (
+          <SupplierCard key={s.id} s={s} onRemove={() => remove(s)}
+            onChange={upd => upd && setItems(list => list.map(x => x.id === upd.id ? upd : x))} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ---------------- Направления: переключатель ----------------
+function NewCampaignForm({ mailboxes, onCreated, onCancel }) {
+  const { show } = useToast()
+  const [f, setF] = useState({ name: '', kind: 'sale', mailbox_id: 'main' })
+  const [busy, setBusy] = useState(false)
+
+  const create = async () => {
+    setBusy(true)
+    try {
+      const c = await createMailingCampaign(f)
+      show(`Направление «${c.name}» создано — напишите для него письмо`, { type: 'success' })
+      onCreated(c)
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+    setBusy(false)
+  }
+
+  return (
+    <div className="card" style={{ padding: 16, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10, alignItems: 'end' }}>
+      <div>
+        <div style={labelStyle}>Название</div>
+        <input autoFocus value={f.name} onChange={e => setF(x => ({ ...x, name: e.target.value }))} placeholder="Краска — закупка" style={inputStyle} />
+      </div>
+      <div>
+        <div style={labelStyle}>Тип</div>
+        <select value={f.kind} onChange={e => setF(x => ({ ...x, kind: e.target.value }))} style={inputStyle}>
+          <option value="sale">Продажа — ищем клиентов</option>
+          <option value="purchase">Закупка — ищем поставщиков</option>
+        </select>
+      </div>
+      <div>
+        <div style={labelStyle}>С какой почты</div>
+        <select value={f.mailbox_id} onChange={e => setF(x => ({ ...x, mailbox_id: e.target.value }))} style={inputStyle}>
+          {mailboxes.map(m => <option key={m.id} value={m.id}>{m.login || m.name}</option>)}
+        </select>
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button className="btn-ghost" onClick={onCancel}>Отмена</button>
+        <button className="btn-primary" onClick={create} disabled={busy || !f.name.trim()}>Создать</button>
+      </div>
+    </div>
+  )
+}
+
+function CampaignBar({ campaigns, value, onChange, onAdd }) {
+  return (
+    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginBottom: 16 }}>
+      <button onClick={() => onChange('')} style={chip(!value)}>Все направления</button>
+      {campaigns.map(c => (
+        <button key={c.id} onClick={() => onChange(c.id)} style={chip(value === c.id)}>
+          <span title={c.running ? 'работает' : 'остановлено'} style={{ width: 7, height: 7, borderRadius: 99, background: c.running ? '#0E9F6E' : '#C4CAD4' }} />
+          {c.name}
+          <span style={{ fontSize: 10.5, fontWeight: 700, color: c.kind === 'purchase' ? '#B45309' : '#8A93A0' }}>{KIND_LABEL[c.kind] || ''}</span>
+          {c.replies_new > 0 && (
+            <span style={{ minWidth: 16, height: 16, borderRadius: 99, background: '#0E9F6E', color: '#fff', fontSize: 10, fontWeight: 800,
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>{c.replies_new}</span>
+          )}
+        </button>
+      ))}
+      <button onClick={onAdd} style={{ ...chip(false), borderStyle: 'dashed' }}>+ Направление</button>
     </div>
   )
 }
 
 // ---------------- Страница ----------------
+const CAMPAIGN_KEY = 'mailing_campaign'
+
 export default function Mailing() {
   const { show } = useToast()
   const [tab, setTab] = useState('overview')
+  const [campaigns, setCampaigns] = useState(null)
+  const [mailboxes, setMailboxes] = useState(null)
+  const [campaignId, setCampaignIdRaw] = useState(() => { try { return localStorage.getItem(CAMPAIGN_KEY) || '' } catch { return '' } })
   const [state, setState] = useState(null)
-  const [settings, setSettings] = useState(null)
   const [newReplies, setNewReplies] = useState([])
   const [contactsGroup, setContactsGroup] = useState('')
+  const [adding, setAdding] = useState(false)
 
-  const loadState = () => {
-    getMailingReplies(true).then(r => setNewReplies(Array.isArray(r) ? r : [])).catch(() => {})
-    return getMailingState().then(setState).catch(e => show('Ошибка загрузки рассылки: ' + e.message, { type: 'error' }))
+  const setCampaignId = (id) => {
+    setCampaignIdRaw(id)
+    try { localStorage.setItem(CAMPAIGN_KEY, id) } catch {}
   }
-  const loadSettings = () => getMailingSettings().then(setSettings).catch(e => show('Ошибка загрузки настроек: ' + e.message, { type: 'error' }))
+
+  const loadCampaigns = () => getMailingCampaigns().then(list => {
+    setCampaigns(list)
+    // выбранное направление удалили (или его нет на этом устройстве) — показываем все
+    if (campaignId && !list.some(c => c.id === campaignId)) setCampaignId('')
+  }).catch(e => show('Ошибка загрузки направлений: ' + e.message, { type: 'error' }))
+  const loadMailboxes = () => getMailboxes().then(setMailboxes).catch(e => show('Ошибка загрузки почты: ' + e.message, { type: 'error' }))
+  const loadState = () => {
+    getMailingReplies(true, campaignId).then(r => setNewReplies(Array.isArray(r) ? r : [])).catch(() => {})
+    return getMailingState(campaignId).then(setState).catch(e => show('Ошибка загрузки рассылки: ' + e.message, { type: 'error' }))
+  }
+  const reloadAll = () => { loadState(); loadCampaigns(); loadMailboxes() }
 
   useEffect(() => {
-    loadState()
-    loadSettings()
-    const t = setInterval(loadState, 20000)
-    return () => clearInterval(t)
+    loadCampaigns()
+    loadMailboxes()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const reloadAll = () => { loadState(); loadSettings() }
+  useEffect(() => {
+    setState(null)
+    loadState()
+    const t = setInterval(() => { loadState(); loadCampaigns() }, 20000)
+    return () => clearInterval(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [campaignId])
+
+  const campaign = (campaigns || []).find(c => c.id === campaignId) || null
+  const hasPurchase = (campaigns || []).some(c => c.kind === 'purchase')
+  const loginFor = (cid) => {
+    const c = (campaigns || []).find(x => x.id === cid)
+    return (mailboxes || []).find(m => m.id === (c?.mailbox_id || 'main'))?.login || ''
+  }
+  const ready = state && campaigns && mailboxes
 
   return (
     <div>
-      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+      <div style={{ marginBottom: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
         <div>
           <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 20, color: '#0E1726' }}>Рассылка</div>
-          <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>Письма по базе с дневным лимитом, напоминанием и проверкой ответов</div>
+          <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>Письма по направлениям с дневным лимитом, напоминанием и проверкой ответов</div>
         </div>
-        <SlidingTabs options={tabsWith(state?.replies_new)} value={tab} onChange={t => { setContactsGroup(''); setTab(t) }} />
+        <SlidingTabs options={tabsWith(state?.replies_new, hasPurchase)} value={tab} onChange={t => { setContactsGroup(''); setTab(t) }} />
       </div>
 
-      {(!state || !settings) && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
-      {state && settings && (
+      {campaigns && (
+        <CampaignBar campaigns={campaigns} value={campaignId} onChange={id => { setCampaignId(id); setAdding(false) }} onAdd={() => setAdding(a => !a)} />
+      )}
+      {adding && mailboxes && (
+        <div style={{ marginBottom: 16 }}>
+          <NewCampaignForm mailboxes={mailboxes} onCancel={() => setAdding(false)}
+            onCreated={c => { setAdding(false); loadCampaigns(); setCampaignId(c.id); setTab('settings') }} />
+        </div>
+      )}
+
+      {!ready && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
+      {ready && (
         <>
-          {tab === 'overview' && <Overview state={state} reload={loadState} onGoSettings={() => setTab('settings')} onGoReplies={() => setTab('replies')}
+          {tab === 'overview' && <Overview state={state} campaignId={campaignId} reload={() => { loadState(); loadCampaigns() }}
+            onGoSettings={() => setTab('settings')} onGoReplies={() => setTab('replies')}
             onGoContacts={g => { setContactsGroup(g); setTab('contacts') }} replies={newReplies} />}
-          {tab === 'replies' && <Replies login={settings.login} onChanged={loadState} />}
-          {tab === 'contacts' && <Contacts key={contactsGroup} onChanged={loadState} groups={state.groups} login={settings.login} initialGroup={contactsGroup} />}
-          {tab === 'settings' && <SettingsPage settings={settings} onSaved={reloadAll} />}
+          {tab === 'replies' && <Replies key={campaignId} campaignId={campaignId} loginFor={loginFor} onChanged={() => { loadState(); loadCampaigns() }} />}
+          {tab === 'contacts' && <Contacts key={campaignId + contactsGroup} campaignId={campaignId} campaignName={campaign?.name}
+            onChanged={loadState} groups={state.groups} loginFor={loginFor} initialGroup={contactsGroup} />}
+          {tab === 'suppliers' && <Suppliers campaignId={campaign?.kind === 'purchase' ? campaignId : ''} />}
+          {tab === 'settings' && <SettingsPage key={campaignId} campaign={campaign} mailboxes={mailboxes} onSaved={reloadAll}
+            onCampaignDeleted={() => { setCampaignId(''); reloadAll() }} />}
         </>
       )}
     </div>

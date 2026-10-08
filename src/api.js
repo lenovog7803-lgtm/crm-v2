@@ -307,32 +307,44 @@ export const getFleetReconciliation = (clientId, params = {}) => req(`/fleet/cli
 export const previewFleetBriefing = () => req('/fleet/briefing/preview');
 export const sendFleetBriefing = () => req('/fleet/briefing', { method: 'POST' });
 
-// Рассылка (backend/mailing.py)
-export const getMailingState = () => req('/mailing/state');
-export const startMailing = () => req('/mailing/start', { method: 'POST' });
-export const stopMailing = () => req('/mailing/stop', { method: 'POST' });
+// Рассылка (backend/mailing.py). campaignId — направление; пусто = все направления
+const cq = (campaignId) => (campaignId ? `campaign_id=${encodeURIComponent(campaignId)}` : '');
+export const getMailingState = (campaignId = '') => req('/mailing/state?' + cq(campaignId));
+export const startMailing = (campaignId = '') => req('/mailing/start?' + cq(campaignId), { method: 'POST' });
+export const stopMailing = (campaignId = '') => req('/mailing/stop?' + cq(campaignId), { method: 'POST' });
 export const checkMailingInbox = () => req('/mailing/check-inbox', { method: 'POST' }, 0);
-export const getMailingContacts = (q = '', status = '', group = '') => req('/mailing/contacts?' + new URLSearchParams({ q, status, group }));
-export const getMailingReplies = (onlyNew = false) => req('/mailing/replies?only_new=' + onlyNew);
-export const resolveMailingReply = (id, status) => req(`/mailing/contacts/${id}/resolve`, { method: 'POST', body: JSON.stringify({ status }) });
-export const markMailingRepliesSeen = (ids) => req('/mailing/replies/seen', { method: 'POST', body: JSON.stringify({ ids }) });
+export const getMailingContacts = (q = '', status = '', group = '', campaignId = '') =>
+  req('/mailing/contacts?' + new URLSearchParams({ q, status, group, campaign_id: campaignId || '' }));
 export const addMailingContact = (data) => req('/mailing/contacts', { method: 'POST', body: JSON.stringify(data) });
 export const updateMailingContact = (id, data) => req(`/mailing/contacts/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
 export const deleteMailingContact = (id) => req(`/mailing/contacts/${id}`, { method: 'DELETE' });
-export const mailingContactsFromLeads = (industry) => req('/mailing/contacts/from-leads', { method: 'POST', body: JSON.stringify({ industry }) });
-export const getMailingSettings = () => req('/mailing/settings');
-export const saveMailingSettings = (data) => req('/mailing/settings', { method: 'PUT', body: JSON.stringify(data) });
-export const testMailingConnection = () => req('/mailing/test-connection', { method: 'POST' }, 0);
+export const getMailingReplies = (onlyNew = false, campaignId = '') => req(`/mailing/replies?only_new=${onlyNew}&` + cq(campaignId));
+export const resolveMailingReply = (id, status) => req(`/mailing/contacts/${id}/resolve`, { method: 'POST', body: JSON.stringify({ status }) });
+export const markMailingRepliesSeen = (ids) => req('/mailing/replies/seen', { method: 'POST', body: JSON.stringify({ ids }) });
 export const previewMailing = (data) => req('/mailing/preview', { method: 'POST', body: JSON.stringify(data) });
-export const sendMailingTestEmail = (to) => req('/mailing/test-email', { method: 'POST', body: JSON.stringify({ to }) }, 0);
-// Свой Gmail рассылки — отдельно от Google-аккаунта CRM (Документы/Календарь не трогает)
-export const startMailingGoogle = () => req('/mailing/google/start');
-export const disconnectMailingGoogle = () => req('/mailing/google', { method: 'DELETE' });
+// направления
+export const getMailingCampaigns = () => req('/mailing/campaigns');
+export const createMailingCampaign = (data) => req('/mailing/campaigns', { method: 'POST', body: JSON.stringify(data) });
+export const updateMailingCampaign = (id, data) => req(`/mailing/campaigns/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+export const deleteMailingCampaign = (id) => req(`/mailing/campaigns/${id}`, { method: 'DELETE' });
+// почтовые ящики (у каждого свой Gmail, подпись, лимит и разгон)
+export const getMailboxes = () => req('/mailing/mailboxes');
+export const createMailbox = (data = {}) => req('/mailing/mailboxes', { method: 'POST', body: JSON.stringify(data) });
+export const saveMailbox = (id, data) => req(`/mailing/mailboxes/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+export const deleteMailbox = (id) => req(`/mailing/mailboxes/${id}`, { method: 'DELETE' });
+export const testMailboxConnection = (id) => req(`/mailing/mailboxes/${id}/test-connection`, { method: 'POST' }, 0);
+export const sendMailboxTestEmail = (id, to) => req(`/mailing/mailboxes/${id}/test-email`, { method: 'POST', body: JSON.stringify({ to }) }, 0);
+export const startMailboxGoogle = (id) => req(`/mailing/mailboxes/${id}/google/start`);
+export const disconnectMailboxGoogle = (id) => req(`/mailing/mailboxes/${id}/google`, { method: 'DELETE' });
+// поставщики (ответы направлений «закупка»)
+export const getSuppliers = (params = {}) => req('/mailing/suppliers?' + new URLSearchParams(params));
+export const updateSupplier = (id, data) => req(`/mailing/suppliers/${id}`, { method: 'PATCH', body: JSON.stringify(data) });
+export const deleteSupplier = (id) => req(`/mailing/suppliers/${id}`, { method: 'DELETE' });
 // multipart — без JSON Content-Type, браузер сам выставит boundary
-export async function importMailingContacts(file) {
+export async function importMailingContacts(file, campaignId = '') {
   const fd = new FormData();
   fd.append('file', file);
-  const res = await fetch(BASE + '/mailing/contacts/import', {
+  const res = await fetch(BASE + '/mailing/contacts/import?' + cq(campaignId), {
     method: 'POST', body: fd,
     headers: { 'Authorization': token ? `Bearer ${token}` : '' },
   });
