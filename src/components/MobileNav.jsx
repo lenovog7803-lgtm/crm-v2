@@ -1,30 +1,50 @@
 import { useRef, useState, useLayoutEffect } from 'react'
 import { useAuth } from '../AuthContext'
-import { ModalOverlay, ModalHeader } from './Modal'
+import { ModalOverlay, useSheet } from './Modal'
 
 // Нижняя панель на телефоне — не больше 5 вкладок (как в iOS); всё остальное — в «Ещё».
-// Раньше «Рассылка», «База обзвона», «Автопарк» и др. с телефона были недоступны вовсе.
+// «Ещё» оформлено как «Настройки» iPhone: серый фон, белые скруглённые группы,
+// цветные иконки-квадратики, системный шрифт, «Готово» справа.
+const g = (d) => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">{d}</svg>
+)
+const ICONS = {
+  tasks: g(<><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></>),
+  money: g(<><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></>),
+  clients: g(<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></>),
+  carriers: g(<><rect x="1" y="4" width="14" height="12" rx="1"/><path d="M15 9h4l3 3v4h-7z"/><circle cx="6" cy="18.5" r="2"/><circle cx="18" cy="18.5" r="2"/></>),
+  leads: g(<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/>),
+  mailing: g(<><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></>),
+  fleet: g(<><path d="M5 17H3V6a1 1 0 0 1 1-1h10v12"/><path d="M14 9h4l3 4v4h-2"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="16.5" cy="17.5" r="2"/></>),
+  dashboard: g(<><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></>),
+  route: g(<><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8a4 4 0 0 0 0-8H8a4 4 0 0 1 0-8h8"/></>),
+  reports: g(<><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></>),
+  book: g(<><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></>),
+  trash: g(<><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></>),
+  backup: g(<><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.7-4 3-9 3s-9-1.3-9-3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/></>),
+  shield: g(<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>),
+}
 const MORE_SECTIONS = [
-  { title: 'Работа с клиентами', items: [
-    { key: 'clients', label: 'Клиенты' },
-    { key: 'carriers', label: 'Перевозчики' },
-    { key: 'leads', label: 'База обзвона', badge: 'newLeads' },
-    { key: 'mailing', label: 'Рассылка', badge: 'newReplies', director: true },
+  { title: 'Работа', items: [
+    { key: 'tasks', label: 'Задачи', icon: 'tasks', color: '#FF9500', badge: 'pendingTasks' },
+    { key: 'finance', label: 'Финансы', icon: 'money', color: '#34C759' },
+    { key: 'leads', label: 'База обзвона', icon: 'leads', color: '#007AFF', badge: 'newLeads' },
+    { key: 'mailing', label: 'Рассылка', icon: 'mailing', color: '#5856D6', badge: 'newReplies', director: true },
   ] },
   { title: 'Свой автопарк', fleet: true, items: [
-    { key: 'fleet-dashboard', label: 'Дашборд автопарка' },
-    { key: 'fleet-trips', label: 'Рейсы' },
-    { key: 'fleet-clients', label: 'Клиенты автопарка' },
-    { key: 'fleet-vehicles', label: 'Машины и водители' },
+    { key: 'fleet-dashboard', label: 'Дашборд автопарка', icon: 'dashboard', color: '#30B0C7' },
+    { key: 'fleet-trips', label: 'Рейсы', icon: 'route', color: '#30B0C7' },
+    { key: 'fleet-clients', label: 'Клиенты автопарка', icon: 'clients', color: '#30B0C7' },
+    { key: 'fleet-vehicles', label: 'Машины и водители', icon: 'fleet', color: '#30B0C7' },
   ] },
   { title: 'Отчёты и учёт', director: true, items: [
-    { key: 'reports', label: 'Отчёты' },
-    { key: 'kudir', label: 'КУДиР' },
+    { key: 'reports', label: 'Отчёты', icon: 'reports', color: '#AF52DE' },
+    { key: 'kudir', label: 'КУДиР', icon: 'book', color: '#A2845E' },
   ] },
   { title: 'Служебное', items: [
-    { key: 'trash', label: 'Корзина' },
-    { key: 'backups', label: 'Резервные копии', egor: true },
-    { key: 'admin', label: 'Администрирование', egor: true },
+    { key: 'trash', label: 'Корзина', icon: 'trash', color: '#8E8E93' },
+    { key: 'backups', label: 'Резервные копии', icon: 'backup', color: '#636366', egor: true },
+    { key: 'admin', label: 'Администрирование', icon: 'shield', color: '#FF3B30', egor: true },
   ] },
 ]
 
@@ -58,24 +78,26 @@ const NAV = [
     ),
   },
   {
-    key: 'tasks',
-    label: 'Задачи',
-    badge: 'pendingTasks',
-    badgeColor: '#D97706',
+    key: 'clients',
+    label: 'Клиенты',
     icon: (a) => (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={a ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="9 11 12 14 22 4"/>
-        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
       </svg>
     ),
   },
   {
-    key: 'finance',
-    label: 'Финансы',
+    key: 'carriers',
+    label: 'Перевозчики',
     icon: (a) => (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={a ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">
-        <line x1="12" y1="1" x2="12" y2="23"/>
-        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        <rect x="1" y="3" width="15" height="13" rx="1"/>
+        <path d="M16 8h4l3 3v5h-7V8z"/>
+        <circle cx="5.5" cy="18.5" r="2.5"/>
+        <circle cx="18.5" cy="18.5" r="2.5"/>
       </svg>
     ),
   },
@@ -134,9 +156,24 @@ const MANAGER_NAV = [
 
 const ACTIVE_KEYS = {
   'order-detail': 'orders',
+  'client-detail': 'clients',
+  'carrier-detail': 'carriers',
 }
-const MORE_KEYS = new Set(['client-detail', 'carrier-detail', 'fleet-trip-detail', 'fleet-client-detail', 'fleet-order-detail', 'fleet-analytics',
+const MORE_KEYS = new Set(['fleet-trip-detail', 'fleet-client-detail', 'fleet-order-detail', 'fleet-analytics',
   ...MORE_SECTIONS.flatMap(sec => sec.items.map(i => i.key))])
+
+const SYS_FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif'
+
+function SheetDone({ onClose }) {
+  const sheet = useSheet()
+  return (
+    <button onClick={() => (sheet ? sheet.requestClose() : onClose())}
+      style={{ position: 'absolute', right: 0, top: 0, border: 'none', background: 'none', padding: '4px 4px 4px 12px',
+        color: '#007AFF', fontFamily: SYS_FONT, fontSize: 17, fontWeight: 600, cursor: 'pointer' }}>
+      Готово
+    </button>
+  )
+}
 
 function MoreSheet({ page, counts, onNav, onClose }) {
   const { user } = useAuth()
@@ -149,32 +186,41 @@ function MoreSheet({ page, counts, onNav, onClose }) {
     .map(sec => ({ ...sec, items: sec.items.filter(i => (!i.director || isDirector) && (!i.egor || isEgor)) }))
     .filter(sec => sec.items.length)
   return (
-    <ModalOverlay onClose={onClose}>
-      <ModalHeader title="Разделы" onClose={onClose} />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-        {sections.map(sec => (
-          <div key={sec.title}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#A6AEB8', marginBottom: 6 }}>{sec.title}</div>
-            <div style={{ borderRadius: 14, background: 'rgba(14,23,38,0.035)', overflow: 'hidden' }}>
-              {sec.items.map((it, idx) => {
-                const active = page === it.key
-                const n = it.badge ? counts?.[it.badge] : 0
-                return (
-                  <button key={it.key} onClick={() => { onNav(it.key); onClose() }}
-                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '14px 14px', border: 'none',
-                      borderTop: idx ? '1px solid rgba(14,23,38,0.06)' : 'none', background: active ? 'rgba(19,102,240,0.08)' : 'transparent',
-                      color: active ? '#1366F0' : '#0E1726', fontFamily: 'Manrope', fontSize: 16, fontWeight: 600, textAlign: 'left', cursor: 'pointer' }}>
-                    <span style={{ flex: 1 }}>{it.label}</span>
-                    {n > 0 && <span style={{ minWidth: 20, height: 20, borderRadius: 99, background: '#0E9F6E', color: '#fff', fontSize: 11, fontWeight: 800,
-                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 6px' }}>{n > 99 ? '99+' : n}</span>}
-                    <span style={{ color: '#C4CAD4', fontSize: 18 }}>›</span>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        ))}
+    <ModalOverlay onClose={onClose}
+      panelStyle={{ background: '#F2F2F7', fontFamily: SYS_FONT, maxHeight: '92dvh', overflowY: 'auto' }}
+      bodyStyle={{ padding: '18px 0 8px' }}>
+      <div style={{ position: 'relative', textAlign: 'center', marginBottom: 18, minHeight: 26 }}>
+        <span style={{ fontSize: 17, fontWeight: 600, color: '#000', letterSpacing: '-0.01em' }}>Разделы</span>
+        <SheetDone onClose={onClose} />
       </div>
+      {sections.map(sec => (
+        <div key={sec.title} style={{ marginBottom: 22 }}>
+          <div style={{ fontSize: 13, color: '#6D6D72', textTransform: 'uppercase', letterSpacing: '0.02em', padding: '0 16px 7px' }}>{sec.title}</div>
+          <div style={{ borderRadius: 12, background: '#FFFFFF', overflow: 'hidden' }}>
+            {sec.items.map((it, idx) => {
+              const active = page === it.key
+              const n = it.badge ? counts?.[it.badge] : 0
+              return (
+                <button key={it.key} className="ios-row" onClick={() => { onNav(it.key); onClose() }}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 14, minHeight: 52, padding: '0 14px 0 14px',
+                    border: 'none', background: '#FFFFFF', fontFamily: SYS_FONT, textAlign: 'left', cursor: 'pointer' }}>
+                  <span style={{ width: 30, height: 30, borderRadius: 7, background: it.color, flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{ICONS[it.icon]}</span>
+                  {/* разделитель начинается от текста, а не от края — как в iOS */}
+                  <span style={{ flex: 1, alignSelf: 'stretch', display: 'flex', alignItems: 'center', gap: 8,
+                    borderTop: idx ? '0.5px solid rgba(60,60,67,0.29)' : 'none' }}>
+                    <span style={{ flex: 1, fontSize: 17, color: '#000', fontWeight: active ? 600 : 400, letterSpacing: '-0.02em' }}>{it.label}</span>
+                    {n > 0 && <span style={{ minWidth: 22, height: 22, borderRadius: 11, background: '#FF3B30', color: '#fff', fontSize: 13, fontWeight: 600,
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 7px' }}>{n > 99 ? '99+' : n}</span>}
+                    {active && <span style={{ color: '#007AFF', fontSize: 15, fontWeight: 600 }}>✓</span>}
+                    <svg width="8" height="14" viewBox="0 0 8 14" fill="none" stroke="#C4C4C7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 1l6 6-6 6"/></svg>
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      ))}
     </ModalOverlay>
   )
 }

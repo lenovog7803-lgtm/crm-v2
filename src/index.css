@@ -302,3 +302,7 @@ input[type="number"] {
   .card { background: #FFFFFF !important; border: 1px solid rgba(14,23,38,0.35) !important; }
   :root { --text-tertiary: #5A6573; --text-quaternary: #8A93A0; }
 }
+
+/* Строки списка в стиле iOS: серая подсветка сразу при нажатии */
+.ios-row { -webkit-tap-highlight-color: transparent; transition: background-color 0.2s ease-out; }
+.ios-row:active { background: #D1D1D6 !important; transition: none; }

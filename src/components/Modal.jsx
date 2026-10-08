@@ -9,9 +9,12 @@ import { spring, project, rubberband, velocityTracker, prefersReducedMotion } fr
 const SheetCtx = createContext(null)
 const SCRIM = 0.4
 
-export function ModalOverlay({ onClose, children }) {
+export const useSheet = () => useContext(SheetCtx)
+
+export function ModalOverlay({ onClose, children, panelStyle, bodyStyle }) {
   const isMobile = useIsMobile()
   const overlayRef = useRef(null)
+  const scrimRef = useRef(null)
   const panelRef = useRef(null)
   const y = useRef(0)
   const anim = useRef(null)
@@ -23,10 +26,11 @@ export function ModalOverlay({ onClose, children }) {
   const height = () => panelRef.current?.offsetHeight || 600
   const setY = (v) => {
     y.current = v
-    if (panelRef.current) panelRef.current.style.transform = `translateY(${v}px)`
+    // только transform и opacity — их видеокарта двигает без перерисовки страницы
+    if (panelRef.current) panelRef.current.style.transform = `translate3d(0, ${v}px, 0)`
     // затемнение уходит вместе со шторкой — видно, сколько осталось до закрытия
     const progress = Math.min(1, Math.max(0, v / height()))
-    if (overlayRef.current) overlayRef.current.style.background = `rgba(14,23,38,${(SCRIM * (1 - progress)).toFixed(3)})`
+    if (scrimRef.current) scrimRef.current.style.opacity = (1 - progress).toFixed(3)
   }
   const mounted = useRef(true)
   useEffect(() => () => { mounted.current = false }, [])
@@ -103,7 +107,11 @@ export function ModalOverlay({ onClose, children }) {
       <div
         ref={overlayRef}
         className="modal-overlay"
-        style={{
+        style={isMobile ? {
+          // телефон: без размытия (тяжело для GPU на каждом кадре) и без прокрутки подложки,
+          // пока шторка за экраном — иначе слой «дёргается» при выезде
+          position: 'fixed', inset: 0, zIndex: 1000, overflow: 'hidden', display: 'grid', padding: 0,
+        } : {
           position: 'fixed', inset: 0,
           background: `rgba(14,23,38,${SCRIM})`,
           backdropFilter: 'blur(8px)',
@@ -115,10 +123,18 @@ export function ModalOverlay({ onClose, children }) {
           animation: closing ? 'fadeOut 0.15s ease-in both' : 'pageIn 0.2s ease-out',
         }}
       >
+        {isMobile && (
+          <div ref={scrimRef} onClick={() => requestClose()}
+            style={{ position: 'absolute', inset: 0, background: `rgba(14,23,38,${SCRIM})`, opacity: 0, willChange: 'opacity' }} />
+        )}
         <div ref={panelRef} className="modal-panel" style={{
           margin: 'auto',
-          background: 'rgba(255,255,255,0.97)',
-          backdropFilter: 'blur(24px) saturate(180%)',
+          background: isMobile ? '#FFFFFF' : 'rgba(255,255,255,0.97)',
+          backdropFilter: isMobile ? 'none' : 'blur(24px) saturate(180%)',
+          // до первого кадра шторка уже за экраном — без вспышки в конечном положении
+          transform: isMobile ? 'translate3d(0, 100%, 0)' : undefined,
+          overflowY: isMobile ? 'auto' : undefined,
+          overscrollBehavior: 'contain',
           borderRadius: 24,
           width: '100%',
           maxWidth: 560,
@@ -126,6 +142,7 @@ export function ModalOverlay({ onClose, children }) {
           position: 'relative',
           animation: isMobile ? 'none' : closing ? 'modalOut 0.15s ease-in both' : 'modalIn 0.22s var(--ease) both',
           willChange: isMobile ? 'transform' : undefined,
+          ...panelStyle,
         }}>
           {isMobile && (
             <div {...dragHandlers} style={{ ...dragHandlers.style, position: 'absolute', top: 0, left: 0, right: 0, height: 28,
@@ -133,7 +150,7 @@ export function ModalOverlay({ onClose, children }) {
               <div style={{ width: 38, height: 5, borderRadius: 99, background: 'rgba(14,23,38,0.18)' }} />
             </div>
           )}
-          <div style={{ padding: 32 }}>
+          <div style={{ padding: 32, ...bodyStyle }}>
             {children}
           </div>
         </div>
