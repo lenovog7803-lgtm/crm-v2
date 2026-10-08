@@ -9,6 +9,9 @@ import {
 } from '../api'
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
+import { CountUp } from '../components/CountUp'
+import { CircularProgress } from '../components/CircularProgress'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 // «Рассылка» — холодные письма по базе. Вся логика (лимиты, рабочие часы,
 // паузы, напоминания, проверка ответов) живёт в backend/mailing.py, здесь
@@ -31,7 +34,6 @@ const tabsWith = (newReplies) => [
   { key: 'overview', label: 'Обзор' },
   { key: 'replies', label: newReplies ? `Ответы · ${newReplies}` : 'Ответы' },
   { key: 'contacts', label: 'Контакты' },
-  { key: 'letter', label: 'Письмо' },
   { key: 'settings', label: 'Настройки' },
 ]
 
@@ -56,29 +58,23 @@ const inputStyle = {
 const labelStyle = { fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 6 }
 const sectionTitle = { fontFamily: 'Onest', fontWeight: 700, fontSize: 15, color: '#0E1726', marginBottom: 12 }
 
-function StatusPill({ status }) {
-  const s = STATUS[status] || STATUS.new
-  return (
-    <span style={{ padding: '3px 9px', borderRadius: 99, background: s.bg, color: s.color, fontSize: 11.5, fontWeight: 600, whiteSpace: 'nowrap' }}>
-      {s.label}
-    </span>
-  )
-}
-
-function Stat({ label, value, hint }) {
-  return (
-    <div className="card" style={{ padding: '14px 16px', minWidth: 140, flex: 1 }}>
-      <div style={{ fontSize: 12, color: '#8A93A0' }}>{label}</div>
-      <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 22, color: '#0E1726', marginTop: 4 }}>{value}</div>
-      {hint && <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 2 }}>{hint}</div>}
-    </div>
-  )
-}
-
 // ---------------- Обзор ----------------
-function Overview({ state, reload, onGoSettings, onGoReplies, replies }) {
+// В стиле дашборда CRM: hero-карточки с градиентом, KPI-полоса, кольцевой прогресс, CountUp.
+const RAMP_STEPS = [{ until: 3, lim: 5 }, { until: 7, lim: 10 }, { until: 12, lim: 15 }, { until: 18, lim: 20 }, { until: 25, lim: 30 }, { until: Infinity, lim: 40 }]
+const LOG_ICON = { 'письмо': '✉️', 'напоминание': '🔁', 'ответ': '💬', 'возврат': '↩️', 'тест': '🧪', 'автостоп': '⛔️', 'проверка почты': '📥' }
+
+const heroBase = {
+  borderRadius: 22, position: 'relative', overflow: 'hidden',
+  transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
+}
+const kicker = (color) => ({ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color, marginBottom: 8 })
+const bigNum = (color, size) => ({ fontFamily: 'Onest', fontWeight: 800, fontSize: size, letterSpacing: '-0.03em', lineHeight: 1, color })
+
+function Overview({ state, reload, onGoSettings, onGoReplies, onGoContacts, replies }) {
   const { show } = useToast()
+  const isMobile = useIsMobile()
   const [busy, setBusy] = useState(false)
+  const [logOpen, setLogOpen] = useState(false)
 
   const toggle = async () => {
     setBusy(true)
@@ -106,96 +102,226 @@ function Overview({ state, reload, onGoSettings, onGoReplies, replies }) {
   }
 
   const counts = state.counts || {}
+  const groups = state.groups || {}
+  const h = state.health || {}
+  const sentTotal = Math.max(0, (state.total || 0) - (counts.new || 0) - (counts.skip || 0))
+  const answered = groups.answered || 0
+  const replyPct = sentTotal ? Math.round((answered / sentTotal) * 100) : 0
+  const todayPct = state.limit ? Math.min(100, (state.sent_today / state.limit) * 100) : 0
+  const healthTone = h.status === 'stop' ? 'red' : (h.status === 'slow' || h.status === 'paused') ? 'amber' : 'ok'
+  const healthCard = {
+    ok: { bg: 'linear-gradient(135deg, rgba(214,236,255,0.95), rgba(186,214,255,0.85))', shadow: 'rgba(19,102,240,0.35)', ink: '#0F4FB8', deep: '#0B3A87', label: 'Норма' },
+    amber: { bg: 'linear-gradient(135deg, rgba(255,236,214,0.95), rgba(255,213,170,0.85))', shadow: 'rgba(217,119,6,0.4)', ink: '#A86A20', deep: '#7A4A12', label: h.status === 'paused' ? 'Пауза' : 'Темп снижен' },
+    red: { bg: 'linear-gradient(135deg, rgba(255,222,222,0.95), rgba(255,190,190,0.85))', shadow: 'rgba(224,71,59,0.4)', ink: '#B4322A', deep: '#7E1D17', label: 'Остановка' },
+  }[healthTone]
+
+  const funnel = [
+    { label: 'Отправлено', value: sentTotal, color: '#1366F0' },
+    { label: 'Ответили', value: answered, color: '#0E9F6E' },
+    { label: 'Интерес', value: (counts.interested || 0) + (counts.deal || 0), color: '#D97706' },
+    { label: 'Сделка', value: counts.deal || 0, color: '#7C3AED' },
+  ]
+  const kpis = [
+    { label: 'В очереди', value: state.queue_new || 0, hint: state.queue_follow ? `+${state.queue_follow} напоминаний` : 'новых адресов', color: '#1366F0', bg: 'rgba(19,102,240,0.08)', group: '' },
+    { label: 'Ждём ответа', value: groups.waiting || 0, hint: 'письмо дошло', color: '#7C3AED', bg: 'rgba(124,58,237,0.08)', group: 'waiting' },
+    { label: 'Молчат', value: groups.silent || 0, hint: 'после напоминания', color: '#8A93A0', bg: 'rgba(14,23,38,0.05)', group: 'silent' },
+    { label: 'Не дошло', value: groups.failed || 0, hint: 'возвраты и ошибки', color: '#E0473B', bg: 'rgba(224,71,59,0.08)', group: 'failed' },
+  ]
+  const log = state.log || []
+  const rampIdx = RAMP_STEPS.findIndex(st => (h.day || 1) <= st.until)
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {!state.configured && (
-        <div className="card" style={{ padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-          <div style={{ fontSize: 13, color: '#5A6573' }}>Почта ещё не подключена — укажите адрес и пароль приложения в настройках.</div>
-          <button className="btn-ghost" onClick={onGoSettings}>Открыть настройки</button>
+        <div className="card" style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{ fontSize: 13, color: '#5A6573' }}>Почта ещё не подключена — без неё рассылку не запустить.</div>
+          <button className="btn-ghost" onClick={onGoSettings}>Подключить почту →</button>
         </div>
       )}
 
-      <div className="card" style={{ padding: 18, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ width: 10, height: 10, borderRadius: 99, background: state.running ? '#0E9F6E' : '#C4CAD4', boxShadow: state.running ? '0 0 0 4px rgba(14,159,110,0.15)' : 'none' }} />
-          <div>
-            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 16, color: '#0E1726' }}>{state.state}</div>
-            {state.next_at && <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>Следующее действие в {state.next_at} (Мск)</div>}
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button className="btn-ghost" onClick={checkInbox} disabled={busy}>Проверить входящие</button>
-          <button
-            className="btn-primary"
-            onClick={toggle}
-            disabled={busy || (!state.running && !state.configured)}
-            style={state.running ? { background: '#E0473B' } : undefined}
-          >
-            {state.running ? 'Остановить' : 'Запустить'}
-          </button>
-        </div>
-      </div>
-
-      {state.health && state.health.status !== 'ok' && (
-        <div className="card" style={{ padding: 16, border: `1px solid ${state.health.status === 'stop' ? 'rgba(224,71,59,0.4)' : 'rgba(217,119,6,0.4)'}` }}>
-          <div style={{ fontWeight: 700, fontSize: 14, color: state.health.status === 'stop' ? '#E0473B' : '#D97706' }}>
-            {state.health.status === 'stop' ? '⛔️ Защита: рассылка будет остановлена' : state.health.status === 'paused' ? '⏸ Пауза' : '⚠️ Темп снижен'}
-          </div>
-          <div style={{ fontSize: 13, color: '#5A6573', marginTop: 4 }}>{state.health.reason}</div>
-        </div>
-      )}
-
-      {replies.length > 0 && (
-        <div className="card" style={{ padding: 18, border: '1px solid rgba(14,159,110,0.3)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-            <div style={{ ...sectionTitle, marginBottom: 0 }}>🔔 Новые ответы: {replies.length}</div>
-            <button className="btn-ghost" onClick={onGoReplies}>Разобрать →</button>
-          </div>
-          {replies.slice(0, 3).map(c => (
-            <div key={c.id} style={{ padding: '8px 0', borderTop: '1px solid rgba(14,23,38,0.05)', fontSize: 13 }}>
-              <b style={{ color: '#0E1726' }}>{c.company || c.email}</b>
-              <span style={{ color: '#5A6573' }}> — {(c.reply_snippet || 'ответ без текста').slice(0, 140)}</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-        <Stat label="Отправлено сегодня" value={`${state.sent_today} / ${state.limit}`}
-          hint={state.health?.auto ? `разгон: день ${state.health.day}, потолок ${state.health.cap}` : 'дневной лимит'} />
-        <Stat label="Возвраты за 7 дней" value={`${state.health?.bounce_rate ?? 0}%`}
-          hint={`${state.health?.bounced_7d ?? 0} из ${state.health?.sent_7d ?? 0} · норма до 4%`} />
-        <Stat label="В очереди" value={state.queue_new} hint={state.queue_follow ? `+ ${state.queue_follow} напоминаний` : 'новых адресов'} />
-        <Stat label="Контактов" value={state.total} hint={`с email: ${state.with_email}`} />
-        <Stat label="Ответили" value={state.groups?.answered ?? 0} hint={counts.deal ? `сделок: ${counts.deal}` : (state.with_email ? `${Math.round(100 * (state.groups?.answered || 0) / Math.max(1, (state.total - (counts.new || 0))))}% от отправленных` : undefined)} />
-      </div>
-
-      <div className="card" style={{ padding: 18 }}>
-        <div style={sectionTitle}>По статусам</div>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {Object.keys(STATUS).filter(k => counts[k]).map(k => (
-            <span key={k} style={{ padding: '6px 12px', borderRadius: 10, background: STATUS[k].bg, color: STATUS[k].color, fontSize: 12.5, fontWeight: 600 }}>
-              {STATUS[k].label}: {counts[k]}
-            </span>
-          ))}
-          {!Object.values(counts).some(Boolean) && <span style={{ fontSize: 13, color: '#A6AEB8' }}>Контактов пока нет</span>}
-        </div>
-      </div>
-
-      <div className="card" style={{ padding: 18 }}>
-        <div style={sectionTitle}>Журнал</div>
-        {(state.log || []).length === 0 && <div style={{ fontSize: 13, color: '#A6AEB8' }}>Пока пусто</div>}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {(state.log || []).map(l => (
-            <div key={l.id} style={{ display: 'grid', gridTemplateColumns: '120px 110px 1fr', gap: 10, padding: '7px 0', borderBottom: '1px solid rgba(14,23,38,0.05)', fontSize: 12.5, alignItems: 'baseline' }}>
-              <span style={{ color: '#A6AEB8' }}>{(l.ts || '').replace('T', ' ').slice(5, 16)}</span>
-              <span style={{ color: l.ok ? '#0E9F6E' : '#E0473B', fontWeight: 600 }}>{l.kind}</span>
-              <span style={{ color: '#5A6573', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {[l.company, l.email].filter(Boolean).join(' · ')}{l.detail ? ` — ${l.detail}` : ''}
+      {/* Hero */}
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.3fr 1fr 1fr', gap: 16 }}>
+        {/* Статус и запуск */}
+        <div style={{ ...heroBase, background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)', color: '#fff',
+          padding: isMobile ? '18px' : '26px 28px', boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)' }}>
+          <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: state.running ? 'rgba(91,232,155,0.12)' : 'rgba(19,102,240,0.15)' }} />
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <span style={{ width: 8, height: 8, borderRadius: 99, background: state.running ? '#5BE89B' : 'rgba(255,255,255,0.35)',
+                boxShadow: state.running ? '0 0 0 4px rgba(91,232,155,0.2)' : 'none' }} />
+              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.5)' }}>
+                {state.running ? 'РАБОТАЕТ' : 'ОСТАНОВЛЕНА'}
               </span>
             </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <span style={bigNum('#fff', isMobile ? 34 : 42)}><CountUp value={state.sent_today} /></span>
+              <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.45)', fontWeight: 600 }}>/ {state.limit} писем сегодня</span>
+            </div>
+            <div style={{ height: 6, borderRadius: 99, background: 'rgba(255,255,255,0.12)', marginTop: 14, overflow: 'hidden' }}>
+              <div style={{ width: `${todayPct}%`, height: '100%', borderRadius: 99, background: 'linear-gradient(90deg, #5BE89B, #2FC7A0)', transition: 'width 0.6s var(--ease)' }} />
+            </div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 10, minHeight: 16 }}>
+              {state.state}{state.next_at ? ` · дальше в ${state.next_at}` : ''}
+            </div>
+            <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
+              <button onClick={toggle} disabled={busy || (!state.running && !state.configured)}
+                style={{ padding: '10px 18px', borderRadius: 12, border: 'none', cursor: 'pointer', fontFamily: 'Manrope', fontSize: 13.5, fontWeight: 700,
+                  background: state.running ? 'rgba(255,107,122,0.18)' : '#fff', color: state.running ? '#FF8A96' : '#0E1726',
+                  opacity: (!state.running && !state.configured) ? 0.5 : 1 }}>
+                {state.running ? '■ Остановить' : '▶ Запустить'}
+              </button>
+              <button onClick={checkInbox} disabled={busy}
+                style={{ padding: '10px 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.18)', background: 'transparent',
+                  color: 'rgba(255,255,255,0.85)', cursor: 'pointer', fontFamily: 'Manrope', fontSize: 13, fontWeight: 600 }}>
+                Проверить входящие
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Ответили */}
+        <div onClick={onGoReplies} style={{ ...heroBase, cursor: 'pointer', padding: isMobile ? '16px 18px' : '26px 24px',
+          background: 'linear-gradient(135deg, rgba(214,245,228,0.95), rgba(170,230,200,0.85))', border: '1px solid rgba(255,255,255,0.6)',
+          boxShadow: '0 16px 40px -16px rgba(14,159,110,0.4)' }}>
+          <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
+          <div style={kicker('#17824F')}>ОТВЕТИЛИ</div>
+          <div style={bigNum('#0B5C37', isMobile ? 28 : 34)}><CountUp value={answered} /></div>
+          <div style={{ fontSize: 12, color: '#17824F', marginTop: 6 }}>{replyPct}% от отправленных</div>
+          <div style={{ marginTop: 14, fontSize: 12.5, color: '#17824F', fontWeight: 700 }}>
+            {state.replies_new ? `🔔 ${state.replies_new} новых — разобрать →` : 'Все ответы →'}
+          </div>
+        </div>
+
+        {/* Здоровье ящика */}
+        <div style={{ ...heroBase, padding: isMobile ? '16px 18px' : '26px 24px', background: healthCard.bg,
+          border: '1px solid rgba(255,255,255,0.6)', boxShadow: `0 16px 40px -16px ${healthCard.shadow}` }}>
+          <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
+          <div style={kicker(healthCard.ink)}>ЗДОРОВЬЕ ЯЩИКА</div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span style={bigNum(healthCard.deep, isMobile ? 28 : 34)}>{h.bounce_rate ?? 0}%</span>
+            <span style={{ fontSize: 12, color: healthCard.ink, fontWeight: 600 }}>возвратов</span>
+          </div>
+          <div style={{ fontSize: 12, color: healthCard.ink, marginTop: 6 }}>{h.bounced_7d ?? 0} из {h.sent_7d ?? 0} за 7 дней · норма до 4%</div>
+          <div style={{ marginTop: 14, display: 'inline-block', padding: '4px 10px', borderRadius: 99, background: 'rgba(255,255,255,0.55)',
+            fontSize: 12, fontWeight: 700, color: healthCard.deep }}>
+            {healthCard.label}
+          </div>
+          {h.reason && <div style={{ fontSize: 11.5, color: healthCard.ink, marginTop: 8, lineHeight: 1.4 }}>{h.reason}</div>}
+        </div>
+      </div>
+
+      {/* KPI */}
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 12 }}>
+        {kpis.map(k => (
+          <div key={k.label} className="card" onClick={() => onGoContacts(k.group)}
+            style={{ padding: isMobile ? '12px 14px' : '18px 20px', cursor: 'pointer' }}>
+            <div style={{ fontSize: isMobile ? 10 : 11, color: '#A6AEB8', fontWeight: 600, marginBottom: 6 }}>{k.label}</div>
+            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 24 : 32, color: k.color, background: k.bg,
+              borderRadius: 12, padding: isMobile ? '5px 10px' : '7px 14px', display: 'inline-block', lineHeight: 1 }}>
+              <CountUp value={k.value} />
+            </div>
+            <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 8 }}>{k.hint}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Разгон + воронка */}
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+        <div className="card" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18 }}>
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <CircularProgress pct={h.auto ? Math.min(100, ((h.day || 1) / 26) * 100) : 100} color="#1366F0" size={56} />
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#1366F0' }}>
+                {h.auto ? `д.${h.day || 1}` : '—'}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Разгон ящика</div>
+              <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 2 }}>
+                {h.auto ? `лимит растёт сам · потолок ${h.cap}` : 'выключен — фиксированный лимит из настроек'}
+              </div>
+            </div>
+          </div>
+          {h.auto && (
+            <div style={{ display: 'flex', gap: 6 }}>
+              {RAMP_STEPS.map((st, i) => {
+                const capped = st.lim > (h.cap || 0)
+                const active = i === rampIdx
+                const done = i < rampIdx
+                return (
+                  <div key={i} style={{ flex: 1, textAlign: 'center', opacity: capped ? 0.35 : 1 }}>
+                    <div style={{ height: 6, borderRadius: 99, background: active ? '#1366F0' : done ? 'rgba(19,102,240,0.45)' : 'rgba(14,23,38,0.08)' }} />
+                    <div style={{ fontSize: 12, fontWeight: active ? 800 : 600, color: active ? '#1366F0' : '#8A93A0', marginTop: 6 }}>{st.lim}</div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        <div className="card" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
+          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Воронка</div>
+          <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 2, marginBottom: 14 }}>за всё время</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+            {funnel.map(f => (
+              <div key={f.label} style={{ display: 'grid', gridTemplateColumns: '92px 1fr 44px', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 12.5, color: '#5A6573', fontWeight: 600 }}>{f.label}</span>
+                <div style={{ height: 10, borderRadius: 99, background: 'rgba(14,23,38,0.05)', overflow: 'hidden' }}>
+                  <div style={{ width: `${sentTotal ? Math.max(f.value ? 3 : 0, (f.value / sentTotal) * 100) : 0}%`, height: '100%', borderRadius: 99,
+                    background: f.color, transition: 'width 0.6s var(--ease)' }} />
+                </div>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#0E1726', textAlign: 'right' }}>{f.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Новые ответы */}
+      {replies.length > 0 && (
+        <div className="card" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Новые ответы</div>
+            <button className="btn-ghost" onClick={onGoReplies}>Разобрать →</button>
+          </div>
+          {replies.slice(0, 4).map(c => (
+            <div key={c.id} onClick={onGoReplies} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 0', borderTop: '1px solid rgba(14,23,38,0.05)', cursor: 'pointer' }}>
+              <div style={{ width: 34, height: 34, borderRadius: 11, background: 'rgba(14,159,110,0.12)', color: '#0E9F6E', flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14 }}>
+                {(c.company || c.email || '').trim().charAt(0).toUpperCase() || '?'}
+              </div>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#0E1726' }}>{c.company || c.email}</div>
+                <div style={{ fontSize: 12.5, color: '#5A6573', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {c.reply_snippet || 'ответ без текста'}
+                </div>
+              </div>
+              <span style={{ fontSize: 11.5, color: '#A6AEB8', flexShrink: 0 }}>{fmtTs(c.replied_at).slice(5)}</span>
+            </div>
           ))}
         </div>
+      )}
+
+      {/* Журнал */}
+      <div className="card" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
+        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 10 }}>Журнал</div>
+        {log.length === 0 && <div style={{ fontSize: 13, color: '#A6AEB8' }}>Пока пусто</div>}
+        {(logOpen ? log : log.slice(0, 8)).map(l => (
+          <div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderTop: '1px solid rgba(14,23,38,0.05)', fontSize: 12.5 }}>
+            <span style={{ width: 26, height: 26, borderRadius: 9, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13,
+              background: l.ok ? 'rgba(14,23,38,0.04)' : 'rgba(224,71,59,0.08)' }}>{LOG_ICON[l.kind] || '•'}</span>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <span style={{ fontWeight: 700, color: l.ok ? '#0E1726' : '#E0473B' }}>{l.company || l.email || l.kind}</span>
+              <span style={{ color: '#8A93A0' }}> · {l.kind}{l.detail ? ` — ${l.detail}` : ''}</span>
+            </div>
+            <span style={{ color: '#A6AEB8', flexShrink: 0 }}>{fmtTs(l.ts).slice(5)}</span>
+          </div>
+        ))}
+        {log.length > 8 && (
+          <button className="btn-ghost" style={{ marginTop: 10 }} onClick={() => setLogOpen(o => !o)}>
+            {logOpen ? 'Свернуть' : `Показать всё (${log.length})`}
+          </button>
+        )}
       </div>
     </div>
   )
@@ -301,13 +427,13 @@ function Replies({ login, onChanged }) {
 // ---------------- Контакты ----------------
 const EMPTY_CONTACT = { company: '', email: '', contact_name: '', city: '', priority: '' }
 
-function Contacts({ onChanged, groups = {}, login }) {
+function Contacts({ onChanged, groups = {}, login, initialGroup = '' }) {
   const { show } = useToast()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [q, setQ] = useState('')
   const [status, setStatus] = useState('')
-  const [group, setGroup] = useState('')
+  const [group, setGroup] = useState(initialGroup)
   const [form, setForm] = useState(null)
   const [busy, setBusy] = useState(false)
   const fileRef = useRef(null)
@@ -749,6 +875,17 @@ function Settings({ settings, onSaved }) {
   )
 }
 
+function SettingsPage({ settings, onSaved, initialSection = 'mail' }) {
+  const [section, setSection] = useState(initialSection)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <SlidingTabs options={[{ key: 'mail', label: 'Почта и отправка' }, { key: 'letter', label: 'Текст письма' }]} value={section} onChange={setSection} />
+      {section === 'mail' && <Settings settings={settings} onSaved={onSaved} />}
+      {section === 'letter' && <Letter key={settings.body} settings={settings} onSaved={onSaved} />}
+    </div>
+  )
+}
+
 // ---------------- Страница ----------------
 export default function Mailing() {
   const { show } = useToast()
@@ -756,6 +893,7 @@ export default function Mailing() {
   const [state, setState] = useState(null)
   const [settings, setSettings] = useState(null)
   const [newReplies, setNewReplies] = useState([])
+  const [contactsGroup, setContactsGroup] = useState('')
 
   const loadState = () => {
     getMailingReplies(true).then(r => setNewReplies(Array.isArray(r) ? r : [])).catch(() => {})
@@ -780,17 +918,17 @@ export default function Mailing() {
           <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 20, color: '#0E1726' }}>Рассылка</div>
           <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>Письма по базе с дневным лимитом, напоминанием и проверкой ответов</div>
         </div>
-        <SlidingTabs options={tabsWith(state?.replies_new)} value={tab} onChange={setTab} />
+        <SlidingTabs options={tabsWith(state?.replies_new)} value={tab} onChange={t => { setContactsGroup(''); setTab(t) }} />
       </div>
 
       {(!state || !settings) && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
       {state && settings && (
         <>
-          {tab === 'overview' && <Overview state={state} reload={loadState} onGoSettings={() => setTab('settings')} onGoReplies={() => setTab('replies')} replies={newReplies} />}
+          {tab === 'overview' && <Overview state={state} reload={loadState} onGoSettings={() => setTab('settings')} onGoReplies={() => setTab('replies')}
+            onGoContacts={g => { setContactsGroup(g); setTab('contacts') }} replies={newReplies} />}
           {tab === 'replies' && <Replies login={settings.login} onChanged={loadState} />}
-          {tab === 'contacts' && <Contacts onChanged={loadState} groups={state.groups} login={settings.login} />}
-          {tab === 'letter' && <Letter key={settings.body} settings={settings} onSaved={reloadAll} />}
-          {tab === 'settings' && <Settings settings={settings} onSaved={reloadAll} />}
+          {tab === 'contacts' && <Contacts key={contactsGroup} onChanged={loadState} groups={state.groups} login={settings.login} initialGroup={contactsGroup} />}
+          {tab === 'settings' && <SettingsPage settings={settings} onSaved={reloadAll} />}
         </>
       )}
     </div>
