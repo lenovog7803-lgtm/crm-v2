@@ -7,6 +7,7 @@ import { SkeletonRow } from './Skeleton'
 import { useToast } from './Toast'
 import { EmptyState } from './EmptyState'
 import { SlidingTabs } from './SlidingTabs'
+import { mouseOnly, spring, project, rubberband, velocityTracker, haptic } from '../motion'
 
 const BULK_STATUSES = [
   { id: 'new', label: 'Новая' },
@@ -59,10 +60,20 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   const swipeStart = useRef({ x: 0, y: 0 })
   const swipeAxis = useRef(null) // 'x' | 'y' — locked in after a few px so vertical scroll still works
 
+  // Физика как в iOS: строка идёт за пальцем 1:1, после 90px — резиновое сопротивление
+  // вместо жёсткого упора; выбор решает «бросок» (позиция + скорость), а не только
+  // расстояние; назад строка возвращается пружиной с той же скоростью, что и палец.
+  const SWIPE_COMMIT = 60, SWIPE_MAX = 90
+  const swipeVel = useRef(velocityTracker())
+  const swipeAnim = useRef(null)
+  const swipeCrossed = useRef(false)
   const handleTouchStart = (id, e) => {
     const t = e.touches[0]
+    swipeAnim.current?.()  // перехватываем строку, которая ещё возвращается
     swipeStart.current = { x: t.clientX, y: t.clientY }
     swipeAxis.current = null
+    swipeVel.current.reset()
+    swipeCrossed.current = false
     setSwipe({ id, dx: 0 })
   }
   const handleTouchMove = (id, e) => {
@@ -72,16 +83,33 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
     if (!swipeAxis.current && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
       swipeAxis.current = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'
     }
-    if (swipeAxis.current !== 'x' || dx < 0) return
-    setSwipe({ id, dx: Math.min(dx, 90) })
+    if (swipeAxis.current !== 'x') return
+    const raw = Math.max(0, dx)
+    swipeVel.current.add(raw)
+    const crossed = raw > SWIPE_COMMIT
+    if (crossed !== swipeCrossed.current) {
+      swipeCrossed.current = crossed
+      if (crossed) haptic(8)  // щелчок в момент, когда отпускание уже выберет строку
+    }
+    setSwipe({ id, dx: raw <= SWIPE_MAX ? raw : SWIPE_MAX + rubberband(raw - SWIPE_MAX, 220) })
   }
   const handleTouchEnd = (id) => {
-    if (swipe.id === id && swipe.dx > 60) {
+    swipeAxis.current = null
+    if (swipe.id !== id || swipe.dx === 0) {
+      setSwipe({ id: null, dx: 0 })
+      return
+    }
+    const v = swipeVel.current.velocity()
+    if (swipe.dx + project(v, 0.99) > SWIPE_COMMIT && v > -300) {
       if (!selectMode) setSelectMode(true)
       toggleSelect(id)
+      haptic(15)
     }
-    setSwipe({ id: null, dx: 0 })
-    swipeAxis.current = null
+    swipeAnim.current = spring({
+      from: swipe.dx, to: 0, velocity: v, damping: 1, response: 0.3,
+      onUpdate: x => setSwipe({ id, dx: Math.max(0, x) }),
+      onDone: () => { setSwipe({ id: null, dx: 0 }); swipeAnim.current = null },
+    })
   }
 
   const [loadError, setLoadError] = useState(false)
@@ -339,8 +367,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
             boxShadow: '0 1px 3px rgba(14,23,38,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
             color: '#1366F0', transition: 'all 0.2s',
           }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(19,102,240,0.22)' }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(19,102,240,0.12)' }}
+            onPointerEnter={mouseOnly(e => { e.currentTarget.style.background = 'rgba(19,102,240,0.22)' })}
+            onPointerLeave={mouseOnly(e => { e.currentTarget.style.background = 'rgba(19,102,240,0.12)' })}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round">
               <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
@@ -569,8 +597,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 animation: isRemoving ? 'none' : 'rise 0.3s var(--ease) both',
                 animationDelay: `${Math.min(i * 20, 240)}ms`,
               }}
-              onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = flagged ? 'rgba(200,25,35,0.08)' : 'rgba(14,23,38,0.02)' }}
-              onMouseLeave={e => { handleMouseUp(); if (!isSelected) e.currentTarget.style.background = flagged ? 'rgba(200,25,35,0.05)' : 'transparent' }}
+              onPointerEnter={mouseOnly(e => { if (!isSelected) e.currentTarget.style.background = flagged ? 'rgba(200,25,35,0.08)' : 'rgba(14,23,38,0.02)' })}
+              onPointerLeave={mouseOnly(e => { handleMouseUp(); if (!isSelected) e.currentTarget.style.background = flagged ? 'rgba(200,25,35,0.05)' : 'transparent' })}
               onMouseDown={() => handleMouseDown(order.id)}
               onMouseUp={handleMouseUp}
               onClick={e => handleRowClick(order, e)}
@@ -712,8 +740,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                   key={s.id}
                   onClick={() => handleBulkStatus(s.id)}
                   style={{ ...bulkBtnStyle, textAlign: 'left', padding: '8px 10px' }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)')}
+                  onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                 >{s.label}</button>
               ))}
             </div>
@@ -726,10 +754,10 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           }}>
             <span style={{ fontSize: 13, color: '#0E1726', fontWeight: 700 }}>Выбрано: {selected.size}</span>
             <div style={{ width: 1, height: 20, background: 'rgba(14,23,38,0.12)' }} />
-            <button onClick={() => setShowStatusMenu(v => !v)} style={bulkBtnStyle} onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>Сменить статус</button>
-            <button onClick={() => setShowCorrespondenceModal(true)} style={bulkBtnStyle} onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>Корреспонденция</button>
-            <button onClick={handleBulkDelete} style={{ ...bulkBtnStyle, color: '#C81923' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(200,25,35,0.08)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>Удалить</button>
-            <button onClick={clearSelection} style={{ ...bulkBtnStyle, color: '#8A93A0' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>Отмена</button>
+            <button onClick={() => setShowStatusMenu(v => !v)} style={bulkBtnStyle} onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)')} onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}>Сменить статус</button>
+            <button onClick={() => setShowCorrespondenceModal(true)} style={bulkBtnStyle} onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)')} onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}>Корреспонденция</button>
+            <button onClick={handleBulkDelete} style={{ ...bulkBtnStyle, color: '#C81923' }} onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(200,25,35,0.08)')} onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}>Удалить</button>
+            <button onClick={clearSelection} style={{ ...bulkBtnStyle, color: '#8A93A0' }} onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)')} onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}>Отмена</button>
           </div>
         </div>
       )}

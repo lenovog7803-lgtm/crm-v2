@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getClients, deleteClient as apiDelete } from '../api'
 import { initials, getGradient } from '../utils'
 import { SkeletonCard } from './Skeleton'
+import { mouseOnly } from '../motion'
 
 // Imported data sometimes has several phone numbers jammed into one field,
 // separated by commas — occasionally with a stray fragment mixed in (e.g.
@@ -77,8 +78,8 @@ export default function Clients({ onOpenClient, onAdd, refreshKey, search = '' }
             <div
               key={client.id} className="card"
               style={{ padding: '22px 22px', cursor: 'pointer', display: 'flex', flexDirection: 'column', transition: 'transform 0.15s, box-shadow 0.15s' }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 50px -20px rgba(20,30,55,0.25)' }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '' }}
+              onPointerEnter={mouseOnly(e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 50px -20px rgba(20,30,55,0.25)' })}
+              onPointerLeave={mouseOnly(e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '' })}
               onClick={() => onOpenClient(client.id)}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>

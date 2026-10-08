@@ -7,6 +7,7 @@ import {
 import { useToast } from '../components/Toast'
 import { ModalOverlay, ModalHeader } from '../components/Modal'
 import { CallsHeatmap, FunnelChart } from '../components/leads/AnalyticsView'
+import { mouseOnly } from '../motion'
 
 const TABS = [
   { id: 'managers', label: 'Пользователи' },
@@ -238,8 +239,8 @@ function UsersTab() {
                 const isManager = m.role === 'manager'
                 return (
                   <tr key={m.id} onClick={() => setEditUser(m)} style={{ cursor: 'pointer' }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.02)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                    onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(14,23,38,0.02)')}
+                    onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                   >
                     <td style={{ padding: '11px 14px', fontSize: 13, fontFamily: 'JetBrains Mono', color: '#1366F0', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.login}</td>
                     <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: '#0E1726', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.name}</td>

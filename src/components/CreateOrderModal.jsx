@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ModalOverlay, ModalHeader } from './Modal'
 import { createOrder, updateOrder, getClients, getCarriers, getToken, syncToSheets } from '../api'
+import { mouseOnly } from '../motion'
 
 const POPULAR_CITIES = [
   'Минск', 'Брест', 'Гродно', 'Гомель', 'Могилёв', 'Витебск', 'Бобруйск',
@@ -77,8 +78,8 @@ function ComboSelect({ value, onTextChange, onSelect, items, placeholder, labelF
               key={item.id}
               onMouseDown={() => { onSelect(item); setShow(false) }}
               style={{ padding: '10px 14px', fontSize: 13, color: '#0E1726', cursor: 'pointer', borderBottom: '1px solid rgba(14,23,38,0.05)', transition: 'background 0.1s' }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(19,102,240,0.07)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.07)')}
+              onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
             >
               {labelFn(item)}
             </div>
@@ -125,8 +126,8 @@ function CityInput({ value, onChange, placeholder }) {
               key={city}
               onMouseDown={() => { onChange(city); setShow(false) }}
               style={{ padding: '10px 14px', fontSize: 13, color: '#0E1726', cursor: 'pointer', borderBottom: '1px solid rgba(14,23,38,0.05)', transition: 'background 0.1s' }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(19,102,240,0.07)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.07)')}
+              onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
             >
               {city}
             </div>

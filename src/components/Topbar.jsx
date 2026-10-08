@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useToast } from './Toast'
 import { fmtDate } from '../utils'
+import { mouseOnly } from '../motion'
 
 const PAGE_META = {
   dashboard: { title: 'Дашборд', subtitle: 'Обзор бизнеса' },
@@ -212,8 +213,8 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
         onClick={() => onNav && onNav('trash')}
         title="Корзина"
         style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', color: '#5A6573', padding: 6, borderRadius: 10 }}
-        onMouseEnter={e => e.currentTarget.style.color = '#C81923'}
-        onMouseLeave={e => e.currentTarget.style.color = '#5A6573'}
+        onPointerEnter={mouseOnly(e => e.currentTarget.style.color = '#C81923')}
+        onPointerLeave={mouseOnly(e => e.currentTarget.style.color = '#5A6573')}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
@@ -320,8 +321,8 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
                           borderLeft: `3px solid ${accent}`,
                           transition: 'background 0.12s',
                         }}
-                        onMouseEnter={e => e.currentTarget.style.background = `${tint}`}
-                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                        onPointerEnter={mouseOnly(e => e.currentTarget.style.background = `${tint}`)}
+                        onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                       >
                         <div style={{
                           width: 32, height: 32, borderRadius: 10, flexShrink: 0,
@@ -381,8 +382,8 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
                       padding: '11px 16px', cursor: item.type === 'order' ? 'pointer' : 'default',
                       borderBottom: '1px solid rgba(14,23,38,0.05)', transition: 'background 0.12s',
                     }}
-                    onMouseEnter={e => { if (item.type === 'order') e.currentTarget.style.background = 'rgba(200,25,35,0.05)' }}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                    onPointerEnter={mouseOnly(e => { if (item.type === 'order') e.currentTarget.style.background = 'rgba(200,25,35,0.05)' })}
+                    onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                   >
                     <div style={{
                       width: 32, height: 32, borderRadius: 10, flexShrink: 0,

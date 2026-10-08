@@ -1,4 +1,32 @@
 import { useRef, useState, useLayoutEffect } from 'react'
+import { useAuth } from '../AuthContext'
+import { ModalOverlay, ModalHeader } from './Modal'
+
+// Нижняя панель на телефоне — не больше 5 вкладок (как в iOS); всё остальное — в «Ещё».
+// Раньше «Рассылка», «База обзвона», «Автопарк» и др. с телефона были недоступны вовсе.
+const MORE_SECTIONS = [
+  { title: 'Работа с клиентами', items: [
+    { key: 'clients', label: 'Клиенты' },
+    { key: 'carriers', label: 'Перевозчики' },
+    { key: 'leads', label: 'База обзвона', badge: 'newLeads' },
+    { key: 'mailing', label: 'Рассылка', badge: 'newReplies', director: true },
+  ] },
+  { title: 'Свой автопарк', fleet: true, items: [
+    { key: 'fleet-dashboard', label: 'Дашборд автопарка' },
+    { key: 'fleet-trips', label: 'Рейсы' },
+    { key: 'fleet-clients', label: 'Клиенты автопарка' },
+    { key: 'fleet-vehicles', label: 'Машины и водители' },
+  ] },
+  { title: 'Отчёты и учёт', director: true, items: [
+    { key: 'reports', label: 'Отчёты' },
+    { key: 'kudir', label: 'КУДиР' },
+  ] },
+  { title: 'Служебное', items: [
+    { key: 'trash', label: 'Корзина' },
+    { key: 'backups', label: 'Резервные копии', egor: true },
+    { key: 'admin', label: 'Администрирование', egor: true },
+  ] },
+]
 
 const NAV = [
   {
@@ -52,26 +80,13 @@ const NAV = [
     ),
   },
   {
-    key: 'clients',
-    label: 'Клиенты',
+    key: 'more',
+    label: 'Ещё',
+    badge: 'moreBadge',
+    badgeColor: '#0E9F6E',
     icon: (a) => (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={a ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-        <circle cx="9" cy="7" r="4"/>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-      </svg>
-    ),
-  },
-  {
-    key: 'carriers',
-    label: 'Перевозчики',
-    icon: (a) => (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={a ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">
-        <rect x="1" y="3" width="15" height="13" rx="1"/>
-        <path d="M16 8h4l3 3v5h-7V8z"/>
-        <circle cx="5.5" cy="18.5" r="2.5"/>
-        <circle cx="18.5" cy="18.5" r="2.5"/>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill={a ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={a ? 0 : 1.8}>
+        <circle cx="5" cy="12" r={a ? 2.4 : 1.8}/><circle cx="12" cy="12" r={a ? 2.4 : 1.8}/><circle cx="19" cy="12" r={a ? 2.4 : 1.8}/>
       </svg>
     ),
   },
@@ -119,14 +134,56 @@ const MANAGER_NAV = [
 
 const ACTIVE_KEYS = {
   'order-detail': 'orders',
-  'client-detail': 'clients',
-  'carrier-detail': 'carriers',
-  'carriers': 'carriers',
+}
+const MORE_KEYS = new Set(['client-detail', 'carrier-detail', 'fleet-trip-detail', 'fleet-client-detail', 'fleet-order-detail', 'fleet-analytics',
+  ...MORE_SECTIONS.flatMap(sec => sec.items.map(i => i.key))])
+
+function MoreSheet({ page, counts, onNav, onClose }) {
+  const { user } = useAuth()
+  const profile = user?.user || {}
+  const isDirector = profile.role === 'director' || profile.role === 'admin'
+  const canFleet = isDirector || profile.fleet_access === true
+  const isEgor = user?.username === 'egor_dir'
+  const sections = MORE_SECTIONS
+    .filter(sec => (!sec.director || isDirector) && (!sec.fleet || canFleet))
+    .map(sec => ({ ...sec, items: sec.items.filter(i => (!i.director || isDirector) && (!i.egor || isEgor)) }))
+    .filter(sec => sec.items.length)
+  return (
+    <ModalOverlay onClose={onClose}>
+      <ModalHeader title="Разделы" onClose={onClose} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        {sections.map(sec => (
+          <div key={sec.title}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#A6AEB8', marginBottom: 6 }}>{sec.title}</div>
+            <div style={{ borderRadius: 14, background: 'rgba(14,23,38,0.035)', overflow: 'hidden' }}>
+              {sec.items.map((it, idx) => {
+                const active = page === it.key
+                const n = it.badge ? counts?.[it.badge] : 0
+                return (
+                  <button key={it.key} onClick={() => { onNav(it.key); onClose() }}
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '14px 14px', border: 'none',
+                      borderTop: idx ? '1px solid rgba(14,23,38,0.06)' : 'none', background: active ? 'rgba(19,102,240,0.08)' : 'transparent',
+                      color: active ? '#1366F0' : '#0E1726', fontFamily: 'Manrope', fontSize: 16, fontWeight: 600, textAlign: 'left', cursor: 'pointer' }}>
+                    <span style={{ flex: 1 }}>{it.label}</span>
+                    {n > 0 && <span style={{ minWidth: 20, height: 20, borderRadius: 99, background: '#0E9F6E', color: '#fff', fontSize: 11, fontWeight: 800,
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 6px' }}>{n > 99 ? '99+' : n}</span>}
+                    <span style={{ color: '#C4CAD4', fontSize: 18 }}>›</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </ModalOverlay>
+  )
 }
 
 export default function MobileNav({ page, onNav, counts, isManager }) {
   const navList = isManager ? MANAGER_NAV : NAV
-  const activeKey = ACTIVE_KEYS[page] || page
+  const [moreOpen, setMoreOpen] = useState(false)
+  const activeKey = !isManager && MORE_KEYS.has(page) ? 'more' : (ACTIVE_KEYS[page] || page)
+  const allCounts = { ...counts, moreBadge: (counts?.newReplies || 0) + (counts?.newLeads || 0) }
 
   // A capsule that glides behind the active icon (Telegram-style tab bar)
   // instead of the icon just swapping color in place. Sized/positioned off
@@ -143,6 +200,7 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
   }, [activeKey])
 
   return (
+    <>
     <div className="mobile-nav" style={{
       position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000,
       alignItems: 'stretch',
@@ -166,13 +224,13 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
       )}
       {navList.map(item => {
         const active = activeKey === item.key
-        const badgeVal = item.badge ? counts?.[item.badge] : 0
+        const badgeVal = item.badge ? allCounts[item.badge] : 0
         const badgeColor = item.badgeColor || '#1366F0'
         return (
           <button
             key={item.key}
             ref={el => { btnRefs.current[item.key] = el }}
-            onClick={() => onNav(item.key)}
+            onClick={() => (item.key === 'more' ? setMoreOpen(true) : onNav(item.key))}
             style={{
               flex: 1,
               border: 'none',
@@ -212,5 +270,7 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
         )
       })}
     </div>
+    {moreOpen && <MoreSheet page={page} counts={allCounts} onNav={onNav} onClose={() => setMoreOpen(false)} />}
+    </>
   )
 }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { prefersReducedMotion } from '../motion'
 
 export function CircularProgress({ pct, color, size = 56, stroke = 6, duration = 800 }) {
   const [display, setDisplay] = useState(0)
@@ -9,6 +10,7 @@ export function CircularProgress({ pct, color, size = 56, stroke = 6, duration =
     fromRef.current = display
     startRef.current = null
     const target = Math.max(0, Math.min(Number(pct) || 0, 100))
+    if (prefersReducedMotion()) { setDisplay(target); return }  // «уменьшить движение» — сразу итог
 
     let raf
     const tick = (t) => {

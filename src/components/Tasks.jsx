@@ -5,6 +5,7 @@ import { fmtDate } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
 import { SlidingTabs } from './SlidingTabs'
+import { mouseOnly } from '../motion'
 
 const TYPE_COLORS = { call: '#1366F0', reminder: '#D97706', payment: '#1E9E5A', other: '#8A93A0' }
 const TYPE_BG = { call: 'rgba(19,102,240,0.1)', reminder: 'rgba(217,119,6,0.1)', payment: 'rgba(30,158,90,0.1)', other: 'rgba(138,147,160,0.1)' }
@@ -122,8 +123,8 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
               transition: 'background 0.12s', cursor: 'pointer',
             }}
               onClick={() => openEdit(task)}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.02)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(14,23,38,0.02)')}
+              onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
             >
               <button onClick={e => { e.stopPropagation(); handleToggle(task) }} style={{
                 width: 22, height: 22, borderRadius: 7, flexShrink: 0,

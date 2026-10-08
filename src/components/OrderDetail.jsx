@@ -7,6 +7,7 @@ import { useToast } from './Toast'
 import { useCelebration } from './Celebration'
 import OrderPaymentModal from './OrderPaymentModal'
 import CarrierActModal from './CarrierActModal'
+import { mouseOnly } from '../motion'
 
 const STATUSES = [
   { id: 'new', label: 'Новая', color: '#7C3AED', bg: 'rgba(124,58,237,0.1)' },
@@ -195,6 +196,7 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
 
   return (
     <div
+      className="no-callout"
       onClick={handleClick}
       onMouseDown={startPress}
       onMouseUp={cancelPress}
@@ -217,8 +219,8 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
         transition: 'all 0.2s',
         userSelect: 'none', WebkitUserSelect: 'none',
       }}
-      onMouseEnter={e => { if (!isPaid && !hasUnmatchedPayment) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.09)' : 'rgba(14,23,38,0.07)' }}
-      onMouseLeave={e => { cancelPress(); if (!isPaid && !hasUnmatchedPayment) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(14,23,38,0.04)' }}
+      onPointerEnter={mouseOnly(e => { if (!isPaid && !hasUnmatchedPayment) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.09)' : 'rgba(14,23,38,0.07)' })}
+      onPointerLeave={mouseOnly(e => { cancelPress(); if (!isPaid && !hasUnmatchedPayment) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(14,23,38,0.04)' })}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{
@@ -885,8 +887,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                     border: `1.5px solid ${view.status === s.id ? s.color + '50' : 'rgba(14,23,38,0.08)'}`,
                     transition: 'all 0.2s',
                   }}
-                  onMouseEnter={e => { if (view.status !== s.id) { e.currentTarget.style.background = s.bg; e.currentTarget.style.color = s.color } }}
-                  onMouseLeave={e => { if (view.status !== s.id) { e.currentTarget.style.background = 'rgba(14,23,38,0.04)'; e.currentTarget.style.color = '#8A93A0' } }}
+                  onPointerEnter={mouseOnly(e => { if (view.status !== s.id) { e.currentTarget.style.background = s.bg; e.currentTarget.style.color = s.color } })}
+                  onPointerLeave={mouseOnly(e => { if (view.status !== s.id) { e.currentTarget.style.background = 'rgba(14,23,38,0.04)'; e.currentTarget.style.color = '#8A93A0' } })}
                 >
                   {s.label}
                 </div>
@@ -914,6 +916,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                 return (
                   <div
                     key={step.key}
+                    className="no-callout"
                     onClick={() => handleDocClick(step)}
                     onMouseDown={() => startDocPress(step)}
                     onMouseUp={cancelDocPress}
@@ -928,8 +931,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                       border: `1px solid ${isDone ? 'rgba(30,158,90,0.2)' : 'rgba(14,23,38,0.07)'}`,
                       transition: 'all 0.2s', userSelect: 'none', WebkitUserSelect: 'none',
                     }}
-                    onMouseEnter={e => { if (!isDone) e.currentTarget.style.background = 'rgba(14,23,38,0.06)' }}
-                    onMouseLeave={e => { cancelDocPress(); if (!isDone) e.currentTarget.style.background = 'rgba(14,23,38,0.03)' }}
+                    onPointerEnter={mouseOnly(e => { if (!isDone) e.currentTarget.style.background = 'rgba(14,23,38,0.06)' })}
+                    onPointerLeave={mouseOnly(e => { cancelDocPress(); if (!isDone) e.currentTarget.style.background = 'rgba(14,23,38,0.03)' })}
                   >
                     <div style={{
                       width: 20, height: 20, borderRadius: 6, flexShrink: 0,
@@ -1063,8 +1066,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                   display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 6,
                   transition: 'background 0.15s', opacity: gAuthBusy ? 0.6 : 1,
                 }}
-                onMouseEnter={e => e.currentTarget.style.background = 'rgba(217,119,6,0.18)'}
-                onMouseLeave={e => e.currentTarget.style.background = 'rgba(217,119,6,0.1)'}
+                onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(217,119,6,0.18)')}
+                onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'rgba(217,119,6,0.1)')}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3" />
@@ -1079,8 +1082,8 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'background 0.15s',
                 }}
-                onMouseEnter={e => e.currentTarget.style.background = 'rgba(19,102,240,0.16)'}
-                onMouseLeave={e => e.currentTarget.style.background = 'rgba(19,102,240,0.08)'}
+                onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.16)')}
+                onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.08)')}
               >
                 <svg
                   width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"

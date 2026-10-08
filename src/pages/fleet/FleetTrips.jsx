@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getFleetTrips, createFleetTrip, getFleetVehicles, getFleetDrivers } from '../../api'
 import { useToast } from '../../components/Toast'
 import { TRIP_STATUS } from './FleetTripDetail'
+import { mouseOnly } from '../../motion'
 
 const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#FFFFFF', boxSizing: 'border-box', width: '100%' }
 
@@ -130,8 +131,8 @@ export default function FleetTrips({ onOpenTrip }) {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
                 {monthTrips.map(t => (
                   <div key={t.id} className="card" onClick={() => onOpenTrip(t.id)} style={{ padding: 18, cursor: 'pointer' }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 50px -20px rgba(20,30,55,0.25)' }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '' }}
+                    onPointerEnter={mouseOnly(e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 50px -20px rgba(20,30,55,0.25)' })}
+                    onPointerLeave={mouseOnly(e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '' })}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                       <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 15, color: '#0E1726', flex: 1, minWidth: 0 }}>

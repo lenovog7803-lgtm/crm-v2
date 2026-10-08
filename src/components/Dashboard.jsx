@@ -5,6 +5,7 @@ import { useEscapeKey } from '../hooks/useEscapeKey'
 import { CountUp } from './CountUp'
 import { CircularProgress } from './CircularProgress'
 import { SkeletonCard } from './Skeleton'
+import { mouseOnly } from '../motion'
 
 const MONTH_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
 const MONTH_RU_SHORT = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек']
@@ -384,8 +385,8 @@ function DebtModal({ title, orders, onClose, onOpenOrder }) {
               <div key={i}
                 onClick={() => { onOpenOrder && onOpenOrder(o.id); onClose() }}
                 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', borderRadius: 12, borderBottom: '1px solid rgba(14,23,38,0.06)', cursor: onOpenOrder ? 'pointer' : 'default', transition: 'background 0.1s' }}
-                onMouseEnter={e => e.currentTarget.style.background = 'rgba(19,102,240,0.05)'}
-                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.05)')}
+                onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
               >
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontFamily: 'JetBrains Mono', fontSize: 12, color: '#1366F0', fontWeight: 600 }}>{o.order_number || `#${o.id}`}</div>
@@ -591,8 +592,8 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
   // DebtModal rows in this file) since these cards mix inline box-shadow
   // with per-card colors that a single shared CSS :hover rule can't express.
   const liftHandlers = (restShadow, hoverShadow) => ({
-    onMouseEnter: e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = hoverShadow },
-    onMouseLeave: e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = restShadow },
+    onPointerEnter: mouseOnly(e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = hoverShadow }),
+    onPointerLeave: mouseOnly(e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = restShadow }),
   })
 
   return (
@@ -738,8 +739,8 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
                   onClick={() => { setEditingGoal(g.key); setGoalInput(String(g.goal)) }}
                   title="Изменить план на этот месяц"
                   style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', borderRadius: 12, padding: 4, margin: -4, transition: 'background 0.15s var(--ease)' }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(14,23,38,0.04)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(14,23,38,0.04)')}
+                  onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                 >
                   <div style={{ position: 'relative', flexShrink: 0 }}>
                     <CircularProgress pct={pct} color={g.color} size={isMobile ? 48 : 56} />

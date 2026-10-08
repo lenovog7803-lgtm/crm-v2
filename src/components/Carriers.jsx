@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getCarriers, deleteCarrier as apiDelete } from '../api'
 import { getGradient } from '../utils'
 import { SkeletonCard } from './Skeleton'
+import { mouseOnly } from '../motion'
 
 // Same cleanup as Clients.jsx — imported phone fields sometimes carry
 // several numbers (and stray fragments) jammed into one comma-separated
@@ -86,8 +87,8 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
             <div
               key={carrier.id} className="card"
               style={{ padding: '22px 22px', cursor: 'pointer', display: 'flex', flexDirection: 'column', transition: 'transform 0.15s, box-shadow 0.15s' }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 50px -20px rgba(20,30,55,0.25)' }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '' }}
+              onPointerEnter={mouseOnly(e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 50px -20px rgba(20,30,55,0.25)' })}
+              onPointerLeave={mouseOnly(e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '' })}
               onClick={() => onOpenCarrier(carrier.id)}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>

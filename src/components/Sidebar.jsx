@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { useAuth } from '../AuthContext'
 import { initials } from '../utils'
 import { SlidingTabs } from './SlidingTabs'
+import { mouseOnly } from '../motion'
 
 const HIDDEN_MENU_WIDTH = 200
 
@@ -448,9 +449,10 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
       }}>
         <div
           ref={avatarRef}
+          className="no-callout"
           onMouseDown={startLongPress}
           onMouseUp={cancelLongPress}
-          onMouseLeave={cancelLongPress}
+          onPointerLeave={mouseOnly(cancelLongPress)}
           onTouchStart={startLongPress}
           onTouchEnd={cancelLongPress}
           style={{
@@ -511,8 +513,8 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
                   color: page === item.key ? '#1366F0' : '#5A6573',
                   fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
                 }}
-                onMouseEnter={e => { if (page !== item.key) e.currentTarget.style.background = 'rgba(14,23,38,0.05)' }}
-                onMouseLeave={e => { if (page !== item.key) e.currentTarget.style.background = 'transparent' }}
+                onPointerEnter={mouseOnly(e => { if (page !== item.key) e.currentTarget.style.background = 'rgba(14,23,38,0.05)' })}
+                onPointerLeave={mouseOnly(e => { if (page !== item.key) e.currentTarget.style.background = 'transparent' })}
               >
                 <span style={{ flexShrink: 0, width: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{item.icon}</span>
                 <span>{item.label}</span>

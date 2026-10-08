@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-
 :root {
   /* Radius scale — everything in the app should round to one of these,
      not an arbitrary one-off px value. xs=pills/icons, sm=inputs/buttons,
@@ -23,6 +21,10 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body, #root { height: 100%; }
+/* Без синей вспышки при касании и без меню «Скопировать» при долгом нажатии на кнопки —
+   у нас долгое нажатие само по себе действие (логотип, заявки). */
+html { -webkit-tap-highlight-color: transparent; }
+button, [role="button"], .no-callout { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 body {
   font-family: Manrope, sans-serif; background: #EDEFF3; -webkit-font-smoothing: antialiased;
   /* Digits line up in columns instead of jittering column width as sums
@@ -44,6 +46,9 @@ input[type="number"] {
 }
 
 @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+@keyframes pageIn { from { opacity:0; } to { opacity:1; } }
+@keyframes modalOut { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(0.97); } }
+@keyframes fadeOut { from { opacity:1; } to { opacity:0; } }
 @keyframes floatA { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(3%,4%) scale(1.08);} }
 @keyframes floatB { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-4%,3%) scale(1.1);} }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -61,7 +66,7 @@ input[type="number"] {
 }
 @keyframes navIconPop {
   0% { transform: scale(1); }
-  40% { transform: scale(1.22); }
+  40% { transform: scale(1.08); }
   100% { transform: scale(1); }
 }
 
@@ -82,7 +87,7 @@ input[type="number"] {
   box-shadow: 0 10px 24px -12px rgba(14,23,38,0.7);
   transition: background 0.15s var(--ease), transform 0.15s var(--ease);
 }
-.btn-primary:hover { background: #1C2740; }
+@media (hover: hover) { .btn-primary:hover { background: #1C2740; } }
 .btn-primary:active { transform: scale(0.97); }
 
 .btn-ghost {
@@ -92,7 +97,7 @@ input[type="number"] {
   color: #0E1726; font-family: Manrope; font-size: 13px; font-weight: 600; cursor: pointer;
   transition: all 0.15s var(--ease);
 }
-.btn-ghost:hover { background: #fff; border-color: rgba(14,23,38,0.25); }
+@media (hover: hover) { .btn-ghost:hover { background: #fff; border-color: rgba(14,23,38,0.25); } }
 .btn-ghost:active { transform: scale(0.97); }
 
 /* CSS-native hover instead of onMouseEnter/onMouseLeave mutating
@@ -101,7 +106,7 @@ input[type="number"] {
    stuck on a sidebar item permanently since nothing else ever reset it.
    :hover can't get stuck; the browser owns it. */
 .sidebar-nav-btn { background: transparent; transition: color 0.15s var(--ease); }
-.sidebar-nav-btn:hover { background: rgba(14,23,38,0.05); }
+@media (hover: hover) { .sidebar-nav-btn:hover { background: rgba(14,23,38,0.05); } }
 .sidebar-nav-btn.active:hover { background: transparent; }
 
 .section-label {
@@ -124,6 +129,7 @@ input[type="number"] {
   position: relative;
   width: 100vw;
   height: 100vh;
+  height: 100dvh; /* iPhone Safari: высота без прыжков из-за адресной строки */
   overflow: hidden;
   background: #EDEFF3;
 }
@@ -190,7 +196,8 @@ input[type="number"] {
   flex: 1;
   overflow-y: auto;
   padding: 16px 0 16px 0;
-  animation: rise 0.3s ease;
+  /* переключение раздела — сотни раз в день: короткое растворение, без «выезда» */
+  animation: pageIn 0.15s ease-out;
 }
 
 /* Mobile nav hidden on desktop */
@@ -220,10 +227,18 @@ input[type="number"] {
     border-top: none !important;
     margin-bottom: 0 !important;
     padding: 10px 16px !important;
-    background: rgba(255,255,255,0.94) !important;
-    border-bottom: 1px solid rgba(14,23,38,0.08) !important;
-    box-shadow: none !important;
+    /* материал, а не сплошная плашка: полупрозрачно + размытие, без жёсткой линии */
+    background: rgba(251,251,253,0.72) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border-bottom: none !important;
+    box-shadow: 0 1px 0 rgba(14,23,38,0.04), 0 8px 16px -12px rgba(14,23,38,0.12) !important;
+    position: relative;
+    z-index: 5;
   }
+
+  /* iOS приближает страницу при фокусе на поле со шрифтом меньше 16px */
+  input, select, textarea { font-size: 16px !important; }
 
   /* Scroll area: 16px iOS standard horizontal margins */
   .scroll-area {
@@ -257,4 +272,33 @@ input[type="number"] {
   /* Aurora orbs: smaller on mobile */
   .aurora-orb-a { width: 260px; height: 260px; }
   .aurora-orb-b { width: 240px; height: 240px; }
+}
+
+/* ── Доступность ───────────────────────────────────────────────
+   «Уменьшить движение»: вместо выездов и масштаба — короткое растворение,
+   фоновые пятна стоят, без отскоков. Цвет/прозрачность оставляем — они помогают понять. */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes rise { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes modalIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes modalOut { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes navIconPop { from { transform: none; } to { transform: none; } }
+  @keyframes statusPulseRing { from { opacity: 0; } to { opacity: 0; } }
+  .aurora-orb-a, .aurora-orb-b { animation: none !important; }
+  .btn-primary:active, .btn-ghost:active { transform: none; }
+  *, *::before, *::after { scroll-behavior: auto !important; }
+}
+
+/* «Уменьшить прозрачность»: плотные поверхности без размытия */
+@media (prefers-reduced-transparency: reduce) {
+  .card { background: #FFFFFF !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .modal-overlay { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(14,23,38,0.55) !important; }
+  .modal-panel { background: #FFFFFF !important; backdrop-filter: none !important; }
+  .mobile-nav, .topbar-mobile { background: #FBFBFD !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .aurora-bg { display: none; }
+}
+
+/* «Увеличить контраст»: почти сплошной фон и чёткая граница */
+@media (prefers-contrast: more) {
+  .card { background: #FFFFFF !important; border: 1px solid rgba(14,23,38,0.35) !important; }
+  :root { --text-tertiary: #5A6573; --text-quaternary: #8A93A0; }
 }

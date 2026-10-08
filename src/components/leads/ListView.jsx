@@ -12,6 +12,7 @@ import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { useCelebration } from '../Celebration'
 import { useAuth } from '../../AuthContext'
 import { initials, getGradient } from '../../utils'
+import { mouseOnly } from '../../motion'
 
 const FILTERS_KEY = 'leads_list_filters'
 const ROW_GRID = 'minmax(0, 1.6fr) minmax(0, 1fr) 130px 120px 90px'
@@ -152,8 +153,8 @@ export default function ListView({ industry }) {
                     background: overdue ? 'rgba(200,25,35,0.03)' : 'transparent',
                     animation: 'rise 0.3s var(--ease) both', animationDelay: `${Math.min(i * 20, 240)}ms`,
                   }}
-                  onMouseEnter={e => e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.06)' : 'rgba(14,23,38,0.02)'}
-                  onMouseLeave={e => e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.03)' : 'transparent'}
+                  onPointerEnter={mouseOnly(e => e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.06)' : 'rgba(14,23,38,0.02)')}
+                  onPointerLeave={mouseOnly(e => e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.03)' : 'transparent')}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                     <div style={{

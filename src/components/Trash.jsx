@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getTrash, restoreTrash, purgeTrash } from '../api'
+import { mouseOnly } from '../motion'
 
 const TYPE_LABELS = {
   orders: 'Заявка',
@@ -209,8 +210,8 @@ export default function Trash() {
                   fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
                   flexShrink: 0, transition: 'all 0.15s',
                 }}
-                onMouseEnter={e => e.currentTarget.style.background = 'rgba(19,102,240,0.12)'}
-                onMouseLeave={e => e.currentTarget.style.background = 'rgba(19,102,240,0.06)'}
+                onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.12)')}
+                onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.06)')}
               >
                 {restoring === item.id ? '...' : 'Восстановить'}
               </button>

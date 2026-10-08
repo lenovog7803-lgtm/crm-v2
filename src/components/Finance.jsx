@@ -5,6 +5,7 @@ import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
 import { useToast } from './Toast'
 import { SlidingTabs } from './SlidingTabs'
+import { mouseOnly } from '../motion'
 
 export default function Finance({ refreshKey }) {
   const isMobile = useIsMobile()
@@ -327,8 +328,8 @@ export default function Finance({ refreshKey }) {
             const [avA, avB] = getGradient(p.gradKey)
             return (
               <div key={`${p.kind}-${p.id}`}
-                onMouseEnter={e => e.currentTarget.style.background = 'rgba(19,102,240,0.05)'}
-                onMouseLeave={e => e.currentTarget.style.background = i % 2 === 0 ? 'rgba(14,23,38,0.02)' : 'transparent'}
+                onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.05)')}
+                onPointerLeave={mouseOnly(e => e.currentTarget.style.background = i % 2 === 0 ? 'rgba(14,23,38,0.02)' : 'transparent')}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 12, padding: '10px 8px', borderRadius: 11,
                   background: i % 2 === 0 ? 'rgba(14,23,38,0.02)' : 'transparent',
@@ -624,8 +625,8 @@ function PartySearchSelect({ items, labelKey, value, onChange, placeholder }) {
               key={item.id}
               onMouseDown={() => { onChange(item.id, item[labelKey] || item.name || ''); setOpen(false); setQuery('') }}
               style={{ padding: '8px 12px', fontSize: 12.5, cursor: 'pointer', color: '#0E1726' }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#F7F8FA' }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+              onPointerEnter={mouseOnly(e => { e.currentTarget.style.background = '#F7F8FA' })}
+              onPointerLeave={mouseOnly(e => { e.currentTarget.style.background = 'transparent' })}
             >
               {item[labelKey] || item.name}
             </div>

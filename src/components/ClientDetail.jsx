@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getClient, deleteClient as apiDelete, updateClient, getOrders } from '../api'
 import { initials, fmtMoney, statusLabel, statusColor, statusBg, getGradient } from '../utils'
+import { mouseOnly } from '../motion'
 
 function Row({ label, value, mono }) {
   return (
@@ -253,8 +254,8 @@ export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }
                     cursor: onOpenOrder ? 'pointer' : 'default',
                     transition: 'background 0.12s',
                   }}
-                  onMouseEnter={e => { if (onOpenOrder) e.currentTarget.style.background = 'rgba(19,102,240,0.05)' }}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  onPointerEnter={mouseOnly(e => { if (onOpenOrder) e.currentTarget.style.background = 'rgba(19,102,240,0.05)' })}
+                  onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                 >
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontFamily: 'JetBrains Mono', fontSize: 12, color: '#1366F0', fontWeight: 600 }}>{o.order_number || o.id}</div>

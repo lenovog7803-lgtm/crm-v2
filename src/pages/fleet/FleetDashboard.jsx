@@ -4,6 +4,7 @@ import { useToast } from '../../components/Toast'
 import { CountUp } from '../../components/CountUp'
 import { TRIP_STATUS } from './FleetTripDetail'
 import { PillBtn } from './fleetUi'
+import { mouseOnly } from '../../motion'
 
 const money = v => `${Math.round(Number(v) || 0).toLocaleString('ru-RU')} BYN`
 const int = v => Math.round(Number(v) || 0).toLocaleString('ru-RU')
@@ -236,8 +237,8 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
                   borderBottom: i < items.length - 1 ? '1px solid #F0F1F4' : 'none', fontSize: 13, color: '#0E1726',
                   cursor: it.id ? 'pointer' : 'default',
                 }}
-                onMouseEnter={e => { if (it.id) e.currentTarget.style.background = 'rgba(19,102,240,0.05)' }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+                onPointerEnter={mouseOnly(e => { if (it.id) e.currentTarget.style.background = 'rgba(19,102,240,0.05)' })}
+                onPointerLeave={mouseOnly(e => { e.currentTarget.style.background = 'transparent' })}
               >
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{it.name || '—'}</span>
                 <span style={{ fontWeight: 700, flexShrink: 0, color: accent, fontFamily: 'JetBrains Mono' }}>{int(it.sum)}</span>

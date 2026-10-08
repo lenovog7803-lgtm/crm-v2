@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { prefersReducedMotion } from '../motion'
 
 export function CountUp({ value, duration = 700, format = (v) => Math.round(v).toLocaleString('ru-RU') }) {
   const [display, setDisplay] = useState(0)
@@ -9,6 +10,7 @@ export function CountUp({ value, duration = 700, format = (v) => Math.round(v).t
     fromRef.current = display
     startRef.current = null
     const target = Number(value) || 0
+    if (prefersReducedMotion()) { setDisplay(target); return }  // «уменьшить движение» — сразу итог
 
     let raf
     const tick = (t) => {
