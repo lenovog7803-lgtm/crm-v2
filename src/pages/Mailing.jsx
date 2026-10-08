@@ -40,7 +40,7 @@ const tabsWith = (newReplies, withSuppliers) => [
   { key: 'settings', label: 'Настройки' },
 ]
 
-const KIND_LABEL = { sale: 'продажа', purchase: 'закупка' }
+const KIND_LABEL = { sale: 'продажа', clients: 'поиск клиентов', purchase: 'закупка' }
 
 // Быстрые фильтры контактов — счётчики приходят из /mailing/state (groups)
 const GROUPS = [
@@ -333,11 +333,17 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
   )
 }
 
+const TAG_COLORS = {
+  purchase: ['rgba(217,119,6,0.1)', '#B45309'],
+  clients: ['rgba(14,159,110,0.1)', '#0E7A55'],
+  sale: ['rgba(19,102,240,0.08)', '#1366F0'],
+}
+
 function CampaignTag({ name, kind }) {
-  const purchase = kind === 'purchase'
+  const [bg, color] = TAG_COLORS[kind] || TAG_COLORS.sale
   return (
     <span style={{ display: 'inline-block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 11, fontWeight: 700,
-      background: purchase ? 'rgba(217,119,6,0.1)' : 'rgba(19,102,240,0.08)', color: purchase ? '#B45309' : '#1366F0' }}>
+      background: bg, color }}>
       {name}
     </span>
   )
@@ -687,7 +693,8 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
           <div>
             <div style={labelStyle}>Тип</div>
             <select value={c.kind} onChange={e => set('kind', e.target.value)} style={inputStyle}>
-              <option value="sale">Продажа — ищем клиентов</option>
+              <option value="sale">Продажа товара</option>
+              <option value="clients">Поиск клиентов</option>
               <option value="purchase">Закупка — ищем поставщиков</option>
             </select>
           </div>
@@ -725,7 +732,7 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
           </div>
         )}
         <div style={{ fontSize: 12, color: '#8A93A0', lineHeight: 1.6 }}>
-          Подставляются: {VARS.map(v => <code key={v} style={{ background: 'rgba(14,23,38,0.05)', padding: '1px 5px', borderRadius: 5, marginRight: 4 }}>{v}</code>)}
+          Подставляются в тему и текст: {VARS.map(v => <code key={v} style={{ background: 'rgba(14,23,38,0.05)', padding: '1px 5px', borderRadius: 5, marginRight: 4 }}>{v}</code>)}
           <br />Имя, компания и телефон берутся из подписи выбранной почты.
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -1142,7 +1149,8 @@ function NewCampaignForm({ mailboxes, onCreated, onCancel }) {
       <div>
         <div style={labelStyle}>Тип</div>
         <select value={f.kind} onChange={e => setF(x => ({ ...x, kind: e.target.value }))} style={inputStyle}>
-          <option value="sale">Продажа — ищем клиентов</option>
+          <option value="sale">Продажа товара</option>
+          <option value="clients">Поиск клиентов</option>
           <option value="purchase">Закупка — ищем поставщиков</option>
         </select>
       </div>
@@ -1168,7 +1176,7 @@ function CampaignBar({ campaigns, value, onChange, onAdd }) {
         <button key={c.id} onClick={() => onChange(c.id)} style={chip(value === c.id)}>
           <span title={c.running ? 'работает' : 'остановлено'} style={{ width: 7, height: 7, borderRadius: 99, background: c.running ? '#0E9F6E' : '#C4CAD4' }} />
           {c.name}
-          <span style={{ fontSize: 10.5, fontWeight: 700, color: c.kind === 'purchase' ? '#B45309' : '#8A93A0' }}>{KIND_LABEL[c.kind] || ''}</span>
+          <span style={{ fontSize: 10.5, fontWeight: 700, color: c.kind === 'purchase' ? '#B45309' : c.kind === 'clients' ? '#0E9F6E' : '#8A93A0' }}>{KIND_LABEL[c.kind] || ''}</span>
           {c.replies_new > 0 && (
             <span style={{ minWidth: 16, height: 16, borderRadius: 99, background: '#0E9F6E', color: '#fff', fontSize: 10, fontWeight: 800,
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>{c.replies_new}</span>
