@@ -668,22 +668,22 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 1fr', gap: 16 }}>
         {/* Маржа — тёмный виджет */}
         <div
-          {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.08), 0 20px 50px -20px rgba(14,23,38,0.6)', 'inset 0 1px 0 rgba(255,255,255,0.08), 0 28px 60px -18px rgba(14,23,38,0.7)')}
+          {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.45), 0 20px 50px -20px rgba(19,102,240,0.55)', 'inset 0 1px 0 rgba(255,255,255,0.45), 0 28px 60px -18px rgba(19,102,240,0.65)')}
           style={{
-            // тёмное тонированное стекло: фон чуть просвечивает, сверху — блик
-            background: 'radial-gradient(120% 70% at 15% -10%, rgba(255,255,255,0.14), transparent 50%), radial-gradient(120% 90% at 100% 0%, rgba(19,102,240,0.38), transparent 55%), linear-gradient(160deg, rgba(21,35,63,0.86) 0%, rgba(14,23,38,0.92) 100%)',
+            // фирменное синее стекло: блик сверху-слева, глубина к низу
+            background: 'radial-gradient(120% 80% at 10% -20%, rgba(255,255,255,0.35), transparent 50%), linear-gradient(150deg, rgba(58,138,255,0.94) 0%, rgba(19,102,240,0.92) 50%, rgba(11,72,190,0.95) 100%)',
             backdropFilter: 'blur(28px) saturate(180%)', WebkitBackdropFilter: 'blur(28px) saturate(180%)',
-            border: '1px solid rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255,255,255,0.35)',
             borderRadius: 26, padding: isMobile ? '16px 18px' : '22px 24px', color: '#fff',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08), 0 20px 50px -20px rgba(14,23,38,0.6)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.45), 0 20px 50px -20px rgba(19,102,240,0.55)',
             transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
           }}>
-          <WidgetHead icon="margin" label="Маржа" color="#1366F0" labelColor="rgba(255,255,255,0.75)"
+          <WidgetHead icon="margin" label="Маржа" color="rgba(255,255,255,0.24)" labelColor="rgba(255,255,255,0.9)"
             right={marginDiff !== null && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 3, padding: '3px 9px', borderRadius: 999,
-                background: marginUp ? 'rgba(91,232,155,0.16)' : 'rgba(255,107,122,0.18)',
-                fontSize: 12, fontWeight: 600, color: marginUp ? '#5BE89B' : '#FF6B7A',
+                background: 'rgba(255,255,255,0.2)',
+                fontSize: 12, fontWeight: 600, color: marginUp ? '#B9FFD6' : '#FFD0D5',
               }}>
                 {marginUp ? '▲' : '▼'} {Math.abs(marginDiff)}%
                 <span style={{ fontWeight: 400, opacity: 0.7, fontSize: 11 }}>vs пред.</span>
@@ -693,16 +693,16 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             <span style={{ fontWeight: 700, fontSize: isMobile ? 34 : 44, letterSpacing: '-0.035em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
               <CountUp value={margin} />
             </span>
-            <span style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.45)' }}>BYN</span>
+            <span style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>BYN</span>
           </div>
-          <div style={{ display: 'flex', gap: isMobile ? 16 : 28, marginTop: isMobile ? 14 : 20, paddingTop: isMobile ? 12 : 14, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ display: 'flex', gap: isMobile ? 16 : 28, marginTop: isMobile ? 14 : 20, paddingTop: isMobile ? 12 : 14, borderTop: '1px solid rgba(255,255,255,0.22)' }}>
             <div>
-              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 2 }}>Выручка</div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>Выручка</div>
               <div style={{ fontWeight: 600, fontSize: isMobile ? 14 : 16, fontVariantNumeric: 'tabular-nums' }}><CountUp value={revenue} format={v => `${Math.round(v).toLocaleString('ru-RU')} BYN`} /></div>
             </div>
             <div>
-              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 2 }}>Чистая прибыль</div>
-              <div style={{ fontWeight: 600, fontSize: isMobile ? 14 : 16, color: '#5BE89B', fontVariantNumeric: 'tabular-nums' }}><CountUp value={netProfit} format={v => `${Math.round(v).toLocaleString('ru-RU')} BYN`} /></div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>Чистая прибыль</div>
+              <div style={{ fontWeight: 600, fontSize: isMobile ? 14 : 16, color: '#C2FFDD', fontVariantNumeric: 'tabular-nums' }}><CountUp value={netProfit} format={v => `${Math.round(v).toLocaleString('ru-RU')} BYN`} /></div>
             </div>
           </div>
         </div>
