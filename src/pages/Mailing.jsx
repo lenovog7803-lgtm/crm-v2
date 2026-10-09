@@ -827,9 +827,12 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
     setBusy(false)
   }
 
-  const doPreview = async () => {
+  const [pvBox, setPvBox] = useState(null)
+  const doPreview = async (box = pvBox) => {
+    const mailbox_id = boxes.includes(box) ? box : boxes[0]
+    setPvBox(mailbox_id)
     try {
-      setPreview(await previewMailing({ campaign_id: campaign.id, mailbox_id: c.mailbox_id, subjects: c.subjects, body: c.body, followup_body: c.followup_body }))
+      setPreview(await previewMailing({ campaign_id: campaign.id, mailbox_id, subjects: c.subjects, body: c.body, followup_body: c.followup_body }))
     } catch (e) {
       show('Ошибка: ' + e.message, { type: 'error' })
     }
@@ -920,7 +923,7 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
           <br />Имя, компания и телефон берутся из подписи выбранной почты.
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <button className="btn-ghost" onClick={doPreview}>Предпросмотр</button>
+          <button className="btn-ghost" onClick={() => doPreview()}>Предпросмотр</button>
           <button className="btn-primary" onClick={save} disabled={busy}>Сохранить</button>
           <div style={{ flex: 1 }} />
           <button className="btn-ghost" onClick={remove} style={{ color: '#E0473B' }}>Удалить направление</button>
@@ -929,6 +932,19 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
 
       <div className="card" style={{ padding: 18 }}>
         <div style={sectionTitle}>Предпросмотр</div>
+        {preview && boxes.length > 1 && (
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginBottom: 14 }}>
+            <span style={{ fontSize: 12, color: '#8A93A0' }}>Письмо с почты:</span>
+            {mailboxes.filter(m => boxes.includes(m.id)).map(m => (
+              <button key={m.id} type="button" onClick={() => doPreview(m.id)}
+                style={{ padding: '5px 10px', borderRadius: 9, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                  border: `1px solid ${pvBox === m.id ? '#2563EB' : 'rgba(14,23,38,0.12)'}`,
+                  background: pvBox === m.id ? 'rgba(37,99,235,0.08)' : '#fff', color: pvBox === m.id ? '#1D4ED8' : '#5A6573' }}>
+                {m.login || m.name}
+              </button>
+            ))}
+          </div>
+        )}
         {!preview && <div style={{ fontSize: 13, color: '#A6AEB8' }}>Нажмите «Предпросмотр», чтобы увидеть письмо для одной из компаний.</div>}
         {preview && [['Письмо', preview.first], ...(c.followup_enabled ? [['Напоминание', preview.follow]] : [])].map(([title, p]) => (
           <div key={title} style={{ marginBottom: 18 }}>
