@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { getDashboard, getOrders, getGoals, saveGoals } from '../api'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useEscapeKey } from '../hooks/useEscapeKey'
@@ -237,42 +237,6 @@ function buildChartData(orders, period) {
     labels: months.map(m => MONTH_RU_SHORT[parseInt(m.slice(5, 7)) - 1] + " '" + m.slice(2, 4)),
     mode: 'months',
   }
-}
-
-// Ряд для мини-графика KPI: сколько разных key было в каждую из последних 8 недель.
-function weeklySeries(orders, pick, weeks = 8) {
-  const now = Date.now(), WEEK = 7 * 864e5
-  const buckets = Array.from({ length: weeks }, () => new Set())
-  orders.forEach(o => {
-    const r = pick(o)
-    const t = r && Date.parse(r.date)
-    if (!t) return
-    const w = Math.floor((now - t) / WEEK)
-    if (w >= 0 && w < weeks) buckets[weeks - 1 - w].add(r.key)
-  })
-  return buckets.map(b => b.size)
-}
-
-function Sparkline({ data, color, w = 84, h = 30 }) {
-  if (!data || data.every(v => v === 0)) return null
-  const max = Math.max(...data, 1)
-  const pts = data.map((v, i) => [(i / (data.length - 1)) * w, h - 3 - (v / max) * (h - 6)])
-  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ')
-  const id = 'spk' + color.slice(1)
-  const last = pts[pts.length - 1]
-  return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ display: 'block', overflow: 'visible', flexShrink: 0 }} aria-hidden="true">
-      <defs>
-        <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={color} stopOpacity="0.28" />
-          <stop offset="1" stopColor={color} stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path d={`${line} L${w},${h} L0,${h} Z`} fill={`url(#${id})`} />
-      <path d={line} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx={last[0]} cy={last[1]} r="3" fill={color} stroke="#fff" strokeWidth="1.5" />
-    </svg>
-  )
 }
 
 const WIDGET_ICONS = {
@@ -632,13 +596,6 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
   // source of truth instead of two formulas that can drift apart.
   const netProfit = (goals && goalsMonth) ? goals.profit_fact : margin * 0.8
 
-  // Мини-графики KPI — последние 8 недель, независимо от выбранного периода.
-  const sparks = useMemo(() => ({
-    active: weeklySeries(allOrders, o => ({ date: o.created_at || o.load_date, key: o.id || o._id })),
-    done: weeklySeries(allOrders, o => ['done', 'delivered', 'completed'].includes(o.status) && { date: o.unload_date, key: o.id || o._id }),
-    clients: weeklySeries(allOrders, o => ({ date: o.load_date || o.created_at, key: o.client_name || o.client_id })),
-    carriers: weeklySeries(allOrders, o => (o.carrier_name || o.carrier_id) && { date: o.load_date || o.created_at, key: o.carrier_name || o.carrier_id }),
-  }), [allOrders])
 
   if (loading) return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -728,18 +685,18 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         ))}
       </div>
 
-      {/* KPI — число + мини-график за 8 недель */}
+      {/* KPI */}
       <div className="dashboard-stat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
         {[
-          { label: 'Активных заявок', value: active, color: '#1366F0', spark: sparks.active, hint: 'новые заявки по неделям',
+          { label: 'Активных заявок', value: active, color: '#1366F0',
             onClick: () => { localStorage.setItem('orders_statusFilter', 'active'); onNav('orders') } },
-          { label: 'Доставлено', value: done, color: '#1E9E5A', spark: sparks.done, hint: 'доставлено по неделям',
+          { label: 'Доставлено', value: done, color: '#1E9E5A',
             onClick: () => { localStorage.setItem('orders_statusFilter', 'done'); onNav('orders') } },
-          { label: 'Клиентов', value: clientsCount, color: '#D97706', spark: sparks.clients, hint: 'клиентов с заявками по неделям', onClick: () => onNav('clients') },
-          { label: 'Перевозчиков', value: carriersCount, color: '#7C3AED', spark: sparks.carriers, hint: 'перевозчиков в работе по неделям', onClick: () => onNav('carriers') },
+          { label: 'Клиентов', value: clientsCount, color: '#D97706', onClick: () => onNav('clients') },
+          { label: 'Перевозчиков', value: carriersCount, color: '#7C3AED', onClick: () => onNav('carriers') },
         ].map(kpi => (
           <div key={kpi.label} className="ios-widget"
-            onClick={kpi.onClick} title={`График: ${kpi.hint}, последние 8 недель`}
+            onClick={kpi.onClick}
             {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.9), 0 14px 40px -22px rgba(20,30,55,0.2)', 'inset 0 1px 0 rgba(255,255,255,0.9), 0 18px 44px -18px rgba(20,30,55,0.3)')}
             style={{ padding: isMobile ? '12px 14px' : '16px 18px', cursor: 'pointer' }}>
             <div style={{ fontSize: isMobile ? 12 : 13, color: '#8A93A0', fontWeight: 600, marginBottom: isMobile ? 6 : 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{kpi.label}</div>
@@ -747,7 +704,6 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
               <div style={{ fontWeight: 700, fontSize: isMobile ? 26 : 32, color: kpi.color, lineHeight: 1, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}>
                 <CountUp value={kpi.value} format={v => Math.round(v).toLocaleString('ru-RU')} />
               </div>
-              <Sparkline data={kpi.spark} color={kpi.color} w={isMobile ? 56 : 84} h={isMobile ? 24 : 30} />
             </div>
           </div>
         ))}
