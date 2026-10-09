@@ -3,6 +3,7 @@ import { getClient, deleteClient as apiDelete, updateClient, getOrders } from '.
 import { initials, fmtMoney, statusLabel, statusColor, statusBg, getGradient } from '../utils'
 import { mouseOnly } from '../motion'
 import { Loader } from './Loader'
+import { StatusOrb } from './StatusOrb'
 
 function Row({ label, value, mono }) {
   return (
@@ -270,8 +271,8 @@ export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }
                   <span style={{
                     padding: '2px 8px', borderRadius: 6, flexShrink: 0,
                     background: statusBg(o.status), color: statusColor(o.status),
-                    fontSize: 11, fontWeight: 600,
-                  }}>{statusLabel(o.status)}</span>
+                    fontSize: 11, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4,
+                  }}><StatusOrb status={o.status} scale={0.7} />{statusLabel(o.status)}</span>
                   {onOpenOrder && (
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A6AEB8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                       <polyline points="9 18 15 12 9 6"/>

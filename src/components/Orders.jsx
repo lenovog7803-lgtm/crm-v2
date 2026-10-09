@@ -9,6 +9,7 @@ import { EmptyState } from './EmptyState'
 import { SlidingTabs } from './SlidingTabs'
 import { mouseOnly, spring, project, rubberband, velocityTracker, haptic } from '../motion'
 import { SwapText } from './Transitions'
+import { StatusOrb } from './StatusOrb'
 
 const BULK_STATUSES = [
   { id: 'new', label: 'Новая' },
@@ -487,22 +488,9 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                         {isSelected && <span style={{ color: '#fff', fontSize: 12 }}>✓</span>}
                       </div>
                     )}
-                    {/* Status dot — overdue rows get a pulsing ring behind it,
-                        a quiet "this needs attention" signal beyond the red tint. */}
-                    <div style={{ position: 'relative', width: 10, height: 10, flexShrink: 0 }}>
-                      {overdue && (
-                        <span style={{
-                          position: 'absolute', inset: 0, borderRadius: '50%',
-                          background: statusColor(order.status),
-                          animation: 'statusPulseRing 1.6s ease-out infinite',
-                        }} />
-                      )}
-                      <div style={{
-                        position: 'relative', width: 10, height: 10, borderRadius: '50%',
-                        background: statusColor(order.status),
-                        boxShadow: `0 0 0 3px ${statusBg(order.status)}`,
-                      }} />
-                    </div>
+                    {/* Живой статус: «В пути» — точки бегут по орбите, «Новая» дышит,
+                        доставленные и отменённые замерли; просроченная — красная и быстрее. */}
+                    <StatusOrb status={order.status} overdue={overdue} />
                     {/* Main info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
@@ -631,12 +619,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                   background: statusBg(order.status), color: statusColor(order.status),
                   fontSize: 11, fontWeight: 600,
                 }}>
-                  {overdue && (
-                    <span style={{ position: 'relative', width: 6, height: 6, flexShrink: 0 }}>
-                      <span style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: statusColor(order.status), animation: 'statusPulseRing 1.6s ease-out infinite' }} />
-                      <span style={{ position: 'relative', width: 6, height: 6, borderRadius: '50%', background: statusColor(order.status), display: 'block' }} />
-                    </span>
-                  )}
+                  <StatusOrb status={order.status} overdue={overdue} scale={0.7} />
                   {statusLabel(order.status)}
                 </div>
               </div>

@@ -76,6 +76,15 @@ function savePageSearch(page, value) {
   } catch {}
 }
 
+// Карточки (заявка, клиент, перевозчик, рейс…) — «глубже» списков: вход в них сдвигается вперёд.
+const isDetailPage = (p) => typeof p === 'string' && p.endsWith('-detail')
+const pageMotion = (page, prev) => {
+  if (!prev) return ''
+  if (isDetailPage(page)) return ' page-forward'
+  if (isDetailPage(prev)) return ' page-back'
+  return ''
+}
+
 function MainApp() {
   const { signOut, user } = useAuth()
   const { show, clearAll } = useToast()
@@ -91,6 +100,9 @@ function MainApp() {
   const [page, setPage] = useState(() =>
     isManager ? 'my-dashboard' : (fleetMode && isDirector ? 'fleet-trips' : 'dashboard')
   )
+  // направление перехода: в карточку — сдвиг вперёд, из карточки обратно — назад
+  const motionRef = useRef({ page: null, cls: '' })
+  if (motionRef.current.page !== page) motionRef.current = { page, cls: pageMotion(page, motionRef.current.page) }
   const [selectedOrderId, setSelectedOrderId] = useState(null)
   const [selectedClientId, setSelectedClientId] = useState(null)
   const [selectedCarrierId, setSelectedCarrierId] = useState(null)
@@ -332,7 +344,7 @@ function MainApp() {
 
         <main className="app-main">
           <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={handleSearchChange} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} onOpenPalette={() => setPaletteOpen(true)} />
-          <div className="scroll-area" key={page} onScroll={handleScrollParallax}>
+          <div className={`scroll-area${motionRef.current.cls}`} key={page} onScroll={handleScrollParallax}>
             {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} onMonthsLoaded={setAvailableMonths} preloadedOrders={allOrders} />}
             {page === 'my-dashboard' && <ErrorBoundary><ManagerDashboard /></ErrorBoundary>}
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../AuthContext';
+import { useShake } from '../components/Transitions';
 
 export default function Login() {
   const { signIn } = useAuth();
@@ -7,6 +8,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [cardRef, shake] = useShake();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,13 +18,14 @@ export default function Login() {
       await signIn(login, password);
     } catch (e) {
       setError('Неверный логин или пароль');
+      shake();
     }
     setLoading(false);
   };
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#EDEFF3' }}>
-      <div style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(24px)', borderRadius: 24, padding: 40, width: 380, border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 20px 60px rgba(20,30,55,0.15)' }}>
+      <div ref={cardRef} style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(24px)', borderRadius: 24, padding: 40, width: 380, border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 20px 60px rgba(20,30,55,0.15)' }}>
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <img src="/logo-full.svg" alt="AV2" style={{ height: 64, margin: '0 auto 16px', display: 'block' }} />
           <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 24, color: '#0E1726' }}>А2 Group CRM</div>

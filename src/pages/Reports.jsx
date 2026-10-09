@@ -4,6 +4,7 @@ import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
 import { fmtMoney } from '../utils'
 import { Loader } from '../components/Loader'
+import { AutoHeight } from '../components/Transitions'
 
 const TABS = [
   { key: 'daily', label: 'Ежедневные' },
@@ -238,7 +239,7 @@ function ReportRow({ r }) {
           </svg>
         </span>
       </button>
-      {open && <div style={{ borderTop: '1px solid #F0F1F4' }}><ReportBody r={r} /></div>}
+      <AutoHeight open={open}><div style={{ borderTop: '1px solid #F0F1F4' }}><ReportBody r={r} /></div></AutoHeight>
     </div>
   )
 }

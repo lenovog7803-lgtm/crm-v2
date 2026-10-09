@@ -66,3 +66,54 @@ export function SwapText({ children }) {
   }, [text])
   return <span className={`t-text-swap ${phase}`}>{shown}</span>
 }
+
+// Две иконки в одном месте: старая растворяется с размытием и уменьшением, новая проявляется.
+export function IconSwap({ on, a, b }) {
+  return (
+    <span className="t-icon-swap" data-state={on ? 'b' : 'a'} aria-hidden="true">
+      <span className="t-icon" data-icon="a">{a}</span>
+      <span className="t-icon" data-icon="b">{b}</span>
+    </span>
+  )
+}
+
+// Плавное раскрытие/сворачивание: высота тянется к содержимому, а не прыгает.
+export function AutoHeight({ open, children }) {
+  const inner = useRef(null)
+  const [h, setH] = useState(open ? 'auto' : 0)
+  const [mounted, setMounted] = useState(open)
+  useEffect(() => {
+    const el = inner.current
+    if (open) {
+      setMounted(true)
+      requestAnimationFrame(() => setH(inner.current ? inner.current.scrollHeight : 'auto'))
+      const t = setTimeout(() => setH('auto'), 320)  // после раскрытия — живая высота (содержимое может меняться)
+      return () => clearTimeout(t)
+    }
+    if (el) {
+      setH(el.scrollHeight)
+      requestAnimationFrame(() => requestAnimationFrame(() => setH(0)))
+    }
+    const t = setTimeout(() => setMounted(false), 320)
+    return () => clearTimeout(t)
+  }, [open])
+  return (
+    <div className="t-resize" style={{ height: h, overflow: 'hidden' }}>
+      <div ref={inner}>{mounted && children}</div>
+    </div>
+  )
+}
+
+// Тряска при ошибке: shake() — элемент с ref коротко дёргается влево-вправо.
+export function useShake() {
+  const ref = useRef(null)
+  const shake = () => {
+    const el = ref.current
+    if (!el || prefersReducedMotion()) return
+    el.classList.remove('t-shaking')
+    void el.offsetWidth
+    el.classList.add('t-shaking')
+    haptic([12, 40, 12])
+  }
+  return [ref, shake]
+}

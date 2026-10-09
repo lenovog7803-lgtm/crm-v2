@@ -400,13 +400,13 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
               }}>{item.icon}</span>
               {expanded && <span style={{ flex: 1, textAlign: 'left' }}>{item.label}</span>}
               {expanded && badgeVal > 0 && (
-                <span style={{
+                <span className="t-badge-pop" style={{
                   background: badgeColor, color: '#fff', borderRadius: 99,
                   padding: '2px 7px', fontSize: 11, fontWeight: 700, flexShrink: 0,
                 }}><PopNumber value={badgeVal > 99 ? '99+' : badgeVal} /></span>
               )}
               {!expanded && badgeVal > 0 && (
-                <span style={{
+                <span className="t-badge-pop" style={{
                   position: 'absolute', top: 6, right: 6,
                   width: 8, height: 8, borderRadius: '50%',
                   background: badgeColor,

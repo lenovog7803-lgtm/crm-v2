@@ -3,6 +3,7 @@ import { useIsMobile } from '../hooks/useIsMobile'
 import { useToast } from './Toast'
 import { fmtDate } from '../utils'
 import { mouseOnly } from '../motion'
+import { PopNumber } from './Transitions'
 
 const PAGE_META = {
   dashboard: { title: 'Дашборд', subtitle: 'Обзор бизнеса' },
@@ -236,13 +237,13 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
             <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
           </svg>
           {badgeCount > 0 && (
-            <span style={{
+            <span className="t-badge-pop" style={{
               position: 'absolute', top: 3, right: 3,
               minWidth: 16, height: 16, borderRadius: 8, background: '#C81923',
               border: '2px solid #fff', color: '#fff',
               fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center',
               padding: '0 3px',
-            }}>{badgeCount > 9 ? '9+' : badgeCount}</span>
+            }}><PopNumber value={badgeCount > 9 ? '9+' : badgeCount} /></span>
           )}
         </button>
 
@@ -292,7 +293,7 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
         </div>
 
         {bellOpen && (
-          <div style={{
+          <div className="t-dropdown-in" style={{
             position: 'absolute', top: 'calc(100% + 10px)', right: 0, zIndex: 9999,
             background: 'rgba(255,255,255,0.98)', backdropFilter: 'blur(24px)',
             borderRadius: 18, border: '1px solid rgba(255,255,255,0.9)',

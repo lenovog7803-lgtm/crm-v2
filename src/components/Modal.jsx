@@ -140,7 +140,7 @@ export function ModalOverlay({ onClose, children, panelStyle, bodyStyle }) {
           maxWidth: 560,
           boxShadow: '0 30px 80px -20px rgba(14,23,38,0.3)',
           position: 'relative',
-          animation: isMobile ? 'none' : closing ? 'modalOut 0.15s ease-in both' : 'modalIn 0.22s var(--ease) both',
+          animation: isMobile ? 'none' : closing ? 'modalOut 0.15s ease-in both' : 'modalIn 0.25s cubic-bezier(0.22, 1, 0.36, 1) both',
           willChange: isMobile ? 'transform' : undefined,
           ...panelStyle,
         }}>

@@ -15,7 +15,7 @@ import { CircularProgress } from '../components/CircularProgress'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { ThinkingOrb } from 'thinking-orbs'
 import { Loader } from '../components/Loader'
-import { PopNumber, SwapText } from '../components/Transitions'
+import { IconSwap, PopNumber, SwapText } from '../components/Transitions'
 
 // «Рассылка» — холодные письма по базе. Вся логика (лимиты, рабочие часы,
 // паузы, напоминания, проверка ответов) живёт в backend/mailing.py, здесь
@@ -192,7 +192,10 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
                 style={{ padding: '10px 18px', borderRadius: 12, border: 'none', cursor: 'pointer', fontFamily: 'Manrope', fontSize: 13.5, fontWeight: 700,
                   background: state.running ? 'rgba(255,107,122,0.18)' : '#fff', color: state.running ? '#FF8A96' : '#0E1726',
                   opacity: (!state.running && !state.configured) ? 0.5 : 1 }}>
-                {state.running ? '■ Остановить' : '▶ Запустить'}
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <IconSwap on={state.running} a="▶" b="■" />
+                  <SwapText>{state.running ? 'Остановить' : 'Запустить'}</SwapText>
+                </span>
               </button>
               <button onClick={checkInbox} disabled={busy}
                 style={{ padding: '10px 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.18)', background: 'transparent',

@@ -47,7 +47,7 @@ input[type="number"] {
 
 @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 @keyframes pageIn { from { opacity:0; } to { opacity:1; } }
-@keyframes modalOut { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(0.97); } }
+@keyframes modalOut { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(0.96); } }
 @keyframes fadeOut { from { opacity:1; } to { opacity:0; } }
 @keyframes floatA { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(3%,4%) scale(1.08);} }
 @keyframes floatB { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-4%,3%) scale(1.1);} }
@@ -364,4 +364,53 @@ input[type="number"] {
   .t-success-check svg polyline { animation: none !important; stroke-dashoffset: 0 !important; }
   .t-digit-group .t-digit { animation: none !important; }
   .t-text-swap { transition: none !important; }
+}
+
+/* ===== transitions.dev: бейджи, тряска, иконки, высота, меню, переход в карточку ===== */
+/* бейдж появляется «хлопком»: из точки с размытием, с лёгким перелётом */
+@keyframes t-badge-pop {
+  from { transform: scale(0); opacity: 0; filter: blur(2px); }
+  to { transform: scale(1); opacity: 1; filter: blur(0); }
+}
+.t-badge-pop { animation: t-badge-pop 500ms cubic-bezier(0.34, 1.36, 0.64, 1) both; }
+
+/* тряска при ошибке: 80/60/80/60 мс */
+.t-shaking { animation: t-shake 280ms linear; }
+@keyframes t-shake {
+  0% { transform: translateX(0); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+  28.57% { transform: translateX(6px); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+  57.14% { transform: translateX(-6px); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+  78.57% { transform: translateX(4px); animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+  100% { transform: translateX(0); }
+}
+
+.t-icon-swap { position: relative; display: inline-grid; vertical-align: middle; }
+.t-icon-swap .t-icon {
+  grid-area: 1 / 1; display: inline-flex; align-items: center; justify-content: center;
+  transition: opacity 200ms ease-in-out, filter 200ms ease-in-out, transform 200ms ease-in-out;
+}
+.t-icon-swap[data-state="a"] .t-icon[data-icon="a"], .t-icon-swap[data-state="b"] .t-icon[data-icon="b"] {
+  opacity: 1; filter: blur(0); transform: scale(1);
+}
+.t-icon-swap[data-state="a"] .t-icon[data-icon="b"], .t-icon-swap[data-state="b"] .t-icon[data-icon="a"] {
+  opacity: 0; filter: blur(2px); transform: scale(0.25);
+}
+
+.t-resize { transition: height 300ms cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* выпадающее меню растёт от кнопки (колокольчик — правый верхний угол) */
+@keyframes t-dropdown-in { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+.t-dropdown-in { transform-origin: top right; animation: t-dropdown-in 250ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* переход в карточку (заявка, клиент, перевозчик, рейс) — сдвиг вбок с размытием;
+   обычное переключение разделов остаётся коротким растворением */
+@keyframes t-page-fwd { from { opacity: 0; transform: translateX(8px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes t-page-back { from { opacity: 0; transform: translateX(-8px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+.scroll-area.page-forward { animation: t-page-fwd 220ms cubic-bezier(0.22, 1, 0.36, 1); }
+.scroll-area.page-back { animation: t-page-back 220ms cubic-bezier(0.22, 1, 0.36, 1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .t-badge-pop, .t-shaking, .t-dropdown-in { animation: none !important; }
+  .t-icon-swap .t-icon, .t-resize { transition: none !important; }
+  .scroll-area.page-forward, .scroll-area.page-back { animation: pageIn 0.15s ease-out; }
 }

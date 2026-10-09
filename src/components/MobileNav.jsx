@@ -302,7 +302,7 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
             }}>
               {item.icon(active)}
               {badgeVal > 0 && (
-                <span style={{
+                <span className="t-badge-pop" style={{
                   position: 'absolute', top: -4, right: -6,
                   minWidth: 15, height: 15, borderRadius: 99,
                   background: badgeColor,
