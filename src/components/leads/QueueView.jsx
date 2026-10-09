@@ -8,6 +8,8 @@ import LeadEditModal from './LeadEditModal'
 import { useCelebration } from '../Celebration'
 import { useAuth } from '../../AuthContext'
 import { Loader } from '../Loader'
+import { CircularProgress } from '../CircularProgress'
+import { iosConfirm } from '../IOSAlert'
 
 export default function QueueView({ industry, onCounts }) {
   const { user } = useAuth()
@@ -17,7 +19,6 @@ export default function QueueView({ industry, onCounts }) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [editLead, setEditLead] = useState(null)
-  const [askClient, setAskClient] = useState(null)
   const [todayCalls, setTodayCalls] = useState(0)
   const { celebrate } = useCelebration()
 
@@ -54,23 +55,14 @@ export default function QueueView({ industry, onCounts }) {
       const res = await logCall(lead.id, data)
       setTodayCalls(c => c + 1)
       if (data.outcome === 'won') celebrate()
-      if (res.ask_create_client) {
-        setAskClient(lead)
-      } else {
-        advance()
+      if (res.ask_create_client && await iosConfirm(`Создать карточку клиента? ${lead.name} стал клиентом — перенести в раздел «Клиенты»?`, { cancelLabel: 'Нет' })) {
+        try { await convertLead(lead.id) } catch (e) { console.error(e) }
       }
+      advance()
     } catch (e) {
       console.error(e)
     }
     setSaving(false)
-  }
-
-  const handleConvert = async (yes) => {
-    if (yes && askClient) {
-      try { await convertLead(askClient.id) } catch (e) { console.error(e) }
-    }
-    setAskClient(null)
-    advance()
   }
 
   const handleClaim = async () => {
@@ -84,28 +76,28 @@ export default function QueueView({ industry, onCounts }) {
   }
 
   const pct = Math.min(100, Math.round((todayCalls / DAILY_GOAL) * 100))
+  const ringColor = pct >= 100 ? '#1E9E5A' : '#1366F0'
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div className="card" style={{ padding: '20px 24px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: -40, right: -40, width: 160, height: 160, borderRadius: '50%', background: 'rgba(19,102,240,0.08)' }} />
-        <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 10 }}>
-          <div>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#A6AEB8', marginBottom: 4 }}>ЗВОНКИ СЕГОДНЯ</div>
-            <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 26, letterSpacing: '-0.02em', color: '#0E1726' }}>{todayCalls}</span>
-            <span style={{ fontSize: 14, color: '#A6AEB8' }}> / {DAILY_GOAL}</span>
-          </div>
-          <span style={{ fontSize: 14, fontWeight: 700, color: pct >= 100 ? '#1E9E5A' : '#1366F0' }}>{pct}%</span>
+      <div className="ios-widget" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ position: 'relative', flexShrink: 0, filter: `drop-shadow(0 4px 10px ${ringColor}40)` }}>
+          <CircularProgress pct={pct} color={ringColor} size={60} stroke={9} track={`${ringColor}22`} />
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: ringColor }}>{pct}%</div>
         </div>
-        <div style={{ position: 'relative', height: 8, borderRadius: 99, background: 'rgba(14,23,38,0.07)' }}>
-          <div style={{ height: '100%', borderRadius: 99, background: pct >= 100 ? '#1E9E5A' : '#1366F0', width: `${pct}%`, transition: 'width 0.4s var(--ease)' }} />
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#8A93A0' }}>Звонки сегодня</div>
+          <div style={{ marginTop: 2 }}>
+            <span style={{ fontWeight: 700, fontSize: 28, letterSpacing: '-0.03em', color: '#0E1726', fontVariantNumeric: 'tabular-nums' }}>{todayCalls}</span>
+            <span style={{ fontSize: 15, fontWeight: 600, color: '#A6AEB8' }}> из {DAILY_GOAL}</span>
+          </div>
         </div>
       </div>
 
       {loading && <Loader padding={40} state="searching" label="Загрузка очереди…" />}
 
       {!loading && !lead && (
-        <div className="card" style={{ padding: 60, textAlign: 'center' }}>
+        <div className="ios-list" style={{ padding: 60, textAlign: 'center' }}>
           <div style={{
             width: 56, height: 56, borderRadius: 18, margin: '0 auto 16px',
             background: 'rgba(30,158,90,0.1)', color: '#1E9E5A',
@@ -150,36 +142,6 @@ export default function QueueView({ industry, onCounts }) {
         />
       )}
 
-      {askClient && (
-        <div style={{
-          position: 'fixed', inset: 0,
-          background: 'rgba(14,23,38,0.55)',
-          backdropFilter: 'blur(6px)',
-          zIndex: 1100,
-          overflowY: 'auto',
-          display: 'grid',
-          padding: 20,
-        }}>
-          <div style={{
-            margin: 'auto',
-            background: '#FFFFFF',
-            borderRadius: 24,
-            width: '100%', maxWidth: 380,
-            textAlign: 'center',
-            border: '1px solid rgba(14,23,38,0.08)',
-            boxShadow: '0 40px 80px rgba(20,30,55,0.28)',
-          }}>
-            <div style={{ padding: 26 }}>
-              <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: '#0E1726', marginBottom: 8 }}>Создать карточку клиента?</div>
-              <div style={{ fontSize: 13, color: '#5A6573', marginBottom: 20 }}>{askClient?.name} стал клиентом — перенести в раздел «Клиенты»?</div>
-              <div style={{ display: 'flex', gap: 10 }}>
-                <button onClick={() => handleConvert(false)} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Нет</button>
-                <button onClick={() => handleConvert(true)} className="btn-primary" style={{ flex: 1, justifyContent: 'center' }}>Да</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

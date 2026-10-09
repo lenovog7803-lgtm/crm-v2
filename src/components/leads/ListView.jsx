@@ -9,13 +9,11 @@ import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { useCelebration } from '../Celebration'
 import { useAuth } from '../../AuthContext'
 import { initials, getGradient } from '../../utils'
-import { mouseOnly } from '../../motion'
 import CallWindow from './CallWindow'
 import Select from '../Select'
 import Switch from '../Switch'
 
 const FILTERS_KEY = 'leads_list_filters'
-const ROW_GRID = 'minmax(0, 1.6fr) minmax(0, 1fr) 130px 120px 90px'
 
 function loadFilters() {
   try { return JSON.parse(localStorage.getItem(FILTERS_KEY)) || {} } catch { return {} }
@@ -115,89 +113,50 @@ export default function ListView({ industry }) {
       </div>
 
       {loading && (
-        <div className="card" style={{ padding: '4px 16px' }}>
+        <div className="ios-list" style={{ padding: '4px 16px' }}>
           {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)}
         </div>
       )}
 
       {!loading && filtered.length === 0 && (
-        <div className="card" style={{ padding: 0 }}>
+        <div className="ios-list">
           <EmptyState title="Нет лидов по фильтрам" subtitle="Попробуйте изменить стадию или поисковый запрос" />
         </div>
       )}
 
       {!loading && filtered.length > 0 && (
-        <div className="card" style={{ overflow: 'hidden', padding: 0 }}>
-          <div style={{
-            display: 'grid', gridTemplateColumns: ROW_GRID,
-            padding: '12px 20px',
-            borderBottom: '1px solid rgba(14,23,38,0.06)',
-            background: 'rgba(14,23,38,0.02)',
-          }}>
-            {['ЛИД', 'КОНТАКТЫ', 'СТАДИЯ', 'СЛЕДУЮЩИЙ ЗВОНОК', ''].map(h => (
-              <div key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8' }}>{h}</div>
-            ))}
-          </div>
+        <div className="ios-list">
           <div ref={scrollRef} onScroll={handleScroll} style={{ maxHeight: 640, overflowY: 'auto' }}>
-            {visible.map((l, i) => {
+            {visible.map(l => {
               const st = stageById(l.stage)
               const [avA, avB] = getGradient(l.name || '')
               const overdue = l.next_call && l.next_call < now
+              const sub = [l.contact_person, l.phone, l.industry, l.city].filter(Boolean).join(' · ')
               return (
-                <div key={l.id} onClick={() => setActiveLead(l)}
-                  style={{
-                    display: 'grid', gridTemplateColumns: ROW_GRID, alignItems: 'center',
-                    padding: '12px 20px', cursor: 'pointer',
-                    borderBottom: i < visible.length - 1 ? '1px solid rgba(14,23,38,0.05)' : 'none',
-                    borderLeft: overdue ? '3px solid rgba(200,25,35,0.5)' : '3px solid transparent',
-                    background: overdue ? 'rgba(200,25,35,0.03)' : 'transparent',
-                    animation: 'rise 0.3s var(--ease) both', animationDelay: `${Math.min(i * 20, 240)}ms`,
-                  }}
-                  onPointerEnter={mouseOnly(e => e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.06)' : 'rgba(14,23,38,0.02)')}
-                  onPointerLeave={mouseOnly(e => e.currentTarget.style.background = overdue ? 'rgba(200,25,35,0.03)' : 'transparent')}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-                    <div style={{
-                      width: 32, height: 32, borderRadius: 10, flexShrink: 0,
-                      background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: '#fff', fontSize: 11, fontWeight: 700,
-                    }}>{initials(l.name)}</div>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
-                      {l.contact_person && <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.contact_person}</div>}
-                    </div>
+                <div key={l.id} className="ios-row" onClick={() => setActiveLead(l)}>
+                  <div className="ios-row-avatar" style={{ background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)` }}>{initials(l.name)}</div>
+                  <div className="ios-row-text">
+                    <div className="ios-row-title">{l.name}</div>
+                    {sub && <div className="ios-row-sub">{sub}</div>}
                   </div>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 12.5, fontFamily: 'var(--font-mono)', color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.phone || '—'}</div>
-                    {(l.industry || l.city) && (
-                      <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {[l.industry, l.city].filter(Boolean).join(' · ')}
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <span style={{ padding: '3px 10px', borderRadius: 8, background: st.bg, color: st.color, fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}>{st.label}</span>
-                  </div>
-                  <div style={{ minWidth: 0 }}>
+                  <span style={{ padding: '3px 10px', borderRadius: 99, background: st.bg, color: st.color, fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap', flexShrink: 0 }}>{st.label}</span>
+                  <div className="ios-row-hide-sm" style={{ width: 86, textAlign: 'right', flexShrink: 0 }}>
                     {l.next_call ? (
                       <>
-                        <div style={{ fontSize: 12, color: overdue ? '#C81923' : '#0E1726', fontWeight: overdue ? 700 : 500 }}>
+                        <div style={{ fontSize: 13, color: overdue ? '#FF3B30' : '#0E1726', fontWeight: overdue ? 600 : 500, fontVariantNumeric: 'tabular-nums' }}>
                           {new Date(l.next_call).toLocaleDateString('ru-RU')}
                         </div>
-                        {(l.call_attempts || 0) > 0 && <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 1 }}>{l.call_attempts} попыт.</div>}
+                        {(l.call_attempts || 0) > 0 && <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 1 }}>{l.call_attempts} попыт.</div>}
                       </>
-                    ) : <span style={{ fontSize: 12, color: '#C4CAD4' }}>—</span>}
+                    ) : <span style={{ fontSize: 13, color: '#C4CAD4' }}>—</span>}
                   </div>
-                  <div style={{ textAlign: 'right' }} onClick={e => e.stopPropagation()}>
-                    {!l.assigned_to ? (
-                      <button onClick={e => handleClaim(l.id, e)} className="btn-ghost" style={{ padding: '5px 12px', fontSize: 11.5 }}>Взять</button>
-                    ) : (
-                      <svg width="8" height="13" viewBox="0 0 8 13" fill="none" style={{ marginLeft: 'auto' }}>
-                        <path d="M1 1.5L6.5 7L1 12.5" stroke="#C4CAD4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    )}
-                  </div>
+                  {!l.assigned_to ? (
+                    <button onClick={e => handleClaim(l.id, e)} style={{ padding: '6px 16px', borderRadius: 99, border: 'none', cursor: 'pointer', background: 'rgba(118,118,128,0.12)', color: '#1366F0', fontSize: 13, fontWeight: 700, fontFamily: 'var(--font-sys)', flexShrink: 0 }}>Взять</button>
+                  ) : (
+                    <svg className="ios-row-chevron" width="8" height="13" viewBox="0 0 8 13" fill="none">
+                      <path d="M1 1.5L6.5 7L1 12.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
                 </div>
               )
             })}

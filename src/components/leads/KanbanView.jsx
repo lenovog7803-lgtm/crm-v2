@@ -67,19 +67,19 @@ function KanbanColumn({ stage, items, dragId, overStage, onDragStart, onDragOver
             onPointerEnter={mouseOnly(e => { e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.borderColor = 'rgba(19,102,240,0.3)'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 24px -12px rgba(20,30,55,0.25)' })}
             onPointerLeave={mouseOnly(e => { e.currentTarget.style.background = 'rgba(255,255,255,0.7)'; e.currentTarget.style.borderColor = 'rgba(14,23,38,0.08)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' })}
             style={{
-              padding: '10px 12px', borderRadius: 12, background: 'rgba(255,255,255,0.7)',
+              padding: '11px 13px', borderRadius: 16, background: 'rgba(255,255,255,0.7)',
               border: '1px solid rgba(14,23,38,0.08)', cursor: 'pointer',
               transition: 'background 0.15s var(--ease), border-color 0.15s var(--ease), transform 0.15s var(--ease), box-shadow 0.15s var(--ease)',
             }}
           >
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
+            <div style={{ fontSize: 13.5, fontWeight: 600, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#1366F0', marginTop: 3 }}>{l.phone}</div>
             {l.contact_person && <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>{l.contact_person}</div>}
             {l.next_call && <div style={{ fontSize: 10.5, color: '#F47A1F', marginTop: 4 }}>→ {new Date(l.next_call).toLocaleDateString('ru-RU')}</div>}
             {!l.assigned_to && (
               <button
                 onClick={e => { e.stopPropagation(); onClaim(l.id) }}
-                style={{ marginTop: 6, width: '100%', padding: '5px 0', borderRadius: 8, border: 'none', cursor: 'pointer', background: 'rgba(19,102,240,0.1)', color: '#1366F0', fontSize: 11, fontWeight: 700 }}
+                style={{ marginTop: 8, width: '100%', padding: '6px 0', borderRadius: 99, border: 'none', cursor: 'pointer', background: 'rgba(19,102,240,0.1)', color: '#1366F0', fontSize: 12, fontWeight: 600 }}
               >
                 Взять в работу
               </button>

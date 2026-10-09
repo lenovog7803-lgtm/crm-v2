@@ -5,8 +5,7 @@ import { fmtDate } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
 import { SlidingTabs } from './SlidingTabs'
-import { mouseOnly } from '../motion'
-import { SuccessCheck } from './Transitions'
+import CheckCircle from './CheckCircle'
 import Select from './Select'
 import { EmptyState } from './EmptyState'
 import { useChangeFlash } from '../hooks/useChangeFlash'
@@ -20,7 +19,7 @@ const inputStyle = {
   border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)',
   fontFamily: 'var(--font-sys)', fontSize: 13, color: '#0E1726', outline: 'none', boxSizing: 'border-box',
 }
-const labelStyle = { fontSize: 12, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.05em', marginBottom: 6, display: 'block' }
+const labelStyle = { fontSize: 13, fontWeight: 600, color: '#8A93A0', marginBottom: 6, paddingLeft: 4, display: 'block' }
 
 export default function Tasks({ onAdd, refreshKey, search = '' }) {
   const isMobile = useIsMobile()
@@ -84,6 +83,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
     setSaving(false)
   }
 
+  const today = new Date().toISOString().slice(0, 10)
   let filtered = [...tasks]
   if (filter === 'active') filtered = filtered.filter(t => t.status !== 'done')
   if (filter === 'done') filtered = filtered.filter(t => t.status === 'done')
@@ -113,75 +113,49 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
         </button>
       </div>
 
-      <div className="card" style={{ overflow: 'hidden' }}>
-        {loading && (
-          <div style={{ padding: '4px 20px' }}>
-            {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)}
-          </div>
-        )}
-        {!loading && filtered.map((task, i) => {
-          const done = task.status === 'done'
-          const typeKey = task.task_type || 'other'
-          return (
-            <div key={task.id} className={liveFlash.has(task.id) ? 'row-flash' : undefined} style={{
-              display: 'flex', alignItems: 'center', gap: 14,
-              padding: '14px 20px',
-              borderBottom: i < filtered.length - 1 ? '1px solid rgba(14,23,38,0.05)' : 'none',
-              transition: 'background 0.12s', cursor: 'pointer',
-            }}
-              onClick={() => openEdit(task)}
-              onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(14,23,38,0.02)')}
-              onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
-            >
-              <button onClick={e => { e.stopPropagation(); handleToggle(task) }} style={{
-                width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
-                border: done ? 'none' : '2px solid rgba(14,23,38,0.2)',
-                background: done ? '#1E9E5A' : 'transparent',
-                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s',
-              }}>
-                <SuccessCheck show={done} size={12} strokeWidth={3} />
-              </button>
-
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{
-                  fontSize: 13.5, fontWeight: 600, color: done ? '#A6AEB8' : '#0E1726',
-                  textDecoration: done ? 'line-through' : 'none',
-                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                }}>{task.title || task.description || '—'}</div>
-                {task.description && task.title && (
-                  <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{task.description}</div>
-                )}
+      {loading && (
+        <div className="ios-list" style={{ padding: '4px 20px' }}>
+          {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)}
+        </div>
+      )}
+      {!loading && filtered.length === 0 && (
+        <div className="ios-list"><EmptyState title="Задач нет" subtitle="Всё сделано — можно выдохнуть. Новая задача появится здесь" /></div>
+      )}
+      {/* как в «Напоминаниях»: круглая отметка, название, тип и срок — подписью */}
+      {!loading && filtered.length > 0 && (
+        <div className="ios-list ios-list--check">
+          {filtered.map(task => {
+            const done = task.status === 'done'
+            const typeKey = task.task_type || 'other'
+            const overdue = !done && task.due_date && task.due_date < today
+            return (
+              <div key={task.id} className={`ios-row${liveFlash.has(task.id) ? ' row-flash' : ''}`} onClick={() => openEdit(task)}>
+                <span onClick={e => e.stopPropagation()} style={{ display: 'flex' }}>
+                  <CheckCircle checked={done} onChange={() => handleToggle(task)} color="#1E9E5A" size={24} />
+                </span>
+                <div className="ios-row-text">
+                  <div className="ios-row-title" style={{ fontWeight: 500, color: done ? '#A6AEB8' : '#0E1726', textDecoration: done ? 'line-through' : 'none' }}>
+                    {task.title || task.description || '—'}
+                  </div>
+                  <div className="ios-row-sub">
+                    <span style={{ color: TYPE_COLORS[typeKey] || TYPE_COLORS.other, fontWeight: 600 }}>{TYPE_LABELS[typeKey] || typeKey}</span>
+                    {task.due_date && <span style={{ color: overdue ? '#FF3B30' : undefined, fontWeight: overdue ? 600 : undefined }}> · {fmtDate(task.due_date)}{task.due_time ? ` ${task.due_time}` : ''}</span>}
+                    {task.description && task.title && <> · {task.description}</>}
+                  </div>
+                </div>
+                <div className="ios-row-actions">
+                  <button className="ios-row-icon ios-row-icon--red ios-row-del" title="Удалить" aria-label="Удалить задачу"
+                    onClick={e => { e.stopPropagation(); handleDelete(task.id) }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  </button>
+                </div>
               </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                <span style={{
-                  padding: '3px 9px', borderRadius: 8,
-                  background: TYPE_BG[typeKey] || TYPE_BG.other,
-                  color: TYPE_COLORS[typeKey] || TYPE_COLORS.other,
-                  fontSize: 11, fontWeight: 600,
-                }}>{TYPE_LABELS[typeKey] || typeKey}</span>
-                {task.due_date && (
-                  <span style={{ fontSize: 12, color: '#A6AEB8', minWidth: 80 }}>
-                    {fmtDate(task.due_date)}{task.due_time ? ` ${task.due_time}` : ''}
-                  </span>
-                )}
-                <button onClick={e => { e.stopPropagation(); handleDelete(task.id) }} style={{
-                  width: 28, height: 28, borderRadius: 8, border: 'none', cursor: 'pointer',
-                  background: 'rgba(200,25,35,0.1)', color: '#C81923',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          )
-        })}
-        {!loading && filtered.length === 0 && (
-          <EmptyState title="Задач нет" subtitle="Всё сделано — можно выдохнуть. Новая задача появится здесь" />
-        )}
-      </div>
+            )
+          })}
+        </div>
+      )}
 
       {/* Edit modal */}
       {editTask && (
@@ -189,7 +163,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
           <ModalHeader title="Редактировать задачу" onClose={() => setEditTask(null)} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div>
-              <label style={labelStyle}>НАЗВАНИЕ</label>
+              <label style={labelStyle}>Название</label>
               <input
                 value={editTask.title}
                 onChange={e => setEditTask(p => ({ ...p, title: e.target.value }))}
@@ -198,7 +172,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
               />
             </div>
             <div>
-              <label style={labelStyle}>ОПИСАНИЕ</label>
+              <label style={labelStyle}>Описание</label>
               <textarea
                 value={editTask.description}
                 onChange={e => setEditTask(p => ({ ...p, description: e.target.value }))}
@@ -208,7 +182,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
               <div>
-                <label style={labelStyle}>ТИП</label>
+                <label style={labelStyle}>Тип</label>
                 <Select value={editTask.task_type} onChange={e => setEditTask(p => ({ ...p, task_type: e.target.value }))} style={inputStyle}>
                   <option value="call">Звонок</option>
                   <option value="reminder">Напоминание</option>
@@ -217,7 +191,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
                 </Select>
               </div>
               <div>
-                <label style={labelStyle}>СТАТУС</label>
+                <label style={labelStyle}>Статус</label>
                 <Select value={editTask.status} onChange={e => setEditTask(p => ({ ...p, status: e.target.value }))} style={inputStyle}>
                   <option value="pending">В работе</option>
                   <option value="done">Выполнено</option>
@@ -226,7 +200,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <div>
-                <label style={labelStyle}>СРОК</label>
+                <label style={labelStyle}>Срок</label>
                 <input
                   type="date"
                   value={editTask.due_date}
@@ -235,7 +209,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
                 />
               </div>
               <div>
-                <label style={labelStyle}>ВРЕМЯ</label>
+                <label style={labelStyle}>Время</label>
                 <input
                   type="time"
                   value={editTask.due_time}
@@ -245,14 +219,8 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
               </div>
             </div>
             <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-              <button onClick={() => setEditTask(null)} style={{
-                flex: 1, height: 44, borderRadius: 13, border: '1px solid rgba(14,23,38,0.12)',
-                background: 'transparent', cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 14, fontWeight: 600, color: '#5A6573',
-              }}>Отмена</button>
-              <button onClick={handleSave} disabled={saving} style={{
-                flex: 2, height: 44, borderRadius: 13, border: 'none', cursor: 'pointer',
-                background: '#1366F0', color: '#fff', fontFamily: 'var(--font-sys)', fontSize: 14, fontWeight: 700, opacity: saving ? 0.7 : 1,
-              }}>{saving ? 'Сохранение...' : 'Сохранить'}</button>
+              <button onClick={() => setEditTask(null)} className="btn-ghost" style={{ flex: 1, height: 46, justifyContent: 'center' }}>Отмена</button>
+              <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ flex: 2, height: 46, justifyContent: 'center', opacity: saving ? 0.7 : 1 }}>{saving ? 'Сохранение...' : 'Сохранить'}</button>
             </div>
           </div>
         </ModalOverlay>

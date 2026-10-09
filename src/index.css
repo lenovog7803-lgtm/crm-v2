@@ -806,3 +806,8 @@ input[type="number"] {
   transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
 @media (max-width: 768px) { .ios-widget { border-radius: 22px; } }
+
+/* задачи: вместо аватара — круглая отметка, разделитель ближе */
+.ios-list--check .ios-row + .ios-row::before { left: 53px; }
+.ios-list--check .ios-row { min-height: 56px; }
+@media (max-width: 768px) { .ios-row-hide-sm { display: none !important; } }
