@@ -161,16 +161,11 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
         <div style={{ ...heroBase, background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)', color: '#fff',
           padding: isMobile ? '18px' : '26px 28px', boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)' }}>
           <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: state.running ? 'rgba(91,232,155,0.12)' : 'rgba(19,102,240,0.15)' }} />
-          {/* вращающаяся сфера: работает — зелёная и крутится, остановлено — замерла и потускнела */}
-          <div style={{ position: 'absolute', top: isMobile ? 12 : 18, right: isMobile ? 12 : 22, zIndex: 1, pointerEvents: 'none',
-            transform: isMobile ? 'scale(0.85)' : 'scale(1.25)', transformOrigin: 'top right' }}>
-            <ThinkingOrb state="searching" size={64} color={state.running ? '#5BE89B' : 'rgba(255,255,255,0.35)'}
-              paused={!state.running} aria-label={state.running ? 'Рассылка работает' : 'Рассылка остановлена'} />
-          </div>
           <div style={{ position: 'relative', zIndex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <span style={{ width: 8, height: 8, borderRadius: 99, background: state.running ? '#5BE89B' : 'rgba(255,255,255,0.35)',
-                boxShadow: state.running ? '0 0 0 4px rgba(91,232,155,0.2)' : 'none' }} />
+              {/* вместо точки статуса — маленькая сфера: работает — зелёная и крутится, стоит — замерла и потускнела */}
+              <ThinkingOrb state="searching" size={20} color={state.running ? '#5BE89B' : 'rgba(255,255,255,0.35)'}
+                paused={!state.running} aria-label={state.running ? 'Рассылка работает' : 'Рассылка остановлена'} />
               <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.5)' }}>
                 {state.running ? 'РАБОТАЕТ' : 'ОСТАНОВЛЕНО'}{state.campaign ? ` · ${state.campaign.name.toUpperCase()}` : ' · ВСЕ НАПРАВЛЕНИЯ'}
               </span>
