@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useAuth } from '../AuthContext'
 import { initials } from '../utils'
 import { SlidingTabs } from './SlidingTabs'
-import { mouseOnly } from '../motion'
+import { mouseOnly, haptic, rubberband } from '../motion'
 import { PopNumber } from './Transitions'
 
 const HIDDEN_MENU_WIDTH = 200
@@ -253,9 +253,85 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
     onNav(next === 'fleet' ? 'fleet-trips' : 'dashboard')
   }
 
-  const navItems = profile.role === 'manager'
+  const baseNavItems = profile.role === 'manager'
     ? [MANAGER_DASHBOARD_ITEM, ...NAV.filter(item => MANAGER_NAV_KEYS.includes(item.key))]
     : (canFleet && mode === 'fleet') ? FLEET_NAV : NAV
+
+  // ---- Свой порядок пунктов меню: зажать и перетащить (как иконки в iOS) ----
+  const orderKey = `crm_nav_order:${user?.username || 'me'}:${profile.role === 'manager' ? 'manager' : mode}`
+  const [navOrder, setNavOrder] = useState(() => { try { return JSON.parse(localStorage.getItem(orderKey)) || [] } catch { return [] } })
+  useEffect(() => { try { setNavOrder(JSON.parse(localStorage.getItem(orderKey)) || []) } catch { setNavOrder([]) } }, [orderKey])
+  const navItems = [...baseNavItems].sort((a, b) => {
+    const ia = navOrder.indexOf(a.key), ib = navOrder.indexOf(b.key)
+    return (ia < 0 ? 999 + baseNavItems.indexOf(a) : ia) - (ib < 0 ? 999 + baseNavItems.indexOf(b) : ib)
+  })
+  const [drag, setDrag] = useState(null)          // { key, from, over, dy, stride, dropping }
+  const press = useRef(null)                      // { key, y, timer, pointerId, el }
+  const suppressClick = useRef(false)
+
+  const beginDrag = (p) => {
+    const stride = (p.el?.offsetHeight || 44) + 4
+    setDrag({ key: p.key, from: navItems.findIndex(i => i.key === p.key), over: navItems.findIndex(i => i.key === p.key), dy: 0, stride, startY: p.y })
+    try { p.el?.setPointerCapture(p.pointerId) } catch { /* уже отпущено */ }
+    haptic(12)
+  }
+  const navPointerDown = (item) => (e) => {
+    if (e.button !== 0) return
+    const p = { key: item.key, y: e.clientY, pointerId: e.pointerId, el: e.currentTarget, mouse: e.pointerType === 'mouse' }
+    press.current = p
+    // палец — долгое нажатие (как в iOS); мышь — достаточно потянуть
+    if (!p.mouse) p.timer = setTimeout(() => { if (press.current === p) beginDrag(p) }, 380)
+  }
+  const navPointerMove = (e) => {
+    const p = press.current
+    if (!p) return
+    if (!drag) {
+      if (Math.abs(e.clientY - p.y) > 6) {
+        if (p.mouse) beginDrag(p)
+        else { clearTimeout(p.timer); press.current = null }  // палец поехал до долгого нажатия — это прокрутка
+      }
+      return
+    }
+    const raw = e.clientY - drag.startY
+    const min = -drag.from * drag.stride, max = (navItems.length - 1 - drag.from) * drag.stride
+    // за краями — резиновое сопротивление, как в iOS
+    const dy = raw < min ? min + rubberband(raw - min, 120) : raw > max ? max + rubberband(raw - max, 120) : raw
+    const over = Math.max(0, Math.min(navItems.length - 1, drag.from + Math.round(dy / drag.stride)))
+    if (over !== drag.over) haptic(6)
+    setDrag(d => ({ ...d, dy, over }))
+  }
+  const navPointerUp = () => {
+    const p = press.current
+    press.current = null
+    if (p?.timer) clearTimeout(p.timer)
+    if (!drag) return
+    suppressClick.current = true
+    setTimeout(() => { suppressClick.current = false }, 50)
+    const { from, over, stride } = drag
+    // пункт пружиной доезжает до нового места, потом фиксируем порядок
+    setDrag(d => ({ ...d, dy: (over - from) * stride, dropping: true }))
+    setTimeout(() => {
+      if (over !== from) {
+        const keys = navItems.map(i => i.key)
+        const [k] = keys.splice(from, 1)
+        keys.splice(over, 0, k)
+        setNavOrder(keys)
+        try { localStorage.setItem(orderKey, JSON.stringify(keys)) } catch { /* приватный режим */ }
+      }
+      setDrag(null)
+    }, 220)
+  }
+  const dragStyle = (index, key) => {
+    if (!drag) return {}
+    if (key === drag.key) {
+      return { transform: `translateY(${drag.dy}px) scale(${drag.dropping ? 1 : 1.04})`, zIndex: 5,
+        boxShadow: drag.dropping ? 'none' : '0 12px 28px -8px rgba(14,23,38,0.35)', background: 'rgba(255,255,255,0.96)',
+        transition: drag.dropping ? 'transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms' : 'box-shadow 160ms, background 160ms', cursor: 'grabbing' }
+    }
+    const { from, over, stride } = drag
+    const shift = from < over && index > from && index <= over ? -stride : from > over && index >= over && index < from ? stride : 0
+    return { transform: `translateY(${shift}px)`, transition: 'transform 260ms cubic-bezier(0.22, 1, 0.36, 1)' }
+  }
 
   const [hiddenMenuOpen, setHiddenMenuOpen] = useState(false)
   const longPressTimer = useRef(null)
@@ -280,7 +356,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   useLayoutEffect(() => {
     const el = navButtonRefs.current[activeKey]
     if (el) setPillRect({ top: el.offsetTop, height: el.offsetHeight })
-  }, [activeKey, expanded])
+  }, [activeKey, expanded, navOrder.join(',')])
 
   const isDirector = profile.role === 'director' || profile.role === 'admin'
 
@@ -370,11 +446,12 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
           <div style={{
             position: 'absolute', left: 0, right: 0, top: pillRect.top, height: pillRect.height,
             borderRadius: 12, background: 'rgba(19,102,240,0.1)',
-            transition: 'top 0.25s var(--ease), height 0.25s var(--ease)',
+            opacity: drag ? 0 : 1,  // во время перетаскивания подсветка не мешает
+            transition: 'top 0.25s var(--ease), height 0.25s var(--ease), opacity 0.15s',
             pointerEvents: 'none', zIndex: 0,
           }} />
         )}
-        {navItems.map(item => {
+        {navItems.map((item, index) => {
           const active = item.key === activeKey
           const badgeVal = item.badge ? counts[item.badge] : null
           const badgeColor = item.badgeColor || '#1366F0'
@@ -382,7 +459,13 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
             <button
               key={item.key}
               ref={el => { navButtonRefs.current[item.key] = el }}
-              onClick={() => onNav(item.key)}
+              onClick={() => { if (!suppressClick.current) onNav(item.key) }}
+              onPointerDown={navPointerDown(item)}
+              onPointerMove={navPointerMove}
+              onPointerUp={navPointerUp}
+              onPointerCancel={navPointerUp}
+              onContextMenu={e => { if (drag || press.current) e.preventDefault() }}
+              title={expanded ? 'Зажмите и перетащите, чтобы поменять порядок' : item.label}
               className={active ? 'sidebar-nav-btn active' : 'sidebar-nav-btn'}
               style={{
                 height: 44, borderRadius: 12, border: 'none', cursor: 'pointer',
@@ -392,6 +475,8 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
                 fontFamily: 'Manrope', fontWeight: 600, fontSize: 13.5,
                 whiteSpace: 'nowrap',
                 position: 'relative', zIndex: 1, textAlign: 'left',
+                touchAction: drag ? 'none' : 'pan-y', userSelect: 'none', WebkitUserSelect: 'none',
+                ...dragStyle(index, item.key),
               }}
             >
               <span style={{
