@@ -20,6 +20,7 @@ import Select from '../components/Select'
 import Switch from '../components/Switch'
 import { EmptyState } from '../components/EmptyState'
 import { iosConfirm } from '../components/IOSAlert'
+import CardGradient from '../components/CardGradient'
 
 // «Рассылка» — холодные письма по базе. Вся логика (лимиты, рабочие часы,
 // паузы, напоминания, проверка ответов) живёт в backend/mailing.py, здесь
@@ -90,7 +91,6 @@ const heroBase = {
   borderRadius: 22, position: 'relative', overflow: 'clip',
   transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
 }
-const kicker = (color) => ({ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color, marginBottom: 8 })
 const bigNum = (color, size) => ({ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: size, letterSpacing: '-0.03em', lineHeight: 1, color })
 
 function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoContacts, replies }) {
@@ -141,10 +141,11 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
   const todayPct = state.limit ? Math.min(100, (state.sent_today / state.limit) * 100) : 0
   const healthTone = h.status === 'stop' ? 'red' : (h.status === 'slow' || h.status === 'paused') ? 'amber' : 'ok'
   const healthCard = {
-    ok: { bg: 'linear-gradient(135deg, rgba(214,236,255,0.95), rgba(186,214,255,0.85))', shadow: 'rgba(19,102,240,0.35)', ink: '#0F4FB8', deep: '#0B3A87', label: 'Норма' },
-    amber: { bg: 'linear-gradient(135deg, rgba(255,236,214,0.95), rgba(255,213,170,0.85))', shadow: 'rgba(217,119,6,0.4)', ink: '#A86A20', deep: '#7A4A12', label: h.status === 'paused' ? 'Пауза' : 'Темп снижен' },
-    red: { bg: 'linear-gradient(135deg, rgba(255,222,222,0.95), rgba(255,190,190,0.85))', shadow: 'rgba(224,71,59,0.4)', ink: '#B4322A', deep: '#7E1D17', label: 'Остановка' },
+    ok: { tone: 'blue', label: 'Норма' },
+    amber: { tone: 'orange', label: h.status === 'paused' ? 'Пауза' : 'Тише' },
+    red: { tone: 'red', label: 'Остановка' },
   }[healthTone]
+  const ink = 'rgba(255,255,255,0.82)'
 
   const funnel = [
     { label: 'Отправлено', value: sentTotal, color: '#1366F0' },
@@ -173,26 +174,25 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
       {/* Hero */}
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.3fr 1fr 1fr', gap: 16 }}>
         {/* Статус и запуск */}
-        <div style={{ ...heroBase, background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)', color: '#fff',
-          padding: isMobile ? '18px' : '26px 28px', boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)' }}>
-          <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: state.running ? 'rgba(91,232,155,0.12)' : 'rgba(19,102,240,0.15)' }} />
+        <div className="grad-card grad-blue" style={{ ...heroBase, padding: isMobile ? '18px' : '26px 28px' }}>
+          <CardGradient tone="blue" />
           <div style={{ position: 'relative', zIndex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
               {/* вместо точки статуса — маленькая сфера: работает — зелёная и крутится, стоит — замерла и потускнела */}
-              <ThinkingOrb state="searching" size={20} dotSize={1.7} color={state.running ? '#7CF5B0' : 'rgba(255,255,255,0.45)'}
+              <ThinkingOrb state="searching" size={20} dotSize={1.7} color={state.running ? '#C8FFE0' : 'rgba(255,255,255,0.6)'}
                 paused={!state.running} aria-label={state.running ? 'Рассылка работает' : 'Рассылка остановлена'} />
-              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.5)' }}>
-                {state.running ? 'РАБОТАЕТ' : 'ОСТАНОВЛЕНО'}{state.campaign ? ` · ${state.campaign.name.toUpperCase()}` : ' · ВСЕ НАПРАВЛЕНИЯ'}
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.92)' }}>
+                {state.running ? 'Работает' : 'Остановлено'}{state.campaign ? ` · ${state.campaign.name}` : ' · все направления'}
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
               <span style={bigNum('#fff', isMobile ? 34 : 42)}><PopNumber value={state.sent_today} /></span>
-              <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.45)', fontWeight: 600 }}>/ {state.limit} писем сегодня</span>
+              <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>/ {state.limit} писем сегодня</span>
             </div>
-            <div style={{ height: 6, borderRadius: 99, background: 'rgba(255,255,255,0.12)', marginTop: 14, overflow: 'hidden' }}>
+            <div style={{ height: 6, borderRadius: 99, background: 'rgba(255,255,255,0.25)', marginTop: 14, overflow: 'hidden' }}>
               <div style={{ width: `${todayPct}%`, height: '100%', borderRadius: 99, background: 'linear-gradient(90deg, #5BE89B, #2FC7A0)', transition: 'width 0.6s var(--ease)' }} />
             </div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 10, minHeight: 16 }}>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', marginTop: 10, minHeight: 16 }}>
               {state.running && state.limit > 0 && state.sent_today >= state.limit
                 ? `Лимит на сегодня выполнен — продолжу ${nextWorkdayLabel()}`
                 : <>{state.state}{state.next_at ? ` · дальше в ${state.next_at}` : ''}</>}
@@ -206,8 +206,8 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
             )}
             <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
               <button onClick={toggle} disabled={busy || (!state.running && !state.configured)}
-                style={{ padding: '10px 18px', borderRadius: 12, border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 13.5, fontWeight: 700,
-                  background: state.running ? 'rgba(255,107,122,0.18)' : '#fff', color: state.running ? '#FF8A96' : '#0E1726',
+                style={{ padding: '10px 18px', borderRadius: 99, border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 13.5, fontWeight: 700,
+                  background: state.running ? 'rgba(255,255,255,0.22)' : '#fff', color: state.running ? '#fff' : '#3A62B8',
                   opacity: (!state.running && !state.configured) ? 0.5 : 1 }}>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                   <IconSwap on={state.running} a="▶" b="■" />
@@ -215,8 +215,8 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
                 </span>
               </button>
               <button onClick={checkInbox} disabled={busy}
-                style={{ padding: '10px 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.18)', background: 'transparent',
-                  color: 'rgba(255,255,255,0.85)', cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600 }}>
+                style={{ padding: '10px 16px', borderRadius: 99, border: '1px solid rgba(255,255,255,0.4)', background: 'transparent',
+                  color: '#fff', cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600 }}>
                 Проверить входящие
               </button>
             </div>
@@ -224,28 +224,25 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
         </div>
 
         {/* Ответили */}
-        <div onClick={onGoReplies} style={{ ...heroBase, cursor: 'pointer', padding: isMobile ? '16px 18px' : '26px 24px',
-          background: 'linear-gradient(135deg, rgba(214,245,228,0.95), rgba(170,230,200,0.85))', border: '1px solid rgba(255,255,255,0.6)',
-          boxShadow: '0 16px 40px -16px rgba(14,159,110,0.4)' }}>
-          <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
-          <div style={kicker('#17824F')}>ОТВЕТИЛИ</div>
-          <div style={bigNum('#0B5C37', isMobile ? 28 : 34)}><PopNumber value={answered} /></div>
-          <div style={{ fontSize: 12, color: '#17824F', marginTop: 6 }}>{replyPct}% от отправленных</div>
-          <div style={{ marginTop: 14, fontSize: 12.5, color: '#17824F', fontWeight: 700 }}>
+        <div onClick={onGoReplies} className="grad-card grad-green is-link" style={{ ...heroBase, cursor: 'pointer', padding: isMobile ? '16px 18px' : '26px 24px' }}>
+          <CardGradient tone="green" />
+          <div className="grad-kicker">Ответили</div>
+          <div style={bigNum('#fff', isMobile ? 28 : 34)}><PopNumber value={answered} /></div>
+          <div style={{ fontSize: 12, color: ink, marginTop: 6 }}>{replyPct}% от отправленных</div>
+          <div style={{ marginTop: 14, fontSize: 12.5, color: '#fff', fontWeight: 700 }}>
             {state.replies_new ? `🔔 ${state.replies_new} новых — разобрать →` : 'Все ответы →'}
           </div>
         </div>
 
         {/* Здоровье ящика */}
-        <div style={{ ...heroBase, padding: isMobile ? '16px 18px' : '26px 24px', background: healthCard.bg,
-          border: '1px solid rgba(255,255,255,0.6)', boxShadow: `0 16px 40px -16px ${healthCard.shadow}` }}>
-          <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
-          <div style={kicker(healthCard.ink)}>{multi ? `ЗДОРОВЬЕ ПОЧТ · ${boxes.length}` : `ЗДОРОВЬЕ ЯЩИКА${boxes[0]?.login ? ` · ${boxes[0].login}` : ''}`}</div>
+        <div className={`grad-card grad-${healthCard.tone}`} style={{ ...heroBase, padding: isMobile ? '16px 18px' : '26px 24px' }}>
+          <CardGradient key={healthCard.tone} tone={healthCard.tone} />
+          <div className="grad-kicker">{multi ? `Здоровье почт · ${boxes.length}` : `Здоровье ящика${boxes[0]?.login ? ` · ${boxes[0].login}` : ''}`}</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={bigNum(healthCard.deep, isMobile ? 28 : 34)}>{bounceRate}%</span>
-            <span style={{ fontSize: 12, color: healthCard.ink, fontWeight: 600 }}>возвратов</span>
+            <span style={bigNum('#fff', isMobile ? 28 : 34)}>{bounceRate}%</span>
+            <span style={{ fontSize: 12, color: ink, fontWeight: 600 }}>возвратов</span>
           </div>
-          <div style={{ fontSize: 12, color: healthCard.ink, marginTop: 6 }}>{bounced7} из {sent7} за 7 дней · норма до 4%</div>
+          <div style={{ fontSize: 12, color: ink, marginTop: 6 }}>{bounced7} из {sent7} за 7 дней · норма до 4%</div>
           {multi && (
             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 4, marginTop: 10 }}>
               {boxes.map(m => {
@@ -255,9 +252,9 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
                 const early = st === 'ok' && (mh.sent_7d || 0) < 10 && (mh.bounced_7d || 0) > 0
                 const dot = st === 'stop' ? '#E0473B' : st === 'ok' && !early ? '#0E9F6E' : '#D97706'
                 return (
-                  <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: healthCard.deep }}
+                  <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#fff' }}
                     title={early ? 'Мало писем для выводов — защита оценивает почту с 10 отправленных' : undefined}>
-                    <span style={{ width: 7, height: 7, borderRadius: 99, background: dot, flexShrink: 0 }} />
+                    <span style={{ width: 8, height: 8, borderRadius: 99, background: dot, boxShadow: '0 0 0 1.5px #fff', flexShrink: 0 }} />
                     <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.login || m.name}</span>
                     <span style={{ opacity: 0.7 }}>{mh.bounced_7d ?? 0} из {mh.sent_7d ?? 0}</span>
                     <b style={{ minWidth: 34, textAlign: 'right' }}>{mh.bounce_rate ?? 0}%</b>
@@ -266,13 +263,13 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
               })}
             </div>
           )}
-          <div style={{ marginTop: 14, display: 'inline-block', padding: '4px 10px', borderRadius: 99, background: 'rgba(255,255,255,0.55)',
-            fontSize: 12, fontWeight: 700, color: healthCard.deep }}>
+          <div style={{ marginTop: 14, display: 'inline-block', padding: '4px 10px', borderRadius: 99, background: 'rgba(255,255,255,0.22)',
+            fontSize: 12, fontWeight: 700, color: '#fff' }}>
             {healthTone === 'ok' && bounceRate > 4 ? 'Норма · мало писем для выводов' : healthCard.label}
           </div>
-          {h.reason && <div style={{ fontSize: 11.5, color: healthCard.ink, marginTop: 8, lineHeight: 1.4 }}>{h.reason}</div>}
+          {h.reason && <div style={{ fontSize: 11.5, color: ink, marginTop: 8, lineHeight: 1.4 }}>{h.reason}</div>}
           {!h.reason && healthTone === 'ok' && bounceRate > 4 && (
-            <div style={{ fontSize: 11.5, color: healthCard.ink, marginTop: 8, lineHeight: 1.4 }}>
+            <div style={{ fontSize: 11.5, color: ink, marginTop: 8, lineHeight: 1.4 }}>
               Защита оценивает каждую почту с 10 отправленных: больше 4% — темп вдвое ниже, больше 8% (от 20 писем) — остановка.
             </div>
           )}

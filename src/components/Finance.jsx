@@ -9,6 +9,7 @@ import { mouseOnly } from '../motion'
 import Select from './Select'
 import { EmptyState } from './EmptyState'
 import DateInput from './DateInput'
+import CardGradient from './CardGradient'
 
 export default function Finance({ refreshKey }) {
   const isMobile = useIsMobile()
@@ -171,63 +172,69 @@ export default function Finance({ refreshKey }) {
       {/* Summary — 3 равных колонки на десктопе */}
       {isMobile ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)', borderRadius: 22, padding: '18px 18px', color: '#fff', boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>ЧИСТАЯ ПРИБЫЛЬ</div>
+          <div className="grad-card grad-blue" style={{ padding: '18px 18px', color: '#fff' }}>
+            <CardGradient tone="blue" />
+            <div className="grad-kicker">Чистая прибыль</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.03em', lineHeight: 1 }}>{netProfit.toLocaleString('ru-RU')}</div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>BYN</div>
-            <div style={{ display: 'flex', gap: 20, marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>BYN</div>
+            <div style={{ display: 'flex', gap: 20, marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.25)' }}>
               <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Поступления</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>Поступления</div>
                 <div style={{ fontWeight: 700, fontSize: 13 }}>{totalIncome.toLocaleString('ru-RU')} BYN</div>
               </div>
               <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Списания</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>Списания</div>
                 <div style={{ fontWeight: 700, fontSize: 13 }}>{totalExpense.toLocaleString('ru-RU')} BYN</div>
               </div>
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
-            <div onClick={() => setShowInModal(true)} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #1E9E5A 0%, #15734A 100%)', borderRadius: 22, padding: '14px 14px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(30,158,90,0.4)' }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>ПОСТУПЛЕНИЯ</div>
+            <div onClick={() => setShowInModal(true)} className="grad-card grad-green is-link" style={{ cursor: 'pointer', padding: '14px 14px', color: '#fff' }}>
+              <CardGradient tone="green" />
+              <div className="grad-kicker">Поступления</div>
               <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>BYN</div>
               <div style={{ marginTop: 6, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paidClientOrders.length} заявок оплачено</div>
             </div>
-            <div onClick={() => setShowOutModal(true)} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #1366F0 0%, #0D4FB5 100%)', borderRadius: 22, padding: '14px 14px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(19,102,240,0.4)' }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>СПИСАНИЯ</div>
+            <div onClick={() => setShowOutModal(true)} className="grad-card grad-purple is-link" style={{ cursor: 'pointer', padding: '14px 14px', color: '#fff' }}>
+              <CardGradient tone="purple" />
+              <div className="grad-kicker">Списания</div>
               <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>BYN</div>
               <div style={{ marginTop: 6, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paidCarrierOrders.length} заявок оплачено</div>
             </div>
           </div>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: 16 }}>
-          <div style={{ background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)', borderRadius: 22, padding: '26px 28px', color: '#fff', boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.4)', marginBottom: 8 }}>ЧИСТАЯ ПРИБЫЛЬ</div>
+          <div className="grad-card grad-blue" style={{ padding: '26px 28px', color: '#fff' }}>
+            <CardGradient tone="blue" />
+            <div className="grad-kicker">Чистая прибыль</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 38, letterSpacing: '-0.03em', lineHeight: 1 }}>{netProfit.toLocaleString('ru-RU')}</div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>BYN</div>
-            <div style={{ display: 'flex', gap: 24, marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>BYN</div>
+            <div style={{ display: 'flex', gap: 24, marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.25)' }}>
               <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Поступления</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>Поступления</div>
                 <div style={{ fontWeight: 700, fontSize: 15 }}>{totalIncome.toLocaleString('ru-RU')} BYN</div>
               </div>
               <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Списания</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>Списания</div>
                 <div style={{ fontWeight: 700, fontSize: 15 }}>{totalExpense.toLocaleString('ru-RU')} BYN</div>
               </div>
             </div>
           </div>
-          <div onClick={() => setShowInModal(true)} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #1E9E5A 0%, #15734A 100%)', borderRadius: 22, padding: '26px 24px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(30,158,90,0.4)' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>ПОСТУПЛЕНИЯ</div>
+          <div onClick={() => setShowInModal(true)} className="grad-card grad-green is-link" style={{ cursor: 'pointer', padding: '26px 24px', color: '#fff' }}>
+            <CardGradient tone="green" />
+            <div className="grad-kicker">Поступления</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>BYN</div>
             <div style={{ marginTop: 14, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paidClientOrders.length} заявок оплачено</div>
           </div>
-          <div onClick={() => setShowOutModal(true)} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #1366F0 0%, #0D4FB5 100%)', borderRadius: 22, padding: '26px 24px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(19,102,240,0.4)' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>СПИСАНИЯ</div>
+          <div onClick={() => setShowOutModal(true)} className="grad-card grad-purple is-link" style={{ cursor: 'pointer', padding: '26px 24px', color: '#fff' }}>
+            <CardGradient tone="purple" />
+            <div className="grad-kicker">Списания</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>BYN</div>
             <div style={{ marginTop: 14, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paidCarrierOrders.length} заявок оплачено</div>
           </div>
         </div>

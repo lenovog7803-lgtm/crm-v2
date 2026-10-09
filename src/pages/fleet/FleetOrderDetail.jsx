@@ -13,6 +13,7 @@ import { SwapText } from '../../components/Transitions'
 import Switch from '../../components/Switch'
 import { iosConfirm } from '../../components/IOSAlert'
 import DateInput from '../../components/DateInput'
+import CardGradient from '../../components/CardGradient'
 
 const sLabel = { fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', marginBottom: 12 }
 const SLabel = ({ children }) => <div style={sLabel}>{children}</div>
@@ -303,34 +304,31 @@ export default function FleetOrderDetail({ orderId, onBack }) {
       <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 16, alignItems: 'start' }}>
         {/* ЛЕВАЯ КОЛОНКА */}
         <div style={col}>
-          {/* Тёмная hero-карточка */}
-          <div style={{
-            background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)',
-            borderRadius: 22, padding: '28px 28px', color: '#fff',
-            boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)',
-          }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>ЗАГРУЗКА</div>
+          {/* Главная карточка — мягкий синий живой градиент */}
+          <div className="grad-card grad-blue" style={{ padding: '28px 28px' }}>
+            <CardGradient tone="blue" />
+            <div className="grad-kicker" style={{ marginBottom: 4 }}>Загрузка</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, letterSpacing: '-0.02em', lineHeight: 1.2 }}>{route}</div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 18 }}>
-              <div><div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Груз</div>
+              <div><div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 2 }}>Груз</div>
                 <div style={{ fontWeight: 600, fontSize: 13 }}>{order.cargo_name || cargoStr || '—'}</div></div>
-              <div><div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Вес / объём</div>
+              <div><div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 2 }}>Вес / объём</div>
                 <div style={{ fontWeight: 600, fontSize: 13 }}>{joinDot(order.weight_tons && `${order.weight_tons} т`, order.volume_m3 && `${order.volume_m3} м³`) || '—'}</div></div>
-              <div><div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Загрузка</div>
+              <div><div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 2 }}>Загрузка</div>
                 <div style={{ fontWeight: 600, fontSize: 13 }}>{fmtDate(order.load_date)}</div></div>
-              <div><div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Выгрузка</div>
+              <div><div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 2 }}>Выгрузка</div>
                 <div style={{ fontWeight: 600, fontSize: 13 }}>{fmtDate(order.unload_date)}</div></div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginTop: 22, paddingTop: 18, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
               <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Цена клиенту</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 3 }}>Цена клиенту</div>
                 <div style={{ fontWeight: 800, fontSize: 20, fontFamily: 'var(--font-sys)' }}>{money(order.rate, cur)}</div>
               </div>
               <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Оплата</div>
-                <div style={{ fontWeight: 800, fontSize: 20, fontFamily: 'var(--font-sys)', color: order.paid ? '#5BE89B' : '#F5B971' }}>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 3 }}>Оплата</div>
+                <div style={{ fontWeight: 800, fontSize: 20, fontFamily: 'var(--font-sys)', color: order.paid ? '#D2FFE6' : '#FFE2C2' }}>
                   {order.paid ? 'Оплачено' : 'Не поступила'}
                 </div>
               </div>

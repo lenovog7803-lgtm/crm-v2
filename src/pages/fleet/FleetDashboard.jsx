@@ -8,6 +8,7 @@ import { mouseOnly } from '../../motion'
 import { Loader } from '../../components/Loader'
 import Select from '../../components/Select'
 import { iosConfirm } from '../../components/IOSAlert'
+import CardGradient from '../../components/CardGradient'
 
 const money = v => `${Math.round(Number(v) || 0).toLocaleString('ru-RU')} BYN`
 const int = v => Math.round(Number(v) || 0).toLocaleString('ru-RU')
@@ -67,63 +68,51 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
       {/* Hero row */}
       <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 1fr', gap: 16 }}>
         {/* Тёмная: прибыль */}
-        <div style={{
-          background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)',
-          borderRadius: 22, padding: '28px 28px', color: '#fff',
-          boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)', position: 'relative', overflow: 'hidden',
-        }}>
-          <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'rgba(19,102,240,0.15)' }} />
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.45)' }}>ПРИБЫЛЬ ПО РЕЙСАМ</div>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 40, letterSpacing: '-0.03em', lineHeight: 1, marginTop: 4, color: d.profit >= 0 ? '#fff' : '#FF6B7A' }}>
+        <div className="grad-card grad-blue" style={{ padding: '24px 26px' }}>
+          <CardGradient tone="blue" />
+          <div>
+            <div className="grad-kicker">Прибыль по рейсам</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 40, letterSpacing: '-0.03em', lineHeight: 1, marginTop: 4, color: d.profit >= 0 ? '#fff' : '#FFD6DB' }}>
               <CountUp value={d.profit} />
             </div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 6 }}>BYN</div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 6 }}>BYN</div>
             <div style={{ display: 'flex', gap: 24, marginTop: 20 }}>
               <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Выручка</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 2 }}>Выручка</div>
                 <div style={{ fontWeight: 700, fontSize: 15 }}><CountUp value={d.revenue} format={money} /></div>
               </div>
               <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Расходы</div>
-                <div style={{ fontWeight: 700, fontSize: 15, color: '#F5B971' }}><CountUp value={d.expenses} format={money} /></div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 2 }}>Расходы</div>
+                <div style={{ fontWeight: 700, fontSize: 15, color: '#FFE2C2' }}><CountUp value={d.expenses} format={money} /></div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Оранжевая: дебиторка */}
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(255,236,214,0.95), rgba(255,213,170,0.85))',
-          borderRadius: 22, padding: '28px 24px', border: '1px solid rgba(255,255,255,0.6)',
-          boxShadow: '0 16px 40px -16px rgba(217,119,6,0.4)', position: 'relative', overflow: 'hidden',
-        }}>
-          <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#A86A20', marginBottom: 8 }}>ОЖИДАЕТСЯ ОТ КЛИЕНТОВ</div>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: '#7A4A12' }}>
+        <div className="grad-card grad-orange" style={{ padding: '24px 24px' }}>
+          <CardGradient tone="orange" />
+          <div className="grad-kicker">Ожидается от клиентов</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: '#fff' }}>
             <CountUp value={d.debt_sum} />
           </div>
-          <div style={{ fontSize: 11, color: '#A86A20', marginTop: 6 }}>BYN</div>
-          <div style={{ marginTop: 14, fontSize: 12, color: '#A86A20', fontWeight: 600 }}>оплачено {money(d.paid_sum)}</div>
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.82)', marginTop: 6 }}>BYN</div>
+          <div style={{ marginTop: 14, fontSize: 12, color: 'rgba(255,255,255,0.82)', fontWeight: 600 }}>оплачено {money(d.paid_sum)}</div>
         </div>
 
         {/* Фиолетовая: расходы по рейсам */}
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(224,224,255,0.95), rgba(208,191,255,0.85))',
-          borderRadius: 22, padding: '28px 24px', border: '1px solid rgba(255,255,255,0.6)',
-          boxShadow: '0 16px 40px -16px rgba(124,58,237,0.4)', position: 'relative', overflow: 'hidden',
-        }}>
-          <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#6B3FB8', marginBottom: 8 }}>РАСХОДЫ ПО РЕЙСАМ</div>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: '#4A2785' }}>
+        <div className="grad-card grad-purple" style={{ padding: '24px 24px' }}>
+          <CardGradient tone="purple" />
+          <div className="grad-kicker">Расходы по рейсам</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: '#fff' }}>
             <CountUp value={d.expenses} />
           </div>
-          <div style={{ fontSize: 11, color: '#6B3FB8', marginTop: 6 }}>BYN</div>
-          <div style={{ marginTop: 14, fontSize: 12, color: '#6B3FB8', fontWeight: 600 }}>
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.82)', marginTop: 6 }}>BYN</div>
+          <div style={{ marginTop: 14, fontSize: 12, color: 'rgba(255,255,255,0.82)', fontWeight: 600 }}>
             топливо {money(d.fuel_cost)} · прочее {money(d.other_expenses)} · ЗП {money(d.driver_salary_total)}
           </div>
           {d.expenses_unpaid > 0.5 && (
-            <div style={{ marginTop: 4, fontSize: 11.5, color: '#C81923', fontWeight: 700 }}>не оплачено {money(d.expenses_unpaid)}</div>
+            <div style={{ marginTop: 4, fontSize: 11.5, color: '#FFE0E3', fontWeight: 700 }}>не оплачено {money(d.expenses_unpaid)}</div>
           )}
         </div>
       </div>

@@ -11,6 +11,7 @@ import { mouseOnly } from '../motion'
 import { Loader } from './Loader'
 import { SuccessCheck } from './Transitions'
 import { iosConfirm } from './IOSAlert'
+import CardGradient from './CardGradient'
 
 const STATUSES = [
   { id: 'new', label: 'Новая', color: '#7C3AED', bg: 'rgba(124,58,237,0.1)' },
@@ -825,47 +826,44 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
       <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 16, alignItems: 'start' }}>
         {/* LEFT COLUMN */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {/* Hero dark card */}
-          <div style={{
-            background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)',
-            borderRadius: 22, padding: isMobile ? '18px 18px' : '28px 28px', color: '#fff',
-            boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)',
-          }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>МАРШРУТ</div>
+          {/* Главная карточка — мягкий синий живой градиент */}
+          <div className="grad-card grad-blue" style={{ padding: isMobile ? '18px 18px' : '28px 28px' }}>
+            <CardGradient tone="blue" />
+            <div className="grad-kicker" style={{ marginBottom: 4 }}>Маршрут</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: isMobile ? 17 : 22, letterSpacing: '-0.02em', lineHeight: 1.2 }}>{route}</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: isMobile ? 10 : 20, marginTop: isMobile ? 12 : 18 }}>
               <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Груз</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 2 }}>Груз</div>
                 <div style={{ fontWeight: 600, fontSize: 13 }}>{view.cargo || '—'}</div>
               </div>
               <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Вес</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 2 }}>Вес</div>
                 <div style={{ fontWeight: 600, fontSize: 13 }}>{view.weight_tons ? view.weight_tons + ' т' : '—'}</div>
               </div>
               <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Загрузка</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 2 }}>Загрузка</div>
                 <div style={{ fontWeight: 600, fontSize: 13 }}>{fmtDate(view.load_date) || '—'}</div>
               </div>
               <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Выгрузка</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 2 }}>Выгрузка</div>
                 <div style={{ fontWeight: 600, fontSize: 13 }}>{fmtDate(view.unload_date) || '—'}</div>
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)', gap: isMobile ? 8 : 24, marginTop: isMobile ? 14 : 22, paddingTop: isMobile ? 14 : 18, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
               <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Клиент</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 3 }}>Клиент</div>
                 <div style={{ fontWeight: 800, fontSize: isMobile ? 15 : 20, fontFamily: 'var(--font-sys)' }}>{fmtMoney(clientRate)}</div>
               </div>
               <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Перевозчик</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 3 }}>Перевозчик</div>
                 <div style={{ fontWeight: 800, fontSize: isMobile ? 15 : 20, fontFamily: 'var(--font-sys)' }}>{fmtMoney(carrierRate)}</div>
               </div>
               <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Маржа</div>
-                <div style={{ fontWeight: 800, fontSize: isMobile ? 15 : 20, fontFamily: 'var(--font-sys)', color: '#5BE89B' }}>
-                  {fmtMoney(margin)}{!isMobile && <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}> ({marginPct}%)</span>}
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 3 }}>Маржа</div>
+                <div style={{ fontWeight: 800, fontSize: isMobile ? 15 : 20, fontFamily: 'var(--font-sys)', color: '#D2FFE6' }}>
+                  {fmtMoney(margin)}{!isMobile && <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}> ({marginPct}%)</span>}
                 </div>
-                {isMobile && <div style={{ fontSize: 10, color: 'rgba(91,232,155,0.7)', marginTop: 1 }}>{marginPct}%</div>}
+                {isMobile && <div style={{ fontSize: 10, color: 'rgba(210,255,230,0.85)', marginTop: 1 }}>{marginPct}%</div>}
               </div>
             </div>
           </div>
