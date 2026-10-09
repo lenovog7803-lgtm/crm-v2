@@ -51,9 +51,10 @@ const fmtQuarter = q => {
   return `${qn} квартал ${y}`
 }
 
-export default function Topbar({ compact = false, page, onSignOut, period = 'month', onPeriodChange, availableMonths = [], search = '', onSearchChange, overdueItems = [], onOpenOrder, onNav, onOpenPalette }) {
+export default function Topbar({ compact = false, page, onSignOut, period = 'month', onPeriodChange, availableMonths = [], search = '', onSearchChange, overdueItems = [], onOpenOrder, onNav, onOpenPalette, meta: metaOverride }) {
   const { notifications, dismiss } = useToast()
-  const meta = PAGE_META[page] || { title: page, subtitle: '' }
+  // карточки (заявка, клиент, перевозчик) подставляют свой заголовок: номер, имя и т.п.
+  const meta = metaOverride || PAGE_META[page] || { title: page, subtitle: '' }
   const [bellOpen, setBellOpen] = useState(false)
   // анимированный поиск: открыт, пока на нём мышь, в нём курсор или есть текст
   const [searchHover, setSearchHover] = useState(false)
@@ -156,7 +157,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
         </div>
       ) : (
         <>
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
         {/* большой заголовок iOS: крупный вверху страницы, сжимается при прокрутке */}
         <div className="ios-title" style={{ fontSize: compact ? (isMobile ? 17 : 18) : (isMobile ? 24 : 26) }}>{meta.title}</div>
         {!isMobile && <div className="ios-subtitle" style={{ fontSize: 12.5, color: '#8A93A0', marginTop: 2 }}>{meta.subtitle}</div>}

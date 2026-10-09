@@ -287,11 +287,18 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
   )
 }
 
-export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, onOpenCarrier, onOpenOrder, onDuplicate, onEdit }) {
+export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenClient, onOpenCarrier, onOpenOrder, onDuplicate, onEdit }) {
   const isMobile = useIsMobile()
   const { show, update } = useToast()
   const { celebrate } = useCelebration()
   const [order, setOrder] = useState(null)
+  // шапка страницы: номер заявки, маршрут, клиент, дата создания
+  useEffect(() => {
+    if (!order) return
+    const route = [order.route_from, order.route_to].filter(Boolean).join(' → ')
+    const created = order.created_at && `создана ${new Date(order.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}`
+    onMeta?.({ title: order.order_number || `#${order.id}`, subtitle: [route, order.client_name, created].filter(Boolean).join(' · ') })
+  }, [order?.order_number, order?.route_from, order?.route_to, order?.client_name, order?.created_at])  // eslint-disable-line react-hooks/exhaustive-deps
   const [loading, setLoading] = useState(true)
   const [payLoading, setPayLoading] = useState(null)
   const [paymentModal, setPaymentModal] = useState(null) // 'client' | 'carrier' | null
@@ -711,9 +718,6 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                 <polyline points="15 18 9 12 15 6" />
               </svg>
             </button>
-            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 14, color: '#1366F0' }}>
-              {order.order_number || `#${order.id}`}
-            </span>
             <span style={{
               padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
               background: curStatus.bg, color: curStatus.color,
@@ -782,14 +786,6 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
             </svg>
             Назад
           </button>
-          <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, fontSize: 15, color: '#1366F0', flexShrink: 0 }}>
-            {order.order_number || `#${order.id}`}
-          </span>
-          {order.created_at && (
-            <span style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 500 }}>
-              создана {new Date(order.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}
-            </span>
-          )}
           <span style={{ padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, flexShrink: 0, background: curStatus.bg, color: curStatus.color }}>{curStatus.label}</span>
           {isDirty && <span style={{ fontSize: 11.5, fontWeight: 600, color: '#D97706', padding: '3px 10px', borderRadius: 8, background: 'rgba(217,119,6,0.1)' }}>Есть изменения</span>}
           <div style={{ flex: 1 }} />

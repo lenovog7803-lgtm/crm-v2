@@ -47,8 +47,13 @@ function EditSelect({ label, value, onChange, options }) {
   )
 }
 
-export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }) {
+export default function ClientDetail({ clientId, onMeta, onBack, onDelete, onOpenOrder }) {
   const [client, setClient] = useState(null)
+  useEffect(() => {
+    if (!client) return
+    const inn = client.inn || client.unp
+    onMeta?.({ title: client.name || 'Клиент', subtitle: [client.contact_person || client.contact, client.city, inn && `УНП ${inn}`].filter(Boolean).join(' · ') || 'Карточка клиента' })
+  }, [client?.name, client?.contact_person, client?.contact, client?.city, client?.inn, client?.unp])  // eslint-disable-line react-hooks/exhaustive-deps
   const [clientOrders, setClientOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)

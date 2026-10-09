@@ -811,3 +811,6 @@ input[type="number"] {
 .ios-list--check .ios-row + .ios-row::before { left: 53px; }
 .ios-list--check .ios-row { min-height: 56px; }
 @media (max-width: 768px) { .ios-row-hide-sm { display: none !important; } }
+
+/* длинный номер/название в шапке — в одну строку с многоточием */
+.ios-title, .ios-subtitle { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

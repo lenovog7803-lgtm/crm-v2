@@ -55,8 +55,13 @@ function EditSelect({ label, value, onChange, options }) {
   )
 }
 
-export default function CarrierDetail({ carrierId, onBack, onDelete, onOpenOrder }) {
+export default function CarrierDetail({ carrierId, onMeta, onBack, onDelete, onOpenOrder }) {
   const [carrier, setCarrier] = useState(null)
+  useEffect(() => {
+    if (!carrier) return
+    const cap = carrier.capacity_tons ? carrier.capacity_tons + ' т' : carrier.cap
+    onMeta?.({ title: carrier.company_name || carrier.name || 'Перевозчик', subtitle: [carrier.driver_name || carrier.driver, cap, carrier.vehicle_type, carrier.plate].filter(Boolean).join(' · ') || 'Карточка перевозчика' })
+  }, [carrier?.company_name, carrier?.name, carrier?.driver_name, carrier?.driver, carrier?.capacity_tons, carrier?.cap, carrier?.vehicle_type, carrier?.plate])  // eslint-disable-line react-hooks/exhaustive-deps
   const [carrierOrders, setCarrierOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)

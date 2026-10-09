@@ -106,6 +106,9 @@ function MainApp() {
   const [selectedOrderId, setSelectedOrderId] = useState(null)
   const [selectedClientId, setSelectedClientId] = useState(null)
   const [selectedCarrierId, setSelectedCarrierId] = useState(null)
+  // заголовок шапки от открытой карточки; привязан к странице, чтобы не «прилипал» к другим разделам
+  const [detailMeta, setDetailMeta] = useState(null)
+  const metaFor = p => m => setDetailMeta(m && { ...m, page: p })
   const [selectedFleetTripId, setSelectedFleetTripId] = useState(null)
   const [selectedFleetClientId, setSelectedFleetClientId] = useState(null)
   const [selectedFleetOrderId, setSelectedFleetOrderId] = useState(null)
@@ -347,7 +350,7 @@ function MainApp() {
         />
 
         <main className="app-main">
-          <Topbar compact={scrolled} page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={handleSearchChange} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} onOpenPalette={() => setPaletteOpen(true)} />
+          <Topbar compact={scrolled} page={page} meta={detailMeta?.page === page ? detailMeta : null} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={handleSearchChange} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} onOpenPalette={() => setPaletteOpen(true)} />
           <div className={`scroll-area${motionRef.current.cls}`} key={page} onScroll={handleScrollParallax}>
             {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} onMonthsLoaded={setAvailableMonths} preloadedOrders={allOrders} />}
             {page === 'my-dashboard' && <ErrorBoundary><ManagerDashboard /></ErrorBoundary>}
@@ -365,6 +368,7 @@ function MainApp() {
             {page === 'order-detail' && (
               <OrderDetail
                 orderId={selectedOrderId}
+                onMeta={metaFor('order-detail')}
                 onBack={() => handleNav('orders')}
                 onDelete={() => { invalidateOrdersCache(); setOrdersKey(k => k + 1) }}
                 onOpenClient={id => openClient(id)}
@@ -401,6 +405,7 @@ function MainApp() {
             {page === 'client-detail' && (
               <ClientDetail
                 clientId={selectedClientId}
+                onMeta={metaFor('client-detail')}
                 onBack={() => handleNav('clients')}
                 onDelete={() => { setClientsKey(k => k + 1) }}
                 onOpenOrder={id => openOrder(id)}
@@ -418,6 +423,7 @@ function MainApp() {
             {page === 'carrier-detail' && (
               <CarrierDetail
                 carrierId={selectedCarrierId}
+                onMeta={metaFor('carrier-detail')}
                 onBack={() => handleNav('carriers')}
                 onDelete={() => { setCarriersKey(k => k + 1) }}
                 onOpenOrder={id => openOrder(id)}
