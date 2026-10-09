@@ -35,11 +35,14 @@ export default function Login() {
           <div style={{ fontSize: 15, color: 'rgba(60,60,67,0.6)', marginTop: 6 }}>Войдите, чтобы продолжить</div>
         </div>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {/* как вход в iOS: два поля в одной скруглённой группе с тонким разделителем */}
-          <div className="login-group">
-            <input value={login} onChange={e => setLogin(e.target.value)} placeholder="Логин" aria-label="Логин" autoComplete="username" autoCapitalize="none" />
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Пароль" aria-label="Пароль" autoComplete="current-password" />
-          </div>
+          <label className="login-field">
+            <span>Логин</span>
+            <input value={login} onChange={e => setLogin(e.target.value)} autoComplete="username" autoCapitalize="none" />
+          </label>
+          <label className="login-field">
+            <span>Пароль</span>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" />
+          </label>
           {error && <div style={{ fontSize: 13, color: '#FF3B30', textAlign: 'center' }}>{error}</div>}
           <button type="submit" disabled={loading} className="btn-primary" style={{ height: 54, justifyContent: 'center', fontSize: 17, fontWeight: 600, marginTop: 4, opacity: loading ? 0.7 : 1 }}>
             {loading ? 'Вход…' : 'Войти'}
