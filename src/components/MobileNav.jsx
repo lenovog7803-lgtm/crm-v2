@@ -238,7 +238,7 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
   // icon up — full nav height, centered on the icon.
   const btnRefs = useRef({})
   const [pill, setPill] = useState(null)
-  const PILL_SIZE = 44
+  const PILL_SIZE = 48
 
   useLayoutEffect(() => {
     const el = btnRefs.current[activeKey]
@@ -248,25 +248,20 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
 
   return (
     <>
-    <div className="mobile-nav liquid-glass" style={{
-      position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000,
+    // iOS 26: плавающая стеклянная капсула над краем экрана, активная вкладка — стеклянная линза
+    <div className="mobile-nav liquid-glass lg-tabbar" style={{
+      position: 'fixed', zIndex: 1000,
+      left: 14, right: 14, bottom: 'calc(8px + env(safe-area-inset-bottom))',
+      height: 60, borderRadius: 30,
       alignItems: 'stretch',
       justifyContent: 'space-around',
-      paddingTop: 0,
-      paddingBottom: 0,
-      height: 'calc(54px + env(safe-area-inset-bottom))',
-      paddingInline: 4,
-      background: 'rgba(251,251,253,0.94)',
-      backdropFilter: 'blur(40px) saturate(180%)',
-      WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-      borderTop: '0.5px solid rgba(0,0,0,0.12)',
+      paddingInline: 6,
     }}>
       {pill && (
-        <div style={{
+        <div className="lg-lens" style={{
           position: 'absolute', left: pill.left, top: '50%', width: PILL_SIZE, height: PILL_SIZE,
           marginTop: -PILL_SIZE / 2,
-          borderRadius: 14, background: 'rgba(19,102,240,0.12)',
-          transition: 'left 0.25s var(--ease)', pointerEvents: 'none',
+          borderRadius: 22, transition: 'left 0.35s cubic-bezier(0.34, 1.3, 0.64, 1)', pointerEvents: 'none',
         }} />
       )}
       {navList.map(item => {
@@ -306,7 +301,7 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
                   position: 'absolute', top: -4, right: -6,
                   minWidth: 15, height: 15, borderRadius: 99,
                   background: badgeColor,
-                  border: '1.5px solid rgba(251,251,253,0.94)',
+                  border: '1.5px solid rgba(255,255,255,0.9)',
                   color: '#fff', fontSize: 8, fontWeight: 800,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   padding: '0 3px', lineHeight: 1,
