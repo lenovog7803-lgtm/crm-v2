@@ -53,6 +53,12 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
   const { notifications, dismiss } = useToast()
   const meta = PAGE_META[page] || { title: page, subtitle: '' }
   const [bellOpen, setBellOpen] = useState(false)
+  // анимированный поиск: открыт, пока на нём мышь, в нём курсор или есть текст
+  const [searchHover, setSearchHover] = useState(false)
+  const [searchFocus, setSearchFocus] = useState(false)
+  const searchInputRef = useRef(null)
+  const searchCloseTimer = useRef(null)
+  const searchOpen = searchHover || searchFocus || !!search
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [bellPulse, setBellPulse] = useState(false)
   const [bubbles, setBubbles] = useState([]) // [{ id, notification, phase: 'enter' | 'exit' }]
@@ -153,35 +159,34 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
         </button>
       )}
 
-      {/* Search — desktop */}
-      <div className="topbar-search" style={{ position: 'relative', width: 300 }}>
-        <svg style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: '#A6AEB8' }} width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {/* Search — desktop: в покое только лупа; наведение, Tab или клик — строка плавно выезжает влево */}
+      <div
+        className={`topbar-search search-pill${searchOpen ? ' is-open' : ''}`}
+        onPointerEnter={mouseOnly(() => { clearTimeout(searchCloseTimer.current); setSearchHover(true) })}
+        onPointerLeave={mouseOnly(() => { searchCloseTimer.current = setTimeout(() => setSearchHover(false), 220) })}
+        onClick={() => searchInputRef.current?.focus()}
+      >
+        <svg className="search-pill-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="11" cy="11" r="8"/>
           <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
         <input
+          ref={searchInputRef}
           value={search}
           onChange={e => onSearchChange && onSearchChange(e.target.value)}
-          placeholder="Поиск..."
-          style={{
-            width: '100%', paddingLeft: 34, paddingRight: 40,
-            height: 38, borderRadius: 11,
-            border: '1px solid rgba(14,23,38,0.12)',
-            background: 'rgba(255,255,255,0.7)',
-            fontFamily: 'Manrope', fontSize: 13.5, color: '#0E1726',
-            outline: 'none',
-          }}
+          onFocus={() => setSearchFocus(true)}
+          onBlur={() => setSearchFocus(false)}
+          onKeyDown={e => { if (e.key === 'Escape') { onSearchChange && onSearchChange(''); e.currentTarget.blur() } }}
+          placeholder="Поиск по CRM…"
+          aria-label="Поиск"
+          className="search-pill-input"
         />
         {onOpenPalette && (
           <button
-            onClick={onOpenPalette}
+            className="search-pill-kbd"
+            onClick={e => { e.stopPropagation(); onOpenPalette() }}
+            tabIndex={searchOpen ? 0 : -1}
             title="Быстрый поиск по всей базе (⌘K)"
-            style={{
-              position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)',
-              height: 24, padding: '0 7px', borderRadius: 7, border: '1px solid rgba(14,23,38,0.1)',
-              background: 'rgba(255,255,255,0.8)', color: '#8A93A0', cursor: 'pointer',
-              fontFamily: 'Manrope', fontSize: 11, fontWeight: 600,
-            }}
           >⌘K</button>
         )}
       </div>

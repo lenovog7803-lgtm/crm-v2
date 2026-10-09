@@ -414,3 +414,46 @@ input[type="number"] {
   .t-icon-swap .t-icon, .t-resize { transition: none !important; }
   .scroll-area.page-forward, .scroll-area.page-back { animation: pageIn 0.15s ease-out; }
 }
+
+/* ===== Анимированный поиск в шапке: лупа → строка ===== */
+.search-pill {
+  position: relative; display: flex; align-items: center; flex-shrink: 0;
+  width: 38px; height: 38px; border-radius: 12px; cursor: text; overflow: hidden;
+  background: rgba(255,255,255,0.7);
+  border: 1px solid rgba(14,23,38,0.10);
+  box-shadow: 0 1px 2px rgba(14,23,38,0.06), inset 0 1px 0 rgba(255,255,255,0.7);
+  backdrop-filter: blur(12px) saturate(160%); -webkit-backdrop-filter: blur(12px) saturate(160%);
+  transition: width 420ms cubic-bezier(0.22, 1, 0.36, 1), border-color 200ms ease, box-shadow 200ms ease, background 200ms ease;
+}
+.search-pill.is-open { width: 300px; background: rgba(255,255,255,0.92); }
+.search-pill:focus-within {
+  border-color: rgba(19,102,240,0.45);
+  box-shadow: 0 0 0 4px rgba(19,102,240,0.12), 0 6px 18px -8px rgba(19,102,240,0.35);
+}
+.search-pill-icon {
+  position: absolute; left: 10px; top: 50%; color: #5A6573; pointer-events: none;
+  transform: translateY(-50%) rotate(0deg) scale(1);
+  transition: color 200ms ease, transform 420ms cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+.search-pill:hover .search-pill-icon { color: #1366F0; }
+.search-pill.is-open .search-pill-icon { color: #1366F0; transform: translateY(-50%) rotate(-12deg) scale(0.92); }
+.search-pill.is-open:focus-within .search-pill-icon { transform: translateY(-50%) rotate(0deg) scale(0.92); }
+.search-pill-input {
+  width: 100%; height: 100%; border: none; outline: none; background: transparent;
+  padding: 0 46px 0 34px; font-family: Manrope; font-size: 13.5px; color: #0E1726;
+  opacity: 0; filter: blur(3px); transform: translateX(8px);
+  transition: opacity 220ms ease 0ms, filter 220ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.search-pill.is-open .search-pill-input { opacity: 1; filter: blur(0); transform: none; transition-delay: 90ms; }
+.search-pill-input::placeholder { color: #A6AEB8; }
+.search-pill-kbd {
+  position: absolute; right: 6px; top: 50%; height: 24px; padding: 0 7px; border-radius: 7px;
+  border: 1px solid rgba(14,23,38,0.1); background: rgba(255,255,255,0.85); color: #8A93A0; cursor: pointer;
+  font-family: Manrope; font-size: 11px; font-weight: 600;
+  opacity: 0; transform: translateY(-50%) scale(0.8); pointer-events: none;
+  transition: opacity 200ms ease, transform 300ms cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+.search-pill.is-open .search-pill-kbd { opacity: 1; transform: translateY(-50%) scale(1); pointer-events: auto; transition-delay: 140ms; }
+@media (prefers-reduced-motion: reduce) {
+  .search-pill, .search-pill-icon, .search-pill-input, .search-pill-kbd { transition: none !important; }
+}
