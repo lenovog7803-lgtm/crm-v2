@@ -670,7 +670,10 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         <div
           {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.08), 0 20px 50px -20px rgba(14,23,38,0.6)', 'inset 0 1px 0 rgba(255,255,255,0.08), 0 28px 60px -18px rgba(14,23,38,0.7)')}
           style={{
-            background: 'radial-gradient(120% 90% at 100% 0%, rgba(19,102,240,0.38), transparent 55%), linear-gradient(160deg, #15233F 0%, #0E1726 100%)',
+            // тёмное тонированное стекло: фон чуть просвечивает, сверху — блик
+            background: 'radial-gradient(120% 70% at 15% -10%, rgba(255,255,255,0.14), transparent 50%), radial-gradient(120% 90% at 100% 0%, rgba(19,102,240,0.38), transparent 55%), linear-gradient(160deg, rgba(21,35,63,0.86) 0%, rgba(14,23,38,0.92) 100%)',
+            backdropFilter: 'blur(28px) saturate(180%)', WebkitBackdropFilter: 'blur(28px) saturate(180%)',
+            border: '1px solid rgba(255,255,255,0.1)',
             borderRadius: 26, padding: isMobile ? '16px 18px' : '22px 24px', color: '#fff',
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08), 0 20px 50px -20px rgba(14,23,38,0.6)',
             transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
@@ -753,7 +756,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       {/* Monthly goals — real plan/fact from the backend, only for a period
           that resolves to one specific month (goals don't exist per-quarter). */}
       {goals && (
-        <div className="card" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
+        <div className="card ios-widget" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
           <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: isMobile ? 12 : 18 }}>
             Цели месяца
           </div>
@@ -820,7 +823,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       )}
 
       {/* Chart */}
-      <div className="card" style={{ padding: isMobile ? '16px 14px 12px' : '24px 24px 16px' }}>
+      <div className="card ios-widget" style={{ padding: isMobile ? '16px 14px 12px' : '24px 24px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>Маржа</div>
@@ -845,7 +848,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       {/* Bottom 3-col */}
       <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)', gap: isMobile ? 10 : 16 }}>
         {/* Top clients */}
-        <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px', minWidth: 0 }}>
+        <div className="card ios-widget" style={{ padding: isMobile ? '14px 14px' : '20px 20px', minWidth: 0 }}>
           <div onClick={() => setOpenModal('clients')} style={{ cursor: 'pointer', marginBottom: 14 }}>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Топ клиентов</div>
             <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 4 }}>по выручке за период</div>
@@ -862,7 +865,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         </div>
 
         {/* Top by margin */}
-        <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px', minWidth: 0 }}>
+        <div className="card ios-widget" style={{ padding: isMobile ? '14px 14px' : '20px 20px', minWidth: 0 }}>
           <div onClick={() => setOpenModal('margin')} style={{ cursor: 'pointer', marginBottom: isMobile ? 10 : 14 }}>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Топ по марже</div>
             <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 4 }}>% маржинальности</div>
@@ -879,7 +882,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         </div>
 
         {/* Debtors */}
-        <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px', minWidth: 0 }}>
+        <div className="card ios-widget" style={{ padding: isMobile ? '14px 14px' : '20px 20px', minWidth: 0 }}>
           <div onClick={() => setOpenModal('debtors')} style={{ cursor: 'pointer', marginBottom: isMobile ? 10 : 14 }}>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Должники</div>
             <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 4 }}>неоплаченные доставки</div>

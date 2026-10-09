@@ -797,13 +797,28 @@ input[type="number"] {
 
 /* iOS 26 — виджет дашборда: белое стекло, большой радиус */
 .ios-widget {
-  background: rgba(255,255,255,0.78);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.7);
-  border-radius: 26px;
+  position: relative; isolation: isolate;
+  background: linear-gradient(160deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.42) 100%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%); backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255,255,255,0.55) !important;
+  border-radius: 26px !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 14px 40px -22px rgba(20,30,55,0.22);
   transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+/* liquid glass: блик по верхнему краю и мягкое свечение сверху-слева — как у стекла iOS 26 */
+.ios-widget::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background:
+    radial-gradient(120% 60% at 15% -10%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 55%),
+    linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 18%);
+}
+.ios-widget::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.6), inset 0 -1px 0 rgba(255,255,255,0.25), inset 0 0 18px rgba(255,255,255,0.18);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .ios-widget { background: #fff !important; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .ios-widget::before { display: none; }
 }
 @media (max-width: 768px) { .ios-widget { border-radius: 22px; } }
 
@@ -860,3 +875,14 @@ input[type="number"] {
 /* живой градиент (ShaderGradient) — проявляется плавно, когда WebGL готов */
 .gradient-layer { position: absolute; inset: 0; animation: gradientIn 1.6s ease-out both; }
 @keyframes gradientIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* экран входа — стеклянная карточка iOS 26 */
+.login-card { z-index: 1; width: 380px; max-width: calc(100vw - 32px); padding: 40px 32px 32px; border-radius: 34px !important; font-family: var(--font-sys);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 30px 80px -24px rgba(20,30,55,0.35) !important; }
+.login-group { border-radius: 16px; overflow: hidden; background: rgba(255,255,255,0.85);
+  box-shadow: 0 0 0 1px rgba(14,23,38,0.08), 0 1px 2px rgba(14,23,38,0.04); }
+.login-group input { display: block; width: 100%; box-sizing: border-box; height: 50px; padding: 0 16px; border: none; outline: none;
+  background: transparent; font-family: var(--font-sys); font-size: 16px; color: #0E1726; caret-color: #1366F0; }
+.login-group input + input { border-top: 0.5px solid rgba(60,60,67,0.2); }
+.login-group input::placeholder { color: rgba(60,60,67,0.45); }
+.login-group:focus-within { box-shadow: 0 0 0 1px rgba(19,102,240,0.45), 0 0 0 4px rgba(19,102,240,0.14); }
