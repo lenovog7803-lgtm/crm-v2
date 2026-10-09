@@ -248,7 +248,7 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
 
   return (
     <>
-    <div className="mobile-nav" style={{
+    <div className="mobile-nav liquid-glass" style={{
       position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 1000,
       alignItems: 'stretch',
       justifyContent: 'space-around',

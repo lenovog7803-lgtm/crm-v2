@@ -385,7 +385,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   }
 
   return (
-    <aside className="desktop-sidebar" style={{
+    <aside className="desktop-sidebar liquid-glass" style={{
       width: expanded ? 240 : 68,
       minWidth: expanded ? 240 : 68,
       transition: 'width 0.2s ease, min-width 0.2s ease',
@@ -443,7 +443,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
       {/* Nav */}
       <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4, position: 'relative' }}>
         {pillRect && (
-          <div style={{
+          <div className="lg-lens" style={{
             position: 'absolute', left: 0, right: 0, top: pillRect.top, height: pillRect.height,
             borderRadius: 12, background: 'rgba(19,102,240,0.1)',
             opacity: drag ? 0 : 1,  // во время перетаскивания подсветка не мешает

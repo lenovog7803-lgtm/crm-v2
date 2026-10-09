@@ -120,7 +120,7 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
   }))).sort().reverse()
 
   return (
-    <div className="topbar-mobile" style={{
+    <div className="topbar-mobile liquid-glass" style={{
       display: 'flex', alignItems: 'center', gap: 16,
       padding: '14px 20px',
       background: 'rgba(255,255,255,0.55)',
@@ -172,7 +172,7 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
 
       {/* Search — desktop: в покое только лупа; наведение, Tab или клик — строка плавно выезжает влево */}
       <div
-        className={`topbar-search search-pill${searchOpen ? ' is-open' : ''}`}
+        className={`topbar-search search-pill liquid-glass${searchOpen ? ' is-open' : ''}`}
         onPointerEnter={mouseOnly(() => { clearTimeout(searchCloseTimer.current); setSearchHover(true) })}
         onPointerLeave={mouseOnly(() => { searchCloseTimer.current = setTimeout(() => setSearchHover(false), 220) })}
         onClick={() => searchInputRef.current?.focus()}

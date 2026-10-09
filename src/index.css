@@ -610,3 +610,43 @@ input[type="number"] {
 @keyframes iosNotifIn { from { opacity: 0; translate: 0 -14px; scale: 0.92; filter: blur(3px); } to { opacity: 1; translate: 0 0; scale: 1; filter: blur(0); } }
 @keyframes iosNotifOut { to { opacity: 0; translate: 0 -10px; scale: 0.94; } }
 @media (prefers-reduced-motion: reduce) { .ios-notif { animation: none !important; transition: none !important; } }
+
+/* ===== Liquid Glass (как в iOS 26 / macOS Tahoe) — на чистом CSS, без снимков страницы ===== */
+.liquid-glass {
+  isolation: isolate;
+  background: linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.40) 100%) !important;
+  backdrop-filter: blur(28px) saturate(210%) brightness(1.04) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(210%) brightness(1.04) !important;
+  border: 1px solid rgba(255,255,255,0.5) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1px 0 rgba(255,255,255,0.3),
+    0 12px 32px -14px rgba(20,30,55,0.25),
+    0 1px 2px rgba(20,30,55,0.05) !important;
+}
+.liquid-glass:not(.mobile-nav):not(.apple-select-menu):not(.spotlight):not(.ios-notif) { position: relative; }
+/* светящийся край: свет падает сверху-слева и отражается снизу-справа */
+.liquid-glass::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: linear-gradient(140deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.15) 35%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.55) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+/* мягкий блик по верху — «толщина» стекла */
+.liquid-glass::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(140% 70% at 20% -20%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 55%);
+}
+/* «линза» — выделение активного пункта/вкладки как капля стекла */
+.lg-lens {
+  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.7)) !important;
+  box-shadow: 0 6px 16px -6px rgba(20,30,55,0.22), 0 1px 2px rgba(20,30,55,0.06),
+    inset 0 1px 0 #fff, inset 0 0 0 0.5px rgba(14,23,38,0.06) !important;
+}
+@media (prefers-reduced-transparency: reduce) {
+  .liquid-glass { background: #F7F8FA !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .liquid-glass::before, .liquid-glass::after { display: none; }
+}
+@media (prefers-contrast: more) {
+  .liquid-glass { background: rgba(255,255,255,0.95) !important; border-color: rgba(14,23,38,0.25) !important; }
+}

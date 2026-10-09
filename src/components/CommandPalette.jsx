@@ -143,7 +143,7 @@ export default function CommandPalette({ open, onClose, onOpenOrder, onOpenClien
   return (
     <div onMouseDown={close} style={{ position: 'fixed', inset: 0, zIndex: 2100, background: 'rgba(14,23,38,0.06)',
       animation: closing ? 'fadeOut 0.14s ease-in both' : 'pageIn 0.18s ease-out' }}>
-      <div onMouseDown={e => e.stopPropagation()} className="spotlight"
+      <div onMouseDown={e => e.stopPropagation()} className="spotlight liquid-glass"
         style={{
           position: 'absolute', left: '50%', top: isMobile ? '8vh' : '16vh', transform: 'translateX(-50%)',
           width: isMobile ? 'calc(100% - 24px)' : 680, maxHeight: isMobile ? '78vh' : '64vh',
