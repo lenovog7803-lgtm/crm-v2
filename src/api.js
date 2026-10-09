@@ -322,6 +322,20 @@ export const getMailingReplies = (onlyNew = false, campaignId = '') => req(`/mai
 export const resolveMailingReply = (id, status) => req(`/mailing/contacts/${id}/resolve`, { method: 'POST', body: JSON.stringify({ status }) });
 export const markMailingRepliesSeen = (ids) => req('/mailing/replies/seen', { method: 'POST', body: JSON.stringify({ ids }) });
 export const previewMailing = (data) => req('/mailing/preview', { method: 'POST', body: JSON.stringify(data) });
+// Переписка с контактом (вкладка «Почта»)
+export const getMailThread = (id) => req(`/mailing/contacts/${id}/thread`, {}, 0);
+export const replyMail = (id, text) => req(`/mailing/contacts/${id}/reply`, { method: 'POST', body: JSON.stringify({ text }) }, 0);
+export async function downloadMailAttachment(id, msg, index, name) {
+  const res = await fetch(BASE + `/mailing/contacts/${id}/attachment?` + new URLSearchParams({ msg, index }), {
+    headers: { 'Authorization': token ? `Bearer ${token}` : '' },
+  });
+  if (res.status === 401) { onUnauthorized?.(); throw new Error('Сессия истекла — войдите заново'); }
+  if (!res.ok) throw new Error(await res.text());
+  const url = URL.createObjectURL(await res.blob());
+  const link = Object.assign(document.createElement('a'), { href: url, download: name });
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 // направления
 export const getMailingCampaigns = () => req('/mailing/campaigns');
 export const createMailingCampaign = (data) => req('/mailing/campaigns', { method: 'POST', body: JSON.stringify(data) });

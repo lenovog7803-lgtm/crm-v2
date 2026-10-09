@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import {
   getMailingState, startMailing, stopMailing, checkMailingInbox,
   getMailingContacts, addMailingContact, updateMailingContact, deleteMailingContact, importMailingContacts,
-  getMailingReplies, resolveMailingReply, markMailingRepliesSeen, previewMailing,
+  getMailingReplies, resolveMailingReply, previewMailing,
+  getMailThread, replyMail, downloadMailAttachment,
   getMailingCampaigns, createMailingCampaign, updateMailingCampaign, deleteMailingCampaign,
   getMailboxes, createMailbox, saveMailbox, deleteMailbox, testMailboxConnection, sendMailboxTestEmail,
   startMailboxGoogle, disconnectMailboxGoogle,
@@ -34,7 +35,7 @@ const STATUS = {
 
 const tabsWith = (newReplies, withSuppliers) => [
   { key: 'overview', label: 'Обзор' },
-  { key: 'replies', label: newReplies ? `Ответы · ${newReplies}` : 'Ответы' },
+  { key: 'replies', label: newReplies ? `Почта · ${newReplies}` : 'Почта' },
   { key: 'contacts', label: 'Контакты' },
   ...(withSuppliers ? [{ key: 'suppliers', label: 'Поставщики' }] : []),
   { key: 'settings', label: 'Настройки' },
@@ -358,10 +359,12 @@ const RESOLVE = [
 
 function Replies({ campaignId, loginFor, onChanged }) {
   const { show } = useToast()
-  const [onlyNew, setOnlyNew] = useState(true)
+  const isMobile = useIsMobile()
+  const [onlyNew, setOnlyNew] = useState(false)
+  const [q, setQ] = useState('')
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
-  const [busyId, setBusyId] = useState(null)
+  const [openId, setOpenId] = useState(null)
 
   const load = () => {
     setLoading(true)
@@ -372,77 +375,183 @@ function Replies({ campaignId, loginFor, onChanged }) {
   }
   useEffect(load, [onlyNew, campaignId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const resolve = async (c, status) => {
-    setBusyId(c.id)
+  const open = (c) => {
+    setOpenId(c.id)
+    if (c.reply_seen === false) {
+      setItems(list => list.map(x => x.id === c.id ? { ...x, reply_seen: true } : x))
+      setTimeout(() => onChanged?.(), 800)  // счётчик новых на вкладке
+    }
+  }
+  const patch = (id, upd) => setItems(list => list.map(x => x.id === id ? { ...x, ...upd } : x))
+  const query = q.trim().toLowerCase()
+  const shown = query ? items.filter(c => [c.company, c.email, c.contact_name, c.reply_snippet].join(' ').toLowerCase().includes(query)) : items
+  const current = items.find(c => c.id === openId)
+
+  const list = (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 0 }}>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+        <SlidingTabs options={[{ key: 'all', label: 'Все' }, { key: 'new', label: 'Новые' }]} value={onlyNew ? 'new' : 'all'} onChange={k => setOnlyNew(k === 'new')} />
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Поиск по переписке" style={{ ...inputStyle, flex: 1, minWidth: 140 }} />
+      </div>
+      {loading && <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
+      {!loading && shown.length === 0 && (
+        <div className="card" style={{ padding: 30, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>
+          {onlyNew ? 'Новых писем нет' : 'Здесь появятся компании, которые ответили на рассылку'}
+        </div>
+      )}
+      {shown.map(c => {
+        const st = STATUS[c.status] || STATUS.replied
+        const active = c.id === openId
+        return (
+          <button key={c.id} onClick={() => open(c)} className="ios-row"
+            style={{ textAlign: 'left', border: 'none', cursor: 'pointer', padding: '12px 14px', borderRadius: 14, fontFamily: 'inherit',
+              background: active ? 'rgba(37,99,235,0.08)' : '#fff', boxShadow: active ? 'inset 0 0 0 1px rgba(37,99,235,0.35)' : '0 1px 2px rgba(14,23,38,0.06)',
+              display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {c.reply_seen === false && <span style={{ width: 8, height: 8, borderRadius: 99, background: '#2563EB', flexShrink: 0 }} />}
+              <span style={{ fontFamily: 'Onest', fontWeight: c.reply_seen === false ? 800 : 600, fontSize: 14, color: '#0E1726', flex: 1, minWidth: 0,
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.company || c.email}</span>
+              <span style={{ fontSize: 11, color: '#8A93A0', flexShrink: 0 }}>{fmtTs(c.replied_at).slice(5)}</span>
+            </div>
+            <div style={{ fontSize: 12.5, color: '#5A6573', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {(c.reply_snippet || c.reply_subject || '').replace(/\s+/g, ' ')}
+            </div>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              <span style={{ padding: '1px 8px', borderRadius: 99, background: st.bg, color: st.color, fontSize: 11, fontWeight: 600 }}>{st.label}</span>
+              {c.awaiting_reply && <span style={{ fontSize: 11, color: '#8A93A0' }}>ждём ответа</span>}
+              {!campaignId && c.campaign_name && <span style={{ fontSize: 11, color: '#8A93A0' }}>{c.campaign_name}</span>}
+            </div>
+          </button>
+        )
+      })}
+    </div>
+  )
+
+  const thread = current
+    ? <MailThread key={current.id} contact={current} gmailHref={gmailLink(loginFor(current.campaign_id), current.email)}
+        onBack={isMobile ? () => setOpenId(null) : null}
+        onPatch={upd => { patch(current.id, upd); onChanged?.() }} />
+    : <div className="card" style={{ padding: 40, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>Выберите переписку слева</div>
+
+  if (isMobile) return current ? thread : list
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(260px, 340px) 1fr', gap: 16, alignItems: 'start' }}>
+      <div style={{ maxHeight: 'calc(100dvh - 220px)', overflowY: 'auto', paddingRight: 4 }}>{list}</div>
+      {thread}
+    </div>
+  )
+}
+
+const fmtSize = (n) => n > 1048576 ? `${(n / 1048576).toFixed(1)} МБ` : `${Math.max(1, Math.round(n / 1024))} КБ`
+
+function MailThread({ contact: c, gmailHref, onBack, onPatch }) {
+  const { show } = useToast()
+  const [data, setData] = useState(null)
+  const [err, setErr] = useState('')
+  const [text, setText] = useState('')
+  const [sending, setSending] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const endRef = useRef(null)
+
+  const load = () => {
+    setErr('')
+    getMailThread(c.id).then(setData).catch(e => setErr(e.message))
+  }
+  useEffect(load, [c.id]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { endRef.current?.scrollIntoView({ block: 'end' }) }, [data])
+
+  const send = async () => {
+    if (!text.trim()) return
+    setSending(true)
+    try {
+      await replyMail(c.id, text)
+      show('Ответ отправлен', { type: 'success' })
+      setText('')
+      onPatch({ awaiting_reply: true })
+      setTimeout(load, 1500)  // Gmail показывает отправленное не мгновенно
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+    setSending(false)
+  }
+
+  const resolve = async (status) => {
+    setBusy(true)
     try {
       const r = await resolveMailingReply(c.id, status)
       const label = RESOLVE.find(x => x.status === status)?.label
-      show(r.supplier_created ? `${label}: добавлен в «Поставщики»` : r.supplier_id ? `${label}: карточка поставщика обновлена` : `Отмечено: ${label}`, { type: 'success' })
-      setItems(list => onlyNew ? list.filter(x => x.id !== c.id) : list.map(x => x.id === c.id ? { ...x, status, reply_seen: true } : x))
-      onChanged?.()
+      show(r.supplier_created ? `${label}: добавлен в «Поставщики»` : `Отмечено: ${label}`, { type: 'success' })
+      onPatch({ status, reply_seen: true })
     } catch (e) {
       show('Ошибка: ' + e.message, { type: 'error' })
     }
-    setBusyId(null)
+    setBusy(false)
   }
 
-  const seenAll = async () => {
-    try {
-      await markMailingRepliesSeen(items.map(c => c.id))
-      setItems([])
-      onChanged?.()
-    } catch (e) {
-      show('Ошибка: ' + e.message, { type: 'error' })
-    }
-  }
+  const download = (m, a) => downloadMailAttachment(c.id, m.id, a.index, a.name).catch(e => show('Ошибка: ' + e.message, { type: 'error' }))
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-        <SlidingTabs options={[{ key: 'new', label: 'Новые' }, { key: 'all', label: 'Все ответы' }]} value={onlyNew ? 'new' : 'all'} onChange={k => setOnlyNew(k === 'new')} />
-        {onlyNew && items.length > 0 && <button className="btn-ghost" onClick={seenAll}>Отметить все просмотренными</button>}
-      </div>
-      <div style={{ fontSize: 12, color: '#8A93A0' }}>
-        Ответы проверяются каждые 15 минут, о новых приходит сообщение в Telegram. В направлениях «закупка» кнопки «Интерес» и «Сделка» заводят карточку во вкладке «Поставщики».
+    <div className="card" style={{ padding: 0, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
+      <div style={{ padding: '14px 16px', borderBottom: '1px solid rgba(14,23,38,0.06)', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {onBack && <button className="btn-ghost" onClick={onBack} aria-label="Назад" style={{ padding: '6px 10px' }}>‹</button>}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 16, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.company || c.email}</div>
+            <div style={{ fontSize: 12, color: '#8A93A0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {[c.contact_name, c.email, data?.mailbox && `с почты ${data.mailbox}`].filter(Boolean).join(' · ')}
+            </div>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {RESOLVE.map(b => (
+            <button key={b.status} className="btn-ghost" disabled={busy} onClick={() => resolve(b.status)}
+              style={c.status === b.status ? { background: b.color, color: '#fff', borderColor: b.color } : { color: b.color }}>
+              {b.label}
+            </button>
+          ))}
+          <a className="btn-ghost" href={gmailHref} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>Gmail ↗</a>
+        </div>
       </div>
 
-      {loading && <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
-      {!loading && items.length === 0 && (
-        <div className="card" style={{ padding: 30, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>
-          {onlyNew ? 'Новых ответов нет' : 'Ответов пока нет'}
-        </div>
-      )}
-      {items.map(c => (
-        <div key={c.id} className="card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10, borderLeft: c.reply_seen === false ? '3px solid #0E9F6E' : undefined }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-            <div>
-              <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>{c.company || c.email}</div>
-              {!campaignId && c.campaign_name && <CampaignTag name={c.campaign_name} kind={c.campaign_kind} />}
-              <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>
-                {[c.contact_name, c.email, c.city].filter(Boolean).join(' · ')} · ответ {fmtTs(c.replied_at)}
-              </div>
+      <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12, background: '#F7F8FA',
+        maxHeight: onBack ? 'none' : 'calc(100dvh - 400px)', minHeight: 200, overflowY: 'auto' }}>
+        {!data && !err && <div style={{ color: '#A6AEB8', textAlign: 'center', padding: 20 }}>Загрузка переписки…</div>}
+        {err && <div style={{ color: '#E0473B', fontSize: 13 }}>{err}</div>}
+        {data?.hint && (
+          <div style={{ padding: '10px 12px', borderRadius: 12, background: 'rgba(217,119,6,0.08)', color: '#B45309', fontSize: 12.5, fontWeight: 600 }}>{data.hint}</div>
+        )}
+        {data?.messages?.map(m => (
+          <div key={m.id} style={{ alignSelf: m.from_me ? 'flex-end' : 'flex-start', maxWidth: '88%',
+            background: m.from_me ? '#2563EB' : '#fff', color: m.from_me ? '#fff' : '#0E1726',
+            borderRadius: 16, padding: '10px 14px', boxShadow: m.from_me ? 'none' : '0 1px 2px rgba(14,23,38,0.08)' }}>
+            <div style={{ fontSize: 11, opacity: 0.75, marginBottom: 4 }}>
+              {m.from_me ? 'Вы' : (c.contact_name || c.company || c.email)} · {fmtTs(m.date)}
             </div>
-            <span style={{ alignSelf: 'flex-start', padding: '3px 9px', borderRadius: 99, background: (STATUS[c.status] || STATUS.replied).bg, color: (STATUS[c.status] || STATUS.replied).color, fontSize: 11.5, fontWeight: 600 }}>
-              {(STATUS[c.status] || STATUS.replied).label}
-            </span>
+            <div style={{ whiteSpace: 'pre-wrap', fontSize: 13.5, lineHeight: 1.5, overflowWrap: 'anywhere' }}>{m.text || '(без текста)'}</div>
+            {m.attachments?.length > 0 && (
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
+                {m.attachments.map(a => (
+                  <button key={a.index} onClick={() => download(m, a)}
+                    style={{ border: 'none', cursor: 'pointer', borderRadius: 10, padding: '6px 10px', fontSize: 12, fontWeight: 600, fontFamily: 'inherit',
+                      background: m.from_me ? 'rgba(255,255,255,0.2)' : 'rgba(37,99,235,0.08)', color: m.from_me ? '#fff' : '#1D4ED8' }}>
+                    📎 {a.name} · {fmtSize(a.size)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          {c.reply_subject && <div style={{ fontSize: 12.5, fontWeight: 600, color: '#5A6573' }}>{c.reply_subject}</div>}
-          <div style={{ whiteSpace: 'pre-wrap', fontSize: 13, color: '#0E1726', lineHeight: 1.55, background: '#F7F8FA', borderRadius: 12, padding: 12, maxHeight: 220, overflowY: 'auto' }}>
-            {c.reply_snippet || 'Текст ответа не удалось прочитать — откройте письмо в Gmail.'}
-          </div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-            {RESOLVE.map(b => (
-              <button key={b.status} className="btn-ghost" disabled={busyId === c.id}
-                onClick={() => resolve(c, b.status)}
-                style={c.status === b.status ? { background: b.color, color: '#fff', borderColor: b.color } : { color: b.color }}>
-                {b.label}
-              </button>
-            ))}
-            <a className="btn-ghost" href={gmailLink(loginFor(c.campaign_id), c.email)} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>Открыть в Gmail ↗</a>
-            {c.supplier_id && <span style={{ fontSize: 12, color: '#8A93A0' }}>есть в «Поставщиках»</span>}
-          </div>
-        </div>
-      ))}
+        ))}
+        <div ref={endRef} />
+      </div>
+
+      <div style={{ padding: 12, borderTop: '1px solid rgba(14,23,38,0.06)', display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+        <textarea value={text} onChange={e => setText(e.target.value)} rows={3} placeholder="Ваш ответ…"
+          onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) send() }}
+          style={{ ...inputStyle, flex: 1, resize: 'vertical', minHeight: 64, fontSize: 16 }} />
+        <button className="btn-primary" disabled={sending || !text.trim()} onClick={send} style={{ flexShrink: 0 }}>
+          {sending ? 'Отправляю…' : 'Отправить'}
+        </button>
+      </div>
     </div>
   )
 }
@@ -902,6 +1011,11 @@ function MailboxSettings({ mailbox, onSaved, onDeleted }) {
               </div>
               <div style={{ marginTop: 10, fontSize: 13, fontWeight: 600, color: mailbox.gmail_connected ? '#0E9F6E' : '#8A93A0' }}>
                 {mailbox.gmail_connected ? `Подключён: ${mailbox.gmail_connected}` : 'Gmail ещё не подключён'}
+                {mailbox.gmail_connected && !mailbox.can_read && (
+                  <div style={{ marginTop: 6, color: '#B45309', fontWeight: 600 }}>
+                    Чтобы видеть переписку во вкладке «Почта» и ловить ответы, нажмите «Подключить другой Gmail», войдите в этот же аккаунт и разрешите чтение писем.
+                  </div>
+                )}
               </div>
               <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
                 <button className="btn-ghost" onClick={connectGoogle}>{mailbox.gmail_connected ? 'Подключить другой Gmail' : 'Подключить Gmail'}</button>
