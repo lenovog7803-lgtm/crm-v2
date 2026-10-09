@@ -14,6 +14,7 @@ import { SlidingTabs } from '../components/SlidingTabs'
 import { CountUp } from '../components/CountUp'
 import { CircularProgress } from '../components/CircularProgress'
 import { useIsMobile } from '../hooks/useIsMobile'
+import { ThinkingOrb } from 'thinking-orbs'
 import { Loader } from '../components/Loader'
 
 // «Рассылка» — холодные письма по базе. Вся логика (лимиты, рабочие часы,
@@ -160,6 +161,12 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
         <div style={{ ...heroBase, background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)', color: '#fff',
           padding: isMobile ? '18px' : '26px 28px', boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)' }}>
           <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: state.running ? 'rgba(91,232,155,0.12)' : 'rgba(19,102,240,0.15)' }} />
+          {/* вращающаяся сфера: работает — зелёная и крутится, остановлено — замерла и потускнела */}
+          <div style={{ position: 'absolute', top: isMobile ? 12 : 18, right: isMobile ? 12 : 22, zIndex: 1, pointerEvents: 'none',
+            transform: isMobile ? 'scale(0.85)' : 'scale(1.25)', transformOrigin: 'top right' }}>
+            <ThinkingOrb state="searching" size={64} color={state.running ? '#5BE89B' : 'rgba(255,255,255,0.35)'}
+              paused={!state.running} aria-label={state.running ? 'Рассылка работает' : 'Рассылка остановлена'} />
+          </div>
           <div style={{ position: 'relative', zIndex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
               <span style={{ width: 8, height: 8, borderRadius: 99, background: state.running ? '#5BE89B' : 'rgba(255,255,255,0.35)',

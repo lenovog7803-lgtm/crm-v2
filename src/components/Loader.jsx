@@ -8,7 +8,10 @@ export function Loader({ label = 'Загрузка…', state = 'working', paddi
   return (
     <div role="status" style={{ padding, display: 'flex', flexDirection: 'column', alignItems: 'center',
       justifyContent: 'center', gap: 10, color: '#A6AEB8', fontSize: 13, ...style }}>
-      <ThinkingOrb state={state} size={64} theme="light" aria-label={label} />
+      {/* сфера нарисована на 64 px — показываем крупнее (80 px), под размер карточек CRM */}
+      <div style={{ width: 80, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <ThinkingOrb state={state} size={64} theme="light" aria-label={label} style={{ transform: 'scale(1.25)' }} />
+      </div>
       {label && <span>{label}</span>}
     </div>
   )
