@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { getDashboard, getOrders, getGoals, saveGoals } from '../api'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useEscapeKey } from '../hooks/useEscapeKey'
@@ -239,6 +239,65 @@ function buildChartData(orders, period) {
   }
 }
 
+// Ряд для мини-графика KPI: сколько разных key было в каждую из последних 8 недель.
+function weeklySeries(orders, pick, weeks = 8) {
+  const now = Date.now(), WEEK = 7 * 864e5
+  const buckets = Array.from({ length: weeks }, () => new Set())
+  orders.forEach(o => {
+    const r = pick(o)
+    const t = r && Date.parse(r.date)
+    if (!t) return
+    const w = Math.floor((now - t) / WEEK)
+    if (w >= 0 && w < weeks) buckets[weeks - 1 - w].add(r.key)
+  })
+  return buckets.map(b => b.size)
+}
+
+function Sparkline({ data, color, w = 84, h = 30 }) {
+  if (!data || data.every(v => v === 0)) return null
+  const max = Math.max(...data, 1)
+  const pts = data.map((v, i) => [(i / (data.length - 1)) * w, h - 3 - (v / max) * (h - 6)])
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ')
+  const id = 'spk' + color.slice(1)
+  const last = pts[pts.length - 1]
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ display: 'block', overflow: 'visible', flexShrink: 0 }} aria-hidden="true">
+      <defs>
+        <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={color} stopOpacity="0.28" />
+          <stop offset="1" stopColor={color} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path d={`${line} L${w},${h} L0,${h} Z`} fill={`url(#${id})`} />
+      <path d={line} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={last[0]} cy={last[1]} r="3" fill={color} stroke="#fff" strokeWidth="1.5" />
+    </svg>
+  )
+}
+
+const WIDGET_ICONS = {
+  margin: <polyline points="2 11 6 7 9 9 14 3" />,
+  in: <><path d="M8 2v8" /><polyline points="4.5 6.5 8 10 11.5 6.5" /><path d="M2.5 13.5h11" /></>,
+  out: <><path d="M8 11V3" /><polyline points="4.5 6.5 8 3 11.5 6.5" /><path d="M2.5 13.5h11" /></>,
+}
+
+// Шапка виджета как в iOS: цветной значок + подпись, справа — что угодно (бейдж, стрелка).
+function WidgetHead({ icon, label, color, labelColor = color, right }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+      <div style={{ width: 24, height: 24, borderRadius: 8, background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{WIDGET_ICONS[icon]}</svg>
+      </div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: labelColor, letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+      {right && <div style={{ marginLeft: 'auto', flexShrink: 0 }}>{right}</div>}
+    </div>
+  )
+}
+
+const Chevron = ({ color }) => (
+  <svg width="8" height="13" viewBox="0 0 8 13" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5 }}><polyline points="1.5 1.5 6.5 6.5 1.5 11.5" /></svg>
+)
+
 function ChartSVG({ current, prev, labels, mode, todayIdx }) {
   const [hovered, setHovered] = useState(null)
   const W = 800, H = 200, PL = 52, PR = 8, PT = 10, PB = 28
@@ -288,7 +347,8 @@ function ChartSVG({ current, prev, labels, mode, todayIdx }) {
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ overflow: 'visible', display: 'block' }}>
         <defs>
           <linearGradient id="dashFillG" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#1366F0" stopOpacity="0.18" />
+            <stop offset="0" stopColor="#1366F0" stopOpacity="0.32" />
+            <stop offset="0.6" stopColor="#1366F0" stopOpacity="0.08" />
             <stop offset="1" stopColor="#1366F0" stopOpacity="0" />
           </linearGradient>
           <linearGradient id="dashLineG" x1="0" y1="0" x2="1" y2="0">
@@ -302,7 +362,7 @@ function ChartSVG({ current, prev, labels, mode, todayIdx }) {
           const y = PT + (1 - t) * (H - PT - PB)
           return (
             <g key={idx}>
-              <line x1={PL} y1={y} x2={W - PR} y2={y} stroke="rgba(14,23,38,0.06)" strokeWidth="1" strokeDasharray="4,4" />
+              <line x1={PL} y1={y} x2={W - PR} y2={y} stroke="rgba(14,23,38,0.07)" strokeWidth="1" />
               <text x={PL - 6} y={y + 4} fontSize="10" fill="#A6AEB8" textAnchor="end">{fmtVal(safeMax * t)}</text>
             </g>
           )
@@ -313,17 +373,13 @@ function ChartSVG({ current, prev, labels, mode, todayIdx }) {
         <path d={curPath} stroke={mode === 'days' ? 'url(#dashLineG)' : '#1366F0'} strokeWidth="3" fill="none" strokeLinecap="round" />
 
         {todayPt && <>
-          <circle cx={todayPt.x} cy={todayPt.y} r="12" fill="#1366F0" opacity="0.08" />
-          <circle cx={todayPt.x} cy={todayPt.y} r="6" fill="#1366F0" opacity="0.15" />
-          <circle cx={todayPt.x} cy={todayPt.y} r="4" fill="#1366F0" />
-          <circle cx={todayPt.x} cy={todayPt.y} r="2" fill="#fff" />
+          <circle cx={todayPt.x} cy={todayPt.y} r="13" fill="#1366F0" opacity="0.12" />
+          <circle cx={todayPt.x} cy={todayPt.y} r="6" fill="#fff" stroke="#1366F0" strokeWidth="3" />
         </>}
 
         {hovered !== null && pts[hovered] && <>
-          <line x1={pts[hovered].x} y1={PT} x2={pts[hovered].x} y2={H - PB} stroke="#1366F0" strokeWidth="1" strokeDasharray="3,3" opacity="0.4" />
-          <circle cx={pts[hovered].x} cy={pts[hovered].y} r="10" fill="#1366F0" opacity="0.12" />
-          <circle cx={pts[hovered].x} cy={pts[hovered].y} r="5" fill="#1366F0" />
-          <circle cx={pts[hovered].x} cy={pts[hovered].y} r="2.5" fill="#fff" />
+          <line x1={pts[hovered].x} y1={PT} x2={pts[hovered].x} y2={H - PB} stroke="#1366F0" strokeWidth="1.5" opacity="0.25" />
+          <circle cx={pts[hovered].x} cy={pts[hovered].y} r="7" fill="#fff" stroke="#1366F0" strokeWidth="3" style={{ filter: 'drop-shadow(0 2px 6px rgba(19,102,240,0.35))' }} />
         </>}
 
         {pts.map((pt, i) => (
@@ -336,10 +392,10 @@ function ChartSVG({ current, prev, labels, mode, todayIdx }) {
       {hovered !== null && pts[hovered] && (
         <div style={{
           position: 'absolute',
-          left: `${Math.max(2, Math.min(pts[hovered].x / W * 100 - 9, 68))}%`,
-          top: 0,
-          background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(20px)',
-          borderRadius: 13, padding: '10px 14px',
+          left: `${Math.max(12, Math.min(pts[hovered].x / W * 100, 86))}%`,
+          top: -6, transform: 'translateX(-50%)',
+          background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+          borderRadius: 16, padding: '10px 14px',
           border: '1px solid rgba(255,255,255,0.9)',
           boxShadow: '0 16px 40px rgba(20,30,55,0.18)',
           pointerEvents: 'none', minWidth: 150, zIndex: 20,
@@ -576,6 +632,14 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
   // source of truth instead of two formulas that can drift apart.
   const netProfit = (goals && goalsMonth) ? goals.profit_fact : margin * 0.8
 
+  // Мини-графики KPI — последние 8 недель, независимо от выбранного периода.
+  const sparks = useMemo(() => ({
+    active: weeklySeries(allOrders, o => ({ date: o.created_at || o.load_date, key: o.id || o._id })),
+    done: weeklySeries(allOrders, o => ['done', 'delivered', 'completed'].includes(o.status) && { date: o.unload_date, key: o.id || o._id }),
+    clients: weeklySeries(allOrders, o => ({ date: o.load_date || o.created_at, key: o.client_name || o.client_id })),
+    carriers: weeklySeries(allOrders, o => (o.carrier_name || o.carrier_id) && { date: o.load_date || o.created_at, key: o.carrier_name || o.carrier_id }),
+  }), [allOrders])
+
   if (loading) return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 12 }}>
@@ -600,122 +664,88 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
   return (
     <div style={{ padding: isMobile ? 0 : '0 2px', display: 'flex', flexDirection: 'column', gap: isMobile ? 10 : 16 }}>
 
-      {/* Hero row */}
+      {/* Hero row — виджеты iOS */}
       <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 1fr', gap: 16 }}>
-        {/* Dark: margin */}
+        {/* Маржа — тёмный виджет */}
         <div
-          {...liftHandlers('0 20px 50px -20px rgba(14,23,38,0.6)', '0 28px 60px -18px rgba(14,23,38,0.7)')}
+          {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.08), 0 20px 50px -20px rgba(14,23,38,0.6)', 'inset 0 1px 0 rgba(255,255,255,0.08), 0 28px 60px -18px rgba(14,23,38,0.7)')}
           style={{
-            background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)',
-            borderRadius: 22, padding: isMobile ? '18px 18px' : '28px 28px', color: '#fff',
-            boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)',
-            position: 'relative', overflow: 'clip',
+            background: 'radial-gradient(120% 90% at 100% 0%, rgba(19,102,240,0.38), transparent 55%), linear-gradient(160deg, #15233F 0%, #0E1726 100%)',
+            borderRadius: 26, padding: isMobile ? '16px 18px' : '22px 24px', color: '#fff',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08), 0 20px 50px -20px rgba(14,23,38,0.6)',
             transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
           }}>
-          <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'rgba(19,102,240,0.15)' }} />
-          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 120% 90% at 50% 120%, transparent 40%, rgba(0,0,0,0.25) 100%)', pointerEvents: 'none' }} />
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.45)' }}>МАРЖА</div>
-              {marginDiff !== null && (
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 3,
-                  padding: '2px 8px', borderRadius: 20,
-                  background: marginUp ? 'rgba(91,232,155,0.18)' : 'rgba(200,25,35,0.22)',
-                  fontSize: 11, fontWeight: 700,
-                  color: marginUp ? '#5BE89B' : '#FF6B7A',
-                }}>
-                  <span>{marginUp ? '▲' : '▼'}</span>
-                  <span>{Math.abs(marginDiff)}%</span>
-                  <span style={{ fontWeight: 400, opacity: 0.75, fontSize: 10 }}>vs пред.</span>
-                </div>
-              )}
-            </div>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: isMobile ? 32 : 40, letterSpacing: '-0.03em', lineHeight: 1 }}>
+          <WidgetHead icon="margin" label="Маржа" color="#1366F0" labelColor="rgba(255,255,255,0.75)"
+            right={marginDiff !== null && (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 3, padding: '3px 9px', borderRadius: 999,
+                background: marginUp ? 'rgba(91,232,155,0.16)' : 'rgba(255,107,122,0.18)',
+                fontSize: 12, fontWeight: 600, color: marginUp ? '#5BE89B' : '#FF6B7A',
+              }}>
+                {marginUp ? '▲' : '▼'} {Math.abs(marginDiff)}%
+                <span style={{ fontWeight: 400, opacity: 0.7, fontSize: 11 }}>vs пред.</span>
+              </div>
+            )} />
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+            <span style={{ fontWeight: 700, fontSize: isMobile ? 34 : 44, letterSpacing: '-0.035em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
               <CountUp value={margin} />
+            </span>
+            <span style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.45)' }}>BYN</span>
+          </div>
+          <div style={{ display: 'flex', gap: isMobile ? 16 : 28, marginTop: isMobile ? 14 : 20, paddingTop: isMobile ? 12 : 14, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            <div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 2 }}>Выручка</div>
+              <div style={{ fontWeight: 600, fontSize: isMobile ? 14 : 16, fontVariantNumeric: 'tabular-nums' }}><CountUp value={revenue} format={v => `${Math.round(v).toLocaleString('ru-RU')} BYN`} /></div>
             </div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 6 }}>BYN</div>
-            <div style={{ display: 'flex', gap: isMobile ? 16 : 24, marginTop: isMobile ? 12 : 20 }}>
-              <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Выручка</div>
-                <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 15 }}><CountUp value={revenue} format={v => `${Math.round(v).toLocaleString('ru-RU')} BYN`} /></div>
-              </div>
-              <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Чистая прибыль</div>
-                <div style={{ fontWeight: 700, fontSize: isMobile ? 13 : 15, color: '#5BE89B' }}><CountUp value={netProfit} format={v => `${Math.round(v).toLocaleString('ru-RU')} BYN`} /></div>
-              </div>
+            <div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 2 }}>Чистая прибыль</div>
+              <div style={{ fontWeight: 600, fontSize: isMobile ? 14 : 16, color: '#5BE89B', fontVariantNumeric: 'tabular-nums' }}><CountUp value={netProfit} format={v => `${Math.round(v).toLocaleString('ru-RU')} BYN`} /></div>
             </div>
           </div>
         </div>
 
-        {/* Orange: client debt */}
-        <div
-          onClick={() => setShowDebtors(true)}
-          {...liftHandlers('0 16px 40px -16px rgba(217,119,6,0.4)', '0 22px 50px -14px rgba(217,119,6,0.5)')}
-          style={{
-            background: 'linear-gradient(135deg, rgba(255,236,214,0.95), rgba(255,213,170,0.85))',
-            borderRadius: 22, padding: isMobile ? '16px 18px' : '28px 24px',
-            border: '1px solid rgba(255,255,255,0.6)',
-            boxShadow: '0 16px 40px -16px rgba(217,119,6,0.4)',
-            cursor: 'pointer', position: 'relative', overflow: 'clip',
-            transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
-          }}
-        >
-          <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#A86A20', marginBottom: isMobile ? 4 : 8 }}>ОЖИДАЕТСЯ ОТ КЛИЕНТОВ</div>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: isMobile ? 24 : 30, letterSpacing: '-0.02em', color: '#7A4A12' }}>
-            <CountUp value={clientDebt} />
+        {[
+          { icon: 'in', label: 'Ожидается от клиентов', color: '#D97706', value: clientDebt, count: debtorOrders.length, onClick: () => setShowDebtors(true) },
+          { icon: 'out', label: 'К оплате перевозчикам', color: '#7C3AED', value: carrierDebt, count: carrierDebtOrders.length, onClick: () => setShowCarrierDebt(true) },
+        ].map(w => (
+          <div key={w.icon} className="ios-widget" onClick={w.onClick}
+            {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.9), 0 14px 40px -22px rgba(20,30,55,0.22)', 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 46px -18px rgba(20,30,55,0.3)')}
+            style={{ padding: isMobile ? '16px 18px' : '22px 24px', cursor: 'pointer' }}>
+            <WidgetHead icon={w.icon} label={w.label} color={w.color} right={<Chevron color={w.color} />} />
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+              <span style={{ fontWeight: 700, fontSize: isMobile ? 28 : 34, letterSpacing: '-0.03em', color: '#0E1726', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+                <CountUp value={w.value} />
+              </span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#A6AEB8' }}>BYN</span>
+            </div>
+            <div style={{ marginTop: isMobile ? 10 : 16, fontSize: 13, color: '#8A93A0' }}>
+              <span style={{ fontWeight: 600, color: w.color }}>{w.count}</span> заявок
+            </div>
           </div>
-          <div style={{ fontSize: 11, color: '#A86A20', marginTop: 6 }}>BYN</div>
-          <div style={{ marginTop: isMobile ? 8 : 14, fontSize: 12, color: '#A86A20', fontWeight: 600 }}>
-            {debtorOrders.length} заявок →
-          </div>
-        </div>
-
-        {/* Purple: carrier debt */}
-        <div
-          onClick={() => setShowCarrierDebt(true)}
-          {...liftHandlers('0 16px 40px -16px rgba(124,58,237,0.4)', '0 22px 50px -14px rgba(124,58,237,0.5)')}
-          style={{
-            background: 'linear-gradient(135deg, rgba(224,224,255,0.95), rgba(208,191,255,0.85))',
-            borderRadius: 22, padding: isMobile ? '16px 18px' : '28px 24px',
-            border: '1px solid rgba(255,255,255,0.6)',
-            boxShadow: '0 16px 40px -16px rgba(124,58,237,0.4)',
-            cursor: 'pointer', position: 'relative', overflow: 'clip',
-            transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
-          }}
-        >
-          <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#6B3FB8', marginBottom: isMobile ? 4 : 8 }}>К ОПЛАТЕ ПЕРЕВОЗЧИКАМ</div>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: isMobile ? 24 : 30, letterSpacing: '-0.02em', color: '#4A2785' }}>
-            <CountUp value={carrierDebt} />
-          </div>
-          <div style={{ fontSize: 11, color: '#6B3FB8', marginTop: 6 }}>BYN</div>
-          <div style={{ marginTop: isMobile ? 8 : 14, fontSize: 12, color: '#6B3FB8', fontWeight: 600 }}>
-            {carrierDebtOrders.length} заявок →
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* KPI strip */}
+      {/* KPI — число + мини-график за 8 недель */}
       <div className="dashboard-stat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
         {[
-          { label: 'Активных заявок', value: active, color: '#1366F0', bg: 'rgba(19,102,240,0.08)',
+          { label: 'Активных заявок', value: active, color: '#1366F0', spark: sparks.active, hint: 'новые заявки по неделям',
             onClick: () => { localStorage.setItem('orders_statusFilter', 'active'); onNav('orders') } },
-          { label: 'Доставлено', value: done, color: '#1E9E5A', bg: 'rgba(30,158,90,0.08)',
+          { label: 'Доставлено', value: done, color: '#1E9E5A', spark: sparks.done, hint: 'доставлено по неделям',
             onClick: () => { localStorage.setItem('orders_statusFilter', 'done'); onNav('orders') } },
-          { label: 'Клиентов', value: clientsCount, color: '#D97706', bg: 'rgba(217,119,6,0.08)', onClick: () => onNav('clients') },
-          { label: 'Перевозчиков', value: carriersCount, color: '#7C3AED', bg: 'rgba(124,58,237,0.08)', onClick: () => onNav('carriers') },
+          { label: 'Клиентов', value: clientsCount, color: '#D97706', spark: sparks.clients, hint: 'клиентов с заявками по неделям', onClick: () => onNav('clients') },
+          { label: 'Перевозчиков', value: carriersCount, color: '#7C3AED', spark: sparks.carriers, hint: 'перевозчиков в работе по неделям', onClick: () => onNav('carriers') },
         ].map(kpi => (
-          <div key={kpi.label} className="card"
-            onClick={kpi.onClick}
+          <div key={kpi.label} className="ios-widget"
+            onClick={kpi.onClick} title={`График: ${kpi.hint}, последние 8 недель`}
             {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.9), 0 14px 40px -22px rgba(20,30,55,0.2)', 'inset 0 1px 0 rgba(255,255,255,0.9), 0 18px 44px -18px rgba(20,30,55,0.3)')}
-            style={{ padding: isMobile ? '12px 14px' : '18px 20px', cursor: 'pointer' }}>
-            <div style={{ fontSize: isMobile ? 10 : 11, color: '#A6AEB8', fontWeight: 600, marginBottom: isMobile ? 4 : 6 }}>{kpi.label}</div>
-            <div style={{
-              fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: isMobile ? 26 : 36, color: kpi.color,
-              background: kpi.bg, borderRadius: isMobile ? 9 : 12, padding: isMobile ? '5px 10px' : '8px 14px', display: 'inline-block', lineHeight: 1,
-            }}><CountUp value={kpi.value} format={v => Math.round(v).toLocaleString('ru-RU')} /></div>
+            style={{ padding: isMobile ? '12px 14px' : '16px 18px', cursor: 'pointer' }}>
+            <div style={{ fontSize: isMobile ? 12 : 13, color: '#8A93A0', fontWeight: 600, marginBottom: isMobile ? 6 : 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{kpi.label}</div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 8 }}>
+              <div style={{ fontWeight: 700, fontSize: isMobile ? 26 : 32, color: kpi.color, lineHeight: 1, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}>
+                <CountUp value={kpi.value} format={v => Math.round(v).toLocaleString('ru-RU')} />
+              </div>
+              <Sparkline data={kpi.spark} color={kpi.color} w={isMobile ? 56 : 84} h={isMobile ? 24 : 30} />
+            </div>
           </div>
         ))}
       </div>
@@ -744,10 +774,12 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
                   onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                 >
                   <div style={{ position: 'relative', flexShrink: 0 }}>
-                    <CircularProgress pct={pct} color={g.color} size={isMobile ? 48 : 56} />
+                    <div style={{ filter: `drop-shadow(0 4px 10px ${g.color}40)` }}>
+                      <CircularProgress pct={pct} color={g.color} size={isMobile ? 54 : 64} stroke={isMobile ? 8 : 10} track={`${g.color}22`} />
+                    </div>
                     <div style={{
                       position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: isMobile ? 10 : 11, fontWeight: 700, color: g.color,
+                      fontSize: isMobile ? 11 : 12, fontWeight: 700, color: g.color, fontVariantNumeric: 'tabular-nums',
                     }}>{Math.round(pct)}%</div>
                   </div>
                   <div style={{ minWidth: 0 }}>

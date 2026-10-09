@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { prefersReducedMotion } from '../motion'
 
-export function CircularProgress({ pct, color, size = 56, stroke = 6, duration = 800 }) {
+export function CircularProgress({ pct, color, size = 56, stroke = 6, duration = 800, track = 'rgba(14,23,38,0.07)' }) {
   const [display, setDisplay] = useState(0)
   const startRef = useRef(null)
   const fromRef = useRef(0)
@@ -31,7 +31,7 @@ export function CircularProgress({ pct, color, size = 56, stroke = 6, duration =
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)', flexShrink: 0 }}>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(14,23,38,0.07)" strokeWidth={stroke} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={track} strokeWidth={stroke} />
       <circle
         cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={stroke}
         strokeDasharray={c} strokeDashoffset={offset} strokeLinecap="round"

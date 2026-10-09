@@ -794,3 +794,15 @@ input[type="number"] {
 .ios-row-chevron { color: rgba(60,60,67,0.3); flex-shrink: 0; margin-left: 2px; }
 .ios-row-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 99px; flex-shrink: 0;
   background: rgba(255,149,0,0.12); color: #D97706; font-size: 12.5px; font-weight: 700; }
+
+/* iOS 26 — виджет дашборда: белое стекло, большой радиус */
+.ios-widget {
+  background: rgba(255,255,255,0.78);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.7);
+  border-radius: 26px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 14px 40px -22px rgba(20,30,55,0.22);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+@media (max-width: 768px) { .ios-widget { border-radius: 22px; } }
