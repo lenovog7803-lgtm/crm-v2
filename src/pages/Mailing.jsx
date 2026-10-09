@@ -921,6 +921,7 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
         <div style={{ fontSize: 12, color: '#8A93A0', lineHeight: 1.6 }}>
           Подставляются в тему и текст: {VARS.map(v => <code key={v} style={{ background: 'rgba(14,23,38,0.05)', padding: '1px 5px', borderRadius: 5, marginRight: 4 }}>{v}</code>)}
           <br />Имя, компания и телефон берутся из подписи выбранной почты.
+          <br />Варианты слов: <code style={{ background: 'rgba(14,23,38,0.05)', padding: '1px 5px', borderRadius: 5 }}>{'{Добрый день|Здравствуйте}'}</code> — в каждое письмо попадёт один вариант наугад, письма не одинаковые слово в слово, так меньше шансов попасть в спам. Нажимайте «Предпросмотр» несколько раз, чтобы увидеть разные варианты.
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button className="btn-ghost" onClick={() => doPreview()}>Предпросмотр</button>
