@@ -6,6 +6,7 @@ import KanbanView from '../components/leads/KanbanView'
 import AnalyticsView from '../components/leads/AnalyticsView'
 import ErrorBoundary from '../components/ErrorBoundary'
 import { SlidingTabs } from '../components/SlidingTabs'
+import Select from '../components/Select'
 
 const VIEWS = [
   { id: 'queue',     label: 'Очередь' },
@@ -32,10 +33,10 @@ export default function Leads() {
         <div style={{ width: 1, height: 24, background: 'rgba(14,23,38,0.1)' }} />
 
         {industries.length > 0 && (
-          <select value={industry} onChange={e => setIndustry(e.target.value)} className="form-input" style={{ minWidth: 180 }}>
+          <Select value={industry} onChange={e => setIndustry(e.target.value)} className="form-input" style={{ minWidth: 180 }}>
             <option value="">Все отрасли</option>
             {industries.map(i => <option key={i.name} value={i.name}>{i.name} ({i.count})</option>)}
-          </select>
+          </Select>
         )}
 
         {view === 'queue' && (

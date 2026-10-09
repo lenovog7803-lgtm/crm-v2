@@ -6,6 +6,7 @@ import { SkeletonRow } from './Skeleton'
 import { useToast } from './Toast'
 import { SlidingTabs } from './SlidingTabs'
 import { mouseOnly } from '../motion'
+import Select from './Select'
 
 export default function Finance({ refreshKey }) {
   const isMobile = useIsMobile()
@@ -281,12 +282,12 @@ export default function Finance({ refreshKey }) {
               {/* Контрагент */}
               <div>
                 <div style={{ fontSize: 10.5, fontWeight: 700, color: '#A6AEB8', letterSpacing: '0.08em', marginBottom: 5 }}>{addType === 'income' ? 'КЛИЕНТ' : 'ПЕРЕВОЗЧИК'}</div>
-                <select value={addPartyId} onChange={e => setAddPartyId(e.target.value)} required style={{ ...iStyle, width: '100%' }}>
+                <Select value={addPartyId} onChange={e => setAddPartyId(e.target.value)} required style={{ ...iStyle, width: '100%' }}>
                   <option value="">— Выберите —</option>
                   {(addType === 'income' ? clients : carriers).map(x => (
                     <option key={x.id} value={x.id}>{addType === 'income' ? x.name : x.company_name}</option>
                   ))}
-                </select>
+                </Select>
               </div>
               {/* ПП */}
               <div>
@@ -387,10 +388,10 @@ export default function Finance({ refreshKey }) {
             value={actPartyType}
             onChange={k => { setActPartyType(k); setActParty('') }}
           />
-          <select value={actParty} onChange={e => setActParty(e.target.value)} style={{ ...iStyle, minWidth: 200 }}>
+          <Select value={actParty} onChange={e => setActParty(e.target.value)} style={{ ...iStyle, minWidth: 200 }}>
             <option value="">— Выберите контрагента —</option>
             {actNames.map(n => <option key={n} value={n}>{n}</option>)}
-          </select>
+          </Select>
         </div>
         {actRows.length > 0 ? (
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
@@ -426,10 +427,10 @@ export default function Finance({ refreshKey }) {
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             <label style={{ fontSize: 11, fontWeight: 600, color: '#A6AEB8' }}>Тип</label>
-            <select value={recType} onChange={e => { setRecType(e.target.value); setRecPartyId(''); setRecPartyName('') }} style={iStyle}>
+            <Select value={recType} onChange={e => { setRecType(e.target.value); setRecPartyId(''); setRecPartyName('') }} style={iStyle}>
               <option value="client">Клиент</option>
               <option value="carrier">Перевозчик</option>
-            </select>
+            </Select>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5, flex: 1 }}>
             <label style={{ fontSize: 11, fontWeight: 600, color: '#A6AEB8' }}>{recType === 'client' ? 'Клиент' : 'Перевозчик'}</label>
@@ -454,13 +455,13 @@ export default function Finance({ refreshKey }) {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             <label style={{ fontSize: 11, fontWeight: 600, color: '#A6AEB8' }}>Период</label>
-            <select value={recPeriod} onChange={e => setRecPeriod(e.target.value)} style={iStyle}>
+            <Select value={recPeriod} onChange={e => setRecPeriod(e.target.value)} style={iStyle}>
               <option value="month">Этот месяц</option>
               <option value="last_month">Прошлый месяц</option>
               <option value="quarter">Квартал</option>
               <option value="year">Год</option>
               <option value="all">Всё время</option>
-            </select>
+            </Select>
           </div>
           <button onClick={handleGenerateReconciliation} disabled={recLoading || !recPartyId} style={{
             height: 36, padding: '0 20px', borderRadius: 11, border: 'none',

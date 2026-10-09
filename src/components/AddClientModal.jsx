@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ModalOverlay, ModalHeader } from './Modal'
 import { createClient } from '../api'
+import Select from './Select'
 
 const sectionLabel = {
   fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: '#A6AEB8',
@@ -124,12 +125,12 @@ export default function AddClientModal({ onClose, onSuccess }) {
             </div>
             <div className="form-field">
               <label className="form-label">УСЛОВИЯ ОПЛАТЫ</label>
-              <select className="form-input" value={form.payment_terms} onChange={e => set('payment_terms', e.target.value)}>
+              <Select className="form-input" value={form.payment_terms} onChange={e => set('payment_terms', e.target.value)}>
                 <option>по факту</option>
                 <option>14 дней</option>
                 <option>30 дней</option>
                 <option>45 дней</option>
-              </select>
+              </Select>
             </div>
           </div>
         </div>

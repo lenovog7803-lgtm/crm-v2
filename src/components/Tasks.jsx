@@ -7,6 +7,7 @@ import { SkeletonRow } from './Skeleton'
 import { SlidingTabs } from './SlidingTabs'
 import { mouseOnly } from '../motion'
 import { SuccessCheck } from './Transitions'
+import Select from './Select'
 
 const TYPE_COLORS = { call: '#1366F0', reminder: '#D97706', payment: '#1E9E5A', other: '#8A93A0' }
 const TYPE_BG = { call: 'rgba(19,102,240,0.1)', reminder: 'rgba(217,119,6,0.1)', payment: 'rgba(30,158,90,0.1)', other: 'rgba(138,147,160,0.1)' }
@@ -203,19 +204,19 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
               <div>
                 <label style={labelStyle}>ТИП</label>
-                <select value={editTask.task_type} onChange={e => setEditTask(p => ({ ...p, task_type: e.target.value }))} style={inputStyle}>
+                <Select value={editTask.task_type} onChange={e => setEditTask(p => ({ ...p, task_type: e.target.value }))} style={inputStyle}>
                   <option value="call">Звонок</option>
                   <option value="reminder">Напоминание</option>
                   <option value="payment">Оплата</option>
                   <option value="other">Прочее</option>
-                </select>
+                </Select>
               </div>
               <div>
                 <label style={labelStyle}>СТАТУС</label>
-                <select value={editTask.status} onChange={e => setEditTask(p => ({ ...p, status: e.target.value }))} style={inputStyle}>
+                <Select value={editTask.status} onChange={e => setEditTask(p => ({ ...p, status: e.target.value }))} style={inputStyle}>
                   <option value="pending">В работе</option>
                   <option value="done">Выполнено</option>
-                </select>
+                </Select>
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>

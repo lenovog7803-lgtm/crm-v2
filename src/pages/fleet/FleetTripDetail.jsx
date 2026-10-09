@@ -10,6 +10,7 @@ import { SlidingTabs } from '../../components/SlidingTabs'
 import { PillBtn } from './fleetUi'
 import { Loader } from '../../components/Loader'
 import { SwapText } from '../../components/Transitions'
+import Select from '../../components/Select'
 
 const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#FFFFFF', boxSizing: 'border-box' }
 const num = v => (v === '' || v == null || isNaN(Number(v)) ? 0 : Number(v))
@@ -206,9 +207,9 @@ function TripInfoCard({ trip, revenue, finance, onSave, onReload }) {
       {f.expenses.map(e => (
         <div key={e.id} style={{ borderBottom: '1px solid #F4F5F7', padding: '8px 0' }}>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}>
-            <select value={e.kind} onChange={ev => setExpense(e.id, 'kind', ev.target.value)} onBlur={() => persist()} style={{ ...fieldStyle, flex: '1 1 140px' }}>
+            <Select value={e.kind} onChange={ev => setExpense(e.id, 'kind', ev.target.value)} onBlur={() => persist()} style={{ ...fieldStyle, flex: '1 1 140px' }}>
               {EXPENSE_KINDS.map(k => <option key={k}>{k}</option>)}
-            </select>
+            </Select>
             <input type="number" value={e.amount} placeholder="BYN" onChange={ev => setExpense(e.id, 'amount', ev.target.value)} onBlur={() => persist()} style={{ ...fieldStyle, width: 100 }} />
             <button onClick={() => delExpense(e.id)} style={{ border: 'none', background: 'transparent', color: '#C4CAD4', cursor: 'pointer', fontSize: 14, flexShrink: 0 }}>✕</button>
           </div>
@@ -229,9 +230,9 @@ function TripInfoCard({ trip, revenue, finance, onSave, onReload }) {
         <div style={{ fontSize: 12, fontWeight: 700, color: '#0E1726', marginBottom: 8 }}>Зарплата водителя за рейс</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10 }}>
           <div><div style={{ fontSize: 11, color: '#8A93A0', marginBottom: 4 }}>Как считать</div>
-            <select value={f.driver_salary_mode} onChange={e => { const n = { ...f, driver_salary_mode: e.target.value }; setF(n); setDirty(true) }} onBlur={() => dirty && persist()} style={{ ...fieldStyle, width: '100%' }}>
+            <Select value={f.driver_salary_mode} onChange={e => { const n = { ...f, driver_salary_mode: e.target.value }; setF(n); setDirty(true) }} onBlur={() => dirty && persist()} style={{ ...fieldStyle, width: '100%' }}>
               {SALARY_MODES.map(m => <option key={m.key} value={m.key}>{m.label}</option>)}
-            </select>
+            </Select>
           </div>
           {f.driver_salary_mode && (
             <div><div style={{ fontSize: 11, color: '#8A93A0', marginBottom: 4 }}>
@@ -359,14 +360,14 @@ function EditTripModal({ trip, onClose, onSaved }) {
             <input value={form.route_to} onChange={e => set('route_to', e.target.value)} placeholder="Куда" style={fieldStyle} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <select value={form.vehicle_id} onChange={e => set('vehicle_id', e.target.value)} style={fieldStyle}>
+            <Select value={form.vehicle_id} onChange={e => set('vehicle_id', e.target.value)} style={fieldStyle}>
               <option value="">Машина на рейс</option>
               {vehicles.map(v => <option key={v.id} value={v.id}>{[v.model, v.plate || v.plate_truck].filter(Boolean).join(' · ') || v.id.slice(0, 6)}</option>)}
-            </select>
-            <select value={form.driver_id} onChange={e => set('driver_id', e.target.value)} style={fieldStyle}>
+            </Select>
+            <Select value={form.driver_id} onChange={e => set('driver_id', e.target.value)} style={fieldStyle}>
               <option value="">Водитель на рейс</option>
               {drivers.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-            </select>
+            </Select>
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>

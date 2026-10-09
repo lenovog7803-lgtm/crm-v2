@@ -4,6 +4,7 @@ import { useToast } from './Toast'
 import { fmtDate } from '../utils'
 import { mouseOnly } from '../motion'
 import { PopNumber } from './Transitions'
+import Select from './Select'
 
 const PAGE_META = {
   dashboard: { title: 'Дашборд', subtitle: 'Обзор бизнеса' },
@@ -193,7 +194,7 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
 
       {/* Period — only on dashboard */}
       {page === 'dashboard' && (
-        <select
+        <Select
           className="topbar-period"
           value={period}
           onChange={e => onPeriodChange && onPeriodChange(e.target.value)}
@@ -210,7 +211,7 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
           {extraQuarters.map(q => <option key={q} value={q}>{fmtQuarter(q)}</option>)}
           {extraMonths.length > 0 && <option disabled>──────────</option>}
           {extraMonths.map(m => <option key={m} value={m}>{fmtMonth(m)}</option>)}
-        </select>
+        </Select>
       )}
 
       {/* Trash */}

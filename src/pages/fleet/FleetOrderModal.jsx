@@ -3,6 +3,7 @@ import { createFleetOrder, updateFleetOrder, getFleetClients, getFleetVehicles, 
 import { useToast } from '../../components/Toast'
 import { ModalOverlay, ModalHeader } from '../../components/Modal'
 import { SwapText } from '../../components/Transitions'
+import Select from '../../components/Select'
 
 const iStyle = {
   width: '100%', height: 38, padding: '0 12px', borderRadius: 10,
@@ -115,10 +116,10 @@ export function FleetOrderModal({ tripId, direction, order, trip, onClose, onSav
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <SectionTitle title="КЛИЕНТ" />
           <Field label="КЛИЕНТ">
-            <select style={iStyle} value={form.client_id} onChange={e => set('client_id', e.target.value)}>
+            <Select style={iStyle} value={form.client_id} onChange={e => set('client_id', e.target.value)}>
               <option value="">Выберите клиента…</option>
               {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
+            </Select>
           </Field>
         </div>
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ModalOverlay, ModalHeader } from './Modal'
 import { createPaymentIn, createPaymentOut, getClients, getCarriers } from '../api'
+import Select from './Select'
 
 export default function PaymentModal({ defaultKind, onClose, onSuccess }) {
   const [clients, setClients] = useState([])
@@ -50,7 +51,7 @@ export default function PaymentModal({ defaultKind, onClose, onSuccess }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
           <div className="form-field">
             <label className="form-label">ТИП</label>
-            <select className="form-input" value={form.kind} onChange={e => {
+            <Select className="form-input" value={form.kind} onChange={e => {
               const k = e.target.value
               set('kind', k)
               set('party', k === 'expense' ? 'carrier' : 'client')
@@ -58,22 +59,22 @@ export default function PaymentModal({ defaultKind, onClose, onSuccess }) {
             }}>
               <option value="income">Поступление</option>
               <option value="expense">Списание</option>
-            </select>
+            </Select>
           </div>
           <div className="form-field">
             <label className="form-label">СТОРОНА</label>
-            <select className="form-input" value={form.party} onChange={e => { set('party', e.target.value); set('partyId', '') }}>
+            <Select className="form-input" value={form.party} onChange={e => { set('party', e.target.value); set('partyId', '') }}>
               <option value="client">Клиент</option>
               <option value="carrier">Перевозчик</option>
-            </select>
+            </Select>
           </div>
         </div>
         <div className="form-field">
           <label className="form-label">КОНТРАГЕНТ</label>
-          <select className="form-input" value={form.partyId} onChange={e => set('partyId', e.target.value)} required>
+          <Select className="form-input" value={form.partyId} onChange={e => set('partyId', e.target.value)} required>
             <option value="">— Выберите —</option>
             {partyList.map(p => <option key={p.id} value={p.id}>{p.name || p.company_name}</option>)}
-          </select>
+          </Select>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
           <div className="form-field">

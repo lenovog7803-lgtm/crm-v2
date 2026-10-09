@@ -16,6 +16,7 @@ import { useIsMobile } from '../hooks/useIsMobile'
 import { ThinkingOrb } from 'thinking-orbs'
 import { Loader } from '../components/Loader'
 import { IconSwap, PopNumber, SwapText } from '../components/Transitions'
+import Select from '../components/Select'
 
 // «Рассылка» — холодные письма по базе. Вся логика (лимиты, рабочие часы,
 // паузы, напоминания, проверка ответов) живёт в backend/mailing.py, здесь
@@ -726,10 +727,10 @@ function Contacts({ campaignId, campaignName, onChanged, groups = {}, loginFor, 
       </div>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
         <input value={q} onChange={e => setQ(e.target.value)} placeholder="Поиск: компания, email, город" style={{ ...inputStyle, width: 260 }} />
-        <select value={status} onChange={e => setStatus(e.target.value)} style={{ ...inputStyle, width: 170 }}>
+        <Select value={status} onChange={e => setStatus(e.target.value)} style={{ ...inputStyle, width: 170 }}>
           <option value="">Все статусы</option>
           {Object.entries(STATUS).map(([k, s]) => <option key={k} value={k}>{s.label}</option>)}
-        </select>
+        </Select>
         <div style={{ flex: 1 }} />
         {campaignId ? (
           <>
@@ -752,9 +753,9 @@ function Contacts({ campaignId, campaignName, onChanged, groups = {}, loginFor, 
           ))}
           <div>
             <div style={labelStyle}>Приоритет</div>
-            <select value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))} style={inputStyle}>
+            <Select value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))} style={inputStyle}>
               <option value="">—</option><option>A</option><option>B</option><option>C</option>
-            </select>
+            </Select>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="btn-ghost" onClick={() => setForm(null)}>Отмена</button>
@@ -788,13 +789,13 @@ function Contacts({ campaignId, campaignName, onChanged, groups = {}, loginFor, 
                 <td style={{ padding: '10px 14px', color: '#5A6573' }}>{c.city || ''}</td>
                 <td style={{ padding: '10px 14px', color: '#5A6573' }}>{c.priority || ''}</td>
                 <td style={{ padding: '10px 14px' }}>
-                  <select
+                  <Select
                     value={c.status}
                     onChange={e => setContactStatus(c, e.target.value)}
                     style={{ border: 'none', background: (STATUS[c.status] || STATUS.new).bg, color: (STATUS[c.status] || STATUS.new).color, borderRadius: 99, padding: '4px 8px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
                   >
                     {Object.entries(STATUS).map(([k, s]) => <option key={k} value={k}>{s.label}</option>)}
-                  </select>
+                  </Select>
                 </td>
                 <td style={{ padding: '10px 14px', color: '#8A93A0', fontSize: 12, whiteSpace: 'nowrap' }}>
                   {c.first_sent || ''}{c.followup_sent ? ` · напом. ${c.followup_sent}` : ''}
@@ -887,11 +888,11 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
           </div>
           <div>
             <div style={labelStyle}>Тип</div>
-            <select value={c.kind} onChange={e => set('kind', e.target.value)} style={inputStyle}>
+            <Select value={c.kind} onChange={e => set('kind', e.target.value)} style={inputStyle}>
               <option value="sale">Продажа товара</option>
               <option value="clients">Поиск клиентов</option>
               <option value="purchase">Закупка — ищем поставщиков</option>
-            </select>
+            </Select>
           </div>
           <div>
             <div style={labelStyle}>С каких почт{boxes.length > 1 ? ` · ${boxes.length}` : ''}</div>
@@ -1265,10 +1266,10 @@ function SupplierCard({ s, onChange, onRemove }) {
           <CampaignTag name={s.product} kind="purchase" />
           <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 4 }}>{[s.contact_name, s.email, s.city, s.site].filter(Boolean).join(' · ')}</div>
         </div>
-        <select value={s.stage} onChange={e => patch({ stage: e.target.value })}
+        <Select value={s.stage} onChange={e => patch({ stage: e.target.value })}
           style={{ alignSelf: 'flex-start', border: 'none', background: st.bg, color: st.color, borderRadius: 99, padding: '5px 10px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>
           {Object.entries(SUP_STAGES).map(([k, x]) => <option key={k} value={k}>{x.label}</option>)}
-        </select>
+        </Select>
       </div>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
         <input value={phone} onChange={e => setPhone(e.target.value)} onBlur={() => phone !== (s.phone || '') && patch({ phone })}
@@ -1377,17 +1378,17 @@ function NewCampaignForm({ mailboxes, onCreated, onCancel }) {
       </div>
       <div>
         <div style={labelStyle}>Тип</div>
-        <select value={f.kind} onChange={e => setF(x => ({ ...x, kind: e.target.value }))} style={inputStyle}>
+        <Select value={f.kind} onChange={e => setF(x => ({ ...x, kind: e.target.value }))} style={inputStyle}>
           <option value="sale">Продажа товара</option>
           <option value="clients">Поиск клиентов</option>
           <option value="purchase">Закупка — ищем поставщиков</option>
-        </select>
+        </Select>
       </div>
       <div>
         <div style={labelStyle}>С какой почты</div>
-        <select value={f.mailbox_id} onChange={e => setF(x => ({ ...x, mailbox_id: e.target.value }))} style={inputStyle}>
+        <Select value={f.mailbox_id} onChange={e => setF(x => ({ ...x, mailbox_id: e.target.value }))} style={inputStyle}>
           {mailboxes.map(m => <option key={m.id} value={m.id}>{m.login || m.name}</option>)}
-        </select>
+        </Select>
       </div>
       <div style={{ display: 'flex', gap: 8 }}>
         <button className="btn-ghost" onClick={onCancel}>Отмена</button>

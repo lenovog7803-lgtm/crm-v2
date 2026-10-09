@@ -3,6 +3,7 @@ import { updateLead } from '../../api'
 import { STAGES } from '../../constants/leads'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { SwapText } from '../Transitions'
+import Select from '../Select'
 
 const labelStyle = { fontSize: 12, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.05em', marginBottom: 6, display: 'block' }
 const fieldStyle = { width: '100%', background: '#F7F8FA' }
@@ -115,9 +116,9 @@ export default function LeadEditModal({ lead, onClose, onSaved }) {
             </div>
             <div>
               <label style={labelStyle}>СТАДИЯ</label>
-              <select value={form.stage || 'new'} onChange={set('stage')} className="form-input" style={fieldStyle}>
+              <Select value={form.stage || 'new'} onChange={set('stage')} className="form-input" style={fieldStyle}>
                 {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
-              </select>
+              </Select>
             </div>
           </div>
 

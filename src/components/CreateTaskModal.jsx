@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { ModalOverlay, ModalHeader } from './Modal'
 import { createTask, getAllUsers } from '../api'
 import { useAuth } from '../AuthContext'
+import Select from './Select'
 
 const ROLE_LABEL = { admin: 'директор', director: 'директор', manager: 'менеджер' }
 
@@ -48,12 +49,12 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
           <div className="form-field">
             <label className="form-label">ТИП</label>
-            <select className="form-input" value={form.task_type} onChange={e => set('task_type', e.target.value)}>
+            <Select className="form-input" value={form.task_type} onChange={e => set('task_type', e.target.value)}>
               <option value="call">Звонок</option>
               <option value="reminder">Напоминание</option>
               <option value="payment">Оплата</option>
               <option value="other">Прочее</option>
-            </select>
+            </Select>
           </div>
           <div className="form-field">
             <label className="form-label">СРОК</label>
@@ -68,12 +69,12 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
           {isDirector && (
             <div className="form-field">
               <label className="form-label">НАЗНАЧИТЬ</label>
-              <select className="form-input" value={form.assigned_user_id} onChange={e => set('assigned_user_id', e.target.value)}>
+              <Select className="form-input" value={form.assigned_user_id} onChange={e => set('assigned_user_id', e.target.value)}>
                 <option value="">Не назначать</option>
                 {users.map(u => (
                   <option key={u.id} value={u.id}>{u.name}{u.role ? ` · ${ROLE_LABEL[u.role] || u.role}` : ''}</option>
                 ))}
-              </select>
+              </Select>
             </div>
           )}
         </div>

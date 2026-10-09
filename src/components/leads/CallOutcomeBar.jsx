@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { OUTCOMES, LOST_REASONS, DATE_PRESETS } from '../../constants/leads'
 import { OutcomeIcon } from './OutcomeIcon'
 import { SwapText } from '../Transitions'
+import Select from '../Select'
 
 const labelStyle = { fontSize: 13, fontWeight: 700, color: '#0E1726', letterSpacing: '-0.01em', marginBottom: 10, display: 'block' }
 
@@ -78,10 +79,10 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 4 }) {
       {cfg?.needsReason && (
         <div style={{ marginBottom: 16 }}>
           <span style={labelStyle}>Причина отказа</span>
-          <select value={lostReason} onChange={e => { setLostReason(e.target.value); setError('') }} className="form-input" style={{ width: '100%', background: '#F7F8FA' }}>
+          <Select value={lostReason} onChange={e => { setLostReason(e.target.value); setError('') }} className="form-input" style={{ width: '100%', background: '#F7F8FA' }}>
             <option value="">Выберите причину…</option>
             {LOST_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
-          </select>
+          </Select>
         </div>
       )}
 

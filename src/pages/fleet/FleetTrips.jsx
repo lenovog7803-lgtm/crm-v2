@@ -4,6 +4,7 @@ import { useToast } from '../../components/Toast'
 import { TRIP_STATUS } from './FleetTripDetail'
 import { mouseOnly } from '../../motion'
 import { Loader } from '../../components/Loader'
+import Select from '../../components/Select'
 
 const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#FFFFFF', boxSizing: 'border-box', width: '100%' }
 
@@ -69,14 +70,14 @@ function CreateTripModal({ onClose, onCreated }) {
             <input value={form.route_to} onChange={e => set('route_to', e.target.value)} placeholder="Куда" style={fieldStyle} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <select value={form.vehicle_id} onChange={e => set('vehicle_id', e.target.value)} style={fieldStyle}>
+            <Select value={form.vehicle_id} onChange={e => set('vehicle_id', e.target.value)} style={fieldStyle}>
               <option value="">Машина на рейс</option>
               {vehicles.map(v => <option key={v.id} value={v.id}>{[v.model, v.plate || v.plate_truck].filter(Boolean).join(' · ') || v.id.slice(0, 6)}</option>)}
-            </select>
-            <select value={form.driver_id} onChange={e => set('driver_id', e.target.value)} style={fieldStyle}>
+            </Select>
+            <Select value={form.driver_id} onChange={e => set('driver_id', e.target.value)} style={fieldStyle}>
               <option value="">Водитель на рейс</option>
               {drivers.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-            </select>
+            </Select>
           </div>
           <div style={{ fontSize: 11, color: '#A6AEB8' }}>Машина и водитель подставятся в каждый заказ этого рейса — в самом заказе можно поменять.</div>
         </div>

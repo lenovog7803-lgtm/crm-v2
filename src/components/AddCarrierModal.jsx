@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ModalOverlay, ModalHeader } from './Modal'
 import { createCarrier } from '../api'
+import Select from './Select'
 
 const sectionLabel = {
   fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: '#A6AEB8',
@@ -78,10 +79,10 @@ export default function AddCarrierModal({ onClose, onSuccess }) {
             </div>
             <div className="form-field">
               <label className="form-label">ОСНОВАНИЕ</label>
-              <select className="form-input" value={form.basis} onChange={e => set('basis', e.target.value)}>
+              <Select className="form-input" value={form.basis} onChange={e => set('basis', e.target.value)}>
                 <option value="Устава">Устава</option>
                 <option value="Свидетельства о гос. регистрации">Свидетельства о гос. регистрации</option>
-              </select>
+              </Select>
             </div>
           </div>
           <div className="form-field">

@@ -6,6 +6,7 @@ import { TRIP_STATUS } from './FleetTripDetail'
 import { PillBtn } from './fleetUi'
 import { mouseOnly } from '../../motion'
 import { Loader } from '../../components/Loader'
+import Select from '../../components/Select'
 
 const money = v => `${Math.round(Number(v) || 0).toLocaleString('ru-RU')} BYN`
 const int = v => Math.round(Number(v) || 0).toLocaleString('ru-RU')
@@ -52,13 +53,13 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
           <a href={fleetExportUrl(month)} style={{ textDecoration: 'none' }}>
             <PillBtn variant="neutral" icon="dup">Excel</PillBtn>
           </a>
-          <select value={month} onChange={e => setMonth(e.target.value)} style={{
+          <Select value={month} onChange={e => setMonth(e.target.value)} style={{
             height: 38, padding: '0 14px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.14)',
             background: 'rgba(255,255,255,0.8)', fontFamily: 'Manrope', fontSize: 13, color: '#0E1726', cursor: 'pointer',
           }}>
             <option value="">Всё время</option>
             {(d.months || []).map(m => <option key={m} value={m}>{monthLabel(m)}</option>)}
-          </select>
+          </Select>
         </div>
       </div>
 

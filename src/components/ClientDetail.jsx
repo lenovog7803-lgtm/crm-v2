@@ -4,6 +4,7 @@ import { initials, fmtMoney, statusLabel, statusColor, statusBg, getGradient } f
 import { mouseOnly } from '../motion'
 import { Loader } from './Loader'
 import { StatusOrb } from './StatusOrb'
+import Select from './Select'
 
 function Row({ label, value, mono }) {
   return (
@@ -38,9 +39,9 @@ function EditSelect({ label, value, onChange, options }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
       <span style={{ fontSize: 12, color: '#A6AEB8', fontWeight: 500, flexShrink: 0, minWidth: 90 }}>{label}</span>
-      <select value={value || ''} onChange={e => onChange(e.target.value)} style={iStyle}>
+      <Select value={value || ''} onChange={e => onChange(e.target.value)} style={iStyle}>
         {options.map(o => <option key={o} value={o}>{o}</option>)}
-      </select>
+      </Select>
     </div>
   )
 }
