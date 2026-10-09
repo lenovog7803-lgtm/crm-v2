@@ -423,14 +423,19 @@ function Replies({ campaignId, loginFor, onChanged }) {
   const [loading, setLoading] = useState(true)
   const [openId, setOpenId] = useState(null)
 
-  const load = () => {
-    setLoading(true)
+  const load = (silent = false) => {
+    if (!silent) setLoading(true)
     getMailingReplies(onlyNew, campaignId)
       .then(r => setItems(Array.isArray(r) ? r : []))
-      .catch(e => show('Ошибка загрузки: ' + e.message, { type: 'error' }))
+      .catch(e => { if (!silent) show('Ошибка загрузки: ' + e.message, { type: 'error' }) })
       .finally(() => setLoading(false))
   }
-  useEffect(load, [onlyNew, campaignId]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    load()
+    // новые письма появляются сами, без обновления страницы
+    const t = setInterval(() => { if (!document.hidden) load(true) }, 20000)
+    return () => clearInterval(t)
+  }, [onlyNew, campaignId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const open = (c) => {
     setOpenId(c.id)
@@ -510,12 +515,18 @@ function MailThread({ contact: c, gmailHref, onBack, onPatch }) {
   const [busy, setBusy] = useState(false)
   const endRef = useRef(null)
 
-  const load = () => {
-    setErr('')
-    getMailThread(c.id).then(setData).catch(e => setErr(e.message))
+  const load = (silent = false) => {
+    if (!silent) setErr('')
+    getMailThread(c.id).then(setData).catch(e => { if (!silent) setErr(e.message) })
   }
-  useEffect(load, [c.id]) // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => { endRef.current?.scrollIntoView({ block: 'end' }) }, [data])
+  useEffect(() => {
+    load()
+    const t = setInterval(() => { if (!document.hidden) load(true) }, 30000)
+    return () => clearInterval(t)
+  }, [c.id]) // eslint-disable-line react-hooks/exhaustive-deps
+  // прокручиваем вниз только когда появилось новое письмо, а не при каждом тихом обновлении
+  const count = data?.messages?.length || 0
+  useEffect(() => { endRef.current?.scrollIntoView({ block: 'end' }) }, [count])
 
   const send = async () => {
     if (!text.trim()) return
