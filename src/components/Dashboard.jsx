@@ -609,7 +609,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)',
             borderRadius: 22, padding: isMobile ? '18px 18px' : '28px 28px', color: '#fff',
             boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)',
-            position: 'relative', overflow: 'hidden',
+            position: 'relative', overflow: 'clip',
             transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
           }}>
           <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'rgba(19,102,240,0.15)' }} />
@@ -657,7 +657,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             borderRadius: 22, padding: isMobile ? '16px 18px' : '28px 24px',
             border: '1px solid rgba(255,255,255,0.6)',
             boxShadow: '0 16px 40px -16px rgba(217,119,6,0.4)',
-            cursor: 'pointer', position: 'relative', overflow: 'hidden',
+            cursor: 'pointer', position: 'relative', overflow: 'clip',
             transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
           }}
         >
@@ -681,7 +681,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             borderRadius: 22, padding: isMobile ? '16px 18px' : '28px 24px',
             border: '1px solid rgba(255,255,255,0.6)',
             boxShadow: '0 16px 40px -16px rgba(124,58,237,0.4)',
-            cursor: 'pointer', position: 'relative', overflow: 'hidden',
+            cursor: 'pointer', position: 'relative', overflow: 'clip',
             transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
           }}
         >

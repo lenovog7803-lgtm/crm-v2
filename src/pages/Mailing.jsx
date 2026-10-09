@@ -75,7 +75,7 @@ const RAMP_STEPS = [{ until: 3, lim: 5 }, { until: 7, lim: 10 }, { until: 12, li
 const LOG_ICON = { 'письмо': '✉️', 'напоминание': '🔁', 'ответ': '💬', 'возврат': '↩️', 'тест': '🧪', 'автостоп': '⛔️', 'проверка почты': '📥' }
 
 const heroBase = {
-  borderRadius: 22, position: 'relative', overflow: 'hidden',
+  borderRadius: 22, position: 'relative', overflow: 'clip',
   transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
 }
 const kicker = (color) => ({ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color, marginBottom: 8 })
