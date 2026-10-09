@@ -615,29 +615,29 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
 
       {/* Hero row — виджеты iOS */}
       <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 1fr', gap: 16 }}>
-        {/* Маржа — пастельный живой градиент */}
+        {/* Маржа — мягкий синий живой градиент */}
         <div
-          {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.8), 0 18px 44px -22px rgba(19,102,240,0.35)', 'inset 0 1px 0 rgba(255,255,255,0.8), 0 24px 54px -18px rgba(19,102,240,0.42)')}
+          {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.4), 0 18px 44px -22px rgba(40,90,190,0.45)', 'inset 0 1px 0 rgba(255,255,255,0.4), 0 24px 54px -18px rgba(40,90,190,0.52)')}
           style={{
-            // пастельное стекло (это же — запасная заливка, если живого градиента нет)
-            background: 'radial-gradient(120% 80% at 10% -20%, rgba(255,255,255,0.6), transparent 50%), linear-gradient(150deg, #CFE0FF 0%, #DCD6FF 55%, #E6EEFF 100%)',
+            // мягкий синий (это же — запасная заливка, если живого градиента нет)
+            background: 'radial-gradient(120% 80% at 10% -20%, rgba(255,255,255,0.3), transparent 50%), linear-gradient(150deg, #6E9CEB 0%, #5585DC 55%, #4A74C9 100%)',
             backdropFilter: 'blur(28px) saturate(180%)', WebkitBackdropFilter: 'blur(28px) saturate(180%)',
-            border: '1px solid rgba(255,255,255,0.7)',
-            borderRadius: 26, padding: isMobile ? '16px 18px' : '22px 24px', color: '#0E1726',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 18px 44px -22px rgba(19,102,240,0.35)',
+            border: '1px solid rgba(255,255,255,0.35)',
+            borderRadius: 26, padding: isMobile ? '16px 18px' : '22px 24px', color: '#fff',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4), 0 18px 44px -22px rgba(40,90,190,0.45)',
             transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
             position: 'relative', overflow: 'hidden', isolation: 'isolate',
           }}>
-          {/* свой живой градиент в пастельных тонах; без WebGL / на телефоне — статичная заливка выше */}
+          {/* свой живой градиент в мягких синих тонах; без WebGL / на телефоне — статичная заливка выше */}
           <div style={{ position: 'absolute', inset: 0, zIndex: -1, borderRadius: 'inherit', overflow: 'hidden', pointerEvents: 'none' }}>
-            <GradientLayer colors={['#B9D3FF', '#D9D0FF', '#EAF1FF']} speed={0.16} />
+            <GradientLayer colors={['#5B8BE0', '#8AB0F2', '#4269BF']} speed={0.16} />
           </div>
-          <WidgetHead label="Маржа" color="#1366F0" labelColor="#1366F0"
+          <WidgetHead label="Маржа" color="rgba(255,255,255,0.24)" labelColor="rgba(255,255,255,0.92)"
             right={marginDiff !== null && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 3, padding: '3px 9px', borderRadius: 999,
-                background: marginUp ? 'rgba(30,158,90,0.12)' : 'rgba(255,59,48,0.1)',
-                fontSize: 12, fontWeight: 600, color: marginUp ? '#1E9E5A' : '#E0473B',
+                background: 'rgba(255,255,255,0.2)',
+                fontSize: 12, fontWeight: 600, color: marginUp ? '#C8FFE0' : '#FFD6DB',
               }}>
                 {marginUp ? '▲' : '▼'} {Math.abs(marginDiff)}%
                 <span style={{ fontWeight: 400, opacity: 0.7, fontSize: 11 }}>vs пред.</span>
@@ -647,16 +647,16 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             <span style={{ fontWeight: 700, fontSize: isMobile ? 34 : 44, letterSpacing: '-0.035em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
               <CountUp value={margin} />
             </span>
-            <span style={{ fontSize: 15, fontWeight: 600, color: '#8A93A0' }}>BYN</span>
+            <span style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.72)' }}>BYN</span>
           </div>
-          <div style={{ display: 'flex', gap: isMobile ? 16 : 28, marginTop: isMobile ? 14 : 20, paddingTop: isMobile ? 12 : 14, borderTop: '1px solid rgba(14,23,38,0.08)' }}>
+          <div style={{ display: 'flex', gap: isMobile ? 16 : 28, marginTop: isMobile ? 14 : 20, paddingTop: isMobile ? 12 : 14, borderTop: '1px solid rgba(255,255,255,0.25)' }}>
             <div>
-              <div style={{ fontSize: 12, color: '#6B7480', marginBottom: 2 }}>Выручка</div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 2 }}>Выручка</div>
               <div style={{ fontWeight: 600, fontSize: isMobile ? 14 : 16, fontVariantNumeric: 'tabular-nums' }}><CountUp value={revenue} format={v => `${Math.round(v).toLocaleString('ru-RU')} BYN`} /></div>
             </div>
             <div>
-              <div style={{ fontSize: 12, color: '#6B7480', marginBottom: 2 }}>Чистая прибыль</div>
-              <div style={{ fontWeight: 600, fontSize: isMobile ? 14 : 16, color: '#1E9E5A', fontVariantNumeric: 'tabular-nums' }}><CountUp value={netProfit} format={v => `${Math.round(v).toLocaleString('ru-RU')} BYN`} /></div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 2 }}>Чистая прибыль</div>
+              <div style={{ fontWeight: 600, fontSize: isMobile ? 14 : 16, color: '#D2FFE6', fontVariantNumeric: 'tabular-nums' }}><CountUp value={netProfit} format={v => `${Math.round(v).toLocaleString('ru-RU')} BYN`} /></div>
             </div>
           </div>
         </div>
