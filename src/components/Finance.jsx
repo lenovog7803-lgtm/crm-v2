@@ -189,19 +189,17 @@ export default function Finance({ refreshKey }) {
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
-            <div onClick={() => setShowInModal(true)} className="grad-card grad-green is-link" style={{ cursor: 'pointer', padding: '14px 14px', color: '#fff' }}>
-              <CardGradient tone="green" />
-              <div className="grad-kicker">Поступления</div>
+            <div onClick={() => setShowInModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '14px 14px', color: '#0E1726' }}>
+              <div className="grad-kicker" style={{ color: '#1E9E5A' }}>Поступления</div>
               <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>BYN</div>
-              <div style={{ marginTop: 6, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paidClientOrders.length} заявок оплачено</div>
+              <div style={{ fontSize: 11, color: '#8A93A0', marginTop: 2 }}>BYN</div>
+              <div style={{ marginTop: 6, fontSize: 11.5, color: '#8A93A0', fontWeight: 600 }}>{paidClientOrders.length} заявок оплачено</div>
             </div>
-            <div onClick={() => setShowOutModal(true)} className="grad-card grad-purple is-link" style={{ cursor: 'pointer', padding: '14px 14px', color: '#fff' }}>
-              <CardGradient tone="purple" />
-              <div className="grad-kicker">Списания</div>
+            <div onClick={() => setShowOutModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '14px 14px', color: '#0E1726' }}>
+              <div className="grad-kicker" style={{ color: '#7C3AED' }}>Списания</div>
               <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>BYN</div>
-              <div style={{ marginTop: 6, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paidCarrierOrders.length} заявок оплачено</div>
+              <div style={{ fontSize: 11, color: '#8A93A0', marginTop: 2 }}>BYN</div>
+              <div style={{ marginTop: 6, fontSize: 11.5, color: '#8A93A0', fontWeight: 600 }}>{paidCarrierOrders.length} заявок оплачено</div>
             </div>
           </div>
         </div>
@@ -223,19 +221,17 @@ export default function Finance({ refreshKey }) {
               </div>
             </div>
           </div>
-          <div onClick={() => setShowInModal(true)} className="grad-card grad-green is-link" style={{ cursor: 'pointer', padding: '26px 24px', color: '#fff' }}>
-            <CardGradient tone="green" />
-            <div className="grad-kicker">Поступления</div>
+          <div onClick={() => setShowInModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '26px 24px', color: '#0E1726' }}>
+            <div className="grad-kicker" style={{ color: '#1E9E5A' }}>Поступления</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>BYN</div>
-            <div style={{ marginTop: 14, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paidClientOrders.length} заявок оплачено</div>
+            <div style={{ fontSize: 11, color: '#8A93A0', marginTop: 2 }}>BYN</div>
+            <div style={{ marginTop: 14, fontSize: 11.5, color: '#8A93A0', fontWeight: 600 }}>{paidClientOrders.length} заявок оплачено</div>
           </div>
-          <div onClick={() => setShowOutModal(true)} className="grad-card grad-purple is-link" style={{ cursor: 'pointer', padding: '26px 24px', color: '#fff' }}>
-            <CardGradient tone="purple" />
-            <div className="grad-kicker">Списания</div>
+          <div onClick={() => setShowOutModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '26px 24px', color: '#0E1726' }}>
+            <div className="grad-kicker" style={{ color: '#7C3AED' }}>Списания</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>BYN</div>
-            <div style={{ marginTop: 14, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paidCarrierOrders.length} заявок оплачено</div>
+            <div style={{ fontSize: 11, color: '#8A93A0', marginTop: 2 }}>BYN</div>
+            <div style={{ marginTop: 14, fontSize: 11.5, color: '#8A93A0', fontWeight: 600 }}>{paidCarrierOrders.length} заявок оплачено</div>
           </div>
         </div>
       )}

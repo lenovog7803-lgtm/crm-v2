@@ -145,7 +145,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
     amber: { tone: 'orange', label: h.status === 'paused' ? 'Пауза' : 'Тише' },
     red: { tone: 'red', label: 'Остановка' },
   }[healthTone]
-  const ink = 'rgba(255,255,255,0.82)'
+  const healthColor = { blue: '#1366F0', orange: '#D97706', red: '#E0473B' }[healthCard.tone]
 
   const funnel = [
     { label: 'Отправлено', value: sentTotal, color: '#1366F0' },
@@ -224,25 +224,23 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
         </div>
 
         {/* Ответили */}
-        <div onClick={onGoReplies} className="grad-card grad-green is-link" style={{ ...heroBase, cursor: 'pointer', padding: isMobile ? '16px 18px' : '26px 24px' }}>
-          <CardGradient tone="green" />
-          <div className="grad-kicker">Ответили</div>
-          <div style={bigNum('#fff', isMobile ? 28 : 34)}><PopNumber value={answered} /></div>
-          <div style={{ fontSize: 12, color: ink, marginTop: 6 }}>{replyPct}% от отправленных</div>
-          <div style={{ marginTop: 14, fontSize: 12.5, color: '#fff', fontWeight: 700 }}>
+        <div onClick={onGoReplies} className="ios-widget" style={{ ...heroBase, cursor: 'pointer', padding: isMobile ? '16px 18px' : '26px 24px' }}>
+          <div className="grad-kicker" style={{ color: '#1E9E5A' }}>Ответили</div>
+          <div style={bigNum('#0E1726', isMobile ? 28 : 34)}><PopNumber value={answered} /></div>
+          <div style={{ fontSize: 12, color: '#1E9E5A', marginTop: 6 }}>{replyPct}% от отправленных</div>
+          <div style={{ marginTop: 14, fontSize: 12.5, color: '#0E1726', fontWeight: 700 }}>
             {state.replies_new ? `🔔 ${state.replies_new} новых — разобрать →` : 'Все ответы →'}
           </div>
         </div>
 
         {/* Здоровье ящика */}
-        <div className={`grad-card grad-${healthCard.tone}`} style={{ ...heroBase, padding: isMobile ? '16px 18px' : '26px 24px' }}>
-          <CardGradient key={healthCard.tone} tone={healthCard.tone} />
-          <div className="grad-kicker">{multi ? `Здоровье почт · ${boxes.length}` : `Здоровье ящика${boxes[0]?.login ? ` · ${boxes[0].login}` : ''}`}</div>
+        <div className="ios-widget" style={{ ...heroBase, padding: isMobile ? '16px 18px' : '26px 24px' }}>
+          <div className="grad-kicker" style={{ color: healthColor }}>{multi ? `Здоровье почт · ${boxes.length}` : `Здоровье ящика${boxes[0]?.login ? ` · ${boxes[0].login}` : ''}`}</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={bigNum('#fff', isMobile ? 28 : 34)}>{bounceRate}%</span>
-            <span style={{ fontSize: 12, color: ink, fontWeight: 600 }}>возвратов</span>
+            <span style={bigNum('#0E1726', isMobile ? 28 : 34)}>{bounceRate}%</span>
+            <span style={{ fontSize: 12, color: '#6B7480', fontWeight: 600 }}>возвратов</span>
           </div>
-          <div style={{ fontSize: 12, color: ink, marginTop: 6 }}>{bounced7} из {sent7} за 7 дней · норма до 4%</div>
+          <div style={{ fontSize: 12, color: '#6B7480', marginTop: 6 }}>{bounced7} из {sent7} за 7 дней · норма до 4%</div>
           {multi && (
             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 4, marginTop: 10 }}>
               {boxes.map(m => {
@@ -252,7 +250,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
                 const early = st === 'ok' && (mh.sent_7d || 0) < 10 && (mh.bounced_7d || 0) > 0
                 const dot = st === 'stop' ? '#E0473B' : st === 'ok' && !early ? '#0E9F6E' : '#D97706'
                 return (
-                  <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#fff' }}
+                  <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#0E1726' }}
                     title={early ? 'Мало писем для выводов — защита оценивает почту с 10 отправленных' : undefined}>
                     <span style={{ width: 8, height: 8, borderRadius: 99, background: dot, boxShadow: '0 0 0 1.5px #fff', flexShrink: 0 }} />
                     <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.login || m.name}</span>
@@ -263,13 +261,13 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
               })}
             </div>
           )}
-          <div style={{ marginTop: 14, display: 'inline-block', padding: '4px 10px', borderRadius: 99, background: 'rgba(255,255,255,0.22)',
-            fontSize: 12, fontWeight: 700, color: '#fff' }}>
+          <div style={{ marginTop: 14, display: 'inline-block', padding: '4px 10px', borderRadius: 99, background: `${healthColor}1A`,
+            fontSize: 12, fontWeight: 700, color: healthColor }}>
             {healthTone === 'ok' && bounceRate > 4 ? 'Норма · мало писем для выводов' : healthCard.label}
           </div>
-          {h.reason && <div style={{ fontSize: 11.5, color: ink, marginTop: 8, lineHeight: 1.4 }}>{h.reason}</div>}
+          {h.reason && <div style={{ fontSize: 11.5, color: '#6B7480', marginTop: 8, lineHeight: 1.4 }}>{h.reason}</div>}
           {!h.reason && healthTone === 'ok' && bounceRate > 4 && (
-            <div style={{ fontSize: 11.5, color: ink, marginTop: 8, lineHeight: 1.4 }}>
+            <div style={{ fontSize: 11.5, color: '#6B7480', marginTop: 8, lineHeight: 1.4 }}>
               Защита оценивает каждую почту с 10 отправленных: больше 4% — темп вдвое ниже, больше 8% (от 20 писем) — остановка.
             </div>
           )}

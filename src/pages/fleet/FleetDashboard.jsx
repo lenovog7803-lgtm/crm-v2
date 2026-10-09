@@ -90,29 +90,27 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
         </div>
 
         {/* Оранжевая: дебиторка */}
-        <div className="grad-card grad-orange" style={{ padding: '24px 24px' }}>
-          <CardGradient tone="orange" />
-          <div className="grad-kicker">Ожидается от клиентов</div>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: '#fff' }}>
+        <div className="ios-widget" style={{ padding: '24px 24px' }}>
+          <div className="grad-kicker" style={{ color: '#D97706' }}>Ожидается от клиентов</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: '#0E1726' }}>
             <CountUp value={d.debt_sum} />
           </div>
-          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.82)', marginTop: 6 }}>BYN</div>
-          <div style={{ marginTop: 14, fontSize: 12, color: 'rgba(255,255,255,0.82)', fontWeight: 600 }}>оплачено {money(d.paid_sum)}</div>
+          <div style={{ fontSize: 11, color: '#8A93A0', marginTop: 6 }}>BYN</div>
+          <div style={{ marginTop: 14, fontSize: 12, color: '#8A93A0', fontWeight: 600 }}>оплачено {money(d.paid_sum)}</div>
         </div>
 
         {/* Фиолетовая: расходы по рейсам */}
-        <div className="grad-card grad-purple" style={{ padding: '24px 24px' }}>
-          <CardGradient tone="purple" />
-          <div className="grad-kicker">Расходы по рейсам</div>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: '#fff' }}>
+        <div className="ios-widget" style={{ padding: '24px 24px' }}>
+          <div className="grad-kicker" style={{ color: '#7C3AED' }}>Расходы по рейсам</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: '#0E1726' }}>
             <CountUp value={d.expenses} />
           </div>
-          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.82)', marginTop: 6 }}>BYN</div>
-          <div style={{ marginTop: 14, fontSize: 12, color: 'rgba(255,255,255,0.82)', fontWeight: 600 }}>
+          <div style={{ fontSize: 11, color: '#8A93A0', marginTop: 6 }}>BYN</div>
+          <div style={{ marginTop: 14, fontSize: 12, color: '#8A93A0', fontWeight: 600 }}>
             топливо {money(d.fuel_cost)} · прочее {money(d.other_expenses)} · ЗП {money(d.driver_salary_total)}
           </div>
           {d.expenses_unpaid > 0.5 && (
-            <div style={{ marginTop: 4, fontSize: 11.5, color: '#FFE0E3', fontWeight: 700 }}>не оплачено {money(d.expenses_unpaid)}</div>
+            <div style={{ marginTop: 4, fontSize: 11.5, color: '#E0473B', fontWeight: 700 }}>не оплачено {money(d.expenses_unpaid)}</div>
           )}
         </div>
       </div>
