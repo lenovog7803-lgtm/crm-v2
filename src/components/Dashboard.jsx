@@ -7,6 +7,7 @@ import { CircularProgress } from './CircularProgress'
 import { SkeletonCard } from './Skeleton'
 import { mouseOnly } from '../motion'
 import { SwapText } from './Transitions'
+import GradientLayer from './GradientLayer'
 
 const MONTH_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
 const MONTH_RU_SHORT = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек']
@@ -239,17 +240,10 @@ function buildChartData(orders, period) {
   }
 }
 
-const WIDGET_ICONS = {
-  margin: <polyline points="2 11 6 7 9 9 14 3" />,
-}
-
-// Шапка виджета как в iOS: цветной значок + подпись, справа — что угодно (бейдж, стрелка).
-function WidgetHead({ icon, label, color, labelColor = color, right }) {
+// Шапка виджета как в iOS: цветная подпись, справа — что угодно (бейдж, стрелка).
+function WidgetHead({ label, color, labelColor = color, right }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-      {icon && <div style={{ width: 24, height: 24, borderRadius: 8, background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{WIDGET_ICONS[icon]}</svg>
-      </div>}
       <div style={{ fontSize: 13, fontWeight: 600, color: labelColor, letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
       {right && <div style={{ marginLeft: 'auto', flexShrink: 0 }}>{right}</div>}
     </div>
@@ -632,8 +626,13 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             borderRadius: 26, padding: isMobile ? '16px 18px' : '22px 24px', color: '#fff',
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.45), 0 20px 50px -20px rgba(19,102,240,0.55)',
             transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
+            position: 'relative', overflow: 'hidden', isolation: 'isolate',
           }}>
-          <WidgetHead icon="margin" label="Маржа" color="rgba(255,255,255,0.24)" labelColor="rgba(255,255,255,0.9)"
+          {/* свой живой градиент в синих тонах; без WebGL / на телефоне — статичная заливка выше */}
+          <div style={{ position: 'absolute', inset: 0, zIndex: -1, borderRadius: 'inherit', overflow: 'hidden', pointerEvents: 'none' }}>
+            <GradientLayer colors={['#1366F0', '#3D8BFF', '#0A3A9C']} speed={0.18} />
+          </div>
+          <WidgetHead label="Маржа" color="rgba(255,255,255,0.24)" labelColor="rgba(255,255,255,0.9)"
             right={marginDiff !== null && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 3, padding: '3px 9px', borderRadius: 999,
