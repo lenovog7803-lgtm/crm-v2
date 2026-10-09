@@ -33,7 +33,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 22, color: '#0E1726' }}>Дашборд</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color: '#0E1726' }}>Дашборд</div>
           <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>Свой автопарк</div>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -55,7 +55,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
           </a>
           <Select value={month} onChange={e => setMonth(e.target.value)} style={{
             height: 38, padding: '0 14px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.14)',
-            background: 'rgba(255,255,255,0.8)', fontFamily: 'Manrope', fontSize: 13, color: '#0E1726', cursor: 'pointer',
+            background: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-sys)', fontSize: 13, color: '#0E1726', cursor: 'pointer',
           }}>
             <option value="">Всё время</option>
             {(d.months || []).map(m => <option key={m} value={m}>{monthLabel(m)}</option>)}
@@ -74,7 +74,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
           <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'rgba(19,102,240,0.15)' }} />
           <div style={{ position: 'relative', zIndex: 1 }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.45)' }}>ПРИБЫЛЬ ПО РЕЙСАМ</div>
-            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 40, letterSpacing: '-0.03em', lineHeight: 1, marginTop: 4, color: d.profit >= 0 ? '#fff' : '#FF6B7A' }}>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 40, letterSpacing: '-0.03em', lineHeight: 1, marginTop: 4, color: d.profit >= 0 ? '#fff' : '#FF6B7A' }}>
               <CountUp value={d.profit} />
             </div>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 6 }}>BYN</div>
@@ -99,7 +99,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
         }}>
           <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
           <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#A86A20', marginBottom: 8 }}>ОЖИДАЕТСЯ ОТ КЛИЕНТОВ</div>
-          <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: '#7A4A12' }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: '#7A4A12' }}>
             <CountUp value={d.debt_sum} />
           </div>
           <div style={{ fontSize: 11, color: '#A86A20', marginTop: 6 }}>BYN</div>
@@ -114,7 +114,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
         }}>
           <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
           <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#6B3FB8', marginBottom: 8 }}>РАСХОДЫ ПО РЕЙСАМ</div>
-          <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: '#4A2785' }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: '#4A2785' }}>
             <CountUp value={d.expenses} />
           </div>
           <div style={{ fontSize: 11, color: '#6B3FB8', marginTop: 6 }}>BYN</div>
@@ -139,7 +139,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
           <div key={kpi.label} className="card" onClick={kpi.onClick} style={{ padding: '18px 20px', cursor: kpi.onClick ? 'pointer' : 'default' }}>
             <div style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600, marginBottom: 6 }}>{kpi.label}</div>
             <div style={{
-              fontFamily: 'Onest', fontWeight: 800, fontSize: 30, color: kpi.color,
+              fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, color: kpi.color,
               background: kpi.bg, borderRadius: 12, padding: '8px 14px', display: 'inline-block', lineHeight: 1,
             }}>{kpi.value != null ? <CountUp value={kpi.value} /> : kpi.raw}</div>
             {kpi.sub && <div style={{ fontSize: 11.5, color: '#8A93A0', marginTop: 6 }}>{kpi.sub}</div>}
@@ -149,7 +149,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
 
       {/* По рейсам */}
       <div className="card" style={{ padding: '18px 20px', overflow: 'hidden' }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 12 }}>По рейсам</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 12 }}>По рейсам</div>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
             <thead>
@@ -167,15 +167,15 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
               {trips.map(t => (
                 <tr key={t.id} onClick={() => onOpenTrip?.(t.id)} style={{ borderTop: '1px solid #F0F1F4', cursor: onOpenTrip ? 'pointer' : 'default' }}>
                   <td style={{ padding: '9px 10px', color: '#0E1726' }}>
-                    <span style={{ fontFamily: 'JetBrains Mono', color: '#1366F0', marginRight: 6 }}>Р{t.trip_number || 0}</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', color: '#1366F0', marginRight: 6 }}>Р{t.trip_number || 0}</span>
                     {t.name || t.route || '—'}
                   </td>
                   <td style={{ padding: '9px 10px' }}>
                     <span style={{ fontSize: 10.5, fontWeight: 700, color: stColor(t.status), background: `${stColor(t.status)}1a`, borderRadius: 99, padding: '2px 8px' }}>{stLabel(t.status)}</span>
                   </td>
-                  <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'JetBrains Mono', color: '#0E1726' }}>{int(t.revenue)}</td>
-                  <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'JetBrains Mono', color: '#E0473B' }}>{int(t.expenses)}</td>
-                  <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'JetBrains Mono', fontWeight: 700, color: t.profit >= 0 ? '#1E9E5A' : '#E0473B' }}>{int(t.profit)}</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'var(--font-mono)', color: '#0E1726' }}>{int(t.revenue)}</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'var(--font-mono)', color: '#E0473B' }}>{int(t.expenses)}</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'var(--font-mono)', fontWeight: 700, color: t.profit >= 0 ? '#1E9E5A' : '#E0473B' }}>{int(t.profit)}</td>
                   <td style={{ padding: '9px 10px', textAlign: 'right', color: '#8A93A0' }}>{t.margin_pct}%</td>
                 </tr>
               ))}
@@ -191,16 +191,16 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
             <div className="card" style={{ padding: '18px 20px', border: '1px solid rgba(200,25,35,0.25)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
                 <div style={{ fontSize: 11, color: '#C81923', fontWeight: 700, letterSpacing: '0.1em' }}>ПРОСРОЧКА ОПЛАТЫ</div>
-                <div style={{ fontFamily: 'JetBrains Mono', fontWeight: 700, color: '#C81923' }}>{int(d.overdue_total)} Br</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#C81923' }}>{int(d.overdue_total)} Br</div>
               </div>
               {d.overdue.map((o, i) => (
                 <div key={o.order_id || i}
                   onClick={() => o.client_id && onOpenClient?.(o.client_id)}
                   style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '8px 0', borderBottom: i < d.overdue.length - 1 ? '1px solid #F0F1F4' : 'none', fontSize: 12.5, cursor: o.client_id ? 'pointer' : 'default' }}>
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    <span style={{ fontFamily: 'JetBrains Mono', color: '#1366F0', marginRight: 6 }}>{o.order_number}</span>{o.client_name}
+                    <span style={{ fontFamily: 'var(--font-mono)', color: '#1366F0', marginRight: 6 }}>{o.order_number}</span>{o.client_name}
                   </span>
-                  <span style={{ flexShrink: 0, color: '#C81923', fontWeight: 700, fontFamily: 'JetBrains Mono' }}>
+                  <span style={{ flexShrink: 0, color: '#C81923', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
                     {int(o.amount)} · +{o.days}д
                   </span>
                 </div>
@@ -211,12 +211,12 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
             <div className="card" style={{ padding: '18px 20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
                 <div style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 700, letterSpacing: '0.1em' }}>ДОЛГ ВОДИТЕЛЯМ</div>
-                <div style={{ fontFamily: 'JetBrains Mono', fontWeight: 700, color: '#D97706' }}>{int(d.driver_debt_total)} Br</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#D97706' }}>{int(d.driver_debt_total)} Br</div>
               </div>
               {d.driver_debts.map((dr, i) => (
                 <div key={dr.id || i} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '8px 0', borderBottom: i < d.driver_debts.length - 1 ? '1px solid #F0F1F4' : 'none', fontSize: 13 }}>
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{dr.name}</span>
-                  <span style={{ flexShrink: 0, color: '#D97706', fontWeight: 700, fontFamily: 'JetBrains Mono' }}>{int(dr.sum)}</span>
+                  <span style={{ flexShrink: 0, color: '#D97706', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{int(dr.sum)}</span>
                 </div>
               ))}
             </div>
@@ -243,7 +243,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
                 onPointerLeave={mouseOnly(e => { e.currentTarget.style.background = 'transparent' })}
               >
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{it.name || '—'}</span>
-                <span style={{ fontWeight: 700, flexShrink: 0, color: accent, fontFamily: 'JetBrains Mono' }}>{int(it.sum)}</span>
+                <span style={{ fontWeight: 700, flexShrink: 0, color: accent, fontFamily: 'var(--font-mono)' }}>{int(it.sum)}</span>
               </div>
             ))}
           </div>

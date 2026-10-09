@@ -328,13 +328,13 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           <div style={{ width: 1, height: 20, background: 'rgba(14,23,38,0.1)', flexShrink: 0 }} />
           <button onClick={() => setPayFilter(payFilter === 'clientUnpaid' ? null : 'clientUnpaid')} style={{
             padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer', flexShrink: 0,
-            fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
+            fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
             background: payFilter === 'clientUnpaid' ? 'rgba(30,158,90,0.15)' : 'rgba(14,23,38,0.06)',
             color: payFilter === 'clientUnpaid' ? '#1E9E5A' : '#5A6573',
           }}>Не оплачено клиентом</button>
           <button onClick={() => setPayFilter(payFilter === 'carrierUnpaid' ? null : 'carrierUnpaid')} style={{
             padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer', flexShrink: 0,
-            fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
+            fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
             background: payFilter === 'carrierUnpaid' ? 'rgba(124,58,237,0.15)' : 'rgba(14,23,38,0.06)',
             color: payFilter === 'carrierUnpaid' ? '#7C3AED' : '#5A6573',
           }}>Не оплачено перевозчику</button>
@@ -342,7 +342,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           {/* Doc filter toggle button */}
           <button onClick={() => setShowDocFilter(v => !v)} style={{
             padding: '6px 14px', borderRadius: 12, cursor: 'pointer', flexShrink: 0,
-            fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
+            fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
             background: docFilters.length > 0 ? 'rgba(19,102,240,0.12)' : showDocFilter ? 'rgba(14,23,38,0.1)' : 'rgba(14,23,38,0.06)',
             color: docFilters.length > 0 ? '#1366F0' : '#5A6573',
             border: docFilters.length > 0 ? '1px solid rgba(19,102,240,0.3)' : '1px solid transparent',
@@ -413,7 +413,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
               <button onClick={() => { setDocFilters([]); setShowDocFilter(false) }} style={{
                 padding: '7px 10px', border: 'none', cursor: 'pointer', marginTop: 6,
                 background: 'rgba(200,25,35,0.07)', color: '#C81923',
-                fontFamily: 'Manrope', fontSize: 12, fontWeight: 600, borderRadius: 10,
+                fontFamily: 'var(--font-sys)', fontSize: 12, fontWeight: 600, borderRadius: 10,
                 textAlign: 'left', width: '100%',
               }}>Сбросить фильтр</button>
             )}
@@ -496,7 +496,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                     {/* Main info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                        <span style={{ fontFamily: 'JetBrains Mono', fontWeight: 600, fontSize: 13, color: '#1366F0' }}>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, fontSize: 13, color: '#1366F0' }}>
                           {order.order_number || order.id}
                         </span>
                         {overdue && <span style={{ fontSize: 10, color: '#C81923', fontWeight: 700 }}>ПРОСРОЧЕНО</span>}
@@ -608,7 +608,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
               <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '140px minmax(0, 1fr) minmax(0, 1fr) 110px 90px 70px', alignItems: 'center' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <div style={{ fontFamily: 'JetBrains Mono', fontWeight: 600, fontSize: 13.5, color: '#1366F0' }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, fontSize: 13.5, color: '#1366F0' }}>
                     {order.order_number || order.id}
                   </div>
                   {missingClientPP && <span style={{ fontSize: 9.5, color: '#C81923', fontWeight: 700 }}>НЕТ ПП КЛИЕНТА</span>}
@@ -799,7 +799,7 @@ function CorrespondenceModal({ orderIds, onClose, onSaved }) {
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
       <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 440, padding: 26 }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 17, color: '#0E1726', marginBottom: 4 }}>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#0E1726', marginBottom: 4 }}>
           Отметить корреспонденцию
         </div>
         <div style={{ fontSize: 12, color: '#8A93A0', marginBottom: 18 }}>

@@ -17,7 +17,7 @@ function StatCard({ label, value, color = '#0E1726' }) {
   return (
     <div className="card" style={{ padding: 18 }}>
       <div style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600, marginBottom: 6 }}>{label}</div>
-      <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 26, color }}>{value}</div>
+      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 26, color }}>{value}</div>
     </div>
   )
 }
@@ -35,7 +35,7 @@ export function CallsHeatmap({ data, onDayClick }) {
 
   return (
     <div className="card" style={{ padding: 20 }}>
-      <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Активность обзвона</div>
+      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Активность обзвона</div>
       {data.length === 0 ? (
         <div style={{ fontSize: 12.5, color: '#A6AEB8' }}>Нет данных за период</div>
       ) : (
@@ -99,7 +99,7 @@ function DayCallsModal({ date, onClose }) {
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
       <div style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 520, padding: 26 }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 17, color: '#0E1726' }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#0E1726' }}>
             Звонки за {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
           </div>
           <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: '#F7F8FA', cursor: 'pointer', fontSize: 18, color: '#8A93A0', flexShrink: 0 }}>×</button>
@@ -153,7 +153,7 @@ export default function AnalyticsView() {
 
       {/* 1. Звонки против плана */}
       <div className="card" style={{ padding: 20 }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 4 }}>Звонки против плана</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 4 }}>Звонки против плана</div>
         <div style={{ display: 'flex', gap: 20, marginBottom: 16, flexWrap: 'wrap' }}>
           <div style={{ fontSize: 12.5, color: '#5A6573' }}>Всего звонков: <b style={{ color: '#0E1726' }}>{data.total_calls}</b></div>
           <div style={{ fontSize: 12.5, color: '#5A6573' }}>Среднее в день: <b style={{ color: '#0E1726' }}>{avgPerDay}</b></div>
@@ -183,14 +183,14 @@ export default function AnalyticsView() {
 
       {/* 2. Воронка конверсий */}
       <div className="card" style={{ padding: 20 }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Воронка конверсий</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Воронка конверсий</div>
         <FunnelChart funnel={data.funnel} />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 20 }}>
         {/* 3. Причины отказов */}
         <div className="card" style={{ padding: 20 }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Причины отказов</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Причины отказов</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {(data.lost_reasons || []).map(r => (
               <div key={r.reason}>
@@ -218,7 +218,7 @@ export default function AnalyticsView() {
 
       {/* 4. Конверсия по отраслям */}
       <div className="card" style={{ padding: 20, overflow: 'auto' }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Конверсия по отраслям</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Конверсия по отраслям</div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>

@@ -57,7 +57,7 @@ function StepModal({ title, fields, onClose, onConfirm }) {
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
       <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 400, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 17, color: '#0E1726', marginBottom: 18 }}>{title}</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#0E1726', marginBottom: 18 }}>{title}</div>
         {fields.map((f, i) => (
           <div key={f.key} style={{ marginBottom: 14 }}>
             <div style={lbl}>{f.label}</div>
@@ -149,7 +149,7 @@ function PaymentsCard({ order, cur, onReload, onFull }) {
         </span>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'JetBrains Mono', fontSize: 15, fontWeight: 700, marginBottom: 6 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 700, marginBottom: 6 }}>
         <span style={{ color: '#1E9E5A' }}>{money(paidAmt, cur === 'BYN' ? 'Br' : cur)}</span>
         <span style={{ color: '#A6AEB8' }}>из {money(rate, cur === 'BYN' ? 'Br' : cur)}</span>
       </div>
@@ -167,7 +167,7 @@ function PaymentsCard({ order, cur, onReload, onFull }) {
             {fmtDate(p.date)}{p.cash ? '  ·  наличными' : p.pp_number ? `  ·  ПП №${p.pp_number}` : ''}
           </span>
           <span style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-            <b style={{ fontFamily: 'JetBrains Mono', color: '#0E1726' }}>{money(p.amount, cur === 'BYN' ? 'Br' : cur)}</b>
+            <b style={{ fontFamily: 'var(--font-mono)', color: '#0E1726' }}>{money(p.amount, cur === 'BYN' ? 'Br' : cur)}</b>
             <button onClick={() => delPay(p.id)} style={{ border: 'none', background: 'transparent', color: '#C4CAD4', cursor: 'pointer', fontSize: 13 }}>✕</button>
           </span>
         </div>
@@ -288,7 +288,7 @@ export default function FleetOrderDetail({ orderId, onBack }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
         <PillBtn variant="neutral" icon="back" onClick={onBack}>Назад</PillBtn>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <span style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 16, color: '#0E1726' }}>{order.order_number || order.client_name || 'Загрузка'}</span>
+          <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 16, color: '#0E1726' }}>{order.order_number || order.client_name || 'Загрузка'}</span>
           <span style={{ fontSize: 12, color: '#A6AEB8', marginLeft: 10 }}>{order.client_name} · {order.trip_name || 'Рейс'} · {order.direction === 'backward' ? 'обратка' : 'прямой'}</span>
         </div>
         <PillBtn variant="edit" icon="edit" onClick={() => setEditing(true)}>Редактировать</PillBtn>
@@ -308,7 +308,7 @@ export default function FleetOrderDetail({ orderId, onBack }) {
             boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)',
           }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>ЗАГРУЗКА</div>
-            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 22, letterSpacing: '-0.02em', lineHeight: 1.2 }}>{route}</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, letterSpacing: '-0.02em', lineHeight: 1.2 }}>{route}</div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginTop: 18 }}>
               <div><div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Груз</div>
@@ -324,11 +324,11 @@ export default function FleetOrderDetail({ orderId, onBack }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginTop: 22, paddingTop: 18, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
               <div>
                 <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Цена клиенту</div>
-                <div style={{ fontWeight: 800, fontSize: 20, fontFamily: 'Onest' }}>{money(order.rate, cur)}</div>
+                <div style={{ fontWeight: 800, fontSize: 20, fontFamily: 'var(--font-sys)' }}>{money(order.rate, cur)}</div>
               </div>
               <div>
                 <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>Оплата</div>
-                <div style={{ fontWeight: 800, fontSize: 20, fontFamily: 'Onest', color: order.paid ? '#5BE89B' : '#F5B971' }}>
+                <div style={{ fontWeight: 800, fontSize: 20, fontFamily: 'var(--font-sys)', color: order.paid ? '#5BE89B' : '#F5B971' }}>
                   {order.paid ? 'Оплачено' : 'Не поступила'}
                 </div>
               </div>

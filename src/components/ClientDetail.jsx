@@ -11,7 +11,7 @@ function Row({ label, value, mono }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, padding: '8px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
       <span style={{ fontSize: 12, color: '#A6AEB8', fontWeight: 500, flexShrink: 0 }}>{label}</span>
-      <span style={{ fontSize: 13, fontWeight: 600, color: '#0E1726', textAlign: 'right', fontFamily: mono ? 'JetBrains Mono' : undefined, wordBreak: 'break-all' }}>{value || '—'}</span>
+      <span style={{ fontSize: 13, fontWeight: 600, color: '#0E1726', textAlign: 'right', fontFamily: mono ? 'var(--font-mono)' : undefined, wordBreak: 'break-all' }}>{value || '—'}</span>
     </div>
   )
 }
@@ -19,7 +19,7 @@ function Row({ label, value, mono }) {
 const iStyle = {
   width: '100%', height: 34, padding: '0 10px', fontSize: 13, borderRadius: 9,
   border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)',
-  fontFamily: 'Manrope', color: '#0E1726', outline: 'none', boxSizing: 'border-box',
+  fontFamily: 'var(--font-sys)', color: '#0E1726', outline: 'none', boxSizing: 'border-box',
 }
 
 function EditField({ label, value, onChange, mono, type = 'text' }) {
@@ -30,7 +30,7 @@ function EditField({ label, value, onChange, mono, type = 'text' }) {
         type={type}
         value={value || ''}
         onChange={e => onChange(e.target.value)}
-        style={{ ...iStyle, fontFamily: mono ? 'JetBrains Mono' : 'Manrope', fontSize: mono ? 12 : 13 }}
+        style={{ ...iStyle, fontFamily: mono ? 'var(--font-mono)' : 'var(--font-sys)', fontSize: mono ? 12 : 13 }}
       />
     </div>
   )
@@ -125,10 +125,10 @@ export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }
         <div style={{ flex: 1 }} />
         {editing ? (
           <>
-            <button onClick={cancelEdit} style={{ padding: '9px 16px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', cursor: 'pointer', background: 'transparent', color: '#5A6573', fontFamily: 'Manrope', fontWeight: 600, fontSize: 13 }}>
+            <button onClick={cancelEdit} style={{ padding: '9px 16px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', cursor: 'pointer', background: 'transparent', color: '#5A6573', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13 }}>
               Отмена
             </button>
-            <button onClick={saveEdit} disabled={saving} style={{ padding: '9px 18px', borderRadius: 12, border: 'none', cursor: 'pointer', background: '#1366F0', color: '#fff', fontFamily: 'Manrope', fontWeight: 600, fontSize: 13 }}>
+            <button onClick={saveEdit} disabled={saving} style={{ padding: '9px 18px', borderRadius: 12, border: 'none', cursor: 'pointer', background: '#1366F0', color: '#fff', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13 }}>
               {saving ? 'Сохранение...' : 'Сохранить'}
             </button>
           </>
@@ -137,7 +137,7 @@ export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }
             <button onClick={startEdit} style={{
               padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
               background: 'rgba(19,102,240,0.1)', color: '#1366F0',
-              fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
+              fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13,
               display: 'flex', alignItems: 'center', gap: 6,
             }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -149,7 +149,7 @@ export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }
             <button onClick={handleDelete} style={{
               padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
               background: 'rgba(200,25,35,0.1)', color: '#C81923',
-              fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
+              fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13,
               display: 'flex', alignItems: 'center', gap: 6,
             }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -177,7 +177,7 @@ export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }
           </div>
         ) : (
           <>
-            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 22, color: '#0E1726', letterSpacing: '-0.02em' }}>{client.name}</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color: '#0E1726', letterSpacing: '-0.02em' }}>{client.name}</div>
             {client.contact_person && <div style={{ fontSize: 14, color: '#A6AEB8', marginTop: 4 }}>{client.contact_person}</div>}
             {client.phone && (
               <a href={`tel:${client.phone}`} style={{ display: 'block', marginTop: 8, fontSize: 15, fontWeight: 600, color: '#1366F0', textDecoration: 'none' }}>{client.phone}</a>
@@ -262,12 +262,12 @@ export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }
                   onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                 >
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: 'JetBrains Mono', fontSize: 12, color: '#1366F0', fontWeight: 600 }}>{o.order_number || o.id}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: '#1366F0', fontWeight: 600 }}>{o.order_number || o.id}</div>
                     <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {o.route_from && o.route_to ? `${o.route_from} → ${o.route_to}` : '—'}
                     </div>
                   </div>
-                  <div style={{ fontFamily: 'JetBrains Mono', fontWeight: 700, fontSize: 13, color: '#0E1726', flexShrink: 0 }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 13, color: '#0E1726', flexShrink: 0 }}>
                     {(o.client_rate || 0).toLocaleString('ru-RU')} Br
                   </div>
                   <span style={{

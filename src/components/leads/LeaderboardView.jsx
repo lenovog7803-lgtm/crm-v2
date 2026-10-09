@@ -31,7 +31,7 @@ export default function LeaderboardView() {
         {PERIODS.map(p => (
           <button key={p.id} onClick={() => setPeriod(p.id)} style={{
             padding: '7px 16px', borderRadius: 99, border: 'none', cursor: 'pointer',
-            fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
+            fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
             background: period === p.id ? '#0E1726' : 'rgba(14,23,38,0.06)',
             color: period === p.id ? '#fff' : '#5A6573',
           }}>{p.label}</button>
@@ -67,15 +67,15 @@ export default function LeaderboardView() {
                 </div>
                 <div style={{ display: 'flex', gap: 22, flexShrink: 0, textAlign: 'right' }}>
                   <div>
-                    <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 18, color: '#0E1726' }}>{r.calls}</div>
+                    <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 18, color: '#0E1726' }}>{r.calls}</div>
                     <div style={{ fontSize: 10.5, color: '#A6AEB8' }}>звонков</div>
                   </div>
                   <div>
-                    <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 18, color: '#1E9E5A' }}>{r.won}</div>
+                    <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 18, color: '#1E9E5A' }}>{r.won}</div>
                     <div style={{ fontSize: 10.5, color: '#A6AEB8' }}>в клиенты</div>
                   </div>
                   <div>
-                    <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 18, color: '#0E1726' }}>{r.conversion}%</div>
+                    <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 18, color: '#0E1726' }}>{r.conversion}%</div>
                     <div style={{ fontSize: 10.5, color: '#A6AEB8' }}>конверсия</div>
                   </div>
                 </div>

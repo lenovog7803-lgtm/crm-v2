@@ -80,7 +80,7 @@ export default function Trash() {
 
   const chipStyle = (k) => ({
     padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer',
-    fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
+    fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
     background: filter === k ? '#0E1726' : 'rgba(14,23,38,0.06)',
     color: filter === k ? '#fff' : '#5A6573',
   })
@@ -94,10 +94,10 @@ export default function Trash() {
           </svg>
         </div>
         <div>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>Корзина</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>Корзина</div>
           <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 2 }}>Удалённые элементы хранятся 30 дней, затем удаляются навсегда</div>
         </div>
-        <div style={{ marginLeft: 'auto', fontFamily: 'Onest', fontWeight: 800, fontSize: 22, color: items.length > 0 ? '#C81923' : '#A6AEB8' }}>
+        <div style={{ marginLeft: 'auto', fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color: items.length > 0 ? '#C81923' : '#A6AEB8' }}>
           {items.length}
         </div>
         {items.length > 0 && (
@@ -106,7 +106,7 @@ export default function Trash() {
             style={{
               padding: '9px 16px', borderRadius: 10, border: '1px solid rgba(200,25,35,0.25)',
               background: 'rgba(200,25,35,0.06)', color: '#C81923',
-              fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 700, cursor: 'pointer',
+              fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer',
             }}
           >
             Очистить корзину
@@ -205,7 +205,7 @@ export default function Trash() {
                 style={{
                   padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(19,102,240,0.25)',
                   background: 'rgba(19,102,240,0.06)', color: '#1366F0',
-                  fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
+                  fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
                   flexShrink: 0, transition: 'all 0.15s',
                 }}
                 onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.12)')}

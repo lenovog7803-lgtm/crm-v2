@@ -61,7 +61,7 @@ export default function LeadEditModal({ lead, onClose, onSaved }) {
       }}>
         <div style={{ padding: 26 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>Редактировать лида</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>Редактировать лида</div>
           <button
             onClick={onClose}
             style={{

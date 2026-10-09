@@ -319,8 +319,12 @@ function MainApp() {
   // over one set from JS, so the scroll effect would otherwise be invisible.
   const orbARef = useRef(null)
   const orbBRef = useRef(null)
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => { setScrolled(false) }, [page])  // новая страница начинается сверху — заголовок снова большой
   const handleScrollParallax = e => {
     const y = e.currentTarget.scrollTop
+    const sc = y > 24
+    setScrolled(prev => (prev === sc ? prev : sc))
     if (orbARef.current) orbARef.current.style.marginTop = `${Math.min(y * 0.06, 40)}px`
     if (orbBRef.current) orbBRef.current.style.marginBottom = `${Math.min(y * 0.04, 30)}px`
   }
@@ -343,7 +347,7 @@ function MainApp() {
         />
 
         <main className="app-main">
-          <Topbar page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={handleSearchChange} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} onOpenPalette={() => setPaletteOpen(true)} />
+          <Topbar compact={scrolled} page={page} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={handleSearchChange} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} onOpenPalette={() => setPaletteOpen(true)} />
           <div className={`scroll-area${motionRef.current.cls}`} key={page} onScroll={handleScrollParallax}>
             {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} onMonthsLoaded={setAvailableMonths} preloadedOrders={allOrders} />}
             {page === 'my-dashboard' && <ErrorBoundary><ManagerDashboard /></ErrorBoundary>}

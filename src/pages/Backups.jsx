@@ -19,7 +19,7 @@ function ImportPreviewModal({ preview, onClose, onConfirm, applying }) {
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
       <div style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 640, padding: 26, maxHeight: '86vh', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 17, color: '#0E1726', marginBottom: 4 }}>Что изменится при импорте из Таблицы</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#0E1726', marginBottom: 4 }}>Что изменится при импорте из Таблицы</div>
         <div style={{ fontSize: 12, color: '#8A93A0', marginBottom: 16 }}>Ничего ещё не применено — только предпросмотр</div>
 
         <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
@@ -194,7 +194,7 @@ export default function Backups() {
     <div>
       <div style={{ marginBottom: 16, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
         <div>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 20, color: '#0E1726' }}>Резервные копии</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 20, color: '#0E1726' }}>Резервные копии</div>
           <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>Автоматический снимок раз в сутки, хранятся последние 30</div>
         </div>
         {!forbidden && (
@@ -263,7 +263,7 @@ export default function Backups() {
       {restoreTarget && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
           <div style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 440, padding: 26 }}>
-            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 17, color: '#E0473B', marginBottom: 8 }}>Восстановить из бэкапа?</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#E0473B', marginBottom: 8 }}>Восстановить из бэкапа?</div>
             <div style={{ fontSize: 13, color: '#5A6573', marginBottom: 18, lineHeight: 1.5 }}>
               Это заменит текущие данные снимком от{' '}
               {new Date(restoreTarget.created_at).toLocaleDateString('ru-RU')}. Текущее состояние тоже будет сохранено отдельным бэкапом на случай ошибки.

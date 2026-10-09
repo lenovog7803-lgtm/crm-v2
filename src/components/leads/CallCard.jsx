@@ -57,7 +57,7 @@ export default function CallCard({ lead, onEdit, part }) {
             {lead.phone ? (
               <a href={`tel:${lead.phone.replace(/[^\d+]/g, '')}`} className="call-pill call-pill--green" style={{ marginTop: 6 }} title="Позвонить">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" /></svg>
-                <span style={{ fontFamily: 'JetBrains Mono', fontWeight: 600 }}>{lead.phone}</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}>{lead.phone}</span>
               </a>
             ) : <div style={{ fontSize: 13, color: '#A6AEB8', marginTop: 4 }}>нет телефона</div>}
           </div>

@@ -15,10 +15,10 @@ export default class ErrorBoundary extends Component {
     if (this.state.error) {
       return (
         <div style={{ background: '#FFFFFF', borderRadius: 20, padding: 24, border: '1px solid rgba(224,71,59,0.25)' }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 16, color: '#E0473B', marginBottom: 8 }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: '#E0473B', marginBottom: 8 }}>
             Ошибка в разделе
           </div>
-          <div style={{ fontSize: 13, color: '#5A6573', marginBottom: 14, fontFamily: 'JetBrains Mono' }}>
+          <div style={{ fontSize: 13, color: '#5A6573', marginBottom: 14, fontFamily: 'var(--font-mono)' }}>
             {String(this.state.error?.message || this.state.error)}
           </div>
           <button

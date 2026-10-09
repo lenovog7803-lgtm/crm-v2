@@ -33,7 +33,7 @@ const PERMISSION_OPTIONS = [
 const inputStyle = {
   width: '100%', padding: '10px 12px', borderRadius: 10,
   border: '1px solid rgba(14,23,38,0.12)', background: '#F7F8FA',
-  fontSize: 13, fontFamily: 'Manrope', color: '#0E1726', boxSizing: 'border-box',
+  fontSize: 13, fontFamily: 'var(--font-sys)', color: '#0E1726', boxSizing: 'border-box',
 }
 
 function parseDeviceInfo(ua) {
@@ -126,7 +126,7 @@ function UserDetailModal({ user, onClose, onSaved }) {
         {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center' }}>{error}</div>}
 
         <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-          <button onClick={onClose} style={{ flex: 1, height: 44, borderRadius: 13, border: '1px solid rgba(14,23,38,0.12)', background: 'transparent', cursor: 'pointer', fontFamily: 'Manrope', fontSize: 14, fontWeight: 600, color: '#5A6573' }}>Отмена</button>
+          <button onClick={onClose} style={{ flex: 1, height: 44, borderRadius: 13, border: '1px solid rgba(14,23,38,0.12)', background: 'transparent', cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 14, fontWeight: 600, color: '#5A6573' }}>Отмена</button>
           <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ flex: 2, justifyContent: 'center', opacity: saving ? 0.7 : 1 }}>
             <SwapText>{saving ? 'Сохранение…' : 'Сохранить'}</SwapText>
           </button>
@@ -245,7 +245,7 @@ function UsersTab() {
                     onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(14,23,38,0.02)')}
                     onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                   >
-                    <td style={{ padding: '11px 14px', fontSize: 13, fontFamily: 'JetBrains Mono', color: '#1366F0', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.login}</td>
+                    <td style={{ padding: '11px 14px', fontSize: 13, fontFamily: 'var(--font-mono)', color: '#1366F0', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.login}</td>
                     <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: '#0E1726', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.name}</td>
                     <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)' }}>
                       <span style={{
@@ -269,7 +269,7 @@ function UsersTab() {
                         type="number"
                         defaultValue={m.daily_call_goal || 45}
                         onBlur={e => changeGoal(m, e.target.value)}
-                        style={{ width: 70, padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(14,23,38,0.12)', fontSize: 12.5, fontFamily: 'JetBrains Mono' }}
+                        style={{ width: 70, padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(14,23,38,0.12)', fontSize: 12.5, fontFamily: 'var(--font-mono)' }}
                       />
                     </td>
                     <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)', textAlign: 'right' }} onClick={e => e.stopPropagation()}>
@@ -366,7 +366,7 @@ function ManagerDetail({ manager, period }) {
     <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
       <CallsHeatmap data={data.calls_by_day || []} onDayClick={() => {}} />
       <div>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Воронка конверсий</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Воронка конверсий</div>
         <FunnelChart funnel={data.funnel} />
       </div>
     </div>
@@ -393,7 +393,7 @@ function StatsTab() {
         {STAT_PERIODS.map(p => (
           <button key={p.id} onClick={() => setPeriod(p.id)} style={{
             padding: '7px 16px', borderRadius: 99, border: 'none', cursor: 'pointer',
-            fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
+            fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
             background: period === p.id ? '#0E1726' : 'rgba(14,23,38,0.06)',
             color: period === p.id ? '#fff' : '#5A6573',
           }}>{p.label}</button>
@@ -453,7 +453,7 @@ export default function Admin() {
         {TABS.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)} style={{
             padding: '7px 15px', borderRadius: 99, border: 'none', cursor: 'pointer',
-            fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600,
+            fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
             background: tab === t.id ? '#0E1726' : 'rgba(14,23,38,0.06)',
             color: tab === t.id ? '#fff' : '#5A6573',
           }}>{t.label}</button>

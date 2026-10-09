@@ -20,7 +20,7 @@ export function PillBtn({ variant = 'neutral', icon, onClick, disabled, style, c
   return (
     <button onClick={onClick} disabled={disabled} style={{
       padding: '9px 16px', borderRadius: 12, border: 'none', cursor: disabled ? 'default' : 'pointer',
-      flexShrink: 0, background: v.bg, color: v.color, fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
+      flexShrink: 0, background: v.bg, color: v.color, fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13,
       display: 'inline-flex', alignItems: 'center', gap: 6, opacity: disabled ? 0.6 : 1, ...style,
     }}>
       {icon && ICONS[icon]}{children}

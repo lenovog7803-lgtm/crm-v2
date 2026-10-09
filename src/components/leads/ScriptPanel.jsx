@@ -38,7 +38,7 @@ export default function ScriptPanel({ stage }) {
         border: 'none', cursor: 'pointer', width: '100%', minHeight: 120,
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
       }}>
-        <span style={{ fontFamily: 'Onest', fontWeight: 600, fontSize: 13, color: '#5A6573' }}>Показать скрипт</span>
+        <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13, color: '#5A6573' }}>Показать скрипт</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A93A0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="9 18 15 12 9 6" />
         </svg>
@@ -65,7 +65,7 @@ export default function ScriptPanel({ stage }) {
           <textarea
             value={draft}
             onChange={e => setDraft(e.target.value)}
-            style={{ width: '100%', minHeight: 260, padding: 12, borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', background: '#F7F8FA', fontFamily: 'JetBrains Mono', fontSize: 12.5, color: '#0E1726', resize: 'vertical', boxSizing: 'border-box', whiteSpace: 'pre-wrap' }}
+            style={{ width: '100%', minHeight: 260, padding: 12, borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', background: '#F7F8FA', fontFamily: 'var(--font-mono)', fontSize: 12.5, color: '#0E1726', resize: 'vertical', boxSizing: 'border-box', whiteSpace: 'pre-wrap' }}
           />
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={() => setEditing(false)} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>

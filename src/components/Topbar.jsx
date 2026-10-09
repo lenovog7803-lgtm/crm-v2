@@ -51,7 +51,7 @@ const fmtQuarter = q => {
   return `${qn} квартал ${y}`
 }
 
-export default function Topbar({ page, onSignOut, period = 'month', onPeriodChange, availableMonths = [], search = '', onSearchChange, overdueItems = [], onOpenOrder, onNav, onOpenPalette }) {
+export default function Topbar({ compact = false, page, onSignOut, period = 'month', onPeriodChange, availableMonths = [], search = '', onSearchChange, overdueItems = [], onOpenOrder, onNav, onOpenPalette }) {
   const { notifications, dismiss } = useToast()
   const meta = PAGE_META[page] || { title: page, subtitle: '' }
   const [bellOpen, setBellOpen] = useState(false)
@@ -120,7 +120,7 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
   }))).sort().reverse()
 
   return (
-    <div className="topbar-mobile liquid-glass" style={{
+    <div className={`topbar-mobile liquid-glass${compact ? ' topbar-compact' : ''}`} style={{
       display: 'flex', alignItems: 'center', gap: 16,
       padding: '14px 20px',
       background: 'rgba(255,255,255,0.55)',
@@ -147,18 +147,19 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
               height: 38, borderRadius: 11,
               border: '1px solid rgba(14,23,38,0.12)',
               background: 'rgba(255,255,255,0.7)',
-              fontFamily: 'Manrope', fontSize: 14, color: '#0E1726', outline: 'none',
+              fontFamily: 'var(--font-sys)', fontSize: 14, color: '#0E1726', outline: 'none',
             }}
           />
-          <button onClick={() => { setMobileSearchOpen(false); onSearchChange && onSearchChange('') }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8A93A0', padding: 4, fontSize: 13, fontFamily: 'Manrope', fontWeight: 600 }}>
+          <button onClick={() => { setMobileSearchOpen(false); onSearchChange && onSearchChange('') }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8A93A0', padding: 4, fontSize: 13, fontFamily: 'var(--font-sys)', fontWeight: 600 }}>
             Отмена
           </button>
         </div>
       ) : (
         <>
       <div style={{ flex: 1 }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: isMobile ? 16 : 18, color: '#0E1726', letterSpacing: '-0.02em' }}>{meta.title}</div>
-        {!isMobile && <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 1 }}>{meta.subtitle}</div>}
+        {/* большой заголовок iOS: крупный вверху страницы, сжимается при прокрутке */}
+        <div className="ios-title" style={{ fontSize: compact ? (isMobile ? 17 : 18) : (isMobile ? 24 : 26) }}>{meta.title}</div>
+        {!isMobile && <div className="ios-subtitle" style={{ fontSize: 12.5, color: '#8A93A0', marginTop: 2 }}>{meta.subtitle}</div>}
       </div>
 
       {/* Mobile search icon */}
@@ -212,7 +213,7 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
             height: 38, padding: '0 12px', borderRadius: 11,
             border: '1px solid rgba(14,23,38,0.12)',
             background: 'rgba(255,255,255,0.7)',
-            fontFamily: 'Manrope', fontSize: 13, fontWeight: 600, color: '#0E1726',
+            fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600, color: '#0E1726',
             outline: 'none', cursor: 'pointer',
           }}
         >

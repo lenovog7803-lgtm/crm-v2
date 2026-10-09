@@ -15,7 +15,7 @@ function StatCard({ label, value, color = '#0E1726', format }) {
   return (
     <div className="card" style={{ padding: 18 }}>
       <div style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600, marginBottom: 6 }}>{label}</div>
-      <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 22, color }}>
+      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color }}>
         <CountUp value={value} format={format} />
       </div>
     </div>
@@ -62,7 +62,7 @@ export default function ManagerDashboard() {
       </div>
 
       <div className="card" style={{ padding: 20 }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 4 }}>Звонки по месяцам</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 4 }}>Звонки по месяцам</div>
         <div style={{ fontSize: 12.5, color: '#5A6573', marginBottom: 16 }}>
           В этом месяце: <b style={{ color: '#0E1726' }}>{currentMonth?.calls || 0}</b> звонков, <b style={{ color: '#1E9E5A' }}>{currentMonth?.won || 0}</b> в клиенты
         </div>

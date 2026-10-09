@@ -94,7 +94,7 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 4 }) {
             onChange={e => { setComment(e.target.value); setError('') }}
             placeholder="О чём говорили, что решили…"
             autoFocus
-            style={{ width: '100%', minHeight: 70, padding: '11px 13px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', background: '#F7F8FA', fontSize: 13, fontFamily: 'Manrope', color: '#0E1726', resize: 'vertical', boxSizing: 'border-box' }}
+            style={{ width: '100%', minHeight: 70, padding: '11px 13px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', background: '#F7F8FA', fontSize: 13, fontFamily: 'var(--font-sys)', color: '#0E1726', resize: 'vertical', boxSizing: 'border-box' }}
           />
         </div>
       )}

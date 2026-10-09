@@ -45,7 +45,7 @@ function KanbanColumn({ stage, items, dragId, overStage, onDragStart, onDragOver
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 4px' }}>
         <span style={{ width: 8, height: 8, borderRadius: 4, background: stage.color, flexShrink: 0 }} />
-        <span style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 12.5, color: '#0E1726' }}>{stage.label}</span>
+        <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 12.5, color: '#0E1726' }}>{stage.label}</span>
         <span style={{ fontSize: 11.5, color: '#A6AEB8', marginLeft: 'auto' }}>{sorted.length}</span>
       </div>
       <div
@@ -73,7 +73,7 @@ function KanbanColumn({ stage, items, dragId, overStage, onDragStart, onDragOver
             }}
           >
             <div style={{ fontSize: 12.5, fontWeight: 700, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
-            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: '#1366F0', marginTop: 3 }}>{l.phone}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#1366F0', marginTop: 3 }}>{l.phone}</div>
             {l.contact_person && <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>{l.contact_person}</div>}
             {l.next_call && <div style={{ fontSize: 10.5, color: '#F47A1F', marginTop: 4 }}>→ {new Date(l.next_call).toLocaleDateString('ru-RU')}</div>}
             {!l.assigned_to && (

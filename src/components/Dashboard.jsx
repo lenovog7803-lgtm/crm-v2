@@ -345,7 +345,7 @@ function ChartSVG({ current, prev, labels, mode, todayIdx }) {
           pointerEvents: 'none', minWidth: 150, zIndex: 20,
         }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.04em', marginBottom: 6 }}>{labels[hovered]}</div>
-          <div style={{ fontFamily: 'JetBrains Mono', fontWeight: 700, fontSize: 17, color: '#0E1726' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 17, color: '#0E1726' }}>
             {pts[hovered].v.toLocaleString('ru-RU')} Br
           </div>
           {prev && prev[hovered] !== undefined && prev[hovered] > 0 && (
@@ -377,7 +377,7 @@ function DebtModal({ title, orders, onClose, onOpenOrder }) {
       <div style={{ margin: 'auto', background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(30px)', borderRadius: 24, maxWidth: 560, width: '90%', border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 40px 80px rgba(20,30,55,0.3)', animation: 'modalIn 0.22s var(--ease) both' }}>
         <div style={{ padding: 28 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
             <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: 'transparent', cursor: 'pointer', fontSize: 20, color: '#8A93A0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
           </div>
           {orders.length === 0 && <div style={{ color: '#A6AEB8', fontSize: 13, textAlign: 'center', padding: '20px 0' }}>Нет неоплаченных заявок</div>}
@@ -390,12 +390,12 @@ function DebtModal({ title, orders, onClose, onOpenOrder }) {
                 onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
               >
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontFamily: 'JetBrains Mono', fontSize: 12, color: '#1366F0', fontWeight: 600 }}>{o.order_number || `#${o.id}`}</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: '#1366F0', fontWeight: 600 }}>{o.order_number || `#${o.id}`}</div>
                   <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {o.client_name || o.carrier_name || '—'}{(o.route_from && o.route_to) ? ` · ${o.route_from} → ${o.route_to}` : ''}
                   </div>
                 </div>
-                <div style={{ fontFamily: 'JetBrains Mono', fontSize: 14, fontWeight: 700, color: '#D97706', flexShrink: 0, marginLeft: 12 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: '#D97706', flexShrink: 0, marginLeft: 12 }}>
                   {(o.client_rate || o.carrier_rate || 0).toLocaleString('ru-RU')} Br
                 </div>
               </div>
@@ -412,7 +412,7 @@ function TopRow({ rank, name, value, color, bg }) {
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
       <span style={{ width: 24, height: 24, borderRadius: 8, flexShrink: 0, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>{rank}</span>
       <span style={{ flex: 1, fontSize: 13, fontWeight: 500, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-      <span style={{ fontFamily: 'JetBrains Mono', fontSize: 12, fontWeight: 700, color, flexShrink: 0 }}>{value}</span>
+      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 700, color, flexShrink: 0 }}>{value}</span>
     </div>
   )
 }
@@ -425,7 +425,7 @@ function FullListModal({ title, subtitle, items, valueOf, color, bg, onClose }) 
         <div style={{ padding: 26 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
             <div>
-              <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
+              <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
               <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>{subtitle}</div>
             </div>
             <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: '#F7F8FA', cursor: 'pointer', fontSize: 18, color: '#8A93A0', flexShrink: 0 }}>×</button>
@@ -465,7 +465,7 @@ function GoalEditModal({ goalKey, value, onChange, onClose, onSave }) {
         animation: 'modalIn 0.22s var(--ease) both',
       }}>
         <div style={{ padding: 24 }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 16, color: '#0E1726', marginBottom: 4 }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: '#0E1726', marginBottom: 4 }}>
             План: {meta.label}
           </div>
           <div style={{ fontSize: 12, color: '#A6AEB8', marginBottom: 16 }}>Действует только для текущего месяца</div>
@@ -631,7 +631,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
                 </div>
               )}
             </div>
-            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 32 : 40, letterSpacing: '-0.03em', lineHeight: 1 }}>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: isMobile ? 32 : 40, letterSpacing: '-0.03em', lineHeight: 1 }}>
               <CountUp value={margin} />
             </div>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 6 }}>BYN</div>
@@ -663,7 +663,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         >
           <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
           <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#A86A20', marginBottom: isMobile ? 4 : 8 }}>ОЖИДАЕТСЯ ОТ КЛИЕНТОВ</div>
-          <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 24 : 30, letterSpacing: '-0.02em', color: '#7A4A12' }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: isMobile ? 24 : 30, letterSpacing: '-0.02em', color: '#7A4A12' }}>
             <CountUp value={clientDebt} />
           </div>
           <div style={{ fontSize: 11, color: '#A86A20', marginTop: 6 }}>BYN</div>
@@ -687,7 +687,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         >
           <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
           <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#6B3FB8', marginBottom: isMobile ? 4 : 8 }}>К ОПЛАТЕ ПЕРЕВОЗЧИКАМ</div>
-          <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 24 : 30, letterSpacing: '-0.02em', color: '#4A2785' }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: isMobile ? 24 : 30, letterSpacing: '-0.02em', color: '#4A2785' }}>
             <CountUp value={carrierDebt} />
           </div>
           <div style={{ fontSize: 11, color: '#6B3FB8', marginTop: 6 }}>BYN</div>
@@ -713,7 +713,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             style={{ padding: isMobile ? '12px 14px' : '18px 20px', cursor: 'pointer' }}>
             <div style={{ fontSize: isMobile ? 10 : 11, color: '#A6AEB8', fontWeight: 600, marginBottom: isMobile ? 4 : 6 }}>{kpi.label}</div>
             <div style={{
-              fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 26 : 36, color: kpi.color,
+              fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: isMobile ? 26 : 36, color: kpi.color,
               background: kpi.bg, borderRadius: isMobile ? 9 : 12, padding: isMobile ? '5px 10px' : '8px 14px', display: 'inline-block', lineHeight: 1,
             }}><CountUp value={kpi.value} format={v => Math.round(v).toLocaleString('ru-RU')} /></div>
           </div>
@@ -724,7 +724,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           that resolves to one specific month (goals don't exist per-quarter). */}
       {goals && (
         <div className="card" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: isMobile ? 12 : 18 }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: isMobile ? 12 : 18 }}>
             Цели месяца
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: isMobile ? 14 : 20 }}>
@@ -791,7 +791,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       <div className="card" style={{ padding: isMobile ? '16px 14px 12px' : '24px 24px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
           <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>Маржа</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>Маржа</div>
             <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 2 }}>ставка клиента − ставка перевозчика</div>
           </div>
           {chart.prev && chart.prev.length > 0 && chart.prev.some(v => v > 0) && (
@@ -815,7 +815,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         {/* Top clients */}
         <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px', minWidth: 0 }}>
           <div onClick={() => setOpenModal('clients')} style={{ cursor: 'pointer', marginBottom: 14 }}>
-            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Топ клиентов</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Топ клиентов</div>
             <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 4 }}>по выручке за период</div>
           </div>
           {topClients.length > 0 ? (
@@ -832,7 +832,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         {/* Top by margin */}
         <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px', minWidth: 0 }}>
           <div onClick={() => setOpenModal('margin')} style={{ cursor: 'pointer', marginBottom: isMobile ? 10 : 14 }}>
-            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Топ по марже</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Топ по марже</div>
             <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 4 }}>% маржинальности</div>
           </div>
           {topByMargin.length > 0 ? (
@@ -849,7 +849,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         {/* Debtors */}
         <div className="card" style={{ padding: isMobile ? '14px 14px' : '20px 20px', minWidth: 0 }}>
           <div onClick={() => setOpenModal('debtors')} style={{ cursor: 'pointer', marginBottom: isMobile ? 10 : 14 }}>
-            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Должники</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Должники</div>
             <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 4 }}>неоплаченные доставки</div>
           </div>
           {topDebtors.length > 0 ? (

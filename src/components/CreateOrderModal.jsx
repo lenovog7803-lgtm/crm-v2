@@ -21,7 +21,7 @@ const POPULAR_CITIES = [
 const iStyle = {
   width: '100%', height: 38, padding: '0 12px', borderRadius: 10,
   border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)',
-  fontFamily: 'Manrope', fontSize: 13, color: '#0E1726', outline: 'none', boxSizing: 'border-box',
+  fontFamily: 'var(--font-sys)', fontSize: 13, color: '#0E1726', outline: 'none', boxSizing: 'border-box',
 }
 
 const labelSt = {

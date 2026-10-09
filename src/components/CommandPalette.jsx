@@ -6,7 +6,7 @@ import { useIsMobile } from '../hooks/useIsMobile'
 // Быстрый поиск ⌘K в духе Spotlight: стеклянная панель без тёмной подложки, крупная строка,
 // высота по содержимому; пустой запрос — быстрые переходы в разделы (⌘1…⌘5).
 
-const SYS = "-apple-system, BlinkMacSystemFont, 'SF Pro Text', Manrope, sans-serif"
+const SYS = 'var(--font-sys)'
 
 // Цветные «иконки приложений» — квадрат со скруглением и градиентом, как в Spotlight
 const ICON_PATHS = {

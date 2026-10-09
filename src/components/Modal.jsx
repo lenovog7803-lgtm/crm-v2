@@ -165,7 +165,7 @@ export function ModalHeader({ title, onClose }) {
   const drag = sheet?.dragHandlers || {}
   return (
     <div {...drag} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, ...(drag.style || {}) }}>
-      <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
+      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
       <button
         onClick={() => (sheet ? sheet.requestClose() : onClose?.())}
         aria-label="Закрыть"

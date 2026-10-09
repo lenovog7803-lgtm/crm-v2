@@ -1,4 +1,9 @@
 :root {
+  /* iOS 26: системный шрифт Apple (на Mac/iPhone — SF Pro), на Windows — Segoe UI */
+  --font-sys: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+}
+:root {
   /* Radius scale — everything in the app should round to one of these,
      not an arbitrary one-off px value. xs=pills/icons, sm=inputs/buttons,
      md=small cards/skeletons, lg=cards/sidebar, xl=modals/hero blocks. */
@@ -26,7 +31,7 @@ html, body, #root { height: 100%; }
 html { -webkit-tap-highlight-color: transparent; }
 button, [role="button"], .no-callout { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 body {
-  font-family: Manrope, sans-serif; background: #EDEFF3; -webkit-font-smoothing: antialiased;
+  font-family: var(--font-sys); background: #EDEFF3; -webkit-font-smoothing: antialiased;
   /* Digits line up in columns instead of jittering column width as sums
      change — matters everywhere money renders in a list or table. */
   font-variant-numeric: tabular-nums;
@@ -82,22 +87,25 @@ input[type="number"] {
 
 .btn-primary {
   display: flex; align-items: center; gap: 8px;
-  padding: 11px 18px; border-radius: var(--radius-sm); border: none; cursor: pointer;
-  background: #0E1726; color: #fff; font-family: Manrope; font-size: 13.5px; font-weight: 600;
-  box-shadow: 0 10px 24px -12px rgba(14,23,38,0.7);
-  transition: background 0.15s var(--ease), transform 0.15s var(--ease);
+  padding: 10px 18px; border-radius: 999px; border: none; cursor: pointer;
+  background: linear-gradient(180deg, #2A7BFF 0%, #1366F0 100%); color: #fff;
+  font-family: var(--font-sys); font-size: 14px; font-weight: 600; letter-spacing: -0.01em;
+  box-shadow: 0 8px 20px -10px rgba(19,102,240,0.75), inset 0 1px 0 rgba(255,255,255,0.28);
+  transition: filter 0.15s var(--ease), transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
 }
-@media (hover: hover) { .btn-primary:hover { background: #1C2740; } }
+@media (hover: hover) { .btn-primary:hover { filter: brightness(1.06); } }
+.btn-primary:disabled { opacity: 0.45; cursor: default; }
 .btn-primary:active { transform: scale(0.97); }
 
 .btn-ghost {
   display: flex; align-items: center; gap: 7px;
-  padding: 9px 15px; border-radius: var(--radius-sm);
-  border: 1px solid rgba(14,23,38,0.12); background: rgba(255,255,255,0.7);
-  color: #0E1726; font-family: Manrope; font-size: 13px; font-weight: 600; cursor: pointer;
-  transition: all 0.15s var(--ease);
+  padding: 9px 16px; border-radius: 999px;
+  border: none; background: rgba(118,118,128,0.12);
+  color: #0E1726; font-family: var(--font-sys); font-size: 13.5px; font-weight: 600; letter-spacing: -0.01em; cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+  transition: background 0.15s var(--ease), transform 0.15s var(--ease);
 }
-@media (hover: hover) { .btn-ghost:hover { background: #fff; border-color: rgba(14,23,38,0.25); } }
+@media (hover: hover) { .btn-ghost:hover { background: rgba(118,118,128,0.2); } }
 .btn-ghost:active { transform: scale(0.97); }
 
 /* CSS-native hover instead of onMouseEnter/onMouseLeave mutating
@@ -117,12 +125,12 @@ input[type="number"] {
 .form-field { display: flex; flex-direction: column; gap: 6px; }
 .form-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-tertiary); }
 .form-input {
-  padding: 10px 13px; border-radius: var(--radius-xs); border: 1px solid rgba(14,23,38,0.12);
-  background: rgba(255,255,255,0.85); font-family: Manrope; font-size: 13.5px; color: #0E1726;
+  padding: 10px 13px; border-radius: 11px; border: 1px solid transparent;
+  background: rgba(118,118,128,0.12); font-family: var(--font-sys); font-size: 14px; color: #0E1726;
   outline: none;
-  transition: border-color 0.15s var(--ease);
+  transition: background 0.15s var(--ease), box-shadow 0.15s var(--ease), border-color 0.15s var(--ease);
 }
-.form-input:focus { border-color: rgba(19,102,240,0.5); }
+.form-input:focus { background: #fff; border-color: rgba(19,102,240,0.45); box-shadow: 0 0 0 3.5px rgba(19,102,240,0.16); }
 
 /* App layout */
 .app-root {
@@ -440,7 +448,7 @@ input[type="number"] {
 .search-pill.is-open:focus-within .search-pill-icon { transform: translateY(-50%) rotate(0deg) scale(0.92); }
 .search-pill-input {
   width: 100%; height: 100%; border: none; outline: none; background: transparent;
-  padding: 0 46px 0 34px; font-family: Manrope; font-size: 13.5px; color: #0E1726;
+  padding: 0 46px 0 34px; font-family: var(--font-sys); font-size: 13.5px; color: #0E1726;
   opacity: 0; filter: blur(3px); transform: translateX(8px);
   transition: opacity 220ms ease 0ms, filter 220ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -449,7 +457,7 @@ input[type="number"] {
 .search-pill-kbd {
   position: absolute; right: 6px; top: 50%; height: 24px; padding: 0 7px; border-radius: 7px;
   border: 1px solid rgba(14,23,38,0.1); background: rgba(255,255,255,0.85); color: #8A93A0; cursor: pointer;
-  font-family: Manrope; font-size: 11px; font-weight: 600;
+  font-family: var(--font-sys); font-size: 11px; font-weight: 600;
   opacity: 0; transform: translateY(-50%) scale(0.8); pointer-events: none;
   transition: opacity 200ms ease, transform 300ms cubic-bezier(0.34, 1.45, 0.64, 1);
 }
@@ -475,7 +483,6 @@ input[type="number"] {
 }
 
 /* ===== Окно звонка в стиле macOS ===== */
-:root { --font-sys: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Manrope, sans-serif; }
 .call-window {
   font-family: var(--font-sys);
   background: rgba(246,247,250,0.82);
@@ -674,3 +681,34 @@ input[type="number"] {
 .ios-switch.is-on { --knob-x: 15px; }
 .ios-switch--sm.is-on { --knob-x: 12px; }
 @media (prefers-reduced-motion: reduce) { .ios-check { transition: none; } }
+
+
+/* ===== iOS 26: поля ввода по всей CRM — серая заливка без рамки, при фокусе белое с синим ободком ===== */
+.app-root input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not(.search-pill-input):not([data-plain]),
+.app-root textarea:not([data-plain]),
+.app-root .apple-select {
+  background: rgba(118,118,128,0.12) !important;
+  border: 1px solid transparent !important;
+  border-radius: 11px !important;
+  box-shadow: none !important;
+  color: #0E1726;
+  caret-color: #1366F0;
+  transition: background 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.app-root input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not(.search-pill-input):not([data-plain]):focus,
+.app-root textarea:not([data-plain]):focus,
+.app-root .apple-select:focus-visible, .app-root .apple-select.is-open {
+  background: #fff !important;
+  border-color: rgba(19,102,240,0.45) !important;
+  box-shadow: 0 0 0 3.5px rgba(19,102,240,0.16) !important;
+  outline: none;
+}
+.app-root input::placeholder, .app-root textarea::placeholder { color: rgba(60,60,67,0.45); }
+/* поля внутри стеклянных/тёмных мест, где серая заливка не к месту */
+.app-root .spotlight input, .app-root .search-pill input { background: transparent !important; box-shadow: none !important; border: none !important; }
+
+/* ===== iOS 26: большой заголовок, который сжимается при прокрутке ===== */
+.ios-title { font-family: var(--font-sys); font-weight: 700; color: #0E1726; letter-spacing: -0.025em; line-height: 1.1;
+  transition: font-size 260ms cubic-bezier(0.22, 1, 0.36, 1), letter-spacing 260ms; }
+.ios-subtitle { transition: opacity 200ms ease, max-height 260ms cubic-bezier(0.22, 1, 0.36, 1); overflow: hidden; max-height: 20px; }
+.topbar-compact .ios-subtitle { opacity: 0; max-height: 0; }

@@ -41,7 +41,7 @@ function niceInput(props) {
 const stat = (label, value, color = '#0E1726') => (
   <div style={{ background: 'rgba(14,23,38,0.03)', borderRadius: 12, padding: '10px 14px', minWidth: 0 }}>
     <div style={{ fontSize: 10.5, color: '#A6AEB8', fontWeight: 600, marginBottom: 4 }}>{label}</div>
-    <div style={{ fontFamily: 'JetBrains Mono', fontWeight: 700, fontSize: 15, color }}>{value}</div>
+    <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 15, color }}>{value}</div>
   </div>
 )
 
@@ -156,7 +156,7 @@ function TripInfoCard({ trip, revenue, finance, onSave, onReload }) {
         </div>
         <div style={{ textAlign: 'right', flexShrink: 0 }}>
           <div style={{ fontSize: 10, color: '#A6AEB8', fontWeight: 600 }}>ПРИБЫЛЬ</div>
-          <div style={{ fontFamily: 'JetBrains Mono', fontWeight: 700, fontSize: 14, color: profit >= 0 ? '#1E9E5A' : '#E0473B' }}>{money(profit)} Br</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 14, color: profit >= 0 ? '#1E9E5A' : '#E0473B' }}>{money(profit)} Br</div>
         </div>
       </div>
 
@@ -260,7 +260,7 @@ function TripInfoCard({ trip, revenue, finance, onSave, onReload }) {
               <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: '#5A6573', padding: '5px 0', borderBottom: '1px solid #F4F5F7' }}>
                 <span>{p.kind === 'advance' ? 'Аванс' : 'Выплата'} · {fmtDate(p.date)}</span>
                 <span style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                  <b style={{ fontFamily: 'JetBrains Mono', color: '#0E1726' }}>{money(p.amount)} Br</b>
+                  <b style={{ fontFamily: 'var(--font-mono)', color: '#0E1726' }}>{money(p.amount)} Br</b>
                   <button onClick={() => removePayout(p.id)} style={{ border: 'none', background: 'transparent', color: '#C4CAD4', cursor: 'pointer', fontSize: 13 }}>✕</button>
                 </span>
               </div>
@@ -352,7 +352,7 @@ function EditTripModal({ trip, onClose, onSaved }) {
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
       <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 460, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 17, color: '#0E1726', marginBottom: 18 }}>Изменить рейс</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#0E1726', marginBottom: 18 }}>Изменить рейс</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
           <input autoFocus value={form.name} onChange={e => set('name', e.target.value)} placeholder="Название рейса" style={{ ...fieldStyle, width: '100%' }} />
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -411,7 +411,7 @@ function FleetOrderCard({ order, onReload, onOpen }) {
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: '#0E1726' }}>
-          {order.order_number && <span style={{ fontFamily: 'JetBrains Mono', color: '#1366F0', fontSize: 12, marginRight: 6 }}>{order.order_number}</span>}
+          {order.order_number && <span style={{ fontFamily: 'var(--font-mono)', color: '#1366F0', fontSize: 12, marginRight: 6 }}>{order.order_number}</span>}
           {order.client_name || 'Клиент не указан'}
         </div>
         <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
@@ -431,7 +431,7 @@ function FleetOrderCard({ order, onReload, onOpen }) {
         <span style={{ fontSize: 11, color: '#8A93A0' }}>{fmtDate(order.load_date)} → {fmtDate(order.unload_date)}</span>
         <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <span style={{ fontSize: 10.5, fontWeight: 700, color: payState.c, background: payState.bg, borderRadius: 6, padding: '2px 7px' }}>{payState.t}</span>
-          <span style={{ fontFamily: 'JetBrains Mono', fontSize: 13, fontWeight: 700, color: '#1366F0' }}>{rate.toLocaleString('ru-RU')} Br</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: '#1366F0' }}>{rate.toLocaleString('ru-RU')} Br</span>
         </span>
       </div>
     </div>
@@ -450,7 +450,7 @@ function DirectionSection({ title, orders, onAdd, onReload, onOpen }) {
       {orders.length === 0 && <div style={{ fontSize: 12, color: '#A6AEB8', textAlign: 'center', padding: 20 }}>Заказов пока нет</div>}
       <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #F0F1F4', display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
         <span style={{ color: '#8A93A0' }}>Итого</span>
-        <span style={{ fontFamily: 'JetBrains Mono', color: '#1366F0' }}>{total.toLocaleString('ru-RU')} Br</span>
+        <span style={{ fontFamily: 'var(--font-mono)', color: '#1366F0' }}>{total.toLocaleString('ru-RU')} Br</span>
       </div>
     </div>
   )
@@ -514,7 +514,7 @@ export default function FleetTripDetail({ tripId, onBack, onOpenOrder }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
         <PillBtn variant="neutral" icon="back" onClick={onBack}>Все рейсы</PillBtn>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <span style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 20, color: '#0E1726' }}>
+          <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, color: '#0E1726' }}>
             {trip.trip_number ? `Р${trip.trip_number} · ` : ''}{trip.name || 'Рейс'}
           </span>
           <span style={{ fontSize: 12, color: '#8A93A0', marginLeft: 10 }}>

@@ -416,7 +416,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
         </div>
         {expanded && (
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 15, color: '#0E1726', letterSpacing: '-0.01em', whiteSpace: 'nowrap' }}>А2 Group</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 15, color: '#0E1726', letterSpacing: '-0.01em', whiteSpace: 'nowrap' }}>А2 Group</div>
           </div>
         )}
         {expanded && (
@@ -472,7 +472,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
                 display: 'flex', alignItems: 'center', gap: 10, padding: '0 10px',
                 justifyContent: expanded ? 'flex-start' : 'center',
                 color: active ? '#1366F0' : '#5A6573',
-                fontFamily: 'Manrope', fontWeight: 600, fontSize: 13.5,
+                fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13.5,
                 whiteSpace: 'nowrap',
                 position: 'relative', zIndex: 1, textAlign: 'left',
                 touchAction: drag ? 'none' : 'pan-y', userSelect: 'none', WebkitUserSelect: 'none',
@@ -597,7 +597,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
                   display: 'flex', alignItems: 'center', gap: 10, padding: '0 10px',
                   background: page === item.key ? 'rgba(19,102,240,0.1)' : 'transparent',
                   color: page === item.key ? '#1366F0' : '#5A6573',
-                  fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
+                  fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13,
                 }}
                 onPointerEnter={mouseOnly(e => { if (page !== item.key) e.currentTarget.style.background = 'rgba(14,23,38,0.05)' })}
                 onPointerLeave={mouseOnly(e => { if (page !== item.key) e.currentTarget.style.background = 'transparent' })}

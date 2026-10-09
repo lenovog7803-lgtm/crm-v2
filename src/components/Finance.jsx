@@ -162,7 +162,7 @@ export default function Finance({ refreshKey }) {
 
   const recList = recType === 'client' ? clients : carriers
   const recLabelKey = recType === 'client' ? 'name' : 'company_name'
-  const iStyle = { height: 36, padding: '0 10px', fontSize: 13, borderRadius: 10, border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)', fontFamily: 'Manrope', color: '#0E1726', outline: 'none' }
+  const iStyle = { height: 36, padding: '0 10px', fontSize: 13, borderRadius: 10, border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-sys)', color: '#0E1726', outline: 'none' }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 10 : 16 }}>
@@ -172,7 +172,7 @@ export default function Finance({ refreshKey }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)', borderRadius: 22, padding: '18px 18px', color: '#fff', boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)' }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>ЧИСТАЯ ПРИБЫЛЬ</div>
-            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 30, letterSpacing: '-0.03em', lineHeight: 1 }}>{netProfit.toLocaleString('ru-RU')}</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.03em', lineHeight: 1 }}>{netProfit.toLocaleString('ru-RU')}</div>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>BYN</div>
             <div style={{ display: 'flex', gap: 20, marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
               <div>
@@ -188,13 +188,13 @@ export default function Finance({ refreshKey }) {
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
             <div onClick={() => setShowInModal(true)} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #1E9E5A 0%, #15734A 100%)', borderRadius: 22, padding: '14px 14px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(30,158,90,0.4)' }}>
               <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>ПОСТУПЛЕНИЯ</div>
-              <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
+              <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
               <div style={{ marginTop: 6, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paidClientOrders.length} заявок оплачено</div>
             </div>
             <div onClick={() => setShowOutModal(true)} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #1366F0 0%, #0D4FB5 100%)', borderRadius: 22, padding: '14px 14px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(19,102,240,0.4)' }}>
               <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>СПИСАНИЯ</div>
-              <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
+              <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
               <div style={{ marginTop: 6, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paidCarrierOrders.length} заявок оплачено</div>
             </div>
@@ -204,7 +204,7 @@ export default function Finance({ refreshKey }) {
         <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: 16 }}>
           <div style={{ background: 'linear-gradient(135deg, #0E1726 0%, #1A2A4A 100%)', borderRadius: 22, padding: '26px 28px', color: '#fff', boxShadow: '0 20px 50px -20px rgba(14,23,38,0.6)' }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.4)', marginBottom: 8 }}>ЧИСТАЯ ПРИБЫЛЬ</div>
-            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 38, letterSpacing: '-0.03em', lineHeight: 1 }}>{netProfit.toLocaleString('ru-RU')}</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 38, letterSpacing: '-0.03em', lineHeight: 1 }}>{netProfit.toLocaleString('ru-RU')}</div>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>BYN</div>
             <div style={{ display: 'flex', gap: 24, marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
               <div>
@@ -219,13 +219,13 @@ export default function Finance({ refreshKey }) {
           </div>
           <div onClick={() => setShowInModal(true)} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #1E9E5A 0%, #15734A 100%)', borderRadius: 22, padding: '26px 24px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(30,158,90,0.4)' }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>ПОСТУПЛЕНИЯ</div>
-            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
             <div style={{ marginTop: 14, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paidClientOrders.length} заявок оплачено</div>
           </div>
           <div onClick={() => setShowOutModal(true)} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, #1366F0 0%, #0D4FB5 100%)', borderRadius: 22, padding: '26px 24px', color: '#fff', boxShadow: '0 16px 40px -16px rgba(19,102,240,0.4)' }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', marginBottom: 8 }}>СПИСАНИЯ</div>
-            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 2 }}>BYN</div>
             <div style={{ marginTop: 14, fontSize: 11.5, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>{paidCarrierOrders.length} заявок оплачено</div>
           </div>
@@ -241,7 +241,7 @@ export default function Finance({ refreshKey }) {
         ].map(k => (
           <div key={k.label} className="card" style={{ padding: isMobile ? '10px 12px' : '16px 18px' }}>
             <div style={{ fontSize: isMobile ? 10 : 11, color: '#A6AEB8', fontWeight: 600, marginBottom: isMobile ? 4 : 6 }}>{k.label}</div>
-            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 14 : 18, color: k.color }}>{k.val}</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: isMobile ? 14 : 18, color: k.color }}>{k.val}</div>
           </div>
         ))}
       </div>
@@ -249,7 +249,7 @@ export default function Finance({ refreshKey }) {
       {/* Payments — ручные записи с ПП и датой */}
       <div className="card" style={{ padding: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: showAdd ? 12 : 14, flexWrap: 'wrap' }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', flex: 1 }}>Платежи</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', flex: 1 }}>Платежи</div>
           <SlidingTabs
             options={[{ key: 'all', label: 'Все' }, { key: 'income', label: 'Поступления' }, { key: 'expense', label: 'Списания' }]}
             value={typeFilter}
@@ -310,11 +310,11 @@ export default function Finance({ refreshKey }) {
               <button type="submit" disabled={addLoading} style={{
                 padding: '8px 20px', borderRadius: 10, border: 'none', cursor: 'pointer',
                 background: '#0E1726', color: '#fff',
-                fontFamily: 'Manrope', fontSize: 13, fontWeight: 600,
+                fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600,
               }}>{addLoading ? 'Сохранение...' : 'Добавить платёж'}</button>
               <button type="button" onClick={() => setShowAdd(false)} style={{
                 padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(14,23,38,0.12)', cursor: 'pointer',
-                background: 'transparent', color: '#5A6573', fontFamily: 'Manrope', fontSize: 13,
+                background: 'transparent', color: '#5A6573', fontFamily: 'var(--font-sys)', fontSize: 13,
               }}>Отмена</button>
             </div>
           </form>
@@ -348,11 +348,11 @@ export default function Finance({ refreshKey }) {
                   <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 1 }}>
                     {p.kind === 'income' ? 'Поступление' : 'Списание'}
                     {p.pp_number ? ` · ПП ${p.pp_number}` : ''}
-                    {p.order_number ? <span style={{ color: '#1366F0', fontFamily: 'JetBrains Mono' }}> · {p.order_number}</span> : ''}
+                    {p.order_number ? <span style={{ color: '#1366F0', fontFamily: 'var(--font-mono)' }}> · {p.order_number}</span> : ''}
                   </div>
                 </div>
                 <div style={{ fontSize: 11.5, color: '#A6AEB8', flexShrink: 0 }}>{fmtDate(p.date) || '—'}</div>
-                <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: p.kind === 'income' ? '#1E9E5A' : '#1366F0', flexShrink: 0 }}>
+                <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: p.kind === 'income' ? '#1E9E5A' : '#1366F0', flexShrink: 0 }}>
                   {p.kind === 'income' ? '+' : '-'}{(p.amount || 0).toLocaleString('ru-RU')} BYN
                 </div>
                 <button onClick={() => handleDeletePayment(p)} style={{
@@ -375,14 +375,14 @@ export default function Finance({ refreshKey }) {
           <button onClick={() => setShowAll(v => !v)} style={{
             width: '100%', marginTop: 10, padding: '9px', borderRadius: 11,
             border: '1px solid rgba(19,102,240,0.2)', background: 'rgba(19,102,240,0.04)',
-            cursor: 'pointer', fontFamily: 'Manrope', fontSize: 13, fontWeight: 600, color: '#1366F0',
+            cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600, color: '#1366F0',
           }}>{showAll ? 'Свернуть' : `Показать все (${filtered.length})`}</button>
         )}
       </div>
 
       {/* Акт сверки — таблица */}
       <div className="card" style={{ padding: '20px' }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Акт сверки</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Акт сверки</div>
         <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
           <SlidingTabs
             options={[{ key: 'clients', label: 'Клиенты' }, { key: 'carriers', label: 'Перевозчики' }]}
@@ -407,7 +407,7 @@ export default function Finance({ refreshKey }) {
               {actRows.map(row => (
                 <tr key={row.id} style={{ borderBottom: '1px solid rgba(14,23,38,0.04)' }}>
                   <td style={{ padding: '10px 12px', color: '#A6AEB8' }}>{row.n}</td>
-                  <td style={{ padding: '10px 12px', fontFamily: 'JetBrains Mono', fontSize: 12, color: '#1366F0' }}>{row.order_number || '—'}</td>
+                  <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)', fontSize: 12, color: '#1366F0' }}>{row.order_number || '—'}</td>
                   <td style={{ padding: '10px 12px', color: '#5A6573' }}>{fmtDate(row.unload_date) || '—'}</td>
                   <td style={{ padding: '10px 12px', color: '#1E9E5A', fontWeight: 700 }}>{(row.amt || 0).toLocaleString('ru-RU')} BYN</td>
                   <td style={{ padding: '10px 12px', fontWeight: 700, color: row.balance >= 0 ? '#1E9E5A' : '#C81923' }}>{row.balance.toLocaleString('ru-RU')} BYN</td>
@@ -424,7 +424,7 @@ export default function Finance({ refreshKey }) {
 
       {/* Генерация акта сверки */}
       <div className="card" style={{ padding: '20px' }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Сформировать акт сверки (документ)</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Сформировать акт сверки (документ)</div>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
             <label style={{ fontSize: 11, fontWeight: 600, color: '#A6AEB8' }}>Тип</label>
@@ -469,7 +469,7 @@ export default function Finance({ refreshKey }) {
             cursor: recPartyId ? 'pointer' : 'not-allowed',
             background: recPartyId ? '#1366F0' : 'rgba(14,23,38,0.08)',
             color: recPartyId ? '#fff' : '#A6AEB8',
-            fontFamily: 'Manrope', fontSize: 13, fontWeight: 600, opacity: recLoading ? 0.7 : 1,
+            fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600, opacity: recLoading ? 0.7 : 1,
           }}>{recLoading ? 'Генерация...' : 'Сформировать акт'}</button>
         </div>
         {recHistory.length > 0 && (
@@ -503,7 +503,7 @@ export default function Finance({ refreshKey }) {
             <div style={{ padding: 28 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
-                  <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>Поступления от клиентов</div>
+                  <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>Поступления от клиентов</div>
                   <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 2 }}>Итого: {totalIncome.toLocaleString('ru-RU')} BYN · {paidClientOrders.length} заявок</div>
                 </div>
                 <button onClick={() => setShowInModal(false)} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: 'transparent', cursor: 'pointer', fontSize: 18, color: '#A6AEB8' }}>×</button>
@@ -526,7 +526,7 @@ export default function Finance({ refreshKey }) {
                         {o.client_paid_date ? ` · ${new Date(o.client_paid_date).toLocaleDateString('ru-RU')}` : ''}
                       </div>
                     </div>
-                    <div style={{ fontFamily: 'JetBrains Mono', fontSize: 14, fontWeight: 700, color: '#1E9E5A', flexShrink: 0 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: '#1E9E5A', flexShrink: 0 }}>
                       +{parseFloat(o.client_rate || 0).toLocaleString('ru-RU')} BYN
                     </div>
                   </div>
@@ -552,7 +552,7 @@ export default function Finance({ refreshKey }) {
             <div style={{ padding: 28 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
-                  <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>Оплачено перевозчикам</div>
+                  <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>Оплачено перевозчикам</div>
                   <div style={{ fontSize: 12, color: '#E0473B', fontWeight: 600, marginTop: 2 }}>Итого: -{totalExpense.toLocaleString('ru-RU')} BYN · {paidCarrierOrders.length} заявок</div>
                 </div>
                 <button onClick={() => setShowOutModal(false)} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: 'transparent', cursor: 'pointer', fontSize: 18, color: '#A6AEB8' }}>×</button>
@@ -575,7 +575,7 @@ export default function Finance({ refreshKey }) {
                         {o.carrier_paid_date ? ` · ${new Date(o.carrier_paid_date).toLocaleDateString('ru-RU')}` : ''}
                       </div>
                     </div>
-                    <div style={{ fontFamily: 'JetBrains Mono', fontSize: 15, fontWeight: 700, color: '#E0473B', flexShrink: 0 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 700, color: '#E0473B', flexShrink: 0 }}>
                       -{parseFloat(o.carrier_rate || 0).toLocaleString('ru-RU')} BYN
                     </div>
                   </div>
@@ -616,7 +616,7 @@ function PartySearchSelect({ items, labelKey, value, onChange, placeholder }) {
         onFocus={() => { setQuery(''); setOpen(true) }}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         placeholder={placeholder}
-        style={{ height: 36, padding: '0 10px', fontSize: 13, borderRadius: 10, border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)', fontFamily: 'Manrope', color: '#0E1726', outline: 'none', width: '100%', boxSizing: 'border-box' }}
+        style={{ height: 36, padding: '0 10px', fontSize: 13, borderRadius: 10, border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-sys)', color: '#0E1726', outline: 'none', width: '100%', boxSizing: 'border-box' }}
       />
       {open && (
         <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, maxHeight: 240, overflowY: 'auto', background: '#fff', border: '1px solid #E8EAEE', borderRadius: 10, boxShadow: '0 8px 24px rgba(14,23,38,0.14)', zIndex: 20 }}>
@@ -678,7 +678,7 @@ function PPLedgerModal({ type, entityId, entityName, onClose }) {
       <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 520, padding: 26 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
           <div>
-            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 17, color: '#0E1726' }}>{type === 'client' ? 'Платежи клиента' : 'Платежи перевозчику'}</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#0E1726' }}>{type === 'client' ? 'Платежи клиента' : 'Платежи перевозчику'}</div>
             <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>{entityName} · всего {total.toLocaleString('ru-RU')} Br</div>
           </div>
           <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #E8EAEE', background: '#F7F8FA', cursor: 'pointer', fontSize: 18, color: '#8A93A0' }}>×</button>
@@ -700,7 +700,7 @@ function PPLedgerModal({ type, entityId, entityName, onClose }) {
                 <div style={{ fontSize: 13, fontWeight: 500, color: '#0E1726' }}>ПП № {e.pp_number}</div>
                 <div style={{ fontSize: 11, color: '#8A93A0' }}>{new Date(e.pp_date).toLocaleDateString('ru-RU')}</div>
               </div>
-              <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, fontWeight: 700, color: accentColor }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: accentColor }}>
                 {Number(e.amount).toLocaleString('ru-RU')} Br
               </div>
               <button onClick={() => remove(e.id)} style={{ border: 'none', background: 'transparent', color: '#E0473B', fontSize: 15, cursor: 'pointer' }}>×</button>

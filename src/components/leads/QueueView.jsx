@@ -92,7 +92,7 @@ export default function QueueView({ industry, onCounts }) {
         <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 10 }}>
           <div>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: '#A6AEB8', marginBottom: 4 }}>ЗВОНКИ СЕГОДНЯ</div>
-            <span style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 26, letterSpacing: '-0.02em', color: '#0E1726' }}>{todayCalls}</span>
+            <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 26, letterSpacing: '-0.02em', color: '#0E1726' }}>{todayCalls}</span>
             <span style={{ fontSize: 14, color: '#A6AEB8' }}> / {DAILY_GOAL}</span>
           </div>
           <span style={{ fontSize: 14, fontWeight: 700, color: pct >= 100 ? '#1E9E5A' : '#1366F0' }}>{pct}%</span>
@@ -116,7 +116,7 @@ export default function QueueView({ industry, onCounts }) {
               <polyline points="22 4 12 14.01 9 11.01" />
             </svg>
           </div>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 16, color: '#0E1726' }}>Очередь пуста</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: '#0E1726' }}>Очередь пуста</div>
           <div style={{ fontSize: 13, color: '#A6AEB8', marginTop: 6 }}>Все звонки на сегодня обработаны</div>
         </div>
       )}
@@ -170,7 +170,7 @@ export default function QueueView({ industry, onCounts }) {
             boxShadow: '0 40px 80px rgba(20,30,55,0.28)',
           }}>
             <div style={{ padding: 26 }}>
-              <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 16, color: '#0E1726', marginBottom: 8 }}>Создать карточку клиента?</div>
+              <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: '#0E1726', marginBottom: 8 }}>Создать карточку клиента?</div>
               <div style={{ fontSize: 13, color: '#5A6573', marginBottom: 20 }}>{askClient?.name} стал клиентом — перенести в раздел «Клиенты»?</div>
               <div style={{ display: 'flex', gap: 10 }}>
                 <button onClick={() => handleConvert(false)} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Нет</button>

@@ -33,7 +33,7 @@ export default function FleetClients({ onOpenClient }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, gap: 12, flexWrap: 'wrap' }}>
         <div>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 22, color: '#0E1726' }}>Клиенты</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 22, color: '#0E1726' }}>Клиенты</div>
           <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>Свой автопарк · {clients.length}</div>
         </div>
         <button onClick={() => setShowAdd(true)} className="btn-primary">
@@ -55,7 +55,7 @@ export default function FleetClients({ onOpenClient }) {
               className="card" style={{ padding: 18, cursor: 'pointer' }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-                <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>{c.name}</div>
+                <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>{c.name}</div>
                 <button onClick={e => remove(e, c.id)} title="Удалить" style={{ border: 'none', background: 'transparent', color: '#C4CAD4', cursor: 'pointer', fontSize: 14 }}>✕</button>
               </div>
               {(c.phone || c.contact_person) && (

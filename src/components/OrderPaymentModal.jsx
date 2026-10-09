@@ -204,7 +204,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
         </div>
         <div style={{ fontSize: 14, color: '#5A6573', marginBottom: 4 }}>{who}</div>
         <div style={{
-          fontFamily: 'JetBrains Mono', fontSize: 28, fontWeight: 700,
+          fontFamily: 'var(--font-mono)', fontSize: 28, fontWeight: 700,
           color: isCarrier ? '#E0473B' : '#1E9E5A', marginBottom: 22,
         }}>
           {expected.toLocaleString('ru-RU')} Br

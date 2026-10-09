@@ -12,7 +12,7 @@ const TABS = [
 
 const inputStyle = {
   padding: '6px 8px', borderRadius: 8, border: '1px solid #E0473B4D', fontSize: 12,
-  fontFamily: 'Manrope', color: '#0E1726',
+  fontFamily: 'var(--font-sys)', color: '#0E1726',
 }
 
 const MISSING_FIELD_META = {
@@ -61,7 +61,7 @@ function MissingPPRow({ order, onSaved }) {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderBottom: '1px solid #F0F1F4', flexWrap: 'wrap' }}>
-      <div style={{ width: 110, fontFamily: 'JetBrains Mono', fontSize: 12, color: '#1366F0' }}>{order.order_number}</div>
+      <div style={{ width: 110, fontFamily: 'var(--font-mono)', fontSize: 12, color: '#1366F0' }}>{order.order_number}</div>
       <div style={{ flex: 1, minWidth: 120, fontSize: 12, color: '#0E1726' }}>{order.client_name}</div>
       {missing.map(key => {
         const meta = MISSING_FIELD_META[key]
@@ -325,7 +325,7 @@ function BookTab() {
 // order automatically.
 const cellInputStyle = {
   width: '100%', border: '1px solid transparent', background: 'transparent',
-  padding: '6px 8px', borderRadius: 8, fontSize: 12, fontFamily: 'Manrope', color: '#0E1726',
+  padding: '6px 8px', borderRadius: 8, fontSize: 12, fontFamily: 'var(--font-sys)', color: '#0E1726',
   boxSizing: 'border-box',
 }
 const focusCell = e => { e.target.style.border = '1px solid #E0473B4D'; e.target.style.background = '#fff' }
@@ -449,7 +449,7 @@ export default function Kudir() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <h1 style={{ fontFamily: 'Onest', fontSize: 20, fontWeight: 800, color: '#0E1726', margin: 0 }}>КУДиР</h1>
+        <h1 style={{ fontFamily: 'var(--font-sys)', fontSize: 20, fontWeight: 800, color: '#0E1726', margin: 0 }}>КУДиР</h1>
         <SlidingTabs options={TABS} value={tab} onChange={setTab} />
       </div>
       {tab === 'backfill' ? <BackfillTab /> : <BookTab />}

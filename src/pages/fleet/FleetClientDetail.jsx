@@ -63,7 +63,7 @@ function ReconciliationModal({ clientId, clientName, onClose }) {
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, display: 'grid', padding: 24 }}>
       <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#fff', borderRadius: 22, width: '100%', maxWidth: 380, padding: 24, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 16, color: '#0E1726', marginBottom: 14 }}>Акт сверки</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: '#0E1726', marginBottom: 14 }}>Акт сверки</div>
         <div style={{ fontSize: 12, color: '#8A93A0', marginBottom: 12 }}>Период (можно оставить пустым — тогда за всё время)</div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 18 }}>
           <input type="date" value={from} onChange={e => setFrom(e.target.value)} style={{ ...fld, flex: 1 }} />
@@ -101,7 +101,7 @@ function OrderRow({ order, onOpen, onReload }) {
     <div onClick={() => onOpen(order.id)} title="Открыть карточку загрузки" style={{ padding: '12px 0', borderBottom: '1px solid #F0F1F4', cursor: 'pointer' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: '#0E1726' }}>
-          {order.order_number && <span style={{ fontFamily: 'JetBrains Mono', color: '#1366F0', fontSize: 12, marginRight: 6 }}>{order.order_number}</span>}
+          {order.order_number && <span style={{ fontFamily: 'var(--font-mono)', color: '#1366F0', fontSize: 12, marginRight: 6 }}>{order.order_number}</span>}
           {order.trip_name || 'Рейс'}
           <span style={{ color: '#A6AEB8', fontWeight: 400 }}> · {order.direction === 'backward' ? 'обратка' : 'прямой'}</span>
         </div>
@@ -112,7 +112,7 @@ function OrderRow({ order, onOpen, onReload }) {
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
         <span style={{ fontSize: 11, color: '#8A93A0' }}>{fmtDate(order.load_date)} → {fmtDate(order.unload_date)}</span>
-        <span style={{ fontFamily: 'JetBrains Mono', fontSize: 13, fontWeight: 700, color: '#1366F0' }}>{(order.rate || 0).toLocaleString('ru-RU')} Br</span>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: '#1366F0' }}>{(order.rate || 0).toLocaleString('ru-RU')} Br</span>
       </div>
     </div>
   )
@@ -142,7 +142,7 @@ export default function FleetClientDetail({ clientId, onBack, onOpenOrder }) {
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 18 }}>
         <PillBtn variant="neutral" icon="back" onClick={onBack}>Клиенты</PillBtn>
-        <div style={{ flex: 1, minWidth: 0, fontFamily: 'Onest', fontWeight: 800, fontSize: 20, color: '#0E1726' }}>{client.name}</div>
+        <div style={{ flex: 1, minWidth: 0, fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, color: '#0E1726' }}>{client.name}</div>
         <PillBtn variant="neutral" icon="dup" onClick={() => setReconcile(true)}>Акт сверки</PillBtn>
         <PillBtn variant="edit" icon="edit" onClick={() => setEditing(true)}>Изменить</PillBtn>
       </div>
@@ -163,7 +163,7 @@ export default function FleetClientDetail({ clientId, onBack, onOpenOrder }) {
       <div className="card" style={{ padding: 18 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: '#0E1726' }}>Заказы клиента · {orders.length}</div>
-          <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, fontWeight: 700, color: '#1366F0' }}>{total.toLocaleString('ru-RU')} Br</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: '#1366F0' }}>{total.toLocaleString('ru-RU')} Br</div>
         </div>
         {orders.length === 0
           ? <div style={{ fontSize: 12, color: '#A6AEB8', textAlign: 'center', padding: 20 }}>Заказов пока нет</div>

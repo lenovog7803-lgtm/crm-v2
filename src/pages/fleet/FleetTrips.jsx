@@ -63,7 +63,7 @@ function CreateTripModal({ onClose, onCreated }) {
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
       <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 460, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 17, color: '#0E1726', marginBottom: 18 }}>Новый рейс</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#0E1726', marginBottom: 18 }}>Новый рейс</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
           <input autoFocus value={form.name} onChange={e => set('name', e.target.value)} placeholder="Название рейса, напр. Минск–Москва" style={fieldStyle} />
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -110,7 +110,7 @@ export default function FleetTrips({ onOpenTrip }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, gap: 12, flexWrap: 'wrap' }}>
         <div>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 22, color: '#0E1726' }}>Рейсы</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 22, color: '#0E1726' }}>Рейсы</div>
           <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>Свой автопарк</div>
         </div>
         <button onClick={() => setShowCreate(true)} className="btn-primary">
@@ -136,8 +136,8 @@ export default function FleetTrips({ onOpenTrip }) {
                     onPointerLeave={mouseOnly(e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '' })}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 15, color: '#0E1726', flex: 1, minWidth: 0 }}>
-                        {t.trip_number ? <span style={{ fontFamily: 'JetBrains Mono', color: '#1366F0', fontSize: 13, marginRight: 6 }}>Р{t.trip_number}</span> : null}
+                      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: '#0E1726', flex: 1, minWidth: 0 }}>
+                        {t.trip_number ? <span style={{ fontFamily: 'var(--font-mono)', color: '#1366F0', fontSize: 13, marginRight: 6 }}>Р{t.trip_number}</span> : null}
                         {t.name || 'Без названия'}
                       </div>
                       {(() => { const s = TRIP_STATUS.find(x => x.key === (t.status || 'active')) || TRIP_STATUS[0]; return (
@@ -150,7 +150,7 @@ export default function FleetTrips({ onOpenTrip }) {
                     <div style={{ fontSize: 11.5, color: '#A6AEB8', marginBottom: 12 }}>
                       {fmtDate(t.first_load_date)} – {fmtDate(t.last_unload_date)}
                     </div>
-                    <div style={{ fontFamily: 'JetBrains Mono', fontSize: 18, fontWeight: 700, color: '#1366F0' }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 700, color: '#1366F0' }}>
                       {(t.total_amount || 0).toLocaleString('ru-RU')} Br
                     </div>
                   </div>

@@ -50,7 +50,7 @@ function Stat({ label, value, color = '#0E1726', bg = 'rgba(14,23,38,0.06)', sub
     <div style={{ minWidth: 0 }}>
       <div style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600, marginBottom: 6 }}>{label}</div>
       <div style={{
-        fontFamily: 'Onest', fontWeight: 800, fontSize: 24, color,
+        fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 24, color,
         background: bg, borderRadius: 12, padding: '8px 14px', display: 'inline-block', lineHeight: 1,
       }}>{value}</div>
       {sub != null && <div style={{ fontSize: 11.5, color: '#8A93A0', marginTop: 6 }}>{sub}</div>}
@@ -71,7 +71,7 @@ function LegList({ title, items }) {
               padding: '7px 0', borderBottom: i < items.length - 1 ? '1px solid #F0F1F4' : 'none',
               fontSize: 13, color: '#0E1726',
             }}>
-              <span style={{ fontFamily: 'JetBrains Mono', fontSize: 12, color: '#1366F0', marginRight: 8 }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: '#1366F0', marginRight: 8 }}>
                 {x.order_number || '—'}
               </span>
               {[x.route_from, x.route_to].filter(Boolean).join(' → ')}
@@ -160,7 +160,7 @@ function ReportBody({ r }) {
 
       {(r.period === 'quarterly' || r.period === 'yearly') && (
         <div style={{ borderTop: '1px solid #F0F1F4', paddingTop: 14 }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 13, color: '#0E1726', marginBottom: 12 }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 13, color: '#0E1726', marginBottom: 12 }}>
             Налог по КУДиР <span style={{ color: '#8A93A0', fontWeight: 400 }}>(по фактическим датам оплат в книге)</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 18 }}>
@@ -203,7 +203,7 @@ function ReportBody({ r }) {
 
       {hasTomorrow && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14, borderTop: '1px solid #F0F1F4', paddingTop: 14 }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 13, color: '#0E1726' }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 13, color: '#0E1726' }}>
             Завтра{r.tomorrow_date ? ` (${r.tomorrow_date})` : ''}
           </div>
           <LegList title="Загрузки" items={loads} />
@@ -226,7 +226,7 @@ function ReportRow({ r }) {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, minWidth: 0, flexWrap: 'wrap' }}>
-          <span style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>{rowTitle(r)}</span>
+          <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>{rowTitle(r)}</span>
           <span style={{ fontSize: 12.5, color: '#8A93A0' }}>
             выручка {money(r.revenue)} · маржа {money(r.margin)}
           </span>
@@ -316,26 +316,26 @@ export default function Reports() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-        <h1 style={{ fontFamily: 'Onest', fontSize: 20, fontWeight: 800, color: '#0E1726', margin: 0 }}>Отчёты</h1>
+        <h1 style={{ fontFamily: 'var(--font-sys)', fontSize: 20, fontWeight: 800, color: '#0E1726', margin: 0 }}>Отчёты</h1>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button
             onClick={sendTaskReminders}
             disabled={taskRem}
-            style={{ padding: '7px 15px', borderRadius: 99, border: '1px solid rgba(14,23,38,0.14)', cursor: taskRem ? 'default' : 'pointer', fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600, background: '#fff', color: '#0E1726', opacity: taskRem ? 0.6 : 1, whiteSpace: 'nowrap' }}
+            style={{ padding: '7px 15px', borderRadius: 99, border: '1px solid rgba(14,23,38,0.14)', cursor: taskRem ? 'default' : 'pointer', fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600, background: '#fff', color: '#0E1726', opacity: taskRem ? 0.6 : 1, whiteSpace: 'nowrap' }}
           >
             {taskRem ? '…' : 'Напоминания по задачам'}
           </button>
           <button
             onClick={sendMorning}
             disabled={morning}
-            style={{ padding: '7px 15px', borderRadius: 99, border: '1px solid rgba(14,23,38,0.14)', cursor: morning ? 'default' : 'pointer', fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600, background: '#fff', color: '#0E1726', opacity: morning ? 0.6 : 1, whiteSpace: 'nowrap' }}
+            style={{ padding: '7px 15px', borderRadius: 99, border: '1px solid rgba(14,23,38,0.14)', cursor: morning ? 'default' : 'pointer', fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600, background: '#fff', color: '#0E1726', opacity: morning ? 0.6 : 1, whiteSpace: 'nowrap' }}
           >
             {morning ? '…' : 'Утренняя сводка'}
           </button>
           <button
             onClick={runNow}
             disabled={running}
-            style={{ padding: '7px 15px', borderRadius: 99, border: 'none', cursor: running ? 'default' : 'pointer', fontFamily: 'Manrope', fontSize: 12.5, fontWeight: 600, background: '#0E1726', color: '#fff', opacity: running ? 0.6 : 1, whiteSpace: 'nowrap' }}
+            style={{ padding: '7px 15px', borderRadius: 99, border: 'none', cursor: running ? 'default' : 'pointer', fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600, background: '#0E1726', color: '#fff', opacity: running ? 0.6 : 1, whiteSpace: 'nowrap' }}
           >
             {running ? '…' : 'Сформировать сейчас'}
           </button>

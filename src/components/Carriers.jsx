@@ -55,7 +55,7 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>
           {search ? `Найдено: ${visible.length}` : <>Всего перевозчиков: <span style={{ color: '#1366F0' }}>{carriers.length}</span></>}
         </div>
         <div style={{ flex: 1 }} />
@@ -104,7 +104,7 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
                   </svg>
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14.5, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
+                  <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14.5, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
                   {driver && <div style={{ fontSize: 12.5, color: '#A6AEB8', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{driver}</div>}
                 </div>
                 <div style={{
@@ -145,7 +145,7 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
                 <div style={{ minWidth: 0, overflow: 'hidden' }}>
                   {carrier.plate && (
                     <div style={{ fontSize: 11, color: '#A6AEB8', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      Номер: <span style={{ color: '#0E1726', fontFamily: 'JetBrains Mono', fontWeight: 600, fontSize: 12 }}>{carrier.plate}</span>
+                      Номер: <span style={{ color: '#0E1726', fontFamily: 'var(--font-mono)', fontWeight: 600, fontSize: 12 }}>{carrier.plate}</span>
                     </div>
                   )}
                   {carrier.regions && (

@@ -18,7 +18,7 @@ const TYPE_LABELS = { call: 'Звонок', reminder: 'Напоминание', 
 const inputStyle = {
   width: '100%', height: 38, padding: '0 12px', borderRadius: 10,
   border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)',
-  fontFamily: 'Manrope', fontSize: 13, color: '#0E1726', outline: 'none', boxSizing: 'border-box',
+  fontFamily: 'var(--font-sys)', fontSize: 13, color: '#0E1726', outline: 'none', boxSizing: 'border-box',
 }
 const labelStyle = { fontSize: 12, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.05em', marginBottom: 6, display: 'block' }
 
@@ -247,11 +247,11 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
             <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
               <button onClick={() => setEditTask(null)} style={{
                 flex: 1, height: 44, borderRadius: 13, border: '1px solid rgba(14,23,38,0.12)',
-                background: 'transparent', cursor: 'pointer', fontFamily: 'Manrope', fontSize: 14, fontWeight: 600, color: '#5A6573',
+                background: 'transparent', cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 14, fontWeight: 600, color: '#5A6573',
               }}>Отмена</button>
               <button onClick={handleSave} disabled={saving} style={{
                 flex: 2, height: 44, borderRadius: 13, border: 'none', cursor: 'pointer',
-                background: '#1366F0', color: '#fff', fontFamily: 'Manrope', fontSize: 14, fontWeight: 700, opacity: saving ? 0.7 : 1,
+                background: '#1366F0', color: '#fff', fontFamily: 'var(--font-sys)', fontSize: 14, fontWeight: 700, opacity: saving ? 0.7 : 1,
               }}>{saving ? 'Сохранение...' : 'Сохранить'}</button>
             </div>
           </div>

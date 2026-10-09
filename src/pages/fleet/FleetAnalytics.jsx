@@ -29,7 +29,7 @@ function ProfitChart({ rows }) {
               <rect x={cx - bw / 2} y={pos ? H / 2 - h : H / 2} width={bw} height={Math.max(2, h)} rx="3"
                 fill={pos ? '#1366F0' : '#E0473B'} />
               <text x={cx} y={pos ? H / 2 - h - 5 : H / 2 + h + 13} textAnchor="middle"
-                fontSize="10" fontFamily="JetBrains Mono" fill={pos ? '#1366F0' : '#E0473B'}>{int(r.profit)}</text>
+                fontSize="10" fontFamily="ui-monospace, Menlo, monospace" fill={pos ? '#1366F0' : '#E0473B'}>{int(r.profit)}</text>
               <text x={cx} y={H + 18} textAnchor="middle" fontSize="10.5" fill="#8A93A0">{mLabel(r.month)}</text>
             </g>
           )
@@ -42,7 +42,7 @@ function ProfitChart({ rows }) {
 function PnlTable({ title, rows, cols }) {
   return (
     <div className="card" style={{ padding: '18px 20px', overflow: 'hidden' }}>
-      <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 12 }}>{title}</div>
+      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 12 }}>{title}</div>
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
           <thead>
@@ -57,7 +57,7 @@ function PnlTable({ title, rows, cols }) {
                 {cols.map(c => (
                   <td key={c.key} style={{
                     padding: '9px 10px', textAlign: c.right ? 'right' : 'left',
-                    fontFamily: c.mono ? 'JetBrains Mono' : 'inherit',
+                    fontFamily: c.mono ? 'var(--font-mono)' : 'inherit',
                     fontWeight: c.bold ? 700 : 400,
                     color: c.color ? c.color(r[c.key]) : '#0E1726',
                   }}>{c.fmt ? c.fmt(r[c.key], r) : r[c.key]}</td>
@@ -86,7 +86,7 @@ export default function FleetAnalytics({ onBack }) {
 
   if (!d) return <Loader padding={20} state="composing" />
 
-  const inp = { height: 38, padding: '0 12px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)', fontFamily: 'Manrope', fontSize: 13, color: '#0E1726' }
+  const inp = { height: 38, padding: '0 12px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-sys)', fontSize: 13, color: '#0E1726' }
   const profitColor = v => (Number(v) >= 0 ? '#1E9E5A' : '#E0473B')
 
   return (
@@ -94,7 +94,7 @@ export default function FleetAnalytics({ onBack }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <PillBtn variant="neutral" icon="back" onClick={onBack}>Дашборд</PillBtn>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 22, color: '#0E1726' }}>Аналитика автопарка</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color: '#0E1726' }}>Аналитика автопарка</div>
           <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>{d.trips_total} рейсов · {int(d.total_km)} км</div>
         </div>
         <input type="date" value={from} onChange={e => setFrom(e.target.value)} style={inp} />
@@ -112,14 +112,14 @@ export default function FleetAnalytics({ onBack }) {
         ].map(k => (
           <div key={k.label} className="card" style={{ padding: '16px 18px' }}>
             <div style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600, marginBottom: 6 }}>{k.label}</div>
-            <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: 24, color: k.c }}>{k.v}</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 24, color: k.c }}>{k.v}</div>
           </div>
         ))}
       </div>
 
       {/* График по месяцам */}
       <div className="card" style={{ padding: '18px 20px' }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 12 }}>Прибыль по месяцам</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 12 }}>Прибыль по месяцам</div>
         <ProfitChart rows={d.by_month || []} />
       </div>
 

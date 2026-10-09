@@ -169,7 +169,7 @@ export default function ListView({ industry }) {
                     </div>
                   </div>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 12.5, fontFamily: 'JetBrains Mono', color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.phone || '—'}</div>
+                    <div style={{ fontSize: 12.5, fontFamily: 'var(--font-mono)', color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.phone || '—'}</div>
                     {(l.industry || l.city) && (
                       <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {[l.industry, l.city].filter(Boolean).join(' · ')}

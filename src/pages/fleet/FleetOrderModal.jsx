@@ -8,7 +8,7 @@ import Select from '../../components/Select'
 const iStyle = {
   width: '100%', height: 38, padding: '0 12px', borderRadius: 10,
   border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)',
-  fontFamily: 'Manrope', fontSize: 13, color: '#0E1726', outline: 'none', boxSizing: 'border-box',
+  fontFamily: 'var(--font-sys)', fontSize: 13, color: '#0E1726', outline: 'none', boxSizing: 'border-box',
 }
 const labelSt = { fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', marginBottom: 5, display: 'block' }
 
@@ -107,9 +107,9 @@ export function FleetOrderModal({ tripId, direction, order, trip, onClose, onSav
         title={editing ? 'Редактировать заявку' : 'Новая заявка'}
         onClose={onClose}
       />
-      <div style={{ marginTop: -14, marginBottom: 20, fontFamily: 'JetBrains Mono', fontSize: 13, fontWeight: 700, color: '#1366F0' }}>
+      <div style={{ marginTop: -14, marginBottom: 20, fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: '#1366F0' }}>
         {editing ? (order.order_number || '№ —') : '№ присвоится после создания'}
-        {dir ? <span style={{ color: '#A6AEB8', fontFamily: 'Manrope', fontWeight: 500, marginLeft: 10 }}>{dir === 'forward' ? 'прямой' : 'обратка'}</span> : null}
+        {dir ? <span style={{ color: '#A6AEB8', fontFamily: 'var(--font-sys)', fontWeight: 500, marginLeft: 10 }}>{dir === 'forward' ? 'прямой' : 'обратка'}</span> : null}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>

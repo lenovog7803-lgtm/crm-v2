@@ -29,7 +29,7 @@ export function SlidingTabs({ options, value, onChange, pillColor, activeColor =
           style={{
             position: 'relative', zIndex: 1, flexShrink: 0,
             padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer',
-            fontFamily: 'Manrope', fontSize, fontWeight: 600,
+            fontFamily: 'var(--font-sys)', fontSize, fontWeight: 600,
             background: 'transparent',
             color: opt.key === value ? activeColor : inactiveColor,
             transition: 'color 0.15s var(--ease)',
