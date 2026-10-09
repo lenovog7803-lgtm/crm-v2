@@ -12,6 +12,7 @@ import { SwapText } from './Transitions'
 import { StatusOrb } from './StatusOrb'
 import { useChangeFlash } from '../hooks/useChangeFlash'
 import CheckCircle from './CheckCircle'
+import { iosConfirm } from './IOSAlert'
 
 const BULK_STATUSES = [
   { id: 'new', label: 'Новая' },
@@ -242,7 +243,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
 
   const handleBulkDelete = async () => {
     const ids = [...selected]
-    const ok = window.confirm(`Удалить ${ids.length} заявок? Это действие можно отменить в течение нескольких секунд.`)
+    const ok = await iosConfirm(`Удалить ${ids.length} заявок? Это действие можно отменить в течение нескольких секунд.`)
     if (!ok) return
     await Promise.all(ids.map(id => apiDelete(id)))
     await animateRemoval(ids)

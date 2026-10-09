@@ -7,6 +7,7 @@ import { PillBtn } from './fleetUi'
 import { mouseOnly } from '../../motion'
 import { Loader } from '../../components/Loader'
 import Select from '../../components/Select'
+import { iosConfirm } from '../../components/IOSAlert'
 
 const money = v => `${Math.round(Number(v) || 0).toLocaleString('ru-RU')} BYN`
 const int = v => Math.round(Number(v) || 0).toLocaleString('ru-RU')
@@ -44,7 +45,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
               const w = window.open('', '_blank')
               w.document.write(`<pre style="font:13px/1.5 -apple-system,Arial;white-space:pre-wrap;padding:24px;max-width:640px">${(p.text || '').replace(/<[^>]+>/g, '')}</pre>`)
               w.document.close()
-              if (window.confirm('Отправить эту сводку в Telegram сейчас?')) {
+              if (await iosConfirm('Отправить эту сводку в Telegram сейчас?')) {
                 const r = await sendFleetBriefing()
                 show(r.sent ? `Отправлено (${r.sent})` : 'Не отправлено — проверьте бота', { type: r.sent ? 'success' : 'error' })
               }

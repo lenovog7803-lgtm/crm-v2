@@ -11,6 +11,7 @@ import { PillBtn } from './fleetUi'
 import { Loader } from '../../components/Loader'
 import { SwapText } from '../../components/Transitions'
 import Switch from '../../components/Switch'
+import { iosConfirm } from '../../components/IOSAlert'
 
 const sLabel = { fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', marginBottom: 12 }
 const SLabel = ({ children }) => <div style={sLabel}>{children}</div>
@@ -131,7 +132,7 @@ function PaymentsCard({ order, cur, onReload, onFull }) {
     } catch (e) { show('Ошибка: ' + e.message, { type: 'error' }) }
   }
   const delPay = async (pid) => {
-    if (!window.confirm('Удалить этот платёж?')) return
+    if (!(await iosConfirm('Удалить этот платёж?'))) return
     try { await deleteFleetOrderPayment(order.id, pid); onReload() }
     catch (e) { show('Ошибка: ' + e.message, { type: 'error' }) }
   }
@@ -258,7 +259,7 @@ export default function FleetOrderDetail({ orderId, onBack }) {
   }
   // Снятие любой отметки — с подтверждением и возможностью вернуть.
   const unmark = async (label, offData, restoreData) => {
-    if (!window.confirm(`Снять отметку «${label}»? Можно будет вернуть.`)) return
+    if (!(await iosConfirm(`Снять отметку «${label}»? Можно будет вернуть.`))) return
     try {
       await updateFleetOrder(order.id, offData)
       await load()

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { ModalOverlay, ModalHeader } from './Modal'
 import { createOrder, updateOrder, getClients, getCarriers, getToken, syncToSheets } from '../api'
 import { mouseOnly } from '../motion'
+import { iosConfirm } from './IOSAlert'
 
 const POPULAR_CITIES = [
   'Минск', 'Брест', 'Гродно', 'Гомель', 'Могилёв', 'Витебск', 'Бобруйск',
@@ -141,8 +142,8 @@ function CityInput({ value, onChange, placeholder }) {
 export default function CreateOrderModal({ onClose, onSuccess, initialData, editOrderId }) {
   const isEdit = Boolean(editOrderId)
   const [isDirty, setIsDirty] = useState(false)
-  const handleClose = () => {
-    if (isDirty && !window.confirm('Вы уверены? Изменения не сохранятся.')) return
+  const handleClose = async () => {
+    if (isDirty && !(await iosConfirm('Вы уверены? Изменения не сохранятся.'))) return
     onClose()
   }
   const [clients, setClients] = useState([])

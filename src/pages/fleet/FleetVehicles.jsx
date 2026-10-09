@@ -8,6 +8,7 @@ import { SlidingTabs } from '../../components/SlidingTabs'
 import { Loader } from '../../components/Loader'
 import { SwapText } from '../../components/Transitions'
 import { EmptyState } from '../../components/EmptyState'
+import { iosConfirm } from '../../components/IOSAlert'
 
 const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#FFFFFF', boxSizing: 'border-box', width: '100%' }
 
@@ -120,13 +121,13 @@ export default function FleetVehicles() {
 
   const removeVehicle = async (e, id) => {
     e.stopPropagation()
-    if (!window.confirm('Удалить машину?')) return
+    if (!(await iosConfirm('Удалить машину?'))) return
     try { await deleteFleetVehicle(id); setVehicles(p => p.filter(v => v.id !== id)) }
     catch (err) { show('Ошибка: ' + err.message, { type: 'error' }) }
   }
   const removeDriver = async (e, id) => {
     e.stopPropagation()
-    if (!window.confirm('Удалить водителя?')) return
+    if (!(await iosConfirm('Удалить водителя?'))) return
     try { await deleteFleetDriver(id); setDrivers(p => p.filter(d => d.id !== id)) }
     catch (err) { show('Ошибка: ' + err.message, { type: 'error' }) }
   }

@@ -10,6 +10,7 @@ import CarrierActModal from './CarrierActModal'
 import { mouseOnly } from '../motion'
 import { Loader } from './Loader'
 import { SuccessCheck } from './Transitions'
+import { iosConfirm } from './IOSAlert'
 
 const STATUSES = [
   { id: 'new', label: 'Новая', color: '#7C3AED', bg: 'rgba(124,58,237,0.1)' },
@@ -443,9 +444,9 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     // Снятие любой отметки — всегда с подтверждением; потом можно вернуть
     // тем же нажатием на кнопку «Отменить» в тосте (дата восстановится).
     const prevDate = draft[dateKey] !== undefined ? draft[dateKey] : order[dateKey]
-    if (!newVal && !window.confirm(
+    if (!newVal && !(await iosConfirm(
       `Снять отметку «${step?.label || key}»? Дату можно вернуть кнопкой «Отменить».`
-    )) return
+    ))) return
     const now = new Date().toISOString()
     const patch = { [key]: newVal, [dateKey]: newVal ? now : null }
     try {
@@ -561,9 +562,9 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     const ppShown = side === 'client'
       ? (order.client_pp_number || existingPayments[0]?.pp_number)
       : (order.carrier_pp_number || existingPayments[0]?.pp_number)
-    if (ppShown && !window.confirm(
+    if (ppShown && !(await iosConfirm(
       `Снять отметку оплаты ${who}? ПП №${ppShown} будет убран (можно вернуть кнопкой «↩ Вернуть»).`
-    )) return
+    ))) return
 
     // Заявки с несколькими частичными ПП (payments/{side} endpoints) —
     // снятие отметки должно удалить каждый ПП по отдельности, иначе
@@ -612,9 +613,9 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
 
   const handleDelete = async () => {
     const deletedId = order.id
-    if (!window.confirm(
+    if (!(await iosConfirm(
       `Удалить заявку ${order.order_number || ''}? Её можно будет восстановить кнопкой «Отменить» или из Корзины.`
-    )) return
+    ))) return
     try {
       await apiDelete(deletedId)
       onDelete(deletedId)

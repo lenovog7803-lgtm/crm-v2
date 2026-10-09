@@ -7,7 +7,6 @@ import { spring, project, rubberband, velocityTracker, prefersReducedMotion } fr
 // тянется за пальцем 1:1 за ручку или заголовок, закрывается броском (позиция + скорость),
 // иначе возвращается пружиной с той же скоростью. На компьютере — растворение при закрытии.
 const SheetCtx = createContext(null)
-const SCRIM = 0.4
 
 export const useSheet = () => useContext(SheetCtx)
 
@@ -113,9 +112,9 @@ export function ModalOverlay({ onClose, children, panelStyle, bodyStyle }) {
           position: 'fixed', inset: 0, zIndex: 1000, overflow: 'hidden', display: 'grid', padding: 0,
         } : {
           position: 'fixed', inset: 0,
-          background: `rgba(14,23,38,${SCRIM})`,
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
+          background: 'rgba(14,23,38,0.22)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
           zIndex: 1000,
           overflowY: 'auto',
           display: 'grid',
@@ -125,9 +124,9 @@ export function ModalOverlay({ onClose, children, panelStyle, bodyStyle }) {
       >
         {isMobile && (
           <div ref={scrimRef} onClick={() => requestClose()}
-            style={{ position: 'absolute', inset: 0, background: `rgba(14,23,38,${SCRIM})`, opacity: 0, willChange: 'opacity' }} />
+            style={{ position: 'absolute', inset: 0, background: 'rgba(14,23,38,0.3)', opacity: 0, willChange: 'opacity' }} />
         )}
-        <div ref={panelRef} className="modal-panel" style={{
+        <div ref={panelRef} className="modal-panel ios-sheet" style={{
           margin: 'auto',
           background: isMobile ? '#FFFFFF' : 'rgba(255,255,255,0.97)',
           backdropFilter: isMobile ? 'none' : 'blur(24px) saturate(180%)',
@@ -163,22 +162,21 @@ export function ModalHeader({ title, onClose }) {
   const sheet = useContext(SheetCtx)
   // заголовок шторки — тоже «ручка»: тянуть можно за всю верхнюю полосу
   const drag = sheet?.dragHandlers || {}
+  // iOS 26: круглая стеклянная ✕ слева, заголовок по центру
   return (
-    <div {...drag} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, ...(drag.style || {}) }}>
-      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
+    <div {...drag} style={{ display: 'grid', gridTemplateColumns: '34px 1fr 34px', alignItems: 'center', gap: 10, marginBottom: 22, ...(drag.style || {}) }}>
       <button
         onClick={() => (sheet ? sheet.requestClose() : onClose?.())}
         aria-label="Закрыть"
-        style={{
-          width: 32, height: 32, borderRadius: 10, border: 'none', cursor: 'pointer',
-          background: 'rgba(14,23,38,0.07)', color: '#5A6573',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}
+        className="ios-sheet-close"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>
+      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 17, letterSpacing: '-0.02em', color: '#0E1726', textAlign: 'center',
+        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</div>
+      <span />
     </div>
   )
 }

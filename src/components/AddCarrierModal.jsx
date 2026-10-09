@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ModalOverlay, ModalHeader } from './Modal'
 import { createCarrier } from '../api'
 import Select from './Select'
+import { iosConfirm } from './IOSAlert'
 
 const sectionLabel = {
   fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: '#A6AEB8',
@@ -21,8 +22,8 @@ export default function AddCarrierModal({ onClose, onSuccess }) {
   const [isDirty, setIsDirty] = useState(false)
   const set = (k, v) => { setIsDirty(true); setForm(f => ({ ...f, [k]: v })) }
 
-  const handleClose = () => {
-    if (isDirty && !window.confirm('Вы уверены? Изменения не сохранятся.')) return
+  const handleClose = async () => {
+    if (isDirty && !(await iosConfirm('Вы уверены? Изменения не сохранятся.'))) return
     onClose()
   }
 

@@ -11,6 +11,7 @@ import { mouseOnly } from '../motion'
 import { Loader } from '../components/Loader'
 import { SwapText } from '../components/Transitions'
 import Switch from '../components/Switch'
+import { iosConfirm } from '../components/IOSAlert'
 
 const TABS = [
   { id: 'managers', label: 'Пользователи' },
@@ -189,7 +190,7 @@ function UsersTab() {
   }
 
   const remove = async (m) => {
-    if (!window.confirm(`Удалить пользователя «${m.name}» (${m.login})? Это действие нельзя отменить.`)) return
+    if (!(await iosConfirm(`Удалить пользователя «${m.name}» (${m.login})? Это действие нельзя отменить.`))) return
     try {
       await deleteManager(m.id)
       setUsers(prev => prev.filter(x => x.id !== m.id))

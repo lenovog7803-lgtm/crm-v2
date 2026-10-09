@@ -5,6 +5,7 @@ import { FleetClientModal } from './FleetClientModal'
 import { fmtDate } from './FleetOrderModal'
 import { PillBtn } from './fleetUi'
 import { Loader } from '../../components/Loader'
+import { iosConfirm } from '../../components/IOSAlert'
 
 const fld = { height: 36, padding: '0 10px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#fff' }
 
@@ -93,7 +94,7 @@ function OrderRow({ order, onOpen, onReload }) {
   const { show } = useToast()
   const remove = async (e) => {
     e.stopPropagation()
-    if (!window.confirm('Удалить заказ?')) return
+    if (!(await iosConfirm('Удалить заказ?'))) return
     try { await deleteFleetOrder(order.id); onReload() }
     catch (err) { show('Ошибка: ' + err.message, { type: 'error' }) }
   }

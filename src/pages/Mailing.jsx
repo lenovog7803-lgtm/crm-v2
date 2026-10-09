@@ -19,6 +19,7 @@ import { IconSwap, PopNumber, SwapText } from '../components/Transitions'
 import Select from '../components/Select'
 import Switch from '../components/Switch'
 import { EmptyState } from '../components/EmptyState'
+import { iosConfirm } from '../components/IOSAlert'
 
 // «Рассылка» — холодные письма по базе. Вся логика (лимиты, рабочие часы,
 // паузы, напоминания, проверка ответов) живёт в backend/mailing.py, здесь
@@ -711,7 +712,7 @@ function Contacts({ campaignId, campaignName, onChanged, groups = {}, loginFor, 
   }
 
   const remove = async (c) => {
-    if (!window.confirm(`Удалить «${c.company || c.email}» из рассылки?`)) return
+    if (!(await iosConfirm(`Удалить «${c.company || c.email}» из рассылки?`))) return
     try {
       await deleteMailingContact(c.id)
       after('Удалено')
@@ -888,7 +889,7 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
   }
 
   const remove = async () => {
-    if (!window.confirm(`Удалить направление «${campaign.name}»? Контакты и ответы в нём перестанут показываться.`)) return
+    if (!(await iosConfirm(`Удалить направление «${campaign.name}»? Контакты и ответы в нём перестанут показываться.`))) return
     try {
       await deleteMailingCampaign(campaign.id)
       show('Направление удалено', { type: 'success' })
@@ -1068,7 +1069,7 @@ function MailboxSettings({ mailbox, onSaved, onDeleted }) {
   }
 
   const disconnectGoogle = async () => {
-    if (!window.confirm('Отключить Gmail от этого ящика рассылки? Google-аккаунт CRM это не затронет.')) return
+    if (!(await iosConfirm('Отключить Gmail от этого ящика рассылки? Google-аккаунт CRM это не затронет.'))) return
     try {
       await disconnectMailboxGoogle(mailbox.id)
       show('Gmail отключён', { type: 'success' })
@@ -1079,7 +1080,7 @@ function MailboxSettings({ mailbox, onSaved, onDeleted }) {
   }
 
   const remove = async () => {
-    if (!window.confirm(`Удалить ящик «${mailbox.login || mailbox.name}» из рассылки?`)) return
+    if (!(await iosConfirm(`Удалить ящик «${mailbox.login || mailbox.name}» из рассылки?`))) return
     try {
       await deleteMailbox(mailbox.id)
       show('Ящик удалён', { type: 'success' })
@@ -1342,7 +1343,7 @@ function Suppliers({ campaignId }) {
   }, [campaignId, stage, q])
 
   const remove = async (s) => {
-    if (!window.confirm(`Убрать «${s.company}» из поставщиков?`)) return
+    if (!(await iosConfirm(`Убрать «${s.company}» из поставщиков?`))) return
     try {
       await deleteSupplier(s.id)
       setItems(list => list.filter(x => x.id !== s.id))

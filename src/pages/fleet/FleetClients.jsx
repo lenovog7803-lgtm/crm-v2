@@ -4,6 +4,7 @@ import { useToast } from '../../components/Toast'
 import { FleetClientModal } from './FleetClientModal'
 import { Loader } from '../../components/Loader'
 import { EmptyState } from '../../components/EmptyState'
+import { iosConfirm } from '../../components/IOSAlert'
 
 export default function FleetClients({ onOpenClient }) {
   const { show } = useToast()
@@ -20,7 +21,7 @@ export default function FleetClients({ onOpenClient }) {
 
   const remove = async (e, id) => {
     e.stopPropagation()
-    if (!window.confirm('Удалить клиента?')) return
+    if (!(await iosConfirm('Удалить клиента?'))) return
     try {
       await deleteFleetClient(id)
       setClients(prev => prev.filter(c => c.id !== id))

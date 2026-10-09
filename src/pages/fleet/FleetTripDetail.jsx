@@ -11,6 +11,7 @@ import { PillBtn } from './fleetUi'
 import { Loader } from '../../components/Loader'
 import { SwapText } from '../../components/Transitions'
 import Select from '../../components/Select'
+import { iosConfirm } from '../../components/IOSAlert'
 
 const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#FFFFFF', boxSizing: 'border-box' }
 const num = v => (v === '' || v == null || isNaN(Number(v)) ? 0 : Number(v))
@@ -132,7 +133,7 @@ function TripInfoCard({ trip, revenue, finance, onSave, onReload }) {
     } catch (e) { show('Ошибка: ' + e.message, { type: 'error' }) }
   }
   const removePayout = async (pid) => {
-    if (!window.confirm('Удалить выплату?')) return
+    if (!(await iosConfirm('Удалить выплату?'))) return
     try { await deleteFleetDriverPayout(trip.id, pid); onReload() }
     catch (e) { show('Ошибка: ' + e.message, { type: 'error' }) }
   }
@@ -385,7 +386,7 @@ function FleetOrderCard({ order, onReload, onOpen }) {
   const { show } = useToast()
   const remove = async (e) => {
     e.stopPropagation()
-    if (!window.confirm('Удалить заказ?')) return
+    if (!(await iosConfirm('Удалить заказ?'))) return
     try {
       await deleteFleetOrder(order.id)
       onReload()
@@ -466,7 +467,7 @@ export default function FleetTripDetail({ tripId, onBack, onOpenOrder }) {
   const [editing, setEditing] = useState(false)
 
   const removeTrip = async () => {
-    if (!window.confirm('Удалить весь рейс со всеми заказами?')) return
+    if (!(await iosConfirm('Удалить весь рейс со всеми заказами?'))) return
     try {
       await deleteFleetTrip(tripId)
       show('Рейс удалён', { type: 'info' })
@@ -477,7 +478,7 @@ export default function FleetTripDetail({ tripId, onBack, onOpenOrder }) {
   }
 
   const dupTrip = async () => {
-    if (!window.confirm('Создать копию рейса со всеми заказами (без дат и оплат)?')) return
+    if (!(await iosConfirm('Создать копию рейса со всеми заказами (без дат и оплат)?'))) return
     try {
       const nt = await duplicateFleetTrip(tripId)
       show(`Создан рейс Р${nt.trip_number}`, { type: 'success' })
