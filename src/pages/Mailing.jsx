@@ -164,7 +164,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
           <div style={{ position: 'relative', zIndex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
               {/* вместо точки статуса — маленькая сфера: работает — зелёная и крутится, стоит — замерла и потускнела */}
-              <ThinkingOrb state="searching" size={20} color={state.running ? '#5BE89B' : 'rgba(255,255,255,0.35)'}
+              <ThinkingOrb state="searching" size={20} dotSize={1.7} color={state.running ? '#7CF5B0' : 'rgba(255,255,255,0.45)'}
                 paused={!state.running} aria-label={state.running ? 'Рассылка работает' : 'Рассылка остановлена'} />
               <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.5)' }}>
                 {state.running ? 'РАБОТАЕТ' : 'ОСТАНОВЛЕНО'}{state.campaign ? ` · ${state.campaign.name.toUpperCase()}` : ' · ВСЕ НАПРАВЛЕНИЯ'}
