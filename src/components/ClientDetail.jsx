@@ -5,6 +5,7 @@ import { mouseOnly } from '../motion'
 import { Loader } from './Loader'
 import { StatusOrb } from './StatusOrb'
 import Select from './Select'
+import { EmptyState } from './EmptyState'
 
 function Row({ label, value, mono }) {
   return (
@@ -243,7 +244,7 @@ export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }
         <div className="card" style={{ padding: '20px 22px' }}>
           <div className="section-label" style={{ marginBottom: 10 }}>ИСТОРИЯ ЗАЯВОК</div>
           {clientOrders.length === 0 ? (
-            <div style={{ color: '#A6AEB8', fontSize: 13, padding: '12px 0' }}>Нет заявок</div>
+            <EmptyState compact title="Заявок пока нет" />
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               {clientOrders.slice(0, 15).map(o => (

@@ -10,6 +10,7 @@ import { SlidingTabs } from '../../components/SlidingTabs'
 import { PillBtn } from './fleetUi'
 import { Loader } from '../../components/Loader'
 import { SwapText } from '../../components/Transitions'
+import Switch from '../../components/Switch'
 
 const sLabel = { fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', marginBottom: 12 }
 const SLabel = ({ children }) => <div style={sLabel}>{children}</div>
@@ -181,7 +182,7 @@ function PaymentsCard({ order, cur, onReload, onFull }) {
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <input type="date" value={date} onChange={e => setDate(e.target.value)} style={{ ...iStyle, flex: 1 }} />
             <label style={{ display: 'flex', gap: 6, alignItems: 'center', fontSize: 12, color: '#5A6573', whiteSpace: 'nowrap' }}>
-              <input type="checkbox" checked={cash} onChange={e => setCash(e.target.checked)} /> наличными
+              <Switch size="sm" checked={cash} onChange={e => setCash(e.target.checked)} /> наличными
             </label>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>

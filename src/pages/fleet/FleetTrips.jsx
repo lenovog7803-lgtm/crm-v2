@@ -5,6 +5,7 @@ import { TRIP_STATUS } from './FleetTripDetail'
 import { mouseOnly } from '../../motion'
 import { Loader } from '../../components/Loader'
 import Select from '../../components/Select'
+import { EmptyState } from '../../components/EmptyState'
 
 const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#FFFFFF', boxSizing: 'border-box', width: '100%' }
 
@@ -120,9 +121,7 @@ export default function FleetTrips({ onOpenTrip }) {
       {loading ? (
         <Loader padding={20} />
       ) : trips.length === 0 ? (
-        <div className="card" style={{ color: '#A6AEB8', fontSize: 13, padding: 40, textAlign: 'center' }}>
-          Рейсов пока нет — создайте первый.
-        </div>
+        <div className="card"><EmptyState title="Рейсов пока нет" subtitle="Создайте первый рейс — в нём будут направления и заказы" /></div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
           {groupByMonth(trips).map(([mk, monthTrips]) => (

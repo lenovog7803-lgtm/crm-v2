@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getTrash, restoreTrash, purgeTrash } from '../api'
 import { mouseOnly } from '../motion'
 import { Loader } from './Loader'
+import { EmptyState } from './EmptyState'
 
 const TYPE_LABELS = {
   orders: 'Заявка',
@@ -165,11 +166,7 @@ export default function Trash() {
       <div className="card" style={{ overflow: 'hidden' }}>
         {loading && <Loader padding={40} />}
         {!loading && filtered.length === 0 && (
-          <div style={{ padding: 48, textAlign: 'center' }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>🗑</div>
-            <div style={{ fontSize: 14, color: '#A6AEB8', fontWeight: 600 }}>Корзина пуста</div>
-            <div style={{ fontSize: 12, color: '#C4CAD4', marginTop: 6 }}>Удалённые элементы появятся здесь</div>
-          </div>
+          <EmptyState title="Корзина пуста" subtitle="Удалённые заявки, клиенты и перевозчики появятся здесь — их можно будет вернуть" />
         )}
         {!loading && filtered.map((item, i) => {
           const days = item.days_left ?? 30

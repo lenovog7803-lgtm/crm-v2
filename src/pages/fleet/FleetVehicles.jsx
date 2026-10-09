@@ -7,6 +7,7 @@ import { useToast } from '../../components/Toast'
 import { SlidingTabs } from '../../components/SlidingTabs'
 import { Loader } from '../../components/Loader'
 import { SwapText } from '../../components/Transitions'
+import { EmptyState } from '../../components/EmptyState'
 
 const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#FFFFFF', boxSizing: 'border-box', width: '100%' }
 
@@ -156,7 +157,7 @@ export default function FleetVehicles() {
         <Loader padding={20} />
       ) : tab === 'vehicles' ? (
         vehicles.length === 0 ? (
-          <div className="card" style={{ color: '#A6AEB8', fontSize: 13, padding: 40, textAlign: 'center' }}>Машин пока нет.</div>
+          <div className="card"><EmptyState compact title="Машин пока нет" subtitle="Добавьте первую машину" /></div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
             {vehicles.map(v => {
@@ -177,7 +178,7 @@ export default function FleetVehicles() {
         )
       ) : (
         drivers.length === 0 ? (
-          <div className="card" style={{ color: '#A6AEB8', fontSize: 13, padding: 40, textAlign: 'center' }}>Водителей пока нет.</div>
+          <div className="card"><EmptyState compact title="Водителей пока нет" subtitle="Добавьте первого водителя" /></div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
             {drivers.map(d => (

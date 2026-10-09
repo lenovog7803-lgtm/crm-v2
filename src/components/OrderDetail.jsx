@@ -288,7 +288,7 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
 
 export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, onOpenCarrier, onOpenOrder, onDuplicate, onEdit }) {
   const isMobile = useIsMobile()
-  const { show } = useToast()
+  const { show, update } = useToast()
   const { celebrate } = useCelebration()
   const [order, setOrder] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -356,6 +356,10 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
   const handleGenerate = async (type) => {
     console.log('[DOC] Generating type:', type, 'for order:', orderId)
     setDocLoading(prev => ({ ...prev, [type]: true }))
+    const docName = type === 'client' ? 'заявку-договор' : type === 'carrier' ? 'заявку перевозчику' : 'акт'
+    const tid = show(`Формирую ${docName}…`, { type: 'loading' })
+    // уведомление «в процессе» превращается в итог — без второго всплывающего окна
+    const done = (message, opts) => update(tid, { message, type: opts?.type || 'info' })
     try {
       const fn = type === 'client' ? generateClientDoc : type === 'carrier' ? generateCarrierDoc : generateAct
       const result = await fn(orderId)
@@ -366,16 +370,16 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
         setOrder(prev => ({ ...prev, [field]: url }))
         window.open(url, '_blank')
         const docLabel = type === 'client' ? 'Заявка-договор' : type === 'carrier' ? 'Заявка перевозчику' : 'Акт'
-        show(`${docLabel}: документ сформирован`, { type: 'success' })
+        done(`${docLabel}: документ сформирован`, { type: 'success' })
       } else {
         console.error('[DOC] No URL in result:', result)
-        show('Документ создан, но URL не получен', { type: 'error' })
+        done('Документ создан, но URL не получен', { type: 'error' })
       }
     } catch (e) {
       console.error('[DOC] Error:', e)
       const msg = String(e.message || e)
       const tokenIssue = /token|invalid_grant|авторизац|google-токен/i.test(msg)
-      show(
+      done(
         tokenIssue
           ? 'Google-токен истёк. Нажмите 🔑 в блоке «Документы», авторизуйтесь и повторите.'
           : 'Ошибка генерации: ' + msg,

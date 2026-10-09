@@ -3,6 +3,7 @@ import { getBackups, restoreBackup, createBackupNow, getImportPreview, applyImpo
 import { useToast } from '../components/Toast'
 import { useEscapeKey } from '../hooks/useEscapeKey'
 import { Loader } from '../components/Loader'
+import { EmptyState } from '../components/EmptyState'
 
 function fieldVal(v) {
   if (v === null || v === undefined || v === '') return '—'
@@ -234,9 +235,7 @@ export default function Backups() {
       )}
 
       {!loading && !forbidden && backups.length === 0 && (
-        <div className="card" style={{ padding: 30, textAlign: 'center' }}>
-          <div style={{ fontSize: 13, color: '#A6AEB8' }}>Бэкапов пока нет</div>
-        </div>
+        <div className="card"><EmptyState title="Бэкапов пока нет" subtitle="Копия базы делается сама каждую ночь в 23:00, или нажмите «Создать бэкап»" /></div>
       )}
 
       {!loading && !forbidden && backups.map(b => (

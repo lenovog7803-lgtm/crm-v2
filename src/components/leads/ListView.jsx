@@ -12,6 +12,7 @@ import { initials, getGradient } from '../../utils'
 import { mouseOnly } from '../../motion'
 import CallWindow from './CallWindow'
 import Select from '../Select'
+import Switch from '../Switch'
 
 const FILTERS_KEY = 'leads_list_filters'
 const ROW_GRID = 'minmax(0, 1.6fr) minmax(0, 1fr) 130px 120px 90px'
@@ -108,7 +109,7 @@ export default function ListView({ industry }) {
           {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
         </Select>
         <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: '#5A6573', cursor: 'pointer' }}>
-          <input type="checkbox" checked={filters.overdueOnly} onChange={e => set('overdueOnly')(e.target.checked)} />
+          <Switch size="sm" checked={filters.overdueOnly} onChange={e => set('overdueOnly')(e.target.checked)} />
           Только просроченные
         </label>
       </div>

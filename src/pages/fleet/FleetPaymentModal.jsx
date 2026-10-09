@@ -3,6 +3,7 @@ import { updateFleetOrder } from '../../api'
 import { useToast } from '../../components/Toast'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { SwapText } from '../../components/Transitions'
+import Switch from '../../components/Switch'
 
 const today = () => new Date().toISOString().slice(0, 10)
 const fieldStyle = {
@@ -45,7 +46,7 @@ export default function FleetPaymentModal({ order, onClose, onSaved }) {
         <div style={{ fontSize: 14, color: '#5A6573', marginBottom: 20 }}>{order.client_name || '—'} · {(order.rate || 0).toLocaleString('ru-RU')} Br</div>
 
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, cursor: 'pointer', fontSize: 13, color: '#0E1726' }}>
-          <input type="checkbox" checked={isCash} onChange={e => setIsCash(e.target.checked)} />
+          <Switch size="sm" checked={isCash} onChange={e => setIsCash(e.target.checked)} />
           Оплачено наличными (без ПП)
         </label>
 

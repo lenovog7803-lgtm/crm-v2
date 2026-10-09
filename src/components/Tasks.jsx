@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getTasks, updateTask as apiUpdate, deleteTask as apiDelete } from '../api'
 import { ModalOverlay, ModalHeader } from './Modal'
 import { fmtDate } from '../utils'
@@ -8,6 +8,8 @@ import { SlidingTabs } from './SlidingTabs'
 import { mouseOnly } from '../motion'
 import { SuccessCheck } from './Transitions'
 import Select from './Select'
+import { EmptyState } from './EmptyState'
+import { useChangeFlash } from '../hooks/useChangeFlash'
 
 const TYPE_COLORS = { call: '#1366F0', reminder: '#D97706', payment: '#1E9E5A', other: '#8A93A0' }
 const TYPE_BG = { call: 'rgba(19,102,240,0.1)', reminder: 'rgba(217,119,6,0.1)', payment: 'rgba(30,158,90,0.1)', other: 'rgba(138,147,160,0.1)' }
@@ -23,6 +25,8 @@ const labelStyle = { fontSize: 12, fontWeight: 700, color: '#8A93A0', letterSpac
 export default function Tasks({ onAdd, refreshKey, search = '' }) {
   const isMobile = useIsMobile()
   const [tasks, setTasks] = useState([])
+  const ownEdits = useRef(new Set())
+  const liveFlash = useChangeFlash(tasks, t => [t.title, t.status, t.due_date, t.due_time, t.description].join('|'), ownEdits)
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('active')
   const [editTask, setEditTask] = useState(null)
@@ -40,6 +44,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
 
   const handleToggle = (task) => {
     const newStatus = task.status === 'done' ? 'pending' : 'done'
+    ownEdits.current.add(task.id)
     setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: newStatus } : t))
     apiUpdate(task.id, { status: newStatus }).catch(console.error)
   }
@@ -118,7 +123,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
           const done = task.status === 'done'
           const typeKey = task.task_type || 'other'
           return (
-            <div key={task.id} style={{
+            <div key={task.id} className={liveFlash.has(task.id) ? 'row-flash' : undefined} style={{
               display: 'flex', alignItems: 'center', gap: 14,
               padding: '14px 20px',
               borderBottom: i < filtered.length - 1 ? '1px solid rgba(14,23,38,0.05)' : 'none',
@@ -174,7 +179,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
           )
         })}
         {!loading && filtered.length === 0 && (
-          <div style={{ padding: '40px', textAlign: 'center', color: '#A6AEB8', fontSize: 14 }}>Нет задач</div>
+          <EmptyState title="Задач нет" subtitle="Всё сделано — можно выдохнуть. Новая задача появится здесь" />
         )}
       </div>
 

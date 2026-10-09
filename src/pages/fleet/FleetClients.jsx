@@ -3,6 +3,7 @@ import { getFleetClients, deleteFleetClient } from '../../api'
 import { useToast } from '../../components/Toast'
 import { FleetClientModal } from './FleetClientModal'
 import { Loader } from '../../components/Loader'
+import { EmptyState } from '../../components/EmptyState'
 
 export default function FleetClients({ onOpenClient }) {
   const { show } = useToast()
@@ -43,7 +44,7 @@ export default function FleetClients({ onOpenClient }) {
       {loading ? (
         <Loader padding={20} />
       ) : clients.length === 0 ? (
-        <div className="card" style={{ color: '#A6AEB8', fontSize: 13, padding: 40, textAlign: 'center' }}>Клиентов пока нет.</div>
+        <div className="card"><EmptyState title="Клиентов пока нет" subtitle="Добавьте первого клиента автопарка" /></div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
           {clients.map(c => (

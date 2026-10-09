@@ -17,6 +17,8 @@ import { ThinkingOrb } from 'thinking-orbs'
 import { Loader } from '../components/Loader'
 import { IconSwap, PopNumber, SwapText } from '../components/Transitions'
 import Select from '../components/Select'
+import Switch from '../components/Switch'
+import { EmptyState } from '../components/EmptyState'
 
 // «Рассылка» — холодные письма по базе. Вся логика (лимиты, рабочие часы,
 // паузы, напоминания, проверка ответов) живёт в backend/mailing.py, здесь
@@ -931,7 +933,7 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
         </div>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', fontSize: 13, color: '#0E1726' }}>
           <label style={{ display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer' }}>
-            <input type="checkbox" checked={!!c.followup_enabled} onChange={e => set('followup_enabled', e.target.checked)} /> Отправлять напоминание через
+            <Switch size="sm" checked={!!c.followup_enabled} onChange={e => set('followup_enabled', e.target.checked)} /> Отправлять напоминание через
           </label>
           <input type="number" min={1} value={c.followup_days ?? 4} onChange={e => set('followup_days', e.target.value)} style={{ ...inputStyle, width: 70 }} />
           <span>дней</span>
@@ -1150,10 +1152,10 @@ function MailboxSettings({ mailbox, onSaved, onDeleted }) {
         ))}
         <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', fontSize: 13, color: '#0E1726' }}>
           <label style={{ display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer' }}>
-            <input type="checkbox" checked={!!s.auto_limit} onChange={e => set('auto_limit', e.target.checked)} /> Автоматический разгон и защита от бана
+            <Switch size="sm" checked={!!s.auto_limit} onChange={e => set('auto_limit', e.target.checked)} /> Автоматический разгон и защита от бана
           </label>
           <label style={{ display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer' }}>
-            <input type="checkbox" checked={!!s.weekdays_only} onChange={e => set('weekdays_only', e.target.checked)} /> Только будни
+            <Switch size="sm" checked={!!s.weekdays_only} onChange={e => set('weekdays_only', e.target.checked)} /> Только будни
           </label>
         </div>
         <div style={{ fontSize: 12, color: '#8A93A0', lineHeight: 1.6 }}>
@@ -1340,7 +1342,7 @@ function Suppliers({ campaignId }) {
       </div>
       {loading && <Loader padding={30} />}
       {!loading && items.length === 0 && (
-        <div className="card" style={{ padding: 30, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>Поставщиков пока нет</div>
+        <div className="card"><EmptyState title="Поставщиков пока нет" subtitle="Здесь появятся компании, ответившие на направления «закупка» с интересом" /></div>
       )}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 14 }}>
         {items.map(s => (

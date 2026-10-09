@@ -7,6 +7,7 @@ import { useToast } from './Toast'
 import { SlidingTabs } from './SlidingTabs'
 import { mouseOnly } from '../motion'
 import Select from './Select'
+import { EmptyState } from './EmptyState'
 
 export default function Finance({ refreshKey }) {
   const isMobile = useIsMobile()
@@ -692,7 +693,7 @@ function PPLedgerModal({ type, entityId, entityName, onClose }) {
 
         <div style={{ maxHeight: '45vh', overflowY: 'auto' }}>
           {entries.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 30, fontSize: 13, color: '#8A93A0' }}>Платежей пока нет</div>
+            <EmptyState compact title="Платежей пока нет" subtitle="Платежи появятся, когда вы отметите оплату в заявке" />
           ) : entries.map(e => (
             <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: '1px solid #F0F1F4' }}>
               <div style={{ flex: 1 }}>

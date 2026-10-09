@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { ThinkingOrb } from 'thinking-orbs'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useToast } from './Toast'
 import { fmtDate } from '../utils'
 import { mouseOnly } from '../motion'
-import { PopNumber } from './Transitions'
+import { PopNumber, SwapText } from './Transitions'
 import Select from './Select'
 
 const PAGE_META = {
@@ -78,24 +79,33 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
   // bell, sits for a bit, then sinks back into it and vanishes — it stays
   // recorded in the persistent list (the dropdown) regardless, this is
   // purely the "you just got something" cue.
+  // Каждое новое уведомление — всплывашка из колокольчика (как в iOS — стопкой).
+  // «В процессе» (loading) висит, пока не превратится в итог; итог уходит через 3.5 с.
+  const exitScheduled = useRef(new Set())
+  const scheduleExit = (id) => {
+    if (exitScheduled.current.has(id)) return
+    exitScheduled.current.add(id)
+    setTimeout(() => {
+      setBubbles(prev => prev.map(b => b.id === id ? { ...b, phase: 'exit' } : b))
+      setTimeout(() => setBubbles(prev => prev.filter(b => b.id !== id)), 350)
+    }, 3500)
+  }
   useEffect(() => {
     const fresh = notifications.filter(n => !seenIds.current.has(n.id))
-    if (fresh.length === 0) return
     fresh.forEach(n => seenIds.current.add(n.id))
-
-    setBellPulse(true)
-    setTimeout(() => setBellPulse(false), 600)
-
-    setBubbles(prev => [...prev, ...fresh.map(n => ({ id: n.id, notification: n, phase: 'enter' }))])
-    fresh.forEach(n => {
-      setTimeout(() => {
-        setBubbles(prev => prev.map(b => b.id === n.id ? { ...b, phase: 'exit' } : b))
-        setTimeout(() => {
-          setBubbles(prev => prev.filter(b => b.id !== n.id))
-        }, 350)
-      }, 3000)
-    })
+    if (fresh.length) {
+      setBellPulse(true)
+      setTimeout(() => setBellPulse(false), 600)
+      setBubbles(prev => [...prev, ...fresh.map(n => ({ id: n.id, notification: n, phase: 'enter' }))])
+    }
+    const byId = new Map(notifications.map(n => [n.id, n]))
+    // живые данные уведомления (обновился текст/тип) + запуск ухода для завершённых
+    setBubbles(prev => prev.map(b => byId.has(b.id) ? { ...b, notification: byId.get(b.id) } : b))
+    ;[...fresh, ...notifications.filter(n => byId.has(n.id))].forEach(n => { if (n.type !== 'loading') scheduleExit(n.id) })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notifications])
+
+  const [stackHover, setStackHover] = useState(false)
 
   const badgeCount = overdueItems.length + notifications.length
 
@@ -253,46 +263,47 @@ export default function Topbar({ page, onSignOut, period = 'month', onPeriodChan
           )}
         </button>
 
-        {/* Transient bubbles — emerge from the bell, then sink back into it */}
-        <div style={{ position: 'absolute', top: '100%', right: 0, zIndex: 1500, display: 'flex', flexDirection: 'column-reverse', gap: 8, marginTop: 8 }}>
-          {bubbles.map(b => {
+        {/* Всплывающие уведомления — стопкой как в iOS: новое сверху, старые выглядывают сзади; наведение раскрывает стопку */}
+        <div onPointerEnter={() => setStackHover(true)} onPointerLeave={() => setStackHover(false)}
+          style={{ position: 'absolute', top: '100%', right: 0, zIndex: 1500, marginTop: 10, width: 340,
+            height: bubbles.length ? (stackHover ? bubbles.slice(-4).length * 72 : 64 + Math.min(bubbles.length - 1, 2) * 8) : 0,
+            transition: 'height 300ms cubic-bezier(0.22, 1, 0.36, 1)', pointerEvents: bubbles.length ? 'auto' : 'none' }}>
+          {bubbles.slice(-4).reverse().map((b, depth) => {
             const n = b.notification
-            const accent = n.type === 'error' ? '#E0473B' : n.type === 'success' ? '#1E9E5A' : '#1366F0'
-            const tint = n.type === 'error' ? 'rgba(224,71,59,0.1)' : n.type === 'success' ? 'rgba(30,158,90,0.1)' : 'rgba(19,102,240,0.08)'
+            const kind = n.type === 'error' ? 'error' : n.type === 'success' ? 'success' : n.type === 'loading' ? 'loading' : 'info'
+            const icon = {
+              success: ['#34C759', '#248A3D', <polyline key="i" points="20 6 9 17 4 12" />],
+              error: ['#FF453A', '#D70015', <g key="i"><line x1="12" y1="7" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></g>],
+              info: ['#0A84FF', '#0060DF', <g key="i"><line x1="12" y1="16" x2="12" y2="11" /><line x1="12" y1="8" x2="12.01" y2="8" /></g>],
+              loading: ['#8E8E93', '#636366', null],
+            }[kind]
+            const collapsed = !stackHover && depth > 0
             return (
-              <div
-                key={b.id}
-                onClick={() => { setBubbles(prev => prev.filter(x => x.id !== b.id)); dismiss(b.id) }}
+              <div key={b.id}
+                onClick={() => { if (kind === 'loading') return; setBubbles(prev => prev.filter(x => x.id !== b.id)); dismiss(b.id) }}
+                className="ios-notif"
                 style={{
-                  pointerEvents: 'auto', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  minWidth: 240, maxWidth: 340,
-                  background: `linear-gradient(${tint}, ${tint}), rgba(255,255,255,0.85)`,
-                  backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-                  border: `1px solid ${accent}40`, borderRadius: 14, padding: '10px 13px',
-                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 16px 40px -16px rgba(20,30,55,0.35)',
-                  transformOrigin: 'top right',
-                  animation: b.phase === 'enter'
-                    ? 'toastEmerge 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
-                    : 'toastAbsorb 0.35s cubic-bezier(0.5, 0, 0.75, 0) forwards',
-                }}
-              >
-                <div style={{
-                  width: 22, height: 22, borderRadius: 8, flexShrink: 0,
-                  background: `${accent}26`, border: `1px solid ${accent}40`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  position: 'absolute', right: 0, left: 0, top: 0, zIndex: 10 - depth,
+                  transform: collapsed ? `translateY(${Math.min(depth, 2) * 8}px) scale(${1 - Math.min(depth, 2) * 0.05})` : `translateY(${depth * 72}px)`,
+                  opacity: collapsed && depth > 2 ? 0 : 1,
+                  transformOrigin: 'top center',
+                  animation: b.phase === 'enter' ? 'iosNotifIn 0.45s cubic-bezier(0.34, 1.4, 0.64, 1) both' : 'iosNotifOut 0.3s ease-in forwards',
                 }}>
-                  {n.type === 'success' && (
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  )}
-                  {n.type === 'error' && (
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  )}
-                  {n.type === 'info' && (
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="16" x2="12" y2="11"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                  )}
+                <span style={{ width: 34, height: 34, borderRadius: 9, flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  background: `linear-gradient(160deg, ${icon[0]}, ${icon[1]})`, boxShadow: `0 2px 6px -1px ${icon[1]}77, inset 0 1px 0 rgba(255,255,255,0.3)` }}>
+                  {kind === 'loading'
+                    ? <ThinkingOrb state="working" size={20} color="#fff" aria-label="В процессе" />
+                    : <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">{icon[2]}</svg>}
+                </span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, color: '#8A93A0', fontWeight: 600, marginBottom: 1 }}>
+                    <span>{kind === 'loading' ? 'В процессе' : kind === 'success' ? 'Готово' : kind === 'error' ? 'Ошибка' : 'А2 CRM'}</span>
+                    <span>сейчас</span>
+                  </div>
+                  <div style={{ fontSize: 13.5, fontWeight: 500, color: '#0E1726', lineHeight: 1.35, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: collapsed ? 1 : 2, WebkitBoxOrient: 'vertical' }}>
+                    <SwapText>{n.message}</SwapText>
+                  </div>
                 </div>
-                <div style={{ flex: 1, fontSize: 12.5, fontWeight: 500, color: '#0E1726', lineHeight: 1.35 }}>{n.message}</div>
               </div>
             )
           })}

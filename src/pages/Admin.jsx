@@ -10,6 +10,7 @@ import { CallsHeatmap, FunnelChart } from '../components/leads/AnalyticsView'
 import { mouseOnly } from '../motion'
 import { Loader } from '../components/Loader'
 import { SwapText } from '../components/Transitions'
+import Switch from '../components/Switch'
 
 const TABS = [
   { id: 'managers', label: 'Пользователи' },
@@ -115,7 +116,7 @@ function UserDetailModal({ user, onClose, onSaved }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {PERMISSION_OPTIONS.map(p => (
               <label key={p.key} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 10, cursor: 'pointer', fontSize: 13, color: '#0E1726', background: perms[p.key] ? 'rgba(19,102,240,0.06)' : 'transparent' }}>
-                <input type="checkbox" checked={!!perms[p.key]} onChange={() => togglePerm(p.key)} style={{ width: 15, height: 15, accentColor: '#1366F0' }} />
+                <Switch size="sm" checked={!!perms[p.key]} onChange={() => togglePerm(p.key)} style={{ width: 15, height: 15, accentColor: '#1366F0' }} />
                 {p.label}
               </label>
             ))}

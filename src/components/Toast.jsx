@@ -24,7 +24,7 @@ export function ToastProvider({ children }) {
     const notification = {
       id,
       message,
-      type: options.type || 'info',       // info | success | error
+      type: options.type || 'info',       // info | success | error | loading
       actionLabel: options.actionLabel,
       onAction: options.onAction,
       created_at: new Date().toISOString(),
@@ -33,8 +33,13 @@ export function ToastProvider({ children }) {
     return id
   }, [])
 
+  // Обновить уже показанное уведомление: «Генерирую документ…» (type: 'loading') → «Готово» (success)
+  const update = useCallback((id, patch) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, ...patch } : n))
+  }, [])
+
   return (
-    <ToastContext.Provider value={{ notifications, show, dismiss, clearAll }}>
+    <ToastContext.Provider value={{ notifications, show, update, dismiss, clearAll }}>
       {children}
     </ToastContext.Provider>
   )

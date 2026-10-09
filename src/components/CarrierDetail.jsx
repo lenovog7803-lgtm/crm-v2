@@ -5,6 +5,7 @@ import { mouseOnly } from '../motion'
 import { Loader } from './Loader'
 import { StatusOrb } from './StatusOrb'
 import Select from './Select'
+import { EmptyState } from './EmptyState'
 
 function Row({ label, value, mono }) {
   return (
@@ -265,7 +266,7 @@ export default function CarrierDetail({ carrierId, onBack, onDelete, onOpenOrder
         <div className="card" style={{ padding: '20px 22px', gridColumn: '1 / -1' }}>
           <div className="section-label" style={{ marginBottom: 10 }}>ИСТОРИЯ ЗАЯВОК</div>
           {carrierOrders.length === 0 ? (
-            <div style={{ color: '#A6AEB8', fontSize: 13, padding: '12px 0' }}>Нет заявок</div>
+            <EmptyState compact title="Заявок пока нет" />
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               {carrierOrders.slice(0, 15).map(o => (

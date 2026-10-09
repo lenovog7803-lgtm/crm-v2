@@ -3,6 +3,7 @@ import { addPayment, deletePayment, getOrder, updateOrder } from '../api'
 import { useToast } from './Toast'
 import { useEscapeKey } from '../hooks/useEscapeKey'
 import { SwapText } from './Transitions'
+import Switch from './Switch'
 
 const today = () => new Date().toISOString().slice(0, 10)
 
@@ -214,8 +215,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
           padding: '10px 12px', borderRadius: 12, background: isCash ? '#FFF7E8' : '#F7F8FA',
           border: `1px solid ${isCash ? '#F0B84D' : '#E8EAEE'}`,
         }}>
-          <input
-            type="checkbox"
+          <Switch size="sm"
             checked={isCash}
             onChange={e => setIsCash(e.target.checked)}
             style={{ width: 16, height: 16, accentColor: '#D97706', cursor: 'pointer' }}

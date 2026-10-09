@@ -10,6 +10,7 @@ import { SlidingTabs } from './SlidingTabs'
 import { mouseOnly, spring, project, rubberband, velocityTracker, haptic } from '../motion'
 import { SwapText } from './Transitions'
 import { StatusOrb } from './StatusOrb'
+import { useChangeFlash } from '../hooks/useChangeFlash'
 
 const BULK_STATUSES = [
   { id: 'new', label: 'Новая' },
@@ -34,6 +35,9 @@ const DOC_FILTER_OPTIONS = [
 export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '', onClearSearch, scrollToOrderId }) {
   const { show } = useToast()
   const [orders, setOrders] = useState([])
+  // живое обновление: изменённая заявка мягко вспыхивает в списке
+  const liveFlash = useChangeFlash(orders, o => [o.status, o.client_paid, o.carrier_paid, o.client_rate, o.carrier_rate,
+    o.load_date, o.unload_date, o.client_name, o.carrier_name, o.route_from, o.route_to].join('|'))
   const [loading, setLoading] = useState(true)
   // Return-from-detail scroll restore: the row the user last opened gets
   // scrolled into view and briefly flashed once per mount, instead of
@@ -456,6 +460,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 return (
                   <div
                     key={order.id}
+                    className={liveFlash.has(order.id) ? 'row-flash' : undefined}
                     ref={order.id === scrollToOrderId ? scrollTargetRef : null}
                     onClick={() => { if (selectMode) toggleSelect(order.id); else onOpenOrder(order.id) }}
                     style={{
@@ -570,6 +575,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           return (
             <div
               key={order.id}
+              className={liveFlash.has(order.id) ? 'row-flash' : undefined}
               ref={order.id === scrollToOrderId ? scrollTargetRef : null}
               style={{
                 display: 'flex', alignItems: 'center',
