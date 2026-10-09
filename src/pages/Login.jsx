@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { useShake } from '../components/Transitions';
+import GradientLayer from '../components/GradientLayer'
 
 export default function Login() {
   const { signIn } = useAuth();
@@ -25,7 +26,8 @@ export default function Login() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#EDEFF3' }}>
-      <div ref={cardRef} style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(24px)', borderRadius: 24, padding: 40, width: 380, border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 20px 60px rgba(20,30,55,0.15)' }}>
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}><GradientLayer /></div>
+      <div ref={cardRef} style={{ position: 'relative', zIndex: 1, background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(24px)', borderRadius: 24, padding: 40, width: 380, border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 20px 60px rgba(20,30,55,0.15)' }}>
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <img src="/logo-full.svg" alt="AV2" style={{ height: 64, margin: '0 auto 16px', display: 'block' }} />
           <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 24, color: '#0E1726' }}>А2 Group CRM</div>

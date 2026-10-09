@@ -28,6 +28,7 @@ import Reports from './pages/Reports'
 import Mailing from './pages/Mailing'
 import ManagerDashboard from './pages/ManagerDashboard'
 import ErrorBoundary from './components/ErrorBoundary'
+import GradientLayer from './components/GradientLayer'
 import FleetTrips from './pages/fleet/FleetTrips'
 import FleetTripDetail from './pages/fleet/FleetTripDetail'
 import FleetClients from './pages/fleet/FleetClients'
@@ -337,6 +338,7 @@ function MainApp() {
       <div className="aurora-bg">
         <div ref={orbARef} className="aurora-orb-a" />
         <div ref={orbBRef} className="aurora-orb-b" />
+        <GradientLayer />
       </div>
 
       <div className="app-frame">

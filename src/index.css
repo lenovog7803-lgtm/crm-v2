@@ -856,3 +856,7 @@ input[type="number"] {
 .ios-cal-foot button:hover { background: rgba(19,102,240,0.08); }
 @media (prefers-reduced-motion: reduce) { .ios-cal { animation: none; } }
 .ios-row-skel { cursor: default; pointer-events: none; }
+
+/* живой градиент (ShaderGradient) — проявляется плавно, когда WebGL готов */
+.gradient-layer { position: absolute; inset: 0; animation: gradientIn 1.6s ease-out both; }
+@keyframes gradientIn { from { opacity: 0; } to { opacity: 1; } }

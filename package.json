@@ -10,9 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-three/fiber": "^9.8.1",
+    "@shadergradient/react": "^2.4.20",
+    "camera-controls": "^3.1.2",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "thinking-orbs": "^0.3.2"
+    "thinking-orbs": "^0.3.2",
+    "three": "^0.186.1",
+    "three-stdlib": "^2.36.1"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",
