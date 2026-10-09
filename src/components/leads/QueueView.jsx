@@ -7,6 +7,7 @@ import ScriptPanel from './ScriptPanel'
 import LeadEditModal from './LeadEditModal'
 import { useCelebration } from '../Celebration'
 import { useAuth } from '../../AuthContext'
+import { Loader } from '../Loader'
 
 export default function QueueView({ industry, onCounts }) {
   const { user } = useAuth()
@@ -101,7 +102,7 @@ export default function QueueView({ industry, onCounts }) {
         </div>
       </div>
 
-      {loading && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка очереди…</div>}
+      {loading && <Loader padding={40} state="searching" label="Загрузка очереди…" />}
 
       {!loading && !lead && (
         <div className="card" style={{ padding: 60, textAlign: 'center' }}>

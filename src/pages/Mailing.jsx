@@ -14,6 +14,7 @@ import { SlidingTabs } from '../components/SlidingTabs'
 import { CountUp } from '../components/CountUp'
 import { CircularProgress } from '../components/CircularProgress'
 import { useIsMobile } from '../hooks/useIsMobile'
+import { Loader } from '../components/Loader'
 
 // «Рассылка» — холодные письма по базе. Вся логика (лимиты, рабочие часы,
 // паузы, напоминания, проверка ответов) живёт в backend/mailing.py, здесь
@@ -455,7 +456,7 @@ function Replies({ campaignId, loginFor, onChanged }) {
         <SlidingTabs options={[{ key: 'all', label: 'Все' }, { key: 'new', label: 'Новые' }]} value={onlyNew ? 'new' : 'all'} onChange={k => setOnlyNew(k === 'new')} />
         <input value={q} onChange={e => setQ(e.target.value)} placeholder="Поиск по переписке" style={{ ...inputStyle, flex: 1, minWidth: 140 }} />
       </div>
-      {loading && <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
+      {loading && <Loader padding={30} />}
       {!loading && shown.length === 0 && (
         <div className="card" style={{ padding: 30, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>
           {onlyNew ? 'Новых писем нет' : 'Здесь появятся компании, которые ответили на рассылку'}
@@ -583,7 +584,7 @@ function MailThread({ contact: c, gmailHref, onBack, onPatch }) {
 
       <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12, background: '#F7F8FA',
         maxHeight: onBack ? 'none' : 'calc(100dvh - 400px)', minHeight: 200, overflowY: 'auto' }}>
-        {!data && !err && <div style={{ color: '#A6AEB8', textAlign: 'center', padding: 20 }}>Загрузка переписки…</div>}
+        {!data && !err && <Loader padding={20} state="listening" label="Загрузка переписки…" />}
         {err && <div style={{ color: '#E0473B', fontSize: 13 }}>{err}</div>}
         {data?.hint && (
           <div style={{ padding: '10px 12px', borderRadius: 12, background: 'rgba(217,119,6,0.08)', color: '#B45309', fontSize: 12.5, fontWeight: 600 }}>{data.hint}</div>
@@ -797,7 +798,7 @@ function Contacts({ campaignId, campaignName, onChanged, groups = {}, loginFor, 
             ))}
           </tbody>
         </table>
-        {loading && <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
+        {loading && <Loader padding={30} />}
         {!loading && items.length === 0 && (
           <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>
             Контактов нет. Загрузите xlsx: колонки «Компания», «Email», «Имя контакта», «Город», «Приоритет».
@@ -1325,7 +1326,7 @@ function Suppliers({ campaignId }) {
       <div style={{ fontSize: 12, color: '#8A93A0' }}>
         Сюда попадают поставщики, ответившие на направления «закупка», когда во «Ответах» нажимаете «Интерес» или «Сделка».
       </div>
-      {loading && <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
+      {loading && <Loader padding={30} />}
       {!loading && items.length === 0 && (
         <div className="card" style={{ padding: 30, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>Поставщиков пока нет</div>
       )}
@@ -1479,7 +1480,7 @@ export default function Mailing() {
         </div>
       )}
 
-      {!ready && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
+      {!ready && <Loader padding={40} />}
       {ready && (
         <>
           {tab === 'overview' && <Overview state={state} campaignId={campaignId} reload={() => { loadState(); loadCampaigns() }}

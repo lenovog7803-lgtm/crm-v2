@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getTrash, restoreTrash, purgeTrash } from '../api'
 import { mouseOnly } from '../motion'
+import { Loader } from './Loader'
 
 const TYPE_LABELS = {
   orders: 'Заявка',
@@ -162,7 +163,7 @@ export default function Trash() {
       </div>
 
       <div className="card" style={{ overflow: 'hidden' }}>
-        {loading && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>}
+        {loading && <Loader padding={40} />}
         {!loading && filtered.length === 0 && (
           <div style={{ padding: 48, textAlign: 'center' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>🗑</div>

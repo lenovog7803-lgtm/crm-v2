@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getFleetClients, deleteFleetClient } from '../../api'
 import { useToast } from '../../components/Toast'
 import { FleetClientModal } from './FleetClientModal'
+import { Loader } from '../../components/Loader'
 
 export default function FleetClients({ onOpenClient }) {
   const { show } = useToast()
@@ -40,7 +41,7 @@ export default function FleetClients({ onOpenClient }) {
       </div>
 
       {loading ? (
-        <div style={{ color: '#A6AEB8', fontSize: 13, padding: 20 }}>Загрузка…</div>
+        <Loader padding={20} />
       ) : clients.length === 0 ? (
         <div className="card" style={{ color: '#A6AEB8', fontSize: 13, padding: 40, textAlign: 'center' }}>Клиентов пока нет.</div>
       ) : (

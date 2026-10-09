@@ -10,6 +10,7 @@ import LeadEditModal from './LeadEditModal'
 import { useCelebration } from '../Celebration'
 import { useAuth } from '../../AuthContext'
 import { mouseOnly } from '../../motion'
+import { Loader } from '../Loader'
 
 const PAGE_SIZE = 10
 
@@ -180,7 +181,7 @@ export default function KanbanView({ industry }) {
     )
   }
 
-  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>
+  if (loading) return <Loader padding={40} />
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>

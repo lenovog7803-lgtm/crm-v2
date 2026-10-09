@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getLeadsAnalytics, getCallsByDay } from '../../api'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { SlidingTabs } from '../SlidingTabs'
+import { Loader, InlineLoader } from '../Loader'
 
 const PERIODS = [
   { id: 'week', label: 'Неделя' },
@@ -103,7 +104,7 @@ function DayCallsModal({ date, onClose }) {
           </div>
           <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: '#F7F8FA', cursor: 'pointer', fontSize: 18, color: '#8A93A0', flexShrink: 0 }}>×</button>
         </div>
-        <div style={{ fontSize: 12, color: '#8A93A0', marginBottom: 16 }}>{loading ? 'Загрузка…' : `${calls.length} звонков`}</div>
+        <div style={{ fontSize: 12, color: '#8A93A0', marginBottom: 16 }}>{loading ? <InlineLoader state="composing" /> : `${calls.length} звонков`}</div>
         <div style={{ maxHeight: '55vh', overflowY: 'auto' }}>
           {!loading && calls.length === 0 && (
             <div style={{ fontSize: 12.5, color: '#A6AEB8', textAlign: 'center', padding: 20 }}>Звонков в этот день не было</div>
@@ -134,7 +135,7 @@ export default function AnalyticsView() {
     getLeadsAnalytics(period).then(setData).catch(console.error).finally(() => setLoading(false))
   }, [period])
 
-  if (loading || !data) return <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка отчётов…</div>
+  if (loading || !data) return <Loader padding={40} state="composing" label="Загрузка отчётов…" />
 
   const days = data.calls_by_day || []
   const maxCalls = Math.max(data.daily_goal, ...days.map(d => d.calls), 1)

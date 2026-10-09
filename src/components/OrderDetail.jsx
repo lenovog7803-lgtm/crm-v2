@@ -8,6 +8,7 @@ import { useCelebration } from './Celebration'
 import OrderPaymentModal from './OrderPaymentModal'
 import CarrierActModal from './CarrierActModal'
 import { mouseOnly } from '../motion'
+import { Loader } from './Loader'
 
 const STATUSES = [
   { id: 'new', label: 'Новая', color: '#7C3AED', bg: 'rgba(124,58,237,0.1)' },
@@ -387,7 +388,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
     setDocLoading(prev => ({ ...prev, [type]: false }))
   }
 
-  if (loading) return <div style={{ padding: 60, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>
+  if (loading) return <Loader padding={60} />
   if (!order) return <div style={{ padding: 60, textAlign: 'center', color: '#A6AEB8' }}>Заявка не найдена</div>
 
   const view = { ...order, ...draft }

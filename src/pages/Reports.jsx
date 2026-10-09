@@ -3,6 +3,7 @@ import { getReports, runReport, runMorningBriefing, runTaskReminders } from '../
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
 import { fmtMoney } from '../utils'
+import { Loader } from '../components/Loader'
 
 const TABS = [
   { key: 'daily', label: 'Ежедневные' },
@@ -345,7 +346,7 @@ export default function Reports() {
       </div>
 
       {loading ? (
-        <div className="card" style={{ padding: 24, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>Загрузка…</div>
+        <div className="card"><Loader padding={24} state="composing" /></div>
       ) : reports.length === 0 ? (
         <div className="card" style={{ padding: 32, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>
           Отчётов пока нет. Формируются автоматически в 21:00 по Минску (день — каждый день, неделя — в пятницу,

@@ -3,6 +3,7 @@ import { getMyDashboard } from '../api'
 import { CountUp } from '../components/CountUp'
 import LeaderboardView from '../components/leads/LeaderboardView'
 import ErrorBoundary from '../components/ErrorBoundary'
+import { Loader } from '../components/Loader'
 
 const MONTH_RU_SHORT = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек']
 const fmtMonth = m => {
@@ -34,7 +35,7 @@ export default function ManagerDashboard() {
 
   useEffect(() => { load() }, [])
 
-  if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>
+  if (loading) return <Loader padding={40} state="composing" />
   if (error) return (
     <div className="card" style={{ padding: 40, textAlign: 'center' }}>
       <div style={{ fontSize: 13, color: '#C81923', marginBottom: 12 }}>Не удалось загрузить дашборд: {error}</div>

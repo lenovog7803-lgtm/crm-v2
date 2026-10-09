@@ -8,6 +8,7 @@ import { TRIP_STATUS } from './FleetTripDetail'
 import FleetPaymentModal from './FleetPaymentModal'
 import { SlidingTabs } from '../../components/SlidingTabs'
 import { PillBtn } from './fleetUi'
+import { Loader } from '../../components/Loader'
 
 const sLabel = { fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', marginBottom: 12 }
 const SLabel = ({ children }) => <div style={sLabel}>{children}</div>
@@ -245,7 +246,7 @@ export default function FleetOrderDetail({ orderId, onBack }) {
   const load = useCallback(() => getFleetOrder(orderId).then(setOrder).catch(e => show('Ошибка загрузки: ' + e.message, { type: 'error' })), [orderId, show])
   useEffect(() => { load() }, [load])
 
-  if (!order) return <div style={{ color: '#A6AEB8', fontSize: 13, padding: 20 }}>Загрузка…</div>
+  if (!order) return <Loader padding={20} />
 
   const ourContract = order.is_our_contract !== false
   const cur = order.currency || 'BYN'

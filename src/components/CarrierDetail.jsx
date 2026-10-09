@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getCarrier, deleteCarrier as apiDelete, updateCarrier, getOrders } from '../api'
 import { fmtMoney, statusLabel, statusColor, statusBg, getGradient } from '../utils'
 import { mouseOnly } from '../motion'
+import { Loader } from './Loader'
 
 function Row({ label, value, mono }) {
   return (
@@ -72,7 +73,7 @@ export default function CarrierDetail({ carrierId, onBack, onDelete, onOpenOrder
     }).catch(console.error).finally(() => setLoading(false))
   }, [carrierId])
 
-  if (loading) return <div style={{ padding: 60, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>
+  if (loading) return <Loader padding={60} />
   if (!carrier) return <div style={{ padding: 60, textAlign: 'center', color: '#A6AEB8' }}>Перевозчик не найден</div>
 
   const name = carrier.company_name || carrier.name || '—'

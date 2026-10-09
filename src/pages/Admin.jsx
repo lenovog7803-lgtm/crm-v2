@@ -8,6 +8,7 @@ import { useToast } from '../components/Toast'
 import { ModalOverlay, ModalHeader } from '../components/Modal'
 import { CallsHeatmap, FunnelChart } from '../components/leads/AnalyticsView'
 import { mouseOnly } from '../motion'
+import { Loader } from '../components/Loader'
 
 const TABS = [
   { id: 'managers', label: 'Пользователи' },
@@ -222,7 +223,7 @@ function UsersTab() {
 
       <div className="card" style={{ padding: 0, overflow: 'auto' }}>
         {loading ? (
-          <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>
+          <Loader padding={30} />
         ) : users.length === 0 ? (
           <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Пользователей пока нет</div>
         ) : (
@@ -316,7 +317,7 @@ function SessionsTab() {
     }
   }
 
-  if (loading) return <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>
+  if (loading) return <Loader padding={30} />
   if (sessions.length === 0) return <div className="card" style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Активных сессий нет</div>
 
   return (
@@ -356,7 +357,7 @@ function ManagerDetail({ manager, period }) {
     getManagerStatsDetail(manager.id, period === 'today' ? 'week' : period).then(setData).catch(() => setData(null)).finally(() => setLoading(false))
   }, [manager.id, period])
 
-  if (loading) return <div style={{ padding: 24, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>
+  if (loading) return <Loader padding={24} />
   if (!data) return <div style={{ padding: 24, textAlign: 'center', color: '#A6AEB8' }}>Нет данных</div>
 
   return (
@@ -399,7 +400,7 @@ function StatsTab() {
 
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
         {loading ? (
-          <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>
+          <Loader padding={30} />
         ) : sorted.length === 0 ? (
           <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Менеджеров пока нет</div>
         ) : (

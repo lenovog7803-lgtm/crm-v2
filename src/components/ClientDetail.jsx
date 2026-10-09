@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getClient, deleteClient as apiDelete, updateClient, getOrders } from '../api'
 import { initials, fmtMoney, statusLabel, statusColor, statusBg, getGradient } from '../utils'
 import { mouseOnly } from '../motion'
+import { Loader } from './Loader'
 
 function Row({ label, value, mono }) {
   return (
@@ -64,7 +65,7 @@ export default function ClientDetail({ clientId, onBack, onDelete, onOpenOrder }
     }).catch(console.error).finally(() => setLoading(false))
   }, [clientId])
 
-  if (loading) return <div style={{ padding: 60, textAlign: 'center', color: '#A6AEB8' }}>Загрузка...</div>
+  if (loading) return <Loader padding={60} />
   if (!client) return <div style={{ padding: 60, textAlign: 'center', color: '#A6AEB8' }}>Клиент не найден</div>
 
   const [avA, avB] = getGradient(client.name || '')

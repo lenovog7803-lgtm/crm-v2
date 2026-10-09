@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getBackups, restoreBackup, createBackupNow, getImportPreview, applyImportFromSheets } from '../api'
 import { useToast } from '../components/Toast'
 import { useEscapeKey } from '../hooks/useEscapeKey'
+import { Loader } from '../components/Loader'
 
 function fieldVal(v) {
   if (v === null || v === undefined || v === '') return '—'
@@ -224,7 +225,7 @@ export default function Backups() {
         />
       )}
 
-      {loading && <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>}
+      {loading && <Loader padding={40} state="weaving" />}
 
       {!loading && forbidden && (
         <div className="card" style={{ padding: 30, textAlign: 'center' }}>

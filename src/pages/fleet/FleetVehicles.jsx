@@ -5,6 +5,7 @@ import {
 } from '../../api'
 import { useToast } from '../../components/Toast'
 import { SlidingTabs } from '../../components/SlidingTabs'
+import { Loader } from '../../components/Loader'
 
 const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#FFFFFF', boxSizing: 'border-box', width: '100%' }
 
@@ -151,7 +152,7 @@ export default function FleetVehicles() {
       </div>
 
       {loading ? (
-        <div style={{ color: '#A6AEB8', fontSize: 13, padding: 20 }}>Загрузка…</div>
+        <Loader padding={20} />
       ) : tab === 'vehicles' ? (
         vehicles.length === 0 ? (
           <div className="card" style={{ color: '#A6AEB8', fontSize: 13, padding: 40, textAlign: 'center' }}>Машин пока нет.</div>

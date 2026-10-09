@@ -3,6 +3,7 @@ import { getFleetAnalytics } from '../../api'
 import { useToast } from '../../components/Toast'
 import { CountUp } from '../../components/CountUp'
 import { PillBtn } from './fleetUi'
+import { Loader } from '../../components/Loader'
 
 const int = v => Math.round(Number(v) || 0).toLocaleString('ru-RU')
 const MONTHS_RU = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек']
@@ -83,7 +84,7 @@ export default function FleetAnalytics({ onBack }) {
     getFleetAnalytics(p).then(setD).catch(e => show('Ошибка загрузки: ' + e.message, { type: 'error' }))
   }, [from, to, show])
 
-  if (!d) return <div style={{ color: '#A6AEB8', fontSize: 13, padding: 20 }}>Загрузка…</div>
+  if (!d) return <Loader padding={20} state="composing" />
 
   const inp = { height: 38, padding: '0 12px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)', fontFamily: 'Manrope', fontSize: 13, color: '#0E1726' }
   const profitColor = v => (Number(v) >= 0 ? '#1E9E5A' : '#E0473B')

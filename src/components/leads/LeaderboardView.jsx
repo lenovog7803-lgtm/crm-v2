@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getLeaderboard } from '../../api'
 import { useAuth } from '../../AuthContext'
+import { Loader } from '../Loader'
 
 const PERIODS = [
   { id: 'today', label: 'Сегодня' },
@@ -38,7 +39,7 @@ export default function LeaderboardView() {
       </div>
 
       {loading ? (
-        <div style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</div>
+        <Loader padding={40} state="composing" />
       ) : rows.length === 0 ? (
         <div className="card" style={{ padding: 40, textAlign: 'center', color: '#A6AEB8' }}>Пока нет менеджеров для рейтинга</div>
       ) : (

@@ -3,6 +3,7 @@ import { getFleetTrips, createFleetTrip, getFleetVehicles, getFleetDrivers } fro
 import { useToast } from '../../components/Toast'
 import { TRIP_STATUS } from './FleetTripDetail'
 import { mouseOnly } from '../../motion'
+import { Loader } from '../../components/Loader'
 
 const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#FFFFFF', boxSizing: 'border-box', width: '100%' }
 
@@ -116,7 +117,7 @@ export default function FleetTrips({ onOpenTrip }) {
       </div>
 
       {loading ? (
-        <div style={{ color: '#A6AEB8', fontSize: 13, padding: 20 }}>Загрузка…</div>
+        <Loader padding={20} />
       ) : trips.length === 0 ? (
         <div className="card" style={{ color: '#A6AEB8', fontSize: 13, padding: 40, textAlign: 'center' }}>
           Рейсов пока нет — создайте первый.

@@ -45,6 +45,7 @@ import PaymentModal from './components/PaymentModal'
 import MobileNav from './components/MobileNav'
 import CommandPalette from './components/CommandPalette'
 import { useRealtime } from './hooks/useRealtime'
+import { Loader } from './components/Loader'
 
 const SEARCH_STORAGE_KEYS = {
   orders: 'search_orders',
@@ -505,7 +506,7 @@ function AppContent() {
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#EDEFF3' }}>
-        <div style={{ fontSize: 14, color: '#A6AEB8' }}>Загрузка...</div>
+        <Loader padding={0} state="breathing" />
       </div>
     )
   }

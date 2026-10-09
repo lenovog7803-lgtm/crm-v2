@@ -3,6 +3,7 @@ import { getMissingPP, getKudirEntries, updateKudirEntry, unlockKudirEntry, expo
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
 import { fmtMoney, fmtDate } from '../utils'
+import { Loader } from '../components/Loader'
 
 const TABS = [
   { key: 'backfill', label: 'Дозаполнить' },
@@ -116,7 +117,7 @@ function BackfillTab() {
         Осталось дозаполнить: {orders.length}
       </div>
       {loading ? (
-        <div style={{ padding: 24, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>Загрузка…</div>
+        <Loader padding={24} />
       ) : orders.length === 0 ? (
         <div style={{ padding: 24, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>Всё заполнено</div>
       ) : (
@@ -300,7 +301,7 @@ function BookTab() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={5} style={{ padding: 24, textAlign: 'center', color: '#A6AEB8' }}>Загрузка…</td></tr>
+              <tr><td colSpan={5}><Loader padding={24} /></td></tr>
             ) : filteredEntries.length === 0 ? (
               <tr><td colSpan={5} style={{ padding: 24, textAlign: 'center', color: '#A6AEB8' }}>
                 {needle ? 'Ничего не найдено' : 'Нет записей за период'}

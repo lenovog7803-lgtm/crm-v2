@@ -5,6 +5,7 @@ import { CountUp } from '../../components/CountUp'
 import { TRIP_STATUS } from './FleetTripDetail'
 import { PillBtn } from './fleetUi'
 import { mouseOnly } from '../../motion'
+import { Loader } from '../../components/Loader'
 
 const money = v => `${Math.round(Number(v) || 0).toLocaleString('ru-RU')} BYN`
 const int = v => Math.round(Number(v) || 0).toLocaleString('ru-RU')
@@ -22,7 +23,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
     getFleetDashboard(month).then(setD).catch(e => show('Ошибка загрузки: ' + e.message, { type: 'error' }))
   }, [month, show])
 
-  if (!d) return <div style={{ color: '#A6AEB8', fontSize: 13, padding: 20 }}>Загрузка…</div>
+  if (!d) return <Loader padding={20} state="composing" />
 
   const st = d.trips_by_status || {}
   const trips = d.trips || []

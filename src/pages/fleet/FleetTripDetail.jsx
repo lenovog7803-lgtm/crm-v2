@@ -8,6 +8,7 @@ import { useToast } from '../../components/Toast'
 import { FleetOrderModal, fmtDate } from './FleetOrderModal'
 import { SlidingTabs } from '../../components/SlidingTabs'
 import { PillBtn } from './fleetUi'
+import { Loader } from '../../components/Loader'
 
 const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#FFFFFF', boxSizing: 'border-box' }
 const num = v => (v === '' || v == null || isNaN(Number(v)) ? 0 : Number(v))
@@ -492,7 +493,7 @@ export default function FleetTripDetail({ tripId, onBack, onOpenOrder }) {
 
   useEffect(() => { load() }, [load])
 
-  if (!trip) return <div style={{ color: '#A6AEB8', fontSize: 13, padding: 20 }}>Загрузка…</div>
+  if (!trip) return <Loader padding={20} />
 
   const saveTripInfo = async (data) => {
     try {

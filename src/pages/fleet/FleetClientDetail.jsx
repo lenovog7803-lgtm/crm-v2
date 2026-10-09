@@ -4,6 +4,7 @@ import { useToast } from '../../components/Toast'
 import { FleetClientModal } from './FleetClientModal'
 import { fmtDate } from './FleetOrderModal'
 import { PillBtn } from './fleetUi'
+import { Loader } from '../../components/Loader'
 
 const fld = { height: 36, padding: '0 10px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#fff' }
 
@@ -133,7 +134,7 @@ export default function FleetClientDetail({ clientId, onBack, onOpenOrder }) {
 
   useEffect(() => { load() }, [load])
 
-  if (!client) return <div style={{ color: '#A6AEB8', fontSize: 13, padding: 20 }}>Загрузка…</div>
+  if (!client) return <Loader padding={20} />
 
   const total = orders.reduce((s, o) => s + (o.rate || 0), 0)
 
