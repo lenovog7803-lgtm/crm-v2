@@ -814,3 +814,13 @@ input[type="number"] {
 
 /* длинный номер/название в шапке — в одну строку с многоточием */
 .ios-title, .ios-subtitle { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* iOS 26: группа полей в форме — белая карточка на сером листе («Настройки») */
+.ios-form-group {
+  display: flex; flex-direction: column; gap: 12px;
+  background: rgba(255,255,255,0.9); border-radius: 20px; padding: 16px;
+  box-shadow: 0 0 0 0.5px rgba(14,23,38,0.06), 0 1px 3px rgba(14,23,38,0.04);
+}
+/* поля внутри группы — серая заливка видна на белом */
+.app-root .ios-form-group input:not([type="checkbox"]):not([type="radio"]):not([data-plain]),
+.app-root .ios-form-group textarea { background: rgba(118,118,128,0.1) !important; }

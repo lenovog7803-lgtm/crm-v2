@@ -26,8 +26,9 @@ const iStyle = {
 }
 
 const labelSt = {
-  fontSize: 11, fontWeight: 700, color: '#8A93A0',
-  letterSpacing: '0.06em', marginBottom: 5, display: 'block',
+  fontSize: 13, fontWeight: 500, color: '#6B7480',
+  marginBottom: 6, paddingLeft: 4, display: 'block',
+  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
 }
 
 function Field({ label, children }) {
@@ -45,7 +46,7 @@ function Grid2({ children }) {
 
 function SectionTitle({ title }) {
   return (
-    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: '#A6AEB8', paddingBottom: 8, borderBottom: '1px solid rgba(14,23,38,0.07)' }}>
+    <div style={{ fontSize: 16, fontWeight: 700, color: '#0E1726', letterSpacing: '-0.01em' }}>
       {title}
     </div>
   )
@@ -244,10 +245,10 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
         {/* 1. Стороны */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <SectionTitle title="СТОРОНЫ" />
+        <div className="ios-form-group">
+          <SectionTitle title="Стороны" />
           <Grid2>
-            <Field label="КЛИЕНТ">
+            <Field label="Клиент">
               <ComboSelect
                 value={form.client_name}
                 onTextChange={v => upd('client_name', v)}
@@ -257,7 +258,7 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
                 labelFn={c => c.name || ''}
               />
             </Field>
-            <Field label="ПЕРЕВОЗЧИК">
+            <Field label="Перевозчик">
               <ComboSelect
                 value={form.carrier_name}
                 onTextChange={v => upd('carrier_name', v)}
@@ -271,22 +272,22 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
         </div>
 
         {/* 2. Маршрут */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <SectionTitle title="МАРШРУТ" />
+        <div className="ios-form-group">
+          <SectionTitle title="Маршрут" />
           <Grid2>
-            <Field label="ОТКУДА (ГОРОД)">
+            <Field label="Откуда">
               <CityInput value={form.route_from} onChange={v => upd('route_from', v)} placeholder="Город отправления" />
             </Field>
-            <Field label="КУДА (ГОРОД)">
+            <Field label="Куда">
               <CityInput value={form.route_to} onChange={v => upd('route_to', v)} placeholder="Город назначения" />
             </Field>
           </Grid2>
           <Grid2>
-            <Field label="ТОЧНЫЙ АДРЕС ЗАГРУЗКИ">
+            <Field label="Адрес загрузки">
               <input value={form.route_from_address} onChange={e => upd('route_from_address', e.target.value)}
                 placeholder="Улица, дом, склад, контакт..." style={iStyle} />
             </Field>
-            <Field label="ТОЧНЫЙ АДРЕС ВЫГРУЗКИ">
+            <Field label="Адрес выгрузки">
               <input value={form.route_to_address} onChange={e => upd('route_to_address', e.target.value)}
                 placeholder="Улица, дом, склад, контакт..." style={iStyle} />
             </Field>
@@ -294,31 +295,31 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
         </div>
 
         {/* 3. Даты */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <SectionTitle title="ДАТЫ" />
+        <div className="ios-form-group">
+          <SectionTitle title="Даты" />
           <Grid2>
-            <Field label="ДАТА ЗАГРУЗКИ">
+            <Field label="Загрузка">
               <input type="date" value={form.load_date} onChange={e => upd('load_date', e.target.value)} style={iStyle} />
             </Field>
-            <Field label="ДАТА ВЫГРУЗКИ">
+            <Field label="Выгрузка">
               <input type="date" value={form.unload_date} onChange={e => upd('unload_date', e.target.value)} style={iStyle} />
             </Field>
           </Grid2>
         </div>
 
         {/* 4. Финансы */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <SectionTitle title="ФИНАНСЫ" />
+        <div className="ios-form-group">
+          <SectionTitle title="Финансы" />
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
-            <Field label="СТАВКА КЛИЕНТА (Br)">
+            <Field label="Клиент платит, Br">
               <input type="number" value={form.client_rate} onChange={e => upd('client_rate', e.target.value)}
                 placeholder="0" style={iStyle} />
             </Field>
-            <Field label="СТАВКА ПЕРЕВОЗЧИКА (Br)">
+            <Field label="Перевозчику, Br">
               <input type="number" value={form.carrier_rate} onChange={e => upd('carrier_rate', e.target.value)}
                 placeholder="0" style={iStyle} />
             </Field>
-            <Field label="СРОК ОПЛАТЫ (ДНЕЙ)">
+            <Field label="Отсрочка, дней">
               <input type="number" value={form.payment_days} onChange={e => upd('payment_days', e.target.value)}
                 placeholder="20" style={iStyle} />
             </Field>
@@ -338,18 +339,18 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
         </div>
 
         {/* 5. ТС и водитель */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <SectionTitle title="ТС И ВОДИТЕЛЬ" />
-          <Field label="ТС И ВОДИТЕЛЬ (номер, тип, ФИО, телефон)">
+        <div className="ios-form-group">
+          <SectionTitle title="ТС и водитель" />
+          <Field label="Номер, тип ТС, ФИО и телефон водителя">
             <input value={form.vehicle_info} onChange={e => upd('vehicle_info', e.target.value)}
               placeholder="А000АА77, Газель, Иванов Иван, +375291234567" style={iStyle} />
           </Field>
           <Grid2>
-            <Field label="ГРУЗ">
+            <Field label="Груз">
               <input value={form.cargo} onChange={e => upd('cargo', e.target.value)}
                 placeholder="Описание груза" style={iStyle} />
             </Field>
-            <Field label="ВЕС (Т)">
+            <Field label="Вес, т">
               <input type="number" value={form.weight_tons} onChange={e => upd('weight_tons', e.target.value)}
                 placeholder="0.0" style={iStyle} />
             </Field>
@@ -357,8 +358,8 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
         </div>
 
         {/* 6. Примечания */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <SectionTitle title="ПРИМЕЧАНИЯ" />
+        <div className="ios-form-group">
+          <SectionTitle title="Примечания" />
           <textarea value={form.notes} onChange={e => upd('notes', e.target.value)}
             placeholder="Дополнительная информация..."
             style={{ ...iStyle, height: 72, padding: '10px 12px', resize: 'vertical' }} />
