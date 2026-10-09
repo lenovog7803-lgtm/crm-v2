@@ -662,21 +662,34 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         </div>
 
         {[
-          { icon: 'in', label: 'Ожидается от клиентов', color: '#D97706', value: clientDebt, count: debtorOrders.length, onClick: () => setShowDebtors(true) },
-          { icon: 'out', label: 'К оплате перевозчикам', color: '#7C3AED', value: carrierDebt, count: carrierDebtOrders.length, onClick: () => setShowCarrierDebt(true) },
+          { key: 'in', label: 'Ожидается от клиентов', value: clientDebt, count: debtorOrders.length, onClick: () => setShowDebtors(true),
+            grad: ['#D4843F', '#E09A58', '#B9682A'], fill: 'linear-gradient(150deg, #EAA766 0%, #DC8E48 55%, #C97A36 100%)', shadow: '200,120,50' },
+          { key: 'out', label: 'К оплате перевозчикам', value: carrierDebt, count: carrierDebtOrders.length, onClick: () => setShowCarrierDebt(true),
+            grad: ['#8164D4', '#9C84E3', '#6A4DBE'], fill: 'linear-gradient(150deg, #A68CE8 0%, #8C6FDB 55%, #7A5CCB 100%)', shadow: '120,90,200' },
         ].map(w => (
-          <div key={w.icon} className="ios-widget" onClick={w.onClick}
-            {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.9), 0 14px 40px -22px rgba(20,30,55,0.22)', 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 46px -18px rgba(20,30,55,0.3)')}
-            style={{ padding: isMobile ? '16px 18px' : '22px 24px', cursor: 'pointer' }}>
-            <WidgetHead label={w.label} color={w.color} right={<Chevron color={w.color} />} />
+          // как «Маржа»: свой мягкий живой градиент в цвете карточки, белый текст
+          <div key={w.key} onClick={w.onClick}
+            {...liftHandlers(`inset 0 1px 0 rgba(255,255,255,0.4), 0 18px 44px -22px rgba(${w.shadow},0.45)`, `inset 0 1px 0 rgba(255,255,255,0.4), 0 24px 54px -18px rgba(${w.shadow},0.52)`)}
+            style={{
+              background: `radial-gradient(120% 80% at 10% -20%, rgba(255,255,255,0.3), transparent 50%), ${w.fill}`,
+              border: '1px solid rgba(255,255,255,0.35)', borderRadius: 26, color: '#fff',
+              padding: isMobile ? '16px 18px' : '22px 24px', cursor: 'pointer',
+              boxShadow: `inset 0 1px 0 rgba(255,255,255,0.4), 0 18px 44px -22px rgba(${w.shadow},0.45)`,
+              transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
+              position: 'relative', overflow: 'hidden', isolation: 'isolate',
+            }}>
+            <div style={{ position: 'absolute', inset: 0, zIndex: -1, borderRadius: 'inherit', overflow: 'hidden', pointerEvents: 'none' }}>
+              <GradientLayer colors={w.grad} speed={0.16} />
+            </div>
+            <WidgetHead label={w.label} labelColor="rgba(255,255,255,0.92)" right={<Chevron color="#fff" />} />
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-              <span style={{ fontWeight: 700, fontSize: isMobile ? 28 : 34, letterSpacing: '-0.03em', color: '#0E1726', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontWeight: 700, fontSize: isMobile ? 28 : 34, letterSpacing: '-0.03em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                 <CountUp value={w.value} />
               </span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#A6AEB8' }}>BYN</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.72)' }}>BYN</span>
             </div>
-            <div style={{ marginTop: isMobile ? 10 : 16, fontSize: 13, color: '#8A93A0' }}>
-              <span style={{ fontWeight: 600, color: w.color }}>{w.count}</span> заявок
+            <div style={{ marginTop: isMobile ? 10 : 16, fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>
+              <span style={{ fontWeight: 700, color: '#fff' }}>{w.count}</span> заявок
             </div>
           </div>
         ))}
