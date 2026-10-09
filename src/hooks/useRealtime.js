@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { getToken } from '../api'
 
 const WS_URL = (import.meta.env.VITE_API_URL || 'https://logistics-crm-backend.onrender.com/api')
   .replace(/^http/, 'ws')
@@ -15,7 +16,8 @@ export function useRealtime(onEvent) {
     let pingTimer = null
 
     function connect() {
-      const ws = new WebSocket(WS_URL)
+      // сервер пускает в живые обновления только вошедших
+      const ws = new WebSocket(`${WS_URL}?token=${encodeURIComponent(getToken() || '')}`)
       wsRef.current = ws
 
       ws.onopen = () => { retryRef.current = 1000 }
