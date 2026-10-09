@@ -35,7 +35,8 @@ function AppIcon({ kind, size = 36 }) {
 }
 
 const GROUP = { order: 'Заявки', client: 'Клиенты', carrier: 'Перевозчики', lead: 'Лиды', task: 'Задачи' }
-const GROUP_ORDER = ['order', 'client', 'carrier', 'lead', 'task']
+// сначала сами клиенты и перевозчики, потом их заявки — при поиске по названию нужная карточка сверху
+const GROUP_ORDER = ['client', 'carrier', 'order', 'lead', 'task']
 const QUICK = [
   { kind: 'order', key: 'orders', title: 'Заявки', sub: 'Все перевозки' },
   { kind: 'client', key: 'clients', title: 'Клиенты', sub: 'База клиентов' },
