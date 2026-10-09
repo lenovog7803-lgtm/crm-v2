@@ -640,9 +640,12 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
   const [preview, setPreview] = useState(null)
   const [busy, setBusy] = useState(false)
   const set = (k, v) => setC(prev => ({ ...prev, [k]: v }))
+  const boxes = c.mailbox_ids?.length ? c.mailbox_ids : [c.mailbox_id || 'main']
+  // хотя бы одна почта должна остаться
+  const toggleBox = (id) => set('mailbox_ids', boxes.includes(id) ? (boxes.length > 1 ? boxes.filter(x => x !== id) : boxes) : [...boxes, id])
 
   const payload = () => ({
-    name: c.name, kind: c.kind, mailbox_id: c.mailbox_id, subjects: c.subjects, body: c.body,
+    name: c.name, kind: c.kind, mailbox_ids: boxes, subjects: c.subjects, body: c.body,
     followup_body: c.followup_body, followup_enabled: !!c.followup_enabled, followup_days: c.followup_days,
   })
 
@@ -699,10 +702,25 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
             </select>
           </div>
           <div>
-            <div style={labelStyle}>С какой почты</div>
-            <select value={c.mailbox_id || 'main'} onChange={e => set('mailbox_id', e.target.value)} style={inputStyle}>
-              {mailboxes.map(m => <option key={m.id} value={m.id}>{m.login || m.name}</option>)}
-            </select>
+            <div style={labelStyle}>С каких почт{boxes.length > 1 ? ` · ${boxes.length}` : ''}</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {mailboxes.map(m => {
+                const on = boxes.includes(m.id)
+                return (
+                  <button key={m.id} type="button" onClick={() => toggleBox(m.id)} aria-pressed={on}
+                    style={{ padding: '7px 11px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                      border: `1px solid ${on ? '#2563EB' : 'rgba(14,23,38,0.12)'}`,
+                      background: on ? 'rgba(37,99,235,0.08)' : '#fff', color: on ? '#1D4ED8' : '#5A6573' }}>
+                    {on ? '✓ ' : ''}{m.login || m.name || 'Почта'}
+                  </button>
+                )
+              })}
+            </div>
+            {boxes.length > 1 && (
+              <div style={{ fontSize: 12, color: '#5A6573', marginTop: 6 }}>
+                Каждая почта шлёт свой дневной лимит, напоминание уходит с той же почты, что и первое письмо.
+              </div>
+            )}
           </div>
         </div>
         {hasBlanks && (
@@ -1237,7 +1255,8 @@ export default function Mailing() {
   const hasPurchase = (campaigns || []).some(c => c.kind === 'purchase')
   const loginFor = (cid) => {
     const c = (campaigns || []).find(x => x.id === cid)
-    return (mailboxes || []).find(m => m.id === (c?.mailbox_id || 'main'))?.login || ''
+    const ids = c?.mailbox_ids?.length ? c.mailbox_ids : [c?.mailbox_id || 'main']
+    return (mailboxes || []).filter(m => ids.includes(m.id)).map(m => m.login).filter(Boolean).join(', ')
   }
   const ready = state && campaigns && mailboxes
 
