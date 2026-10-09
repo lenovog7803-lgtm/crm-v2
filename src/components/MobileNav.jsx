@@ -248,7 +248,7 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
 
   return (
     <>
-    // iOS 26: плавающая стеклянная капсула над краем экрана, активная вкладка — стеклянная линза
+    {/* iOS 26: плавающая стеклянная капсула над краем экрана, активная вкладка — стеклянная линза */}
     <div className="mobile-nav liquid-glass lg-tabbar" style={{
       position: 'fixed', zIndex: 1000,
       left: 14, right: 14, bottom: 'calc(8px + env(safe-area-inset-bottom))',
