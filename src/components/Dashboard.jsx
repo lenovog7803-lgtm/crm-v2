@@ -241,17 +241,15 @@ function buildChartData(orders, period) {
 
 const WIDGET_ICONS = {
   margin: <polyline points="2 11 6 7 9 9 14 3" />,
-  in: <><path d="M8 2v8" /><polyline points="4.5 6.5 8 10 11.5 6.5" /><path d="M2.5 13.5h11" /></>,
-  out: <><path d="M8 11V3" /><polyline points="4.5 6.5 8 3 11.5 6.5" /><path d="M2.5 13.5h11" /></>,
 }
 
 // Шапка виджета как в iOS: цветной значок + подпись, справа — что угодно (бейдж, стрелка).
 function WidgetHead({ icon, label, color, labelColor = color, right }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-      <div style={{ width: 24, height: 24, borderRadius: 8, background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+      {icon && <div style={{ width: 24, height: 24, borderRadius: 8, background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{WIDGET_ICONS[icon]}</svg>
-      </div>
+      </div>}
       <div style={{ fontSize: 13, fontWeight: 600, color: labelColor, letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
       {right && <div style={{ marginLeft: 'auto', flexShrink: 0 }}>{right}</div>}
     </div>
@@ -671,7 +669,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           <div key={w.icon} className="ios-widget" onClick={w.onClick}
             {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.9), 0 14px 40px -22px rgba(20,30,55,0.22)', 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 46px -18px rgba(20,30,55,0.3)')}
             style={{ padding: isMobile ? '16px 18px' : '22px 24px', cursor: 'pointer' }}>
-            <WidgetHead icon={w.icon} label={w.label} color={w.color} right={<Chevron color={w.color} />} />
+            <WidgetHead label={w.label} color={w.color} right={<Chevron color={w.color} />} />
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
               <span style={{ fontWeight: 700, fontSize: isMobile ? 28 : 34, letterSpacing: '-0.03em', color: '#0E1726', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                 <CountUp value={w.value} />
