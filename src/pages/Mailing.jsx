@@ -235,13 +235,18 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
           {multi && (
             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 4, marginTop: 10 }}>
               {boxes.map(m => {
-                const st = m.health?.status || 'ok'
-                const dot = st === 'stop' ? '#E0473B' : st === 'ok' ? '#0E9F6E' : '#D97706'
+                const mh = m.health || {}
+                const st = mh.status || 'ok'
+                // меньше 10 писем — процент ещё ничего не значит (1 из 4 = 25%), защита судит с 10-го
+                const early = st === 'ok' && (mh.sent_7d || 0) < 10 && (mh.bounced_7d || 0) > 0
+                const dot = st === 'stop' ? '#E0473B' : st === 'ok' && !early ? '#0E9F6E' : '#D97706'
                 return (
-                  <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: healthCard.deep }}>
+                  <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: healthCard.deep }}
+                    title={early ? 'Мало писем для выводов — защита оценивает почту с 10 отправленных' : undefined}>
                     <span style={{ width: 7, height: 7, borderRadius: 99, background: dot, flexShrink: 0 }} />
                     <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.login || m.name}</span>
-                    <b>{m.health?.bounce_rate ?? 0}%</b>
+                    <span style={{ opacity: 0.7 }}>{mh.bounced_7d ?? 0} из {mh.sent_7d ?? 0}</span>
+                    <b style={{ minWidth: 34, textAlign: 'right' }}>{mh.bounce_rate ?? 0}%</b>
                   </div>
                 )
               })}
@@ -249,9 +254,14 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
           )}
           <div style={{ marginTop: 14, display: 'inline-block', padding: '4px 10px', borderRadius: 99, background: 'rgba(255,255,255,0.55)',
             fontSize: 12, fontWeight: 700, color: healthCard.deep }}>
-            {healthCard.label}
+            {healthTone === 'ok' && bounceRate > 4 ? 'Норма · мало писем для выводов' : healthCard.label}
           </div>
           {h.reason && <div style={{ fontSize: 11.5, color: healthCard.ink, marginTop: 8, lineHeight: 1.4 }}>{h.reason}</div>}
+          {!h.reason && healthTone === 'ok' && bounceRate > 4 && (
+            <div style={{ fontSize: 11.5, color: healthCard.ink, marginTop: 8, lineHeight: 1.4 }}>
+              Защита оценивает каждую почту с 10 отправленных: больше 4% — темп вдвое ниже, больше 8% (от 20 писем) — остановка.
+            </div>
+          )}
         </div>
       </div>
 
