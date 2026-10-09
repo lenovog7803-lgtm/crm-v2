@@ -21,6 +21,7 @@ const PAGE_META = {
   leads: { title: 'База обзвона', subtitle: 'Лиды и потенциальные клиенты' },
   mailing: { title: 'Рассылка', subtitle: 'Холодные письма по базе' },
   backups: { title: 'Резервные копии', subtitle: 'Автоматические снимки базы' },
+  kudir: { title: 'КУДиР', subtitle: 'Книга учёта доходов и расходов' },
   'fleet-dashboard': { title: 'Дашборд', subtitle: 'Свой автопарк' },
   'fleet-analytics': { title: 'Аналитика', subtitle: 'Свой автопарк' },
   'fleet-trips': { title: 'Рейсы', subtitle: 'Свой автопарк' },

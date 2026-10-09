@@ -379,7 +379,7 @@ function EntryRow({ entry, onChanged }) {
           onFocus={focusCell}
           onBlur={e => { blurCell(e); save('entry_date', fields.entry_date) }}
           disabled={saving === 'entry_date'}
-          style={cellInputStyle}
+          data-plain style={cellInputStyle}
         />
       </td>
       <td style={{ padding: '6px 12px' }}>
@@ -389,7 +389,7 @@ function EntryRow({ entry, onChanged }) {
           onFocus={focusCell}
           onBlur={e => { blurCell(e); save('document_ref', fields.document_ref) }}
           disabled={saving === 'document_ref'}
-          style={cellInputStyle}
+          data-plain style={cellInputStyle}
         />
       </td>
       <td style={{ padding: '6px 12px' }}>
@@ -403,7 +403,7 @@ function EntryRow({ entry, onChanged }) {
             onFocus={focusCell}
             onBlur={e => { blurCell(e); save('content', fields.content) }}
             disabled={saving === 'content'}
-            style={cellInputStyle}
+            data-plain style={cellInputStyle}
           />
         </div>
       </td>
@@ -415,7 +415,7 @@ function EntryRow({ entry, onChanged }) {
           onFocus={focusCell}
           onBlur={e => { blurCell(e); save('income_amount', fields.income_amount) }}
           disabled={saving === 'income_amount'}
-          style={{ ...cellInputStyle, textAlign: 'right', fontWeight: 600, color: fields.income_amount != null && fields.income_amount !== '' ? '#1E9E5A' : '#A6AEB8' }}
+          data-plain style={{ ...cellInputStyle, textAlign: 'right', fontWeight: 600, color: fields.income_amount != null && fields.income_amount !== '' ? '#1E9E5A' : '#A6AEB8' }}
           placeholder="—"
         />
       </td>
@@ -427,7 +427,7 @@ function EntryRow({ entry, onChanged }) {
             onFocus={focusCell}
             onBlur={e => { blurCell(e); save('note', fields.note) }}
             disabled={saving === 'note'}
-            style={cellInputStyle}
+            data-plain style={cellInputStyle}
           />
           {locked && (
             <button
