@@ -443,9 +443,9 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
       {/* Nav */}
       <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4, position: 'relative' }}>
         {pillRect && (
-          <div className="lg-lens" style={{
+          <div style={{
             position: 'absolute', left: 0, right: 0, top: pillRect.top, height: pillRect.height,
-            borderRadius: 12, background: 'rgba(19,102,240,0.1)',
+            borderRadius: 12, background: 'rgba(19,102,240,0.1)',  // тонированная заливка без тени — как выделение в боковой панели iPad/Mac
             opacity: drag ? 0 : 1,  // во время перетаскивания подсветка не мешает
             transition: 'top 0.25s var(--ease), height 0.25s var(--ease), opacity 0.15s',
             pointerEvents: 'none', zIndex: 0,
