@@ -615,7 +615,7 @@ input[type="number"] {
 @media (prefers-reduced-motion: reduce) { .ios-notif { animation: none !important; transition: none !important; } }
 
 /* ===== Liquid Glass (как в iOS 26 / macOS Tahoe) — на чистом CSS, без снимков страницы ===== */
-.liquid-glass {
+.liquid-glass, .ios-widget {
   isolation: isolate;
   background: linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.40) 100%) !important;
   backdrop-filter: blur(28px) saturate(210%) brightness(1.04) !important;
@@ -629,14 +629,14 @@ input[type="number"] {
 }
 .liquid-glass:not(.mobile-nav):not(.apple-select-menu):not(.spotlight):not(.ios-notif) { position: relative; }
 /* светящийся край: свет падает сверху-слева и отражается снизу-справа */
-.liquid-glass::before {
+.liquid-glass::before, .ios-widget::before {
   content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 1px; pointer-events: none;
   background: linear-gradient(140deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.15) 35%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.55) 100%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
 }
 /* мягкий блик по верху — «толщина» стекла */
-.liquid-glass::after {
+.liquid-glass::after, .ios-widget::after {
   content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
   background: radial-gradient(140% 70% at 20% -20%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 55%);
 }
@@ -797,28 +797,12 @@ input[type="number"] {
 
 /* iOS 26 — виджет дашборда: белое стекло, большой радиус */
 .ios-widget {
-  position: relative; isolation: isolate;
-  background: linear-gradient(160deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.42) 100%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(190%); backdrop-filter: blur(28px) saturate(190%);
-  border: 1px solid rgba(255,255,255,0.55) !important;
-  border-radius: 26px !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 14px 40px -22px rgba(20,30,55,0.22);
+  position: relative; border-radius: 26px !important;
   transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
-/* liquid glass: блик по верхнему краю и мягкое свечение сверху-слева — как у стекла iOS 26 */
-.ios-widget::before {
-  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
-  background:
-    radial-gradient(120% 60% at 15% -10%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 55%),
-    linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 18%);
-}
-.ios-widget::after {
-  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.6), inset 0 -1px 0 rgba(255,255,255,0.25), inset 0 0 18px rgba(255,255,255,0.18);
-}
 @media (prefers-reduced-transparency: reduce) {
-  .ios-widget { background: #fff !important; backdrop-filter: none; -webkit-backdrop-filter: none; }
-  .ios-widget::before { display: none; }
+  .ios-widget { background: #fff !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .ios-widget::before, .ios-widget::after { display: none; }
 }
 @media (max-width: 768px) { .ios-widget { border-radius: 22px; } }
 
