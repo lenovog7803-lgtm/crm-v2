@@ -73,112 +73,44 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
         </div>
       )}
       {!loading && (
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 14 }}>
+      // iOS 26: список как в «Контактах» — одна группа-лист, строки с разделителями и › справа
+      <div className="ios-list">
         {visible.map(carrier => {
           const name = carrier.company_name || carrier.name || '—'
           const driver = carrier.driver_name || carrier.driver || ''
           const cap = carrier.capacity_tons ? carrier.capacity_tons + ' т' : (carrier.cap || '')
           const vehicleType = carrier.vehicle_type || ''
           const phone = primaryPhone(carrier.phone)
-          const hasStats = cap || vehicleType
-          const hasFooterInfo = carrier.plate || carrier.regions
           const [avA, avB] = getGradient(name)
+          const sub = [driver, cap, vehicleType, carrier.plate, carrier.regions].filter(Boolean).join(' · ')
           return (
-            <div
-              key={carrier.id} className="card"
-              style={{ padding: '22px 22px', cursor: 'pointer', display: 'flex', flexDirection: 'column', transition: 'transform 0.15s, box-shadow 0.15s' }}
-              onPointerEnter={mouseOnly(e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 50px -20px rgba(20,30,55,0.25)' })}
-              onPointerLeave={mouseOnly(e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '' })}
-              onClick={() => onOpenCarrier(carrier.id)}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
-                <div style={{
-                  width: 50, height: 50, borderRadius: 16, flexShrink: 0,
-                  background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="1" y="3" width="15" height="13" rx="1"/>
-                    <path d="M16 8h4l3 3v5h-7V8z"/>
-                    <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
-                  </svg>
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14.5, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
-                  {driver && <div style={{ fontSize: 12.5, color: '#A6AEB8', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{driver}</div>}
-                </div>
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 4,
-                  background: 'rgba(217,119,6,0.1)', borderRadius: 8, padding: '4px 10px', flexShrink: 0,
-                }}>
-                  <StarIcon />
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#D97706' }}>{carrier.rating || '5.0'}</span>
-                </div>
+            <div key={carrier.id} className="ios-row" onClick={() => onOpenCarrier(carrier.id)}>
+              <div className="ios-row-avatar" style={{ background: `linear-gradient(160deg, ${avA} 0%, ${avB} 100%)` }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+                </svg>
               </div>
-
-              {/* Missing fields just don't render a tile — a grid of "—"
-                  placeholders reads as noise, not information. */}
-              {hasStats && (
-                <div style={{ display: 'grid', gridTemplateColumns: cap && vehicleType ? 'minmax(0, 1fr) minmax(0, 1fr)' : '1fr', gap: 10, marginBottom: 14 }}>
-                  {cap && (
-                    <div style={{ background: 'rgba(14,23,38,0.04)', borderRadius: 12, padding: '10px 14px', minWidth: 0 }}>
-                      <div style={{ fontSize: 10.5, color: '#A6AEB8', fontWeight: 600, marginBottom: 4 }}>Грузоподъёмность</div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#0E1726' }}>{cap}</div>
-                    </div>
-                  )}
-                  {vehicleType && (
-                    <div style={{ background: 'rgba(14,23,38,0.04)', borderRadius: 12, padding: '10px 14px', minWidth: 0 }}>
-                      <div style={{ fontSize: 10.5, color: '#A6AEB8', fontWeight: 600, marginBottom: 4 }}>Тип ТС</div>
-                      <div style={{
-                        fontSize: 13, fontWeight: 700, color: '#0E1726',
-                        display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden', textOverflow: 'ellipsis',
-                      }}>{vehicleType}</div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <div style={{ flex: 1 }} />
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '10px 0', borderTop: '1px solid rgba(14,23,38,0.06)' }}>
-                <div style={{ minWidth: 0, overflow: 'hidden' }}>
-                  {carrier.plate && (
-                    <div style={{ fontSize: 11, color: '#A6AEB8', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      Номер: <span style={{ color: '#0E1726', fontFamily: 'var(--font-mono)', fontWeight: 600, fontSize: 12 }}>{carrier.plate}</span>
-                    </div>
-                  )}
-                  {carrier.regions && (
-                    <div style={{ fontSize: 11, color: '#A6AEB8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Регионы: <span style={{ color: '#5A6573', fontWeight: 600 }}>{carrier.regions}</span></div>
-                  )}
-                  {!hasFooterInfo && <div style={{ fontSize: 11, color: '#C4CAD4' }}>Нет данных</div>}
-                </div>
-                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }} onClick={e => e.stopPropagation()}>
+              <div className="ios-row-text">
+                <div className="ios-row-title">{name}</div>
+                <div className="ios-row-sub">{sub || phone || 'Нет данных'}</div>
+              </div>
+              <span className="ios-row-badge"><StarIcon />{carrier.rating || '5.0'}</span>
+                <div className="ios-row-actions" onClick={e => e.stopPropagation()}>
                   {phone && (
-                    <a href={`tel:${phone}`} onClick={e => e.stopPropagation()} style={{
-                      width: 32, height: 32, borderRadius: 10, background: 'rgba(19,102,240,0.1)', color: '#1366F0',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none',
-                    }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 9.7 19.79 19.79 0 0 1 1.63 1.06 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.08 6.08l.96-.96a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
-                      </svg>
+                    <a href={`tel:${phone}`} className="ios-row-icon ios-row-icon--blue" title="Позвонить" onClick={e => e.stopPropagation()}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 9.7 19.79 19.79 0 0 1 1.63 1.06 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.08 6.08l.96-.96a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                     </a>
                   )}
-                  <button onClick={e => handleDelete(e, carrier.id)} style={{
-                    width: 32, height: 32, borderRadius: 10, border: 'none', cursor: 'pointer',
-                    background: 'rgba(200,25,35,0.1)', color: '#C81923',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
-                    </svg>
+                  <button onClick={e => handleDelete(e, carrier.id)} className="ios-row-icon ios-row-icon--red ios-row-del" title="Удалить">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
                   </button>
                 </div>
-              </div>
+                <svg className="ios-row-chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1.5 1.5 6.5 6.5 1.5 11.5"/></svg>
             </div>
           )
         })}
       </div>
+
       )}
     </div>
   )
