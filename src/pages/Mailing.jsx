@@ -111,6 +111,13 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
   const counts = state.counts || {}
   const groups = state.groups || {}
   const h = state.health || {}
+  const boxes = state.mailboxes || []
+  const multi = boxes.length > 1
+  // здоровье по всем почтам: возвраты суммой, статус — худший из почт
+  const sent7 = multi ? boxes.reduce((n, m) => n + (m.health?.sent_7d || 0), 0) : (h.sent_7d ?? 0)
+  const bounced7 = multi ? boxes.reduce((n, m) => n + (m.health?.bounced_7d || 0), 0) : (h.bounced_7d ?? 0)
+  const bounceRate = multi ? (sent7 ? Math.round((bounced7 / sent7) * 1000) / 10 : 0) : (h.bounce_rate ?? 0)
+  const shortLogin = (m) => (m.login || m.name || '').split('@')[0]
   const sentTotal = Math.max(0, (state.total || 0) - (counts.new || 0) - (counts.skip || 0))
   const answered = groups.answered || 0
   const replyPct = sentTotal ? Math.round((answered / sentTotal) * 100) : 0
@@ -170,6 +177,13 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 10, minHeight: 16 }}>
               {state.state}{state.next_at ? ` · дальше в ${state.next_at}` : ''}
             </div>
+            {multi && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px', marginTop: 8, fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
+                {boxes.map(m => (
+                  <span key={m.id}>{shortLogin(m)}: <b style={{ color: '#fff' }}>{m.sent_today ?? 0}</b>/{m.health?.limit ?? 0}</span>
+                ))}
+              </div>
+            )}
             <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
               <button onClick={toggle} disabled={busy || (!state.running && !state.configured)}
                 style={{ padding: '10px 18px', borderRadius: 12, border: 'none', cursor: 'pointer', fontFamily: 'Manrope', fontSize: 13.5, fontWeight: 700,
@@ -203,12 +217,27 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
         <div style={{ ...heroBase, padding: isMobile ? '16px 18px' : '26px 24px', background: healthCard.bg,
           border: '1px solid rgba(255,255,255,0.6)', boxShadow: `0 16px 40px -16px ${healthCard.shadow}` }}>
           <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
-          <div style={kicker(healthCard.ink)}>ЗДОРОВЬЕ ЯЩИКА{state.mailboxes?.length ? ` · ${(state.mailboxes.find(m => m.health?.status === h.status) || state.mailboxes[0]).login || ''}` : ''}</div>
+          <div style={kicker(healthCard.ink)}>{multi ? `ЗДОРОВЬЕ ПОЧТ · ${boxes.length}` : `ЗДОРОВЬЕ ЯЩИКА${boxes[0]?.login ? ` · ${boxes[0].login}` : ''}`}</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={bigNum(healthCard.deep, isMobile ? 28 : 34)}>{h.bounce_rate ?? 0}%</span>
+            <span style={bigNum(healthCard.deep, isMobile ? 28 : 34)}>{bounceRate}%</span>
             <span style={{ fontSize: 12, color: healthCard.ink, fontWeight: 600 }}>возвратов</span>
           </div>
-          <div style={{ fontSize: 12, color: healthCard.ink, marginTop: 6 }}>{h.bounced_7d ?? 0} из {h.sent_7d ?? 0} за 7 дней · норма до 4%</div>
+          <div style={{ fontSize: 12, color: healthCard.ink, marginTop: 6 }}>{bounced7} из {sent7} за 7 дней · норма до 4%</div>
+          {multi && (
+            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 4, marginTop: 10 }}>
+              {boxes.map(m => {
+                const st = m.health?.status || 'ok'
+                const dot = st === 'stop' ? '#E0473B' : st === 'ok' ? '#0E9F6E' : '#D97706'
+                return (
+                  <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: healthCard.deep }}>
+                    <span style={{ width: 7, height: 7, borderRadius: 99, background: dot, flexShrink: 0 }} />
+                    <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.login || m.name}</span>
+                    <b>{m.health?.bounce_rate ?? 0}%</b>
+                  </div>
+                )
+              })}
+            </div>
+          )}
           <div style={{ marginTop: 14, display: 'inline-block', padding: '4px 10px', borderRadius: 99, background: 'rgba(255,255,255,0.55)',
             fontSize: 12, fontWeight: 700, color: healthCard.deep }}>
             {healthCard.label}
@@ -237,19 +266,47 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
         <div className="card" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18 }}>
             <div style={{ position: 'relative', flexShrink: 0 }}>
-              <CircularProgress pct={h.auto ? Math.min(100, ((h.day || 1) / 13) * 100) : 100} color="#1366F0" size={56} />
+              <CircularProgress pct={multi ? Math.min(100, (state.limit / Math.max(1, boxes.reduce((n, m) => n + (m.health?.cap || 0), 0))) * 100)
+                : h.auto ? Math.min(100, ((h.day || 1) / 13) * 100) : 100} color="#1366F0" size={56} />
               <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#1366F0' }}>
-                {h.auto ? `д.${h.day || 1}` : '—'}
+                {multi ? state.limit : h.auto ? `д.${h.day || 1}` : '—'}
               </div>
             </div>
             <div>
-              <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Разгон ящика</div>
+              <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>{multi ? `Разгон почт · ${boxes.length}` : 'Разгон ящика'}</div>
               <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 2 }}>
-                {h.auto ? `лимит растёт сам · потолок ${h.cap}` : 'выключен — фиксированный лимит из настроек'}
+                {multi ? `сегодня всего ${state.limit} писем · потолок ${boxes.reduce((n, m) => n + (m.health?.cap || 0), 0)}`
+                  : h.auto ? `лимит растёт сам · потолок ${h.cap}` : 'выключен — фиксированный лимит из настроек'}
               </div>
             </div>
           </div>
-          {h.auto && (
+          {multi && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {boxes.map(m => {
+                const mh = m.health || {}
+                const idx = RAMP_STEPS.findIndex(st => (mh.day || 1) <= st.until)
+                return (
+                  <div key={m.id}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 12.5, marginBottom: 6 }}>
+                      <span style={{ fontWeight: 600, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.login || m.name}</span>
+                      <span style={{ color: '#8A93A0', flexShrink: 0 }}>
+                        {mh.auto ? `день ${mh.day || 1} · ${mh.limit ?? 0} в день` : `${mh.limit ?? 0} в день`}
+                      </span>
+                    </div>
+                    {mh.auto && (
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        {RAMP_STEPS.map((st, i) => (
+                          <div key={i} style={{ flex: 1, height: 5, borderRadius: 99, opacity: st.lim > (mh.cap || 0) ? 0.35 : 1,
+                            background: i === idx ? '#1366F0' : i < idx ? 'rgba(19,102,240,0.45)' : 'rgba(14,23,38,0.08)' }} />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+          {!multi && h.auto && (
             <div style={{ display: 'flex', gap: 6 }}>
               {RAMP_STEPS.map((st, i) => {
                 const capped = st.lim > (h.cap || 0)
