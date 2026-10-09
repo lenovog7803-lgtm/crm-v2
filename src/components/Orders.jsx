@@ -11,6 +11,7 @@ import { mouseOnly, spring, project, rubberband, velocityTracker, haptic } from 
 import { SwapText } from './Transitions'
 import { StatusOrb } from './StatusOrb'
 import { useChangeFlash } from '../hooks/useChangeFlash'
+import CheckCircle from './CheckCircle'
 
 const BULK_STATUSES = [
   { id: 'new', label: 'Новая' },
@@ -401,12 +402,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                       : 'transparent',
                     transition: 'background 0.12s',
                   }}>
-                    <input
-                      type="checkbox"
-                      checked={docFilters.includes(f.key)}
-                      onChange={() => toggleDocFilter(f.key)}
-                      style={{ accentColor: f.not ? '#C81923' : '#1366F0', width: 14, height: 14, flexShrink: 0 }}
-                    />
+                    <CheckCircle checked={docFilters.includes(f.key)} onChange={() => toggleDocFilter(f.key)}
+                      color={f.not ? '#FF3B30' : '#0A84FF'} size={17} />
                     {f.label}
                   </label>
                 </>

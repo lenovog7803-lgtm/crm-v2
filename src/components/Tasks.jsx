@@ -134,7 +134,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
               onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
             >
               <button onClick={e => { e.stopPropagation(); handleToggle(task) }} style={{
-                width: 22, height: 22, borderRadius: 7, flexShrink: 0,
+                width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
                 border: done ? 'none' : '2px solid rgba(14,23,38,0.2)',
                 background: done ? '#1E9E5A' : 'transparent',
                 cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s',

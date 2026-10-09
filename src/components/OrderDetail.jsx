@@ -226,7 +226,7 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{
-          width: 22, height: 22, borderRadius: 7, flexShrink: 0,
+          width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
           background: isPaid ? '#1E9E5A' : 'transparent',
           border: `2px solid ${isPaid ? '#1E9E5A' : hasUnmatchedPayment ? '#D97706' : '#C4CAD4'}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -937,7 +937,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                     onPointerLeave={mouseOnly(e => { cancelDocPress(); if (!isDone) e.currentTarget.style.background = 'rgba(14,23,38,0.03)' })}
                   >
                     <div style={{
-                      width: 20, height: 20, borderRadius: 6, flexShrink: 0,
+                      width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
                       background: isDone ? '#1E9E5A' : 'transparent',
                       border: `2px solid ${isDone ? '#1E9E5A' : '#C4CAD4'}`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
