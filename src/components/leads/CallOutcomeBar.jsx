@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { OUTCOMES, LOST_REASONS, DATE_PRESETS } from '../../constants/leads'
 import { OutcomeIcon } from './OutcomeIcon'
+import { SwapText } from '../Transitions'
 
 const labelStyle = { fontSize: 10, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8, display: 'block' }
 
@@ -123,7 +124,7 @@ export default function CallOutcomeBar({ lead, onSave, saving }) {
       {error && <div style={{ fontSize: 12, color: '#E0473B', marginBottom: 12 }}>{error}</div>}
 
       <button onClick={handleSave} disabled={saving || !outcome} className="btn-primary" style={{ width: '100%', justifyContent: 'center', height: 46, opacity: (!outcome || saving) ? 0.5 : 1 }}>
-        {saving ? 'Сохраняю…' : 'Сохранить и следующий'}
+        <SwapText>{saving ? 'Сохраняю…' : 'Сохранить и следующий'}</SwapText>
       </button>
     </div>
   )

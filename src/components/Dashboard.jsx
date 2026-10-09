@@ -6,6 +6,7 @@ import { CountUp } from './CountUp'
 import { CircularProgress } from './CircularProgress'
 import { SkeletonCard } from './Skeleton'
 import { mouseOnly } from '../motion'
+import { SwapText } from './Transitions'
 
 const MONTH_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
 const MONTH_RU_SHORT = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек']
@@ -488,7 +489,7 @@ function GoalEditModal({ goalKey, value, onChange, onClose, onSave }) {
               disabled={saving}
               onClick={async () => { setSaving(true); await onSave(); setSaving(false) }}
               style={{ flex: 1, justifyContent: 'center', opacity: saving ? 0.7 : 1 }}
-            >{saving ? 'Сохранение…' : 'Сохранить'}</button>
+            ><SwapText>{saving ? 'Сохранение…' : 'Сохранить'}</SwapText></button>
           </div>
         </div>
       </div>

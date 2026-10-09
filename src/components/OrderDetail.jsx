@@ -9,6 +9,7 @@ import OrderPaymentModal from './OrderPaymentModal'
 import CarrierActModal from './CarrierActModal'
 import { mouseOnly } from '../motion'
 import { Loader } from './Loader'
+import { SuccessCheck } from './Transitions'
 
 const STATUSES = [
   { id: 'new', label: 'Новая', color: '#7C3AED', bg: 'rgba(124,58,237,0.1)' },
@@ -231,11 +232,7 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transition: 'all 0.2s',
         }}>
-          {isPaid && (
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          )}
+          <SuccessCheck show={isPaid} size={11} strokeWidth={3.5} />
           {hasUnmatchedPayment && <span style={{ color: '#D97706', fontSize: 13, fontWeight: 700, lineHeight: 1 }}>!</span>}
         </div>
         <div style={{ flex: 1 }}>
@@ -942,11 +939,7 @@ export default function OrderDetail({ orderId, onBack, onDelete, onOpenClient, o
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       transition: 'all 0.2s',
                     }}>
-                      {isDone && (
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                      )}
+                      <SuccessCheck show={isDone} size={10} strokeWidth={3.5} />
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: 13, fontWeight: 500, color: isDone ? '#1E9E5A' : '#0E1726' }}>{step.label}</div>

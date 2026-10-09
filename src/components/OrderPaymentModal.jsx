@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { addPayment, deletePayment, getOrder, updateOrder } from '../api'
 import { useToast } from './Toast'
 import { useEscapeKey } from '../hooks/useEscapeKey'
+import { SwapText } from './Transitions'
 
 const today = () => new Date().toISOString().slice(0, 10)
 
@@ -364,7 +365,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
             disabled={saving}
             style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: isCash || matches ? (isCarrier ? '#E0473B' : '#1366F0') : '#D97706', color: '#FFFFFF', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
           >
-            {saving ? 'Сохраняю…' : isCash ? 'Подтвердить оплату наличными' : matches ? 'Подтвердить оплату' : 'Сохранить (суммы не совпадают)'}
+            <SwapText>{saving ? 'Сохраняю…' : isCash ? 'Подтвердить оплату наличными' : matches ? 'Подтвердить оплату' : 'Сохранить (суммы не совпадают)'}</SwapText>
           </button>
         </div>
       </div>

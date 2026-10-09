@@ -8,6 +8,7 @@ import { useToast } from './Toast'
 import { EmptyState } from './EmptyState'
 import { SlidingTabs } from './SlidingTabs'
 import { mouseOnly, spring, project, rubberband, velocityTracker, haptic } from '../motion'
+import { SwapText } from './Transitions'
 
 const BULK_STATUSES = [
   { id: 'new', label: 'Новая' },
@@ -859,7 +860,7 @@ function CorrespondenceModal({ orderIds, onClose, onSaved }) {
             disabled={saving || !type}
             style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: type ? '#1366F0' : '#E8EAEE', color: type ? '#FFFFFF' : '#8A93A0', fontWeight: 700, cursor: type ? 'pointer' : 'not-allowed' }}
           >
-            {saving ? 'Сохраняю…' : 'Отметить'}
+            <SwapText>{saving ? 'Сохраняю…' : 'Отметить'}</SwapText>
           </button>
         </div>
       </div>

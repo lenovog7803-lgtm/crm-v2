@@ -9,6 +9,7 @@ import { ModalOverlay, ModalHeader } from '../components/Modal'
 import { CallsHeatmap, FunnelChart } from '../components/leads/AnalyticsView'
 import { mouseOnly } from '../motion'
 import { Loader } from '../components/Loader'
+import { SwapText } from '../components/Transitions'
 
 const TABS = [
   { id: 'managers', label: 'Пользователи' },
@@ -126,7 +127,7 @@ function UserDetailModal({ user, onClose, onSaved }) {
         <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
           <button onClick={onClose} style={{ flex: 1, height: 44, borderRadius: 13, border: '1px solid rgba(14,23,38,0.12)', background: 'transparent', cursor: 'pointer', fontFamily: 'Manrope', fontSize: 14, fontWeight: 600, color: '#5A6573' }}>Отмена</button>
           <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ flex: 2, justifyContent: 'center', opacity: saving ? 0.7 : 1 }}>
-            {saving ? 'Сохранение…' : 'Сохранить'}
+            <SwapText>{saving ? 'Сохранение…' : 'Сохранить'}</SwapText>
           </button>
         </div>
       </div>

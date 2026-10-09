@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { createFleetOrder, updateFleetOrder, getFleetClients, getFleetVehicles, getFleetDrivers } from '../../api'
 import { useToast } from '../../components/Toast'
 import { ModalOverlay, ModalHeader } from '../../components/Modal'
+import { SwapText } from '../../components/Transitions'
 
 const iStyle = {
   width: '100%', height: 38, padding: '0 12px', borderRadius: 10,
@@ -146,7 +147,7 @@ export function FleetOrderModal({ tripId, direction, order, trip, onClose, onSav
         <div style={{ display: 'flex', gap: 10 }}>
           <button className="btn-ghost" onClick={onClose} style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button className="btn-primary" onClick={save} disabled={saving} style={{ flex: 2, justifyContent: 'center' }}>
-            {saving ? 'Сохранение…' : editing ? 'Сохранить изменения' : 'Создать заявку →'}
+            <SwapText>{saving ? 'Сохранение…' : editing ? 'Сохранить изменения' : 'Создать заявку →'}</SwapText>
           </button>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createFleetClient, updateFleetClient } from '../../api'
 import { useToast } from '../../components/Toast'
+import { SwapText } from '../../components/Transitions'
 
 const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#FFFFFF', boxSizing: 'border-box', width: '100%' }
 
@@ -77,7 +78,7 @@ export function FleetClientModal({ initial, onClose, onSaved }) {
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', color: '#5A6573', cursor: 'pointer' }}>Отмена</button>
           <button onClick={save} disabled={saving || !form.name.trim()} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: form.name.trim() ? '#1366F0' : '#C4CAD4', color: '#fff', fontWeight: 700, cursor: saving ? 'default' : 'pointer' }}>
-            {saving ? 'Сохраняю…' : editing ? 'Сохранить' : 'Добавить'}
+            <SwapText>{saving ? 'Сохраняю…' : editing ? 'Сохранить' : 'Добавить'}</SwapText>
           </button>
         </div>
       </div>

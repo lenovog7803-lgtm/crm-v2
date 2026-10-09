@@ -9,6 +9,7 @@ import FleetPaymentModal from './FleetPaymentModal'
 import { SlidingTabs } from '../../components/SlidingTabs'
 import { PillBtn } from './fleetUi'
 import { Loader } from '../../components/Loader'
+import { SwapText } from '../../components/Transitions'
 
 const sLabel = { fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', marginBottom: 12 }
 const SLabel = ({ children }) => <div style={sLabel}>{children}</div>
@@ -66,7 +67,7 @@ function StepModal({ title, fields, onClose, onConfirm }) {
         <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
           <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', fontSize: 14, color: '#5A6573', cursor: 'pointer' }}>Отмена</button>
           <button onClick={go} disabled={saving} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: '#1E9E5A', color: '#FFFFFF', fontSize: 14, fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
-            {saving ? 'Сохраняю…' : 'Подтвердить'}
+            <SwapText>{saving ? 'Сохраняю…' : 'Подтвердить'}</SwapText>
           </button>
         </div>
       </div>

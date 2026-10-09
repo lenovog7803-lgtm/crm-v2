@@ -6,6 +6,7 @@ import {
 import { useToast } from '../../components/Toast'
 import { SlidingTabs } from '../../components/SlidingTabs'
 import { Loader } from '../../components/Loader'
+import { SwapText } from '../../components/Transitions'
 
 const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#FFFFFF', boxSizing: 'border-box', width: '100%' }
 
@@ -91,7 +92,7 @@ function EntityModal({ title, sections, initial, onClose, onSave }) {
         <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
           <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', color: '#5A6573', cursor: 'pointer' }}>Отмена</button>
           <button onClick={submit} disabled={saving} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: '#1366F0', color: '#fff', fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
-            {saving ? 'Сохраняю…' : initial ? 'Сохранить' : 'Добавить'}
+            <SwapText>{saving ? 'Сохраняю…' : initial ? 'Сохранить' : 'Добавить'}</SwapText>
           </button>
         </div>
       </div>

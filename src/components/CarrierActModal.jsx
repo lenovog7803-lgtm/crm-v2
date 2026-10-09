@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useEscapeKey } from '../hooks/useEscapeKey'
+import { SwapText } from './Transitions'
 
 // Gates "получено от перевозчика" behind the act number — the checkbox only
 // ticks once the number is entered and confirmed here, not on a plain click.
@@ -84,7 +85,7 @@ export default function CarrierActModal({ initialValue, initialDate, onClose, on
               cursor: value.trim() && !saving ? 'pointer' : 'default',
             }}
           >
-            {saving ? 'Сохраняю…' : 'Подтвердить'}
+            <SwapText>{saving ? 'Сохраняю…' : 'Подтвердить'}</SwapText>
           </button>
         </div>
       </div>

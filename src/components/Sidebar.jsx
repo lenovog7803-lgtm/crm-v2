@@ -4,6 +4,7 @@ import { useAuth } from '../AuthContext'
 import { initials } from '../utils'
 import { SlidingTabs } from './SlidingTabs'
 import { mouseOnly } from '../motion'
+import { PopNumber } from './Transitions'
 
 const HIDDEN_MENU_WIDTH = 200
 
@@ -402,7 +403,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
                 <span style={{
                   background: badgeColor, color: '#fff', borderRadius: 99,
                   padding: '2px 7px', fontSize: 11, fontWeight: 700, flexShrink: 0,
-                }}>{badgeVal > 99 ? '99+' : badgeVal}</span>
+                }}><PopNumber value={badgeVal > 99 ? '99+' : badgeVal} /></span>
               )}
               {!expanded && badgeVal > 0 && (
                 <span style={{

@@ -1,6 +1,7 @@
 import { useRef, useState, useLayoutEffect } from 'react'
 import { useAuth } from '../AuthContext'
 import { ModalOverlay, useSheet } from './Modal'
+import { PopNumber } from './Transitions'
 
 // Нижняя панель на телефоне — не больше 5 вкладок (как в iOS); всё остальное — в «Ещё».
 // «Ещё» оформлено как «Настройки» iPhone: серый фон, белые скруглённые группы,
@@ -309,7 +310,7 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
                   color: '#fff', fontSize: 8, fontWeight: 800,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   padding: '0 3px', lineHeight: 1,
-                }}>{badgeVal > 99 ? '99+' : badgeVal}</span>
+                }}><PopNumber value={badgeVal > 99 ? '99+' : badgeVal} /></span>
               )}
             </span>
           </button>

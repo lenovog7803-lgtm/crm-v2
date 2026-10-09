@@ -11,11 +11,11 @@ import {
 } from '../api'
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
-import { CountUp } from '../components/CountUp'
 import { CircularProgress } from '../components/CircularProgress'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { ThinkingOrb } from 'thinking-orbs'
 import { Loader } from '../components/Loader'
+import { PopNumber, SwapText } from '../components/Transitions'
 
 // «Рассылка» — холодные письма по базе. Вся логика (лимиты, рабочие часы,
 // паузы, напоминания, проверка ответов) живёт в backend/mailing.py, здесь
@@ -171,7 +171,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <span style={bigNum('#fff', isMobile ? 34 : 42)}><CountUp value={state.sent_today} /></span>
+              <span style={bigNum('#fff', isMobile ? 34 : 42)}><PopNumber value={state.sent_today} /></span>
               <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.45)', fontWeight: 600 }}>/ {state.limit} писем сегодня</span>
             </div>
             <div style={{ height: 6, borderRadius: 99, background: 'rgba(255,255,255,0.12)', marginTop: 14, overflow: 'hidden' }}>
@@ -183,7 +183,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
             {multi && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px', marginTop: 8, fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
                 {boxes.map(m => (
-                  <span key={m.id}>{shortLogin(m)}: <b style={{ color: '#fff' }}>{m.sent_today ?? 0}</b>/{m.health?.limit ?? 0}</span>
+                  <span key={m.id}>{shortLogin(m)}: <b style={{ color: '#fff' }}><PopNumber value={m.sent_today ?? 0} /></b>/{m.health?.limit ?? 0}</span>
                 ))}
               </div>
             )}
@@ -209,7 +209,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
           boxShadow: '0 16px 40px -16px rgba(14,159,110,0.4)' }}>
           <div style={{ position: 'absolute', bottom: -30, right: -20, width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.3)' }} />
           <div style={kicker('#17824F')}>ОТВЕТИЛИ</div>
-          <div style={bigNum('#0B5C37', isMobile ? 28 : 34)}><CountUp value={answered} /></div>
+          <div style={bigNum('#0B5C37', isMobile ? 28 : 34)}><PopNumber value={answered} /></div>
           <div style={{ fontSize: 12, color: '#17824F', marginTop: 6 }}>{replyPct}% от отправленных</div>
           <div style={{ marginTop: 14, fontSize: 12.5, color: '#17824F', fontWeight: 700 }}>
             {state.replies_new ? `🔔 ${state.replies_new} новых — разобрать →` : 'Все ответы →'}
@@ -257,7 +257,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
             <div style={{ fontSize: isMobile ? 10 : 11, color: '#A6AEB8', fontWeight: 600, marginBottom: 6 }}>{k.label}</div>
             <div style={{ fontFamily: 'Onest', fontWeight: 800, fontSize: isMobile ? 24 : 32, color: k.color, background: k.bg,
               borderRadius: 12, padding: isMobile ? '5px 10px' : '7px 14px', display: 'inline-block', lineHeight: 1 }}>
-              <CountUp value={k.value} />
+              <PopNumber value={k.value} />
             </div>
             <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 8 }}>{k.hint}</div>
           </div>
@@ -515,6 +515,7 @@ function MailThread({ contact: c, gmailHref, onBack, onPatch }) {
   const [err, setErr] = useState('')
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
+  const [sentOk, setSentOk] = useState(false)
   const [busy, setBusy] = useState(false)
   const endRef = useRef(null)
 
@@ -538,6 +539,8 @@ function MailThread({ contact: c, gmailHref, onBack, onPatch }) {
       await replyMail(c.id, text)
       show('Ответ отправлен', { type: 'success' })
       setText('')
+      setSentOk(true)
+      setTimeout(() => setSentOk(false), 1800)
       onPatch({ awaiting_reply: true })
       setTimeout(load, 1500)  // Gmail показывает отправленное не мгновенно
     } catch (e) {
@@ -620,7 +623,7 @@ function MailThread({ contact: c, gmailHref, onBack, onPatch }) {
           onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) send() }}
           style={{ ...inputStyle, flex: 1, resize: 'vertical', minHeight: 64, fontSize: 16 }} />
         <button className="btn-primary" disabled={sending || !text.trim()} onClick={send} style={{ flexShrink: 0 }}>
-          {sending ? 'Отправляю…' : 'Отправить'}
+          <SwapText>{sending ? 'Отправляю…' : sentOk ? 'Отправлено ✓' : 'Отправить'}</SwapText>
         </button>
       </div>
     </div>
@@ -817,6 +820,7 @@ const VARS = ['{приветствие}', '{компания}', '{имя_кон�
 function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
   const { show } = useToast()
   const [c, setC] = useState({ ...campaign, subjects: (campaign.subjects || []).join('\n') })
+  const [savedOk, setSavedOk] = useState(false)
   const [preview, setPreview] = useState(null)
   const [busy, setBusy] = useState(false)
   const set = (k, v) => setC(prev => ({ ...prev, [k]: v }))
@@ -834,6 +838,8 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
     try {
       await updateMailingCampaign(campaign.id, payload())
       show('Направление сохранено', { type: 'success' })
+      setSavedOk(true)
+      setTimeout(() => setSavedOk(false), 1800)
       onSaved?.()
     } catch (e) {
       show('Ошибка: ' + e.message, { type: 'error' })
@@ -939,7 +945,7 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button className="btn-ghost" onClick={() => doPreview()}>Предпросмотр</button>
-          <button className="btn-primary" onClick={save} disabled={busy}>Сохранить</button>
+          <button className="btn-primary" onClick={save} disabled={busy}><SwapText>{busy ? 'Сохраняю…' : savedOk ? 'Сохранено ✓' : 'Сохранить'}</SwapText></button>
           <div style={{ flex: 1 }} />
           <button className="btn-ghost" onClick={remove} style={{ color: '#E0473B' }}>Удалить направление</button>
         </div>

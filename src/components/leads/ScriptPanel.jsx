@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getScripts, saveScripts } from '../../api'
 import { stageById } from '../../constants/leads'
+import { SwapText } from '../Transitions'
 
 export default function ScriptPanel({ stage }) {
   const [scripts, setScripts] = useState({})
@@ -68,7 +69,7 @@ export default function ScriptPanel({ stage }) {
           />
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={() => setEditing(false)} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
-            <button onClick={save} disabled={saving} className="btn-primary" style={{ flex: 1, justifyContent: 'center' }}>{saving ? 'Сохраняю…' : 'Сохранить'}</button>
+            <button onClick={save} disabled={saving} className="btn-primary" style={{ flex: 1, justifyContent: 'center' }}><SwapText>{saving ? 'Сохраняю…' : 'Сохранить'}</SwapText></button>
           </div>
         </>
       ) : (

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { updateFleetOrder } from '../../api'
 import { useToast } from '../../components/Toast'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
+import { SwapText } from '../../components/Transitions'
 
 const today = () => new Date().toISOString().slice(0, 10)
 const fieldStyle = {
@@ -61,7 +62,7 @@ export default function FleetPaymentModal({ order, onClose, onSaved }) {
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', fontSize: 14, color: '#5A6573', cursor: 'pointer' }}>Отмена</button>
           <button onClick={confirm} disabled={saving} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: '#1E9E5A', color: '#FFFFFF', fontSize: 14, fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
-            {saving ? 'Сохраняю…' : 'Подтвердить оплату'}
+            <SwapText>{saving ? 'Сохраняю…' : 'Подтвердить оплату'}</SwapText>
           </button>
         </div>
       </div>

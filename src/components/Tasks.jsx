@@ -6,6 +6,7 @@ import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
 import { SlidingTabs } from './SlidingTabs'
 import { mouseOnly } from '../motion'
+import { SuccessCheck } from './Transitions'
 
 const TYPE_COLORS = { call: '#1366F0', reminder: '#D97706', payment: '#1E9E5A', other: '#8A93A0' }
 const TYPE_BG = { call: 'rgba(19,102,240,0.1)', reminder: 'rgba(217,119,6,0.1)', payment: 'rgba(30,158,90,0.1)', other: 'rgba(138,147,160,0.1)' }
@@ -132,11 +133,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
                 background: done ? '#1E9E5A' : 'transparent',
                 cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s',
               }}>
-                {done && (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                )}
+                <SuccessCheck show={done} size={12} strokeWidth={3} />
               </button>
 
               <div style={{ flex: 1, minWidth: 0 }}>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { updateLead } from '../../api'
 import { STAGES } from '../../constants/leads'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
+import { SwapText } from '../Transitions'
 
 const labelStyle = { fontSize: 12, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.05em', marginBottom: 6, display: 'block' }
 const fieldStyle = { width: '100%', background: '#F7F8FA' }
@@ -128,7 +129,7 @@ export default function LeadEditModal({ lead, onClose, onSaved }) {
           <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
             <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center', height: 44 }}>Отмена</button>
             <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ flex: 2, justifyContent: 'center', height: 44 }}>
-              {saving ? 'Сохранение…' : 'Сохранить'}
+              <SwapText>{saving ? 'Сохранение…' : 'Сохранить'}</SwapText>
             </button>
           </div>
         </div>
