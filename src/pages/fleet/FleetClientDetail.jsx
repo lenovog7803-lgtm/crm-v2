@@ -6,6 +6,7 @@ import { fmtDate } from './FleetOrderModal'
 import { PillBtn } from './fleetUi'
 import { Loader } from '../../components/Loader'
 import { iosConfirm } from '../../components/IOSAlert'
+import DateInput from '../../components/DateInput'
 
 const fld = { height: 36, padding: '0 10px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#fff' }
 
@@ -67,9 +68,9 @@ function ReconciliationModal({ clientId, clientName, onClose }) {
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: '#0E1726', marginBottom: 14 }}>Акт сверки</div>
         <div style={{ fontSize: 12, color: '#8A93A0', marginBottom: 12 }}>Период (можно оставить пустым — тогда за всё время)</div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 18 }}>
-          <input type="date" value={from} onChange={e => setFrom(e.target.value)} style={{ ...fld, flex: 1 }} />
+          <DateInput type="date" value={from} onChange={e => setFrom(e.target.value)} style={{ ...fld, flex: 1 }} />
           <span style={{ color: '#A6AEB8' }}>—</span>
-          <input type="date" value={to} onChange={e => setTo(e.target.value)} style={{ ...fld, flex: 1 }} />
+          <DateInput type="date" value={to} onChange={e => setTo(e.target.value)} style={{ ...fld, flex: 1 }} />
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={onClose} style={{ flex: 1, padding: 12, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', color: '#5A6573', cursor: 'pointer' }}>Отмена</button>

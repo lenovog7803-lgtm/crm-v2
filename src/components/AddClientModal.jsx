@@ -5,8 +5,8 @@ import Select from './Select'
 import { iosConfirm } from './IOSAlert'
 
 const sectionLabel = {
-  fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: '#A6AEB8',
-  paddingBottom: 8, borderBottom: '1px solid rgba(14,23,38,0.07)', marginBottom: 4,
+  fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em', color: '#0E1726',
+  marginBottom: 2,
 }
 
 export default function AddClientModal({ onClose, onSuccess }) {
@@ -48,65 +48,65 @@ export default function AddClientModal({ onClose, onSuccess }) {
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
         {/* Основное */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={sectionLabel}>ОСНОВНОЕ</div>
+        <div className="ios-form-group">
+          <div style={sectionLabel}>Основное</div>
           <div className="form-field">
-            <label className="form-label">НАИМЕНОВАНИЕ</label>
+            <label className="form-label">Наименование</label>
             <input className="form-input" placeholder="ООО «Компания»" value={form.name} onChange={e => set('name', e.target.value)} required />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div className="form-field">
-              <label className="form-label">КОНТАКТНОЕ ЛИЦО</label>
+              <label className="form-label">Контактное лицо</label>
               <input className="form-input" placeholder="Фамилия И.О." value={form.contact_person} onChange={e => set('contact_person', e.target.value)} />
             </div>
             <div className="form-field">
-              <label className="form-label">ТЕЛЕФОН</label>
+              <label className="form-label">Телефон</label>
               <input className="form-input" placeholder="+375 29 000-00-00" value={form.phone} onChange={e => set('phone', e.target.value)} />
             </div>
           </div>
           <div className="form-field">
-            <label className="form-label">EMAIL</label>
+            <label className="form-label">Email</label>
             <input className="form-input" type="email" placeholder="email@company.by" value={form.email} onChange={e => set('email', e.target.value)} />
           </div>
         </div>
 
         {/* Реквизиты */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={sectionLabel}>РЕКВИЗИТЫ</div>
+        <div className="ios-form-group">
+          <div style={sectionLabel}>Реквизиты</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div className="form-field">
               <label className="form-label">УНП</label>
               <input className="form-input" placeholder="100000000" value={form.unp} onChange={e => set('unp', e.target.value)} />
             </div>
             <div className="form-field">
-              <label className="form-label">ДИРЕКТОР (Фамилия И.О.)</label>
+              <label className="form-label">Директор (Фамилия И.О.)</label>
               <input className="form-input" placeholder="Иванов И.И." value={form.director} onChange={e => set('director', e.target.value)} />
             </div>
           </div>
           <div className="form-field">
-            <label className="form-label">ДЕЙСТВУЕТ НА ОСНОВАНИИ</label>
+            <label className="form-label">Действует на основании</label>
             <input className="form-input" placeholder="Устава" value={form.basis} onChange={e => set('basis', e.target.value)} />
           </div>
           <div className="form-field">
-            <label className="form-label">ЮРИДИЧЕСКИЙ АДРЕС</label>
+            <label className="form-label">Юридический адрес</label>
             <input className="form-input" placeholder="220001, г. Минск, ул. Ленина, д. 1" value={form.legal_address} onChange={e => set('legal_address', e.target.value)} />
           </div>
           <div className="form-field">
-            <label className="form-label">ПОЧТОВЫЙ АДРЕС</label>
+            <label className="form-label">Почтовый адрес</label>
             <input className="form-input" placeholder="220001, г. Минск, ул. Ленина, д. 1" value={form.postal_address} onChange={e => set('postal_address', e.target.value)} />
           </div>
         </div>
 
         {/* Банковские реквизиты */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={sectionLabel}>БАНКОВСКИЕ РЕКВИЗИТЫ</div>
+        <div className="ios-form-group">
+          <div style={sectionLabel}>Банковские реквизиты</div>
           <div className="form-field">
-            <label className="form-label">БАНК</label>
+            <label className="form-label">Банк</label>
             <input className="form-input" placeholder="ОАО «АСБ Беларусбанк»" value={form.bank_name} onChange={e => set('bank_name', e.target.value)} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 12 }}>
             <div className="form-field">
-              <label className="form-label">РАСЧЁТНЫЙ СЧЁТ</label>
+              <label className="form-label">Расчётный счёт</label>
               <input className="form-input" placeholder="BY20AKBB..." value={form.bank_account} onChange={e => set('bank_account', e.target.value)} />
             </div>
             <div className="form-field">
@@ -117,15 +117,15 @@ export default function AddClientModal({ onClose, onSuccess }) {
         </div>
 
         {/* Доп */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={sectionLabel}>ДОПОЛНИТЕЛЬНО</div>
+        <div className="ios-form-group">
+          <div style={sectionLabel}>Дополнительно</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div className="form-field">
-              <label className="form-label">ГРУЗ</label>
+              <label className="form-label">Груз</label>
               <input className="form-input" placeholder="Тип груза" value={form.cargo_types} onChange={e => set('cargo_types', e.target.value)} />
             </div>
             <div className="form-field">
-              <label className="form-label">УСЛОВИЯ ОПЛАТЫ</label>
+              <label className="form-label">Условия оплаты</label>
               <Select className="form-input" value={form.payment_terms} onChange={e => set('payment_terms', e.target.value)}>
                 <option>по факту</option>
                 <option>14 дней</option>

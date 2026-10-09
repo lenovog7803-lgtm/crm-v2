@@ -13,6 +13,7 @@ import { StatusOrb } from './StatusOrb'
 import { useChangeFlash } from '../hooks/useChangeFlash'
 import CheckCircle from './CheckCircle'
 import { iosConfirm } from './IOSAlert'
+import DateInput from './DateInput'
 
 const BULK_STATUSES = [
   { id: 'new', label: 'Новая' },
@@ -831,7 +832,7 @@ function CorrespondenceModal({ orderIds, onClose, onSaved }) {
         <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
           Дата и время
         </div>
-        <input
+        <DateInput
           type="datetime-local"
           value={date}
           onChange={e => setDate(e.target.value)}

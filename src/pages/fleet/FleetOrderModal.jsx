@@ -10,7 +10,7 @@ const iStyle = {
   border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)',
   fontFamily: 'var(--font-sys)', fontSize: 13, color: '#0E1726', outline: 'none', boxSizing: 'border-box',
 }
-const labelSt = { fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', marginBottom: 5, display: 'block' }
+const labelSt = { fontSize: 13, fontWeight: 500, color: '#6B7480', marginBottom: 6, paddingLeft: 4, display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }
 
 export function fmtDate(v) {
   if (!v) return '—'
@@ -21,7 +21,7 @@ export function fmtDate(v) {
 const Field = ({ label, children }) => <div><label style={labelSt}>{label}</label>{children}</div>
 const Grid2 = ({ children }) => <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 12 }}>{children}</div>
 const SectionTitle = ({ title }) => (
-  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: '#A6AEB8', paddingBottom: 8, borderBottom: '1px solid rgba(14,23,38,0.07)' }}>{title}</div>
+  <div style={{ fontSize: 16, fontWeight: 700, color: '#0E1726', letterSpacing: '-0.01em' }}>{title}</div>
 )
 const vehLabel = v => [v?.model, v?.plate || v?.plate_truck].filter(Boolean).join(', ')
 
@@ -113,9 +113,9 @@ export function FleetOrderModal({ tripId, direction, order, trip, onClose, onSav
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <SectionTitle title="КЛИЕНТ" />
-          <Field label="КЛИЕНТ">
+        <div className="ios-form-group">
+          <SectionTitle title="Клиент" />
+          <Field label="Клиент">
             <Select style={iStyle} value={form.client_id} onChange={e => set('client_id', e.target.value)}>
               <option value="">Выберите клиента…</option>
               {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -123,9 +123,9 @@ export function FleetOrderModal({ tripId, direction, order, trip, onClose, onSav
           </Field>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <SectionTitle title="ТС И ВОДИТЕЛЬ" />
-          <Field label="ТС И ВОДИТЕЛЬ — из рейса, автоматически">
+        <div className="ios-form-group">
+          <SectionTitle title="ТС И водитель" />
+          <Field label="ТС И водитель — из рейса, автоматически">
             <div style={{ ...iStyle, height: 'auto', minHeight: 38, padding: '9px 12px', display: 'flex', alignItems: 'center', color: '#5A6573', background: 'rgba(14,23,38,0.03)' }}>
               {tcLine || '— не задано в рейсе —'}
             </div>

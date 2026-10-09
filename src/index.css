@@ -123,10 +123,10 @@ input[type="number"] {
 }
 
 .form-field { display: flex; flex-direction: column; gap: 6px; }
-.form-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-tertiary); }
+.form-label { font-size: 13px; font-weight: 500; color: #6B7480; padding-left: 4px; }
 .form-input {
-  padding: 10px 13px; border-radius: 11px; border: 1px solid transparent;
-  background: rgba(118,118,128,0.12); font-family: var(--font-sys); font-size: 14px; color: #0E1726;
+  padding: 10px 13px; border-radius: 11px; border: 1px solid rgba(14,23,38,0.11);
+  background: #fff; font-family: var(--font-sys); font-size: 14px; color: #0E1726;
   outline: none;
   transition: background 0.15s var(--ease), box-shadow 0.15s var(--ease), border-color 0.15s var(--ease);
 }
@@ -683,14 +683,14 @@ input[type="number"] {
 @media (prefers-reduced-motion: reduce) { .ios-check { transition: none; } }
 
 
-/* ===== iOS 26: поля ввода по всей CRM — серая заливка без рамки, при фокусе белое с синим ободком ===== */
+/* ===== iOS 26: поля ввода по всей CRM — белые с тонкой рамкой, при фокусе синий ободок ===== */
 .app-root input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not(.search-pill-input):not([data-plain]),
 .app-root textarea:not([data-plain]),
 .app-root .apple-select {
-  background: rgba(118,118,128,0.12) !important;
-  border: 1px solid transparent !important;
+  background: #fff !important;
+  border: 1px solid rgba(14,23,38,0.11) !important;
   border-radius: 11px !important;
-  box-shadow: none !important;
+  box-shadow: 0 1px 2px rgba(14,23,38,0.04) !important;
   color: #0E1726;
   caret-color: #1366F0;
   transition: background 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
@@ -818,9 +818,40 @@ input[type="number"] {
 /* iOS 26: группа полей в форме — белая карточка на сером листе («Настройки») */
 .ios-form-group {
   display: flex; flex-direction: column; gap: 12px;
-  background: rgba(255,255,255,0.9); border-radius: 20px; padding: 16px;
-  box-shadow: 0 0 0 0.5px rgba(14,23,38,0.06), 0 1px 3px rgba(14,23,38,0.04);
+  background: rgba(244,246,249,0.75); border-radius: 20px; padding: 16px;
+  box-shadow: inset 0 0 0 1px rgba(14,23,38,0.05);
 }
-/* поля внутри группы — серая заливка видна на белом */
-.app-root .ios-form-group input:not([type="checkbox"]):not([type="radio"]):not([data-plain]),
-.app-root .ios-form-group textarea { background: rgba(118,118,128,0.1) !important; }
+
+/* ===== iOS 26: календарь ===== */
+.date-input { cursor: pointer; text-align: left; gap: 8px; }
+.ios-cal {
+  position: fixed; z-index: 3000; width: 300px; padding: 14px 12px 10px; border-radius: 24px;
+  background: rgba(255,255,255,0.88); -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%);
+  box-shadow: 0 0 0 0.5px rgba(14,23,38,0.08), 0 24px 60px -16px rgba(20,30,55,0.35), 0 4px 12px rgba(20,30,55,0.08);
+  font-family: var(--font-sys); animation: iosCalIn 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes iosCalIn { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: none; } }
+.ios-cal-head { display: flex; align-items: center; gap: 4px; padding: 0 6px 10px; }
+.ios-cal-title { flex: 1; font-size: 17px; font-weight: 600; color: #0E1726; letter-spacing: -0.02em; }
+.ios-cal-nav { width: 32px; height: 32px; border-radius: 50%; border: none; background: transparent; color: #1366F0; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; transition: background 0.12s; }
+.ios-cal-nav:hover { background: rgba(19,102,240,0.1); }
+.ios-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 2px; }
+.ios-cal-wd { text-align: center; font-size: 12px; font-weight: 600; color: rgba(60,60,67,0.4); padding-bottom: 6px; }
+.ios-cal-day { height: 38px; width: 38px; margin: 0 auto; border-radius: 50%; border: none; background: transparent; cursor: pointer;
+  font-family: var(--font-sys); font-size: 17px; font-weight: 400; color: #0E1726; font-variant-numeric: tabular-nums;
+  transition: background 0.12s, color 0.12s, transform 0.12s; }
+.ios-cal-day:hover { background: rgba(19,102,240,0.08); }
+.ios-cal-day:active { transform: scale(0.9); }
+.ios-cal-day.is-today { color: #1366F0; font-weight: 600; }
+.ios-cal-day.is-sel { background: #1366F0; color: #fff; font-weight: 600; }
+.ios-cal-day.is-sel.is-today { background: #1366F0; }
+.ios-cal-time { display: flex; align-items: center; justify-content: space-between; margin: 8px 6px 0; padding-top: 10px;
+  border-top: 0.5px solid rgba(60,60,67,0.18); font-size: 15px; color: #0E1726; }
+.ios-cal-time input { border: none; outline: none; background: rgba(118,118,128,0.12); border-radius: 8px; padding: 5px 10px;
+  font-family: var(--font-sys); font-size: 16px; color: #0E1726; font-variant-numeric: tabular-nums; }
+.ios-cal-foot { display: flex; gap: 6px; margin-top: 8px; padding: 8px 4px 0; border-top: 0.5px solid rgba(60,60,67,0.18); }
+.ios-cal-foot button { border: none; background: transparent; color: #1366F0; font-family: var(--font-sys); font-size: 15px;
+  padding: 6px 10px; border-radius: 10px; cursor: pointer; }
+.ios-cal-foot button:hover { background: rgba(19,102,240,0.08); }
+@media (prefers-reduced-motion: reduce) { .ios-cal { animation: none; } }

@@ -8,6 +8,7 @@ import { SlidingTabs } from './SlidingTabs'
 import { mouseOnly } from '../motion'
 import Select from './Select'
 import { EmptyState } from './EmptyState'
+import DateInput from './DateInput'
 
 export default function Finance({ refreshKey }) {
   const isMobile = useIsMobile()
@@ -292,17 +293,17 @@ export default function Finance({ refreshKey }) {
               </div>
               {/* ПП */}
               <div>
-                <div style={{ fontSize: 10.5, fontWeight: 700, color: '#A6AEB8', letterSpacing: '0.08em', marginBottom: 5 }}>№ ПП</div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>№ ПП</div>
                 <input value={addPP} onChange={e => setAddPP(e.target.value)} required placeholder="12345" style={{ ...iStyle, width: '100%' }} />
               </div>
               {/* Дата */}
               <div>
-                <div style={{ fontSize: 10.5, fontWeight: 700, color: '#A6AEB8', letterSpacing: '0.08em', marginBottom: 5 }}>ДАТА</div>
-                <input type="date" value={addDate} onChange={e => setAddDate(e.target.value)} required style={{ ...iStyle, width: '100%' }} />
+                <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>Дата</div>
+                <DateInput type="date" value={addDate} onChange={e => setAddDate(e.target.value)} required style={{ ...iStyle, width: '100%' }} />
               </div>
               {/* Сумма */}
               <div>
-                <div style={{ fontSize: 10.5, fontWeight: 700, color: '#A6AEB8', letterSpacing: '0.08em', marginBottom: 5 }}>СУММА (BYN)</div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>Сумма (BYN)</div>
                 <input type="number" value={addAmount} onChange={e => setAddAmount(e.target.value)} required placeholder="0.00" step="0.01" style={{ ...iStyle, width: '100%' }} />
               </div>
             </div>
@@ -686,7 +687,7 @@ function PPLedgerModal({ type, entityId, entityName, onClose }) {
 
         <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
           <input value={ppNumber} onChange={e => setPpNumber(e.target.value)} placeholder="№ ПП" style={{ width: 90, padding: '9px 10px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 12 }} />
-          <input type="date" value={ppDate} onChange={e => setPpDate(e.target.value)} style={{ width: 130, padding: '9px 10px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 12 }} />
+          <DateInput type="date" value={ppDate} onChange={e => setPpDate(e.target.value)} style={{ width: 130, padding: '9px 10px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 12 }} />
           <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Сумма" style={{ flex: 1, padding: '9px 10px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 12 }} />
           <button onClick={add} style={{ width: 34, height: 34, borderRadius: 10, background: '#1366F0', color: '#fff', border: 'none', fontSize: 16, cursor: 'pointer' }}>+</button>
         </div>

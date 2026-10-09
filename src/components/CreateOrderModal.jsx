@@ -3,6 +3,7 @@ import { ModalOverlay, ModalHeader } from './Modal'
 import { createOrder, updateOrder, getClients, getCarriers, getToken, syncToSheets } from '../api'
 import { mouseOnly } from '../motion'
 import { iosConfirm } from './IOSAlert'
+import DateInput from './DateInput'
 
 const POPULAR_CITIES = [
   'Минск', 'Брест', 'Гродно', 'Гомель', 'Могилёв', 'Витебск', 'Бобруйск',
@@ -299,10 +300,10 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
           <SectionTitle title="Даты" />
           <Grid2>
             <Field label="Загрузка">
-              <input type="date" value={form.load_date} onChange={e => upd('load_date', e.target.value)} style={iStyle} />
+              <DateInput type="date" value={form.load_date} onChange={e => upd('load_date', e.target.value)} style={iStyle} />
             </Field>
             <Field label="Выгрузка">
-              <input type="date" value={form.unload_date} onChange={e => upd('unload_date', e.target.value)} style={iStyle} />
+              <DateInput type="date" value={form.unload_date} onChange={e => upd('unload_date', e.target.value)} style={iStyle} />
             </Field>
           </Grid2>
         </div>

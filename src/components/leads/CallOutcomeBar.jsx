@@ -3,6 +3,7 @@ import { OUTCOMES, LOST_REASONS, DATE_PRESETS } from '../../constants/leads'
 import { OutcomeIcon } from './OutcomeIcon'
 import { SwapText } from '../Transitions'
 import Select from '../Select'
+import DateInput from '../DateInput'
 
 const labelStyle = { fontSize: 13, fontWeight: 700, color: '#0E1726', letterSpacing: '-0.01em', marginBottom: 10, display: 'block' }
 
@@ -109,7 +110,7 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 4 }) {
               </button>
             ))}
           </div>
-          <input
+          <DateInput
             type="datetime-local"
             value={nextCall}
             onChange={e => setNextCall(e.target.value)}

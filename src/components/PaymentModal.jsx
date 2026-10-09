@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { ModalOverlay, ModalHeader } from './Modal'
 import { createPaymentIn, createPaymentOut, getClients, getCarriers } from '../api'
 import Select from './Select'
+import DateInput from './DateInput'
 
 export default function PaymentModal({ defaultKind, onClose, onSuccess }) {
   const [clients, setClients] = useState([])
@@ -50,7 +51,7 @@ export default function PaymentModal({ defaultKind, onClose, onSuccess }) {
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
           <div className="form-field">
-            <label className="form-label">ТИП</label>
+            <label className="form-label">Тип</label>
             <Select className="form-input" value={form.kind} onChange={e => {
               const k = e.target.value
               set('kind', k)
@@ -62,7 +63,7 @@ export default function PaymentModal({ defaultKind, onClose, onSuccess }) {
             </Select>
           </div>
           <div className="form-field">
-            <label className="form-label">СТОРОНА</label>
+            <label className="form-label">Сторона</label>
             <Select className="form-input" value={form.party} onChange={e => { set('party', e.target.value); set('partyId', '') }}>
               <option value="client">Клиент</option>
               <option value="carrier">Перевозчик</option>
@@ -70,7 +71,7 @@ export default function PaymentModal({ defaultKind, onClose, onSuccess }) {
           </div>
         </div>
         <div className="form-field">
-          <label className="form-label">КОНТРАГЕНТ</label>
+          <label className="form-label">Контрагент</label>
           <Select className="form-input" value={form.partyId} onChange={e => set('partyId', e.target.value)} required>
             <option value="">— Выберите —</option>
             {partyList.map(p => <option key={p.id} value={p.id}>{p.name || p.company_name}</option>)}
@@ -78,16 +79,16 @@ export default function PaymentModal({ defaultKind, onClose, onSuccess }) {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
           <div className="form-field">
-            <label className="form-label">СУММА (BYN)</label>
+            <label className="form-label">Сумма (BYN)</label>
             <input className="form-input" type="number" placeholder="0" value={form.amount} onChange={e => set('amount', e.target.value)} required />
           </div>
           <div className="form-field">
-            <label className="form-label">ДАТА</label>
-            <input className="form-input" type="date" value={form.date} onChange={e => set('date', e.target.value)} />
+            <label className="form-label">Дата</label>
+            <DateInput className="form-input" type="date" value={form.date} onChange={e => set('date', e.target.value)} />
           </div>
         </div>
         <div className="form-field">
-          <label className="form-label">НОМЕР ПП</label>
+          <label className="form-label">Номер ПП</label>
           <input className="form-input" placeholder="ПП №1234" value={form.pp_number} onChange={e => set('pp_number', e.target.value)} />
         </div>
         {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center' }}>{error}</div>}

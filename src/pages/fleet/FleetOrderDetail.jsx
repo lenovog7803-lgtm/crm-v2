@@ -12,6 +12,7 @@ import { Loader } from '../../components/Loader'
 import { SwapText } from '../../components/Transitions'
 import Switch from '../../components/Switch'
 import { iosConfirm } from '../../components/IOSAlert'
+import DateInput from '../../components/DateInput'
 
 const sLabel = { fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', marginBottom: 12 }
 const SLabel = ({ children }) => <div style={sLabel}>{children}</div>
@@ -181,7 +182,7 @@ function PaymentsCard({ order, cur, onReload, onFull }) {
             <input value={pp} onChange={e => setPp(e.target.value)} placeholder="№ ПП" style={{ ...iStyle, flex: 1 }} />
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <input type="date" value={date} onChange={e => setDate(e.target.value)} style={{ ...iStyle, flex: 1 }} />
+            <DateInput type="date" value={date} onChange={e => setDate(e.target.value)} style={{ ...iStyle, flex: 1 }} />
             <label style={{ display: 'flex', gap: 6, alignItems: 'center', fontSize: 12, color: '#5A6573', whiteSpace: 'nowrap' }}>
               <Switch size="sm" checked={cash} onChange={e => setCash(e.target.checked)} /> наличными
             </label>

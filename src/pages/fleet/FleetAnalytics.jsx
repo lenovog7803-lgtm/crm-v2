@@ -4,6 +4,7 @@ import { useToast } from '../../components/Toast'
 import { CountUp } from '../../components/CountUp'
 import { PillBtn } from './fleetUi'
 import { Loader } from '../../components/Loader'
+import DateInput from '../../components/DateInput'
 
 const int = v => Math.round(Number(v) || 0).toLocaleString('ru-RU')
 const MONTHS_RU = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек']
@@ -97,9 +98,9 @@ export default function FleetAnalytics({ onBack }) {
           <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color: '#0E1726' }}>Аналитика автопарка</div>
           <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>{d.trips_total} рейсов · {int(d.total_km)} км</div>
         </div>
-        <input type="date" value={from} onChange={e => setFrom(e.target.value)} style={inp} />
+        <DateInput type="date" value={from} onChange={e => setFrom(e.target.value)} style={inp} />
         <span style={{ color: '#A6AEB8' }}>—</span>
-        <input type="date" value={to} onChange={e => setTo(e.target.value)} style={inp} />
+        <DateInput type="date" value={to} onChange={e => setTo(e.target.value)} style={inp} />
       </div>
 
       {/* KPI */}

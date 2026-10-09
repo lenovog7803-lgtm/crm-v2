@@ -3,6 +3,7 @@ import { ModalOverlay, ModalHeader } from './Modal'
 import { createTask, getAllUsers } from '../api'
 import { useAuth } from '../AuthContext'
 import Select from './Select'
+import DateInput from './DateInput'
 
 const ROLE_LABEL = { admin: 'директор', director: 'директор', manager: 'менеджер' }
 
@@ -43,12 +44,12 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
       <ModalHeader title="Новая задача" onClose={onClose} />
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <div className="form-field">
-          <label className="form-label">НАЗВАНИЕ</label>
+          <label className="form-label">Название</label>
           <input className="form-input" placeholder="Описание задачи" value={form.title} onChange={e => set('title', e.target.value)} required />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
           <div className="form-field">
-            <label className="form-label">ТИП</label>
+            <label className="form-label">Тип</label>
             <Select className="form-input" value={form.task_type} onChange={e => set('task_type', e.target.value)}>
               <option value="call">Звонок</option>
               <option value="reminder">Напоминание</option>
@@ -57,18 +58,18 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
             </Select>
           </div>
           <div className="form-field">
-            <label className="form-label">СРОК</label>
-            <input className="form-input" type="date" value={form.due_date} onChange={e => set('due_date', e.target.value)} />
+            <label className="form-label">Срок</label>
+            <DateInput className="form-input" type="date" value={form.due_date} onChange={e => set('due_date', e.target.value)} />
           </div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
           <div className="form-field">
-            <label className="form-label">ВРЕМЯ</label>
+            <label className="form-label">Время</label>
             <input className="form-input" type="time" value={form.due_time} onChange={e => set('due_time', e.target.value)} />
           </div>
           {isDirector && (
             <div className="form-field">
-              <label className="form-label">НАЗНАЧИТЬ</label>
+              <label className="form-label">Назначить</label>
               <Select className="form-input" value={form.assigned_user_id} onChange={e => set('assigned_user_id', e.target.value)}>
                 <option value="">Не назначать</option>
                 {users.map(u => (
@@ -79,7 +80,7 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
           )}
         </div>
         <div className="form-field">
-          <label className="form-label">ОПИСАНИЕ</label>
+          <label className="form-label">Описание</label>
           <input className="form-input" placeholder="Напр. Заявка №А2-2847 · БелСталь" value={form.description} onChange={e => set('description', e.target.value)} />
         </div>
         {form.due_time && !form.due_date && (

@@ -4,6 +4,7 @@ import { useToast } from '../../components/Toast'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { SwapText } from '../../components/Transitions'
 import Switch from '../../components/Switch'
+import DateInput from '../../components/DateInput'
 
 const today = () => new Date().toISOString().slice(0, 10)
 const fieldStyle = {
@@ -58,7 +59,7 @@ export default function FleetPaymentModal({ order, onClose, onSaved }) {
         )}
 
         <div style={lbl}>Дата оплаты</div>
-        <input type="date" value={payDate} onChange={e => setPayDate(e.target.value)} style={{ ...fieldStyle, marginBottom: 22 }} />
+        <DateInput type="date" value={payDate} onChange={e => setPayDate(e.target.value)} style={{ ...fieldStyle, marginBottom: 22 }} />
 
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', fontSize: 14, color: '#5A6573', cursor: 'pointer' }}>Отмена</button>

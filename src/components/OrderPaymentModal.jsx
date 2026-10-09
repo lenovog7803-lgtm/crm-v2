@@ -4,6 +4,7 @@ import { useToast } from './Toast'
 import { useEscapeKey } from '../hooks/useEscapeKey'
 import { SwapText } from './Transitions'
 import Switch from './Switch'
+import DateInput from './DateInput'
 
 const today = () => new Date().toISOString().slice(0, 10)
 
@@ -230,7 +231,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
             <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>
               Дата получения
             </div>
-            <input
+            <DateInput
               type="date"
               value={cashDate}
               onChange={e => setCashDate(e.target.value)}
@@ -268,7 +269,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
                   placeholder="№ ПП"
                   style={{ width: 90, padding: '9px 10px', borderRadius: 10, border: `1px solid ${dirty ? '#1366F0' : '#E8EAEE'}`, background: '#FFFFFF', fontSize: 12, color: '#0E1726', boxSizing: 'border-box' }}
                 />
-                <input
+                <DateInput
                   type="date"
                   value={p.pp_date}
                   onChange={e => updateExisting(p.id, 'pp_date', e.target.value)}
@@ -315,7 +316,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
                 autoFocus={p.id === 'new-0'}
                 style={{ width: 90, padding: '9px 10px', borderRadius: 10, border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 12, color: '#0E1726', boxSizing: 'border-box' }}
               />
-              <input
+              <DateInput
                 type="date"
                 value={p.pp_date}
                 onChange={e => updateRow(p.id, 'pp_date', e.target.value)}

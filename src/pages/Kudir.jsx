@@ -4,6 +4,7 @@ import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
 import { fmtMoney, fmtDate } from '../utils'
 import { Loader } from '../components/Loader'
+import DateInput from '../components/DateInput'
 
 const TABS = [
   { key: 'backfill', label: 'Дозаполнить' },
@@ -75,7 +76,7 @@ function MissingPPRow({ order, onSaved }) {
               style={{ ...inputStyle, width: meta.width }}
             />
             {meta.dateKey && (
-              <input
+              <DateInput
                 type="date"
                 value={dates[key]}
                 onChange={e => setDates(d => ({ ...d, [key]: e.target.value }))}

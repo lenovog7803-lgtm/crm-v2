@@ -9,6 +9,7 @@ import CheckCircle from './CheckCircle'
 import Select from './Select'
 import { EmptyState } from './EmptyState'
 import { useChangeFlash } from '../hooks/useChangeFlash'
+import DateInput from './DateInput'
 
 const TYPE_COLORS = { call: '#1366F0', reminder: '#D97706', payment: '#1E9E5A', other: '#8A93A0' }
 const TYPE_BG = { call: 'rgba(19,102,240,0.1)', reminder: 'rgba(217,119,6,0.1)', payment: 'rgba(30,158,90,0.1)', other: 'rgba(138,147,160,0.1)' }
@@ -201,7 +202,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <div>
                 <label style={labelStyle}>Срок</label>
-                <input
+                <DateInput
                   type="date"
                   value={editTask.due_date}
                   onChange={e => setEditTask(p => ({ ...p, due_date: e.target.value }))}

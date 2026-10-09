@@ -5,7 +5,7 @@ import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { SwapText } from '../Transitions'
 import Select from '../Select'
 
-const labelStyle = { fontSize: 12, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.05em', marginBottom: 6, display: 'block' }
+const labelStyle = { fontSize: 13, fontWeight: 500, color: '#6B7480', marginBottom: 6, paddingLeft: 4, display: 'block' }
 const fieldStyle = { width: '100%', background: '#F7F8FA' }
 
 export default function LeadEditModal({ lead, onClose, onSaved }) {
@@ -79,43 +79,43 @@ export default function LeadEditModal({ lead, onClose, onSaved }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div>
-              <label style={labelStyle}>НАЗВАНИЕ КОМПАНИИ</label>
+              <label style={labelStyle}>Название компании</label>
               <input value={form.name || ''} onChange={set('name')} className="form-input" style={fieldStyle} />
             </div>
             <div>
-              <label style={labelStyle}>ТЕЛЕФОН</label>
+              <label style={labelStyle}>Телефон</label>
               <input value={form.phone || ''} onChange={set('phone')} className="form-input" style={fieldStyle} />
             </div>
             <div>
-              <label style={labelStyle}>КОНТАКТНОЕ ЛИЦО</label>
+              <label style={labelStyle}>Контактное лицо</label>
               <input value={form.contact_person || ''} onChange={set('contact_person')} className="form-input" style={fieldStyle} />
             </div>
             <div>
-              <label style={labelStyle}>ДОЛЖНОСТЬ</label>
+              <label style={labelStyle}>Должность</label>
               <input value={form.contact_position || ''} onChange={set('contact_position')} className="form-input" style={fieldStyle} />
             </div>
             <div>
-              <label style={labelStyle}>EMAIL</label>
+              <label style={labelStyle}>Email</label>
               <input value={form.email || ''} onChange={set('email')} className="form-input" style={fieldStyle} />
             </div>
             <div>
-              <label style={labelStyle}>САЙТ</label>
+              <label style={labelStyle}>Сайт</label>
               <input value={form.website || ''} onChange={set('website')} className="form-input" style={fieldStyle} />
             </div>
             <div>
-              <label style={labelStyle}>ОТРАСЛЬ</label>
+              <label style={labelStyle}>Отрасль</label>
               <input value={form.industry || ''} onChange={set('industry')} className="form-input" style={fieldStyle} />
             </div>
             <div>
-              <label style={labelStyle}>ГОРОД</label>
+              <label style={labelStyle}>Город</label>
               <input value={form.city || ''} onChange={set('city')} className="form-input" style={fieldStyle} />
             </div>
             <div>
-              <label style={labelStyle}>РЕГИОН</label>
+              <label style={labelStyle}>Регион</label>
               <input value={form.region || ''} onChange={set('region')} className="form-input" style={fieldStyle} />
             </div>
             <div>
-              <label style={labelStyle}>СТАДИЯ</label>
+              <label style={labelStyle}>Стадия</label>
               <Select value={form.stage || 'new'} onChange={set('stage')} className="form-input" style={fieldStyle}>
                 {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
               </Select>
@@ -123,7 +123,7 @@ export default function LeadEditModal({ lead, onClose, onSaved }) {
           </div>
 
           <div>
-            <label style={labelStyle}>ЗАМЕТКИ</label>
+            <label style={labelStyle}>Заметки</label>
             <textarea value={form.notes || ''} onChange={set('notes')} className="form-input" style={{ ...fieldStyle, height: 80, resize: 'vertical' }} />
           </div>
 

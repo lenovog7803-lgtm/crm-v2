@@ -98,22 +98,22 @@ function UserDetailModal({ user, onClose, onSaved }) {
         </div>
 
         <div>
-          <div style={{ fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', marginBottom: 5 }}>ЛОГИН</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>Логин</div>
           <input style={inputStyle} value={login} onChange={e => setLogin(e.target.value)} />
         </div>
         <div>
-          <div style={{ fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', marginBottom: 5 }}>ИМЯ</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>Имя</div>
           <input style={inputStyle} value={name} onChange={e => setName(e.target.value)} />
         </div>
         <div>
-          <div style={{ fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', marginBottom: 5 }}>НОВЫЙ ПАРОЛЬ</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>Новый пароль</div>
           <input type="password" style={inputStyle} value={password} onChange={e => setPassword(e.target.value)} placeholder="Оставьте пустым, чтобы не менять" autoComplete="new-password" />
           <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 5, lineHeight: 1.4 }}>
             Текущий пароль хранится хешированным и нигде не может быть показан — можно только задать новый.
           </div>
         </div>
         <div>
-          <div style={{ fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', marginBottom: 8 }}>ПРАВА ДОСТУПА</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 8 }}>Права доступа</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {PERMISSION_OPTIONS.map(p => (
               <label key={p.key} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 10, cursor: 'pointer', fontSize: 13, color: '#0E1726', background: perms[p.key] ? 'rgba(19,102,240,0.06)' : 'transparent' }}>
@@ -204,19 +204,19 @@ function UsersTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <form onSubmit={handleCreate} className="card" style={{ padding: 18, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr) auto', gap: 10, alignItems: 'end' }}>
         <div>
-          <div style={{ fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', marginBottom: 5 }}>ЛОГИН</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>Логин</div>
           <input style={inputStyle} value={form.login} onChange={e => set('login', e.target.value)} placeholder="ivan_m" required />
         </div>
         <div>
-          <div style={{ fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', marginBottom: 5 }}>ВРЕМЕННЫЙ ПАРОЛЬ</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>Временный пароль</div>
           <input style={inputStyle} value={form.password} onChange={e => set('password', e.target.value)} placeholder="••••••••" required />
         </div>
         <div>
-          <div style={{ fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', marginBottom: 5 }}>ИМЯ</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>Имя</div>
           <input style={inputStyle} value={form.name} onChange={e => set('name', e.target.value)} placeholder="Иван Менеджеров" required />
         </div>
         <div>
-          <div style={{ fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', marginBottom: 5 }}>ПЛАН ЗВОНКОВ/ДЕНЬ</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>План звонков/день</div>
           <input type="number" style={inputStyle} value={form.daily_call_goal} onChange={e => set('daily_call_goal', e.target.value)} min={1} />
         </div>
         <button type="submit" disabled={creating} className="btn-primary" style={{ height: 40, whiteSpace: 'nowrap' }}>
@@ -234,7 +234,7 @@ function UsersTab() {
             <thead>
               <tr>
                 {['Логин', 'Имя', 'Роль', 'Статус', 'План звонков/день', ''].map(h => (
-                  <th key={h} style={{ textAlign: 'left', padding: '10px 14px', fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</th>
+                  <th key={h} style={{ textAlign: 'left', padding: '10px 14px', fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, textTransform: 'uppercase' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -411,7 +411,7 @@ function StatsTab() {
             <thead>
               <tr>
                 {['Менеджер', 'Звонков', ...(period === 'today' ? ['% плана'] : []), 'Лидов в работе', 'Конверсия', 'Просрочки'].map(h => (
-                  <th key={h} style={{ textAlign: 'left', padding: '10px 14px', fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</th>
+                  <th key={h} style={{ textAlign: 'left', padding: '10px 14px', fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, textTransform: 'uppercase' }}>{h}</th>
                 ))}
               </tr>
             </thead>

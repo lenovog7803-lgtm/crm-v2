@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useEscapeKey } from '../hooks/useEscapeKey'
 import { SwapText } from './Transitions'
+import DateInput from './DateInput'
 
 // Gates "получено от перевозчика" behind the act number — the checkbox only
 // ticks once the number is entered and confirmed here, not on a plain click.
@@ -65,7 +66,7 @@ export default function CarrierActModal({ initialValue, initialDate, onClose, on
         <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
           Дата акта
         </div>
-        <input
+        <DateInput
           type="date"
           value={date}
           onChange={e => setDate(e.target.value)}

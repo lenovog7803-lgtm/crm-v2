@@ -5,8 +5,8 @@ import Select from './Select'
 import { iosConfirm } from './IOSAlert'
 
 const sectionLabel = {
-  fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: '#A6AEB8',
-  paddingBottom: 8, borderBottom: '1px solid rgba(14,23,38,0.07)', marginBottom: 4,
+  fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em', color: '#0E1726',
+  marginBottom: 2,
 }
 
 export default function AddCarrierModal({ onClose, onSuccess }) {
@@ -52,34 +52,34 @@ export default function AddCarrierModal({ onClose, onSuccess }) {
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
         {/* Основное */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={sectionLabel}>ОСНОВНОЕ</div>
+        <div className="ios-form-group">
+          <div style={sectionLabel}>Основное</div>
           <div className="form-field">
-            <label className="form-label">НАИМЕНОВАНИЕ</label>
+            <label className="form-label">Наименование</label>
             <input className="form-input" placeholder="ИП Иванов / ООО «ТрансЛайн»" value={form.company_name} onChange={e => set('company_name', e.target.value)} required />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div className="form-field">
-              <label className="form-label">ВОДИТЕЛЬ</label>
+              <label className="form-label">Водитель</label>
               <input className="form-input" placeholder="Фамилия И.О." value={form.driver_name} onChange={e => set('driver_name', e.target.value)} />
             </div>
             <div className="form-field">
-              <label className="form-label">ТЕЛЕФОН</label>
+              <label className="form-label">Телефон</label>
               <input className="form-input" placeholder="+375 29 000-00-00" value={form.phone} onChange={e => set('phone', e.target.value)} />
             </div>
           </div>
         </div>
 
         {/* Реквизиты */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={sectionLabel}>РЕКВИЗИТЫ</div>
+        <div className="ios-form-group">
+          <div style={sectionLabel}>Реквизиты</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div className="form-field">
               <label className="form-label">УНП</label>
               <input className="form-input" placeholder="100000000" value={form.unp} onChange={e => set('unp', e.target.value)} />
             </div>
             <div className="form-field">
-              <label className="form-label">ОСНОВАНИЕ</label>
+              <label className="form-label">Основание</label>
               <Select className="form-input" value={form.basis} onChange={e => set('basis', e.target.value)}>
                 <option value="Устава">Устава</option>
                 <option value="Свидетельства о гос. регистрации">Свидетельства о гос. регистрации</option>
@@ -87,24 +87,24 @@ export default function AddCarrierModal({ onClose, onSuccess }) {
             </div>
           </div>
           <div className="form-field">
-            <label className="form-label">ДИРЕКТОР</label>
+            <label className="form-label">Директор</label>
             <input className="form-input" placeholder="Иванов Иван Иванович" value={form.director} onChange={e => set('director', e.target.value)} />
           </div>
           <div className="form-field">
-            <label className="form-label">ЮРИДИЧЕСКИЙ АДРЕС</label>
+            <label className="form-label">Юридический адрес</label>
             <input className="form-input" placeholder="220000, г. Минск, ул. Ленина, д. 1" value={form.address} onChange={e => set('address', e.target.value)} />
           </div>
           <div className="form-field">
-            <label className="form-label">ПОЧТОВЫЙ АДРЕС</label>
+            <label className="form-label">Почтовый адрес</label>
             <input className="form-input" placeholder="220000, г. Минск, ул. Ленина, д. 1" value={form.postal_address} onChange={e => set('postal_address', e.target.value)} />
           </div>
         </div>
 
         {/* Банковские реквизиты */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={sectionLabel}>БАНКОВСКИЕ РЕКВИЗИТЫ</div>
+        <div className="ios-form-group">
+          <div style={sectionLabel}>Банковские реквизиты</div>
           <div className="form-field">
-            <label className="form-label">БАНК</label>
+            <label className="form-label">Банк</label>
             <input className="form-input" placeholder="ОАО «АСБ Беларусбанк»" value={form.bank} onChange={e => set('bank', e.target.value)} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
@@ -120,25 +120,25 @@ export default function AddCarrierModal({ onClose, onSuccess }) {
         </div>
 
         {/* ТС */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={sectionLabel}>ТРАНСПОРТ</div>
+        <div className="ios-form-group">
+          <div style={sectionLabel}>Транспорт</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div className="form-field">
-              <label className="form-label">ТИП ТС</label>
+              <label className="form-label">Тип ТС</label>
               <input className="form-input" placeholder="Тент / Реф / Контейнер" value={form.vehicle_type} onChange={e => set('vehicle_type', e.target.value)} />
             </div>
             <div className="form-field">
-              <label className="form-label">НОМЕР ТС</label>
+              <label className="form-label">Номер ТС</label>
               <input className="form-input" placeholder="АВ 1234-7" value={form.plate} onChange={e => set('plate', e.target.value)} />
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
             <div className="form-field">
-              <label className="form-label">ГРУЗОПОДЪЁМНОСТЬ (т)</label>
+              <label className="form-label">Грузоподъёмность (т)</label>
               <input className="form-input" type="number" placeholder="20" value={form.capacity_tons} onChange={e => set('capacity_tons', e.target.value)} />
             </div>
             <div className="form-field">
-              <label className="form-label">РЕГИОНЫ РАБОТЫ</label>
+              <label className="form-label">Регионы работы</label>
               <input className="form-input" placeholder="РБ, РФ, ЕС" value={form.regions} onChange={e => set('regions', e.target.value)} />
             </div>
           </div>
