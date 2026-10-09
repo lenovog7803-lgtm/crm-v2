@@ -69,6 +69,17 @@ const inputStyle = {
 const labelStyle = { fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 6 }
 const sectionTitle = { fontFamily: 'Onest', fontWeight: 700, fontSize: 15, color: '#0E1726', marginBottom: 12 }
 
+
+// Когда рассылка продолжит после дневного лимита: следующий будний день (по Москве).
+const nextWorkdayLabel = () => {
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Moscow' }))
+  const d = new Date(now); d.setDate(d.getDate() + 1)
+  while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1)
+  const days = Math.round((new Date(d.toDateString()) - new Date(now.toDateString())) / 864e5)
+  if (days === 1) return 'завтра утром'
+  return ['в воскресенье', 'в понедельник', 'во вторник', 'в среду', 'в четверг', 'в пятницу', 'в субботу'][d.getDay()] + ' утром'
+}
+
 // ---------------- Обзор ----------------
 // В стиле дашборда CRM: hero-карточки с градиентом, KPI-полоса, кольцевой прогресс, CountUp.
 const RAMP_STEPS = [{ until: 3, lim: 5 }, { until: 7, lim: 10 }, { until: 12, lim: 15 }, { until: Infinity, lim: 20 }]
@@ -181,7 +192,9 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
               <div style={{ width: `${todayPct}%`, height: '100%', borderRadius: 99, background: 'linear-gradient(90deg, #5BE89B, #2FC7A0)', transition: 'width 0.6s var(--ease)' }} />
             </div>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 10, minHeight: 16 }}>
-              {state.state}{state.next_at ? ` · дальше в ${state.next_at}` : ''}
+              {state.running && state.limit > 0 && state.sent_today >= state.limit
+                ? `Лимит на сегодня выполнен — продолжу ${nextWorkdayLabel()}`
+                : <>{state.state}{state.next_at ? ` · дальше в ${state.next_at}` : ''}</>}
             </div>
             {multi && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px', marginTop: 8, fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
