@@ -473,3 +473,58 @@ input[type="number"] {
 @media (prefers-reduced-transparency: reduce) {
   .spotlight { background: #FAFAFC !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
 }
+
+/* ===== Окно звонка в стиле macOS ===== */
+:root { --font-sys: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Manrope, sans-serif; }
+.call-window {
+  font-family: var(--font-sys);
+  background: rgba(246,247,250,0.82);
+  backdrop-filter: blur(40px) saturate(190%); -webkit-backdrop-filter: blur(40px) saturate(190%);
+  border: 1px solid rgba(255,255,255,0.7);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 0 0 0.5px rgba(14,23,38,0.14), 0 40px 100px -24px rgba(14,23,38,0.5);
+  animation: callWindowIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes callWindowIn { from { opacity: 0; transform: scale(0.97) translateY(6px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+/* «листы» внутри окна: белые, без рамок, мягкая тень — как группы в настройках macOS */
+.call-window .card.call-sheet {
+  background: rgba(255,255,255,0.86) !important; border: none !important; border-radius: 20px !important;
+  box-shadow: 0 0 0 0.5px rgba(14,23,38,0.08), 0 1px 3px rgba(14,23,38,0.05) !important;
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+.call-close {
+  width: 30px; height: 30px; border-radius: 99px; border: none; cursor: pointer; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(14,23,38,0.07); color: #5A6573; transition: background 150ms, color 150ms, transform 150ms;
+}
+.call-close:hover { background: rgba(224,71,59,0.14); color: #E0473B; }
+.call-close:active { transform: scale(0.92); }
+.call-pill {
+  display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 13px; border-radius: 99px;
+  border: none; cursor: pointer; text-decoration: none; font-family: var(--font-sys); font-size: 13px; font-weight: 600;
+  background: rgba(14,23,38,0.06); color: #3A4454; transition: background 150ms, transform 150ms;
+}
+.call-pill:hover { background: rgba(14,23,38,0.1); }
+.call-pill:active { transform: scale(0.97); }
+.call-pill--blue { background: #0A84FF; color: #fff; box-shadow: 0 4px 12px -4px rgba(10,132,255,0.6); }
+.call-pill--blue:hover { background: #0071E3; }
+.call-pill--green { background: rgba(48,209,88,0.14); color: #1E8E3E; }
+.call-pill--green:hover { background: rgba(48,209,88,0.24); }
+.call-icon-btn {
+  width: 28px; height: 28px; border-radius: 99px; border: none; cursor: pointer;
+  background: rgba(14,23,38,0.06); color: #5A6573; transition: background 150ms;
+}
+.call-icon-btn:hover { background: rgba(14,23,38,0.11); }
+.call-outcome { transition: background 150ms, box-shadow 150ms, transform 150ms; }
+.call-outcome:hover { transform: translateY(-1px); }
+.call-outcome:active { transform: scale(0.98); }
+.call-timeline .call-tl-row { display: flex; gap: 12px; padding: 10px 4px; border-bottom: 0.5px solid rgba(14,23,38,0.08); }
+.call-timeline .call-tl-row:last-child { border-bottom: none; }
+.call-save {
+  width: 100%; height: 48px; border-radius: 14px; border: none; font-family: var(--font-sys); font-size: 15px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; cursor: not-allowed;
+  background: rgba(14,23,38,0.06); color: #8A93A0; transition: background 200ms, color 200ms, box-shadow 200ms, transform 150ms;
+}
+.call-save.is-ready { cursor: pointer; background: linear-gradient(180deg, #2F95FF, #0A7BF5); color: #fff; box-shadow: 0 8px 20px -8px rgba(10,132,255,0.7), inset 0 1px 0 rgba(255,255,255,0.25); }
+.call-save.is-ready:active { transform: scale(0.985); }
+@media (prefers-reduced-motion: reduce) { .call-window { animation: none; } }
+@media (prefers-reduced-transparency: reduce) { .call-window { background: #F6F7FA; backdrop-filter: none; -webkit-backdrop-filter: none; } }

@@ -1,9 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { getLeads } from '../../api'
 import { STAGES, stageById } from '../../constants/leads'
-import CallCard from './CallCard'
-import CallOutcomeBar from './CallOutcomeBar'
-import ScriptPanel from './ScriptPanel'
 import LeadEditModal from './LeadEditModal'
 import { logCall, claimLead } from '../../api'
 import { SkeletonRow } from '../Skeleton'
@@ -13,6 +10,7 @@ import { useCelebration } from '../Celebration'
 import { useAuth } from '../../AuthContext'
 import { initials, getGradient } from '../../utils'
 import { mouseOnly } from '../../motion'
+import CallWindow from './CallWindow'
 
 const FILTERS_KEY = 'leads_list_filters'
 const ROW_GRID = 'minmax(0, 1.6fr) minmax(0, 1fr) 130px 120px 90px'
@@ -211,29 +209,8 @@ export default function ListView({ industry }) {
       )}
 
       {activeLead && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(10,16,28,0.65)', zIndex: 1000, display: 'grid', padding: 20, overflowY: 'auto' }}>
-          <div className="leads-call-modal" style={{ position: 'relative', width: '100%', maxWidth: 1000, margin: 'auto', borderRadius: 24, overflow: 'hidden', boxShadow: '0 40px 90px rgba(10,16,28,0.5)' }}>
-            {/* Слой 1 — сплошная плотная подложка под блюром */}
-            <div style={{ position: 'absolute', inset: 0, background: '#EEF1F5' }} />
-            {/* Слой 2 — стекло поверх подложки */}
-            <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(40px) saturate(180%)', WebkitBackdropFilter: 'blur(40px) saturate(180%)' }} />
-            <style>{`.leads-call-modal .card { background: rgba(255,255,255,0.5); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); border: 1px solid rgba(255,255,255,0.7); }`}</style>
-            {/* Слой 3 — контент */}
-            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 16, padding: 20 }}>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-                {!activeLead.assigned_to && (
-                  <button onClick={e => handleClaim(activeLead.id, e)} className="btn-primary" style={{ padding: '8px 14px', fontSize: 12.5 }}>Взять в работу</button>
-                )}
-                <button onClick={() => setActiveLead(null)} className="btn-ghost">Закрыть ✕</button>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, alignItems: 'start' }}>
-                <CallCard lead={activeLead} onEdit={setEditLead} />
-                <ScriptPanel stage={activeLead?.stage} />
-              </div>
-              <CallOutcomeBar lead={activeLead} onSave={handleSave} saving={saving} />
-            </div>
-          </div>
-        </div>
+        <CallWindow lead={activeLead} onClose={() => setActiveLead(null)} onClaim={(id, e) => handleClaim(id, e)}
+          onEdit={setEditLead} onSave={handleSave} saving={saving} />
       )}
 
       {editLead && (

@@ -47,16 +47,16 @@ export default function ScriptPanel({ stage }) {
   }
 
   return (
-    <div className="card" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div className="card call-sheet" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>
-          Скрипт · <span style={{ color: st.color }}>{st.label}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 14, color: '#0E1726', letterSpacing: '-0.01em' }}>
+          Скрипт <span style={{ padding: '2px 9px', borderRadius: 99, fontSize: 11.5, fontWeight: 600, background: st.bg || 'rgba(14,23,38,0.06)', color: st.color }}>{st.label}</span>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
           {!editing && (
-            <button onClick={startEdit} title="Редактировать" style={{ width: 28, height: 28, borderRadius: 8, border: 'none', cursor: 'pointer', background: 'rgba(14,23,38,0.06)', color: '#5A6573' }}>✎</button>
+            <button onClick={startEdit} title="Редактировать" className="call-icon-btn">✎</button>
           )}
-          <button onClick={() => setCollapsed(true)} title="Свернуть" style={{ width: 28, height: 28, borderRadius: 8, border: 'none', cursor: 'pointer', background: 'rgba(14,23,38,0.06)', color: '#5A6573' }}>»</button>
+          <button onClick={() => setCollapsed(true)} title="Свернуть" className="call-icon-btn">»</button>
         </div>
       </div>
 
@@ -73,7 +73,7 @@ export default function ScriptPanel({ stage }) {
           </div>
         </>
       ) : (
-        <div style={{ fontFamily: 'JetBrains Mono', fontSize: 12.5, color: '#3A4454', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+        <div style={{ fontFamily: 'var(--font-sys)', fontSize: 14.5, color: '#2A3342', whiteSpace: 'pre-wrap', lineHeight: 1.65, letterSpacing: '-0.005em' }}>
           {text || 'Нет скрипта для этой стадии.'}
         </div>
       )}

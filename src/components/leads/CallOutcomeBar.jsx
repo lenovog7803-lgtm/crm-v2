@@ -3,9 +3,9 @@ import { OUTCOMES, LOST_REASONS, DATE_PRESETS } from '../../constants/leads'
 import { OutcomeIcon } from './OutcomeIcon'
 import { SwapText } from '../Transitions'
 
-const labelStyle = { fontSize: 10, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8, display: 'block' }
+const labelStyle = { fontSize: 13, fontWeight: 700, color: '#0E1726', letterSpacing: '-0.01em', marginBottom: 10, display: 'block' }
 
-export default function CallOutcomeBar({ lead, onSave, saving }) {
+export default function CallOutcomeBar({ lead, onSave, saving, columns = 4 }) {
   const [outcome, setOutcome] = useState(null)
   const [comment, setComment] = useState('')
   const [lostReason, setLostReason] = useState('')
@@ -45,28 +45,30 @@ export default function CallOutcomeBar({ lead, onSave, saving }) {
   }
 
   return (
-    <div className="card" style={{ padding: 20 }}>
+    <div className="card call-sheet" style={{ padding: 20 }}>
       <span style={labelStyle}>Результат звонка</span>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 16 }}>
+      <div className="call-outcomes" style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: 8, marginBottom: 16 }}>
         {OUTCOMES.map(o => (
           <button
             key={o.id}
             onClick={() => { setOutcome(o.id); setError('') }}
+            className="call-outcome"
+            aria-pressed={outcome === o.id}
             style={{
-              display: 'flex', alignItems: 'center', gap: 9, padding: '9px 12px', borderRadius: 12,
-              background: outcome === o.id ? o.color + '1F' : '#F7F8FA',
-              border: `1.5px solid ${outcome === o.id ? o.color + '55' : 'rgba(14,23,38,0.08)'}`,
-              cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s var(--ease)',
+              display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 14,
+              background: outcome === o.id ? o.color + '1F' : 'rgba(255,255,255,0.75)',
+              boxShadow: outcome === o.id ? `inset 0 0 0 1.5px ${o.color}66` : 'inset 0 0 0 1px rgba(14,23,38,0.07), 0 1px 2px rgba(14,23,38,0.04)',
+              border: 'none', cursor: 'pointer', textAlign: 'left',
             }}
           >
             <span style={{
-              width: 26, height: 26, borderRadius: 9, flexShrink: 0,
+              width: 30, height: 30, borderRadius: 9, flexShrink: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               background: outcome === o.id ? o.color : o.color + '1A',
               color: outcome === o.id ? '#fff' : o.color,
               transition: 'all 0.15s var(--ease)',
             }}><OutcomeIcon id={o.id} size={14} /></span>
-            <span style={{ fontFamily: 'Manrope', fontSize: 12.5, fontWeight: outcome === o.id ? 700 : 500, color: outcome === o.id ? o.color : '#0E1726' }}>
+            <span style={{ fontFamily: 'var(--font-sys)', fontSize: 13.5, fontWeight: outcome === o.id ? 700 : 500, color: outcome === o.id ? o.color : '#0E1726' }}>
               {o.label}
             </span>
           </button>
@@ -123,8 +125,8 @@ export default function CallOutcomeBar({ lead, onSave, saving }) {
 
       {error && <div style={{ fontSize: 12, color: '#E0473B', marginBottom: 12 }}>{error}</div>}
 
-      <button onClick={handleSave} disabled={saving || !outcome} className="btn-primary" style={{ width: '100%', justifyContent: 'center', height: 46, opacity: (!outcome || saving) ? 0.5 : 1 }}>
-        <SwapText>{saving ? 'Сохраняю…' : 'Сохранить и следующий'}</SwapText>
+      <button onClick={handleSave} disabled={saving || !outcome} className={`call-save${outcome ? ' is-ready' : ''}`}>
+        <SwapText>{saving ? 'Сохраняю…' : outcome ? 'Сохранить и следующий' : 'Выберите результат звонка'}</SwapText>
       </button>
     </div>
   )

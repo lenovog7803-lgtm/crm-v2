@@ -13,13 +13,14 @@ function NoteIcon(p) {
   )
 }
 
-const chip = (bg, color) => ({ padding: '4px 11px', borderRadius: 8, background: bg, color, fontSize: 11.5, fontWeight: 600 })
+const chip = (bg, color) => ({ padding: '4px 11px', borderRadius: 99, background: bg, color, fontSize: 12, fontWeight: 600 })
 
-export default function CallCard({ lead, onEdit }) {
+// part: 'header' — шапка (без истории), 'history' — описание и история, по умолчанию — всё
+export default function CallCard({ lead, onEdit, part }) {
   const [history, setHistory] = useState([])
 
   useEffect(() => {
-    if (!lead?.id) return
+    if (!lead?.id || part === 'header') return
     getCallHistory(lead.id).then(r => setHistory(r.calls || [])).catch(() => setHistory([]))
   }, [lead?.id])
 
@@ -40,24 +41,30 @@ export default function CallCard({ lead, onEdit }) {
   const callEntries = history.map(h => ({ ...h, kind: 'call' }))
   const timeline = [...callEntries, ...legacyNotes].sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
 
-  return (
-    <div className="card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+  const headerEl = (
+    <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
           <div style={{
-            width: 50, height: 50, borderRadius: 16, flexShrink: 0,
-            background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
+            width: 56, height: 56, borderRadius: 15, flexShrink: 0,
+            background: `linear-gradient(160deg, ${avA} 0%, ${avB} 100%)`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', fontWeight: 700, fontSize: 16,
-            boxShadow: `0 8px 20px -8px ${avB}80`,
+            color: '#fff', fontWeight: 700, fontSize: 19, letterSpacing: '-0.02em',
+            boxShadow: `0 6px 16px -6px ${avB}90, inset 0 1px 0 rgba(255,255,255,0.35)`,
           }}>{initials(lead.name)}</div>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontFamily: 'Onest', fontWeight: 700, fontSize: 18, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.name}</div>
-            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 14.5, color: '#1366F0', marginTop: 4 }}>{lead.phone || '—'}</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 21, letterSpacing: '-0.02em', color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.name}</div>
+            {lead.phone ? (
+              <a href={`tel:${lead.phone.replace(/[^\d+]/g, '')}`} className="call-pill call-pill--green" style={{ marginTop: 6 }} title="Позвонить">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" /></svg>
+                <span style={{ fontFamily: 'JetBrains Mono', fontWeight: 600 }}>{lead.phone}</span>
+              </a>
+            ) : <div style={{ fontSize: 13, color: '#A6AEB8', marginTop: 4 }}>нет телефона</div>}
           </div>
         </div>
-        <button onClick={() => onEdit(lead)} className="btn-ghost" style={{ flexShrink: 0 }}>
-          Редактировать данные
+        <button onClick={() => onEdit(lead)} className="call-pill" style={{ flexShrink: 0 }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
+          Изменить
         </button>
       </div>
 
@@ -93,24 +100,27 @@ export default function CallCard({ lead, onEdit }) {
         )}
       </div>
 
-      {lead.notes && (
-        <div style={{ fontSize: 13, color: '#5A6573', lineHeight: 1.5, background: '#F7F8FA', border: '1px solid rgba(14,23,38,0.08)', borderRadius: 12, padding: '10px 13px' }}>
+    </>
+  )
+  const historyEl = (
+    <>      {lead.notes && (
+        <div style={{ fontSize: 13.5, color: '#3A4454', lineHeight: 1.55, background: 'rgba(14,23,38,0.035)', borderRadius: 14, padding: '12px 14px' }}>
           {lead.notes}
         </div>
       )}
 
       <div>
-        <div style={{ fontSize: 10, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
-          История звонков {timeline.length > 0 && `(${timeline.length})`}
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#0E1726', marginBottom: 10, letterSpacing: '-0.01em' }}>
+          История звонков {timeline.length > 0 && <span style={{ color: '#A6AEB8', fontWeight: 600 }}>{timeline.length}</span>}
         </div>
         {timeline.length === 0 && <div style={{ fontSize: 12.5, color: '#A6AEB8' }}>Звонков ещё не было</div>}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 220, overflowY: 'auto' }}>
+        <div className="call-timeline" style={{ display: 'flex', flexDirection: 'column', maxHeight: 240, overflowY: 'auto' }}>
           {timeline.map((h) => {
             if (h.kind === 'note') {
               return (
-                <div key={h.id} style={{ display: 'flex', gap: 10, padding: '8px 12px', background: '#F7F8FA', border: '1px solid rgba(14,23,38,0.08)', borderRadius: 10 }}>
+                <div key={h.id} className="call-tl-row">
                   <div style={{
-                    width: 24, height: 24, borderRadius: 8, flexShrink: 0,
+                    width: 28, height: 28, borderRadius: 9, flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     background: 'rgba(138,147,160,0.15)', color: '#8A93A0',
                   }}><NoteIcon width={12} height={12} /></div>
@@ -118,16 +128,16 @@ export default function CallCard({ lead, onEdit }) {
                     <div style={{ fontSize: 11, color: '#8A93A0', fontWeight: 700 }}>
                       {h.author ? `${h.author} · ` : ''}{h.created_at ? new Date(h.created_at).toLocaleString('ru-RU') : ''}
                     </div>
-                    {h.text && <div style={{ fontSize: 12.5, color: '#5A6573', marginTop: 2 }}>{h.text}</div>}
+                    {h.text && <div style={{ fontSize: 13.5, color: '#3A4454', marginTop: 2 }}>{h.text}</div>}
                   </div>
                 </div>
               )
             }
             const o = outcomeById(h.outcome)
             return (
-              <div key={h.id} style={{ display: 'flex', gap: 10, padding: '8px 12px', background: '#F7F8FA', border: '1px solid rgba(14,23,38,0.08)', borderRadius: 10 }}>
+              <div key={h.id} className="call-tl-row">
                 <div style={{
-                  width: 24, height: 24, borderRadius: 8, flexShrink: 0,
+                  width: 28, height: 28, borderRadius: 9, flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   background: (o?.color || '#8A93A0') + '1A', color: o?.color || '#8A93A0',
                 }}><OutcomeIcon id={o?.id || 'reached'} size={12} /></div>
@@ -135,7 +145,7 @@ export default function CallCard({ lead, onEdit }) {
                   <div style={{ fontSize: 11, color: o?.color || '#8A93A0', fontWeight: 700 }}>
                     {o?.label || h.outcome} · {new Date(h.created_at).toLocaleString('ru-RU')}
                   </div>
-                  {h.comment && <div style={{ fontSize: 12.5, color: '#5A6573', marginTop: 2 }}>{h.comment}</div>}
+                  {h.comment && <div style={{ fontSize: 13.5, color: '#3A4454', marginTop: 2 }}>{h.comment}</div>}
                   {h.lost_reason && <div style={{ fontSize: 12, color: '#E0473B', marginTop: 2 }}>Причина: {h.lost_reason}</div>}
                 </div>
               </div>
@@ -143,6 +153,12 @@ export default function CallCard({ lead, onEdit }) {
           })}
         </div>
       </div>
+    </>
+  )
+  return (
+    <div className="card call-sheet" style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {part !== 'history' && headerEl}
+      {part !== 'header' && historyEl}
     </div>
   )
 }
