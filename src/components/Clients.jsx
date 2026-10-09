@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getClients, deleteClient as apiDelete } from '../api'
 import { initials, getGradient } from '../utils'
-import { SkeletonCard } from './Skeleton'
+import { SkeletonList } from './Skeleton'
 import { mouseOnly } from '../motion'
 
 // Imported data sometimes has several phone numbers jammed into one field,
@@ -61,9 +61,7 @@ export default function Clients({ onOpenClient, onAdd, refreshKey, search = '' }
       </div>
 
       {loading && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 14 }}>
-          {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} lines={3} />)}
-        </div>
+        <SkeletonList />
       )}
       {!loading && (
       // iOS 26: список как в «Контактах» — одна группа-лист, строки с разделителями и › справа

@@ -855,3 +855,4 @@ input[type="number"] {
   padding: 6px 10px; border-radius: 10px; cursor: pointer; }
 .ios-cal-foot button:hover { background: rgba(19,102,240,0.08); }
 @media (prefers-reduced-motion: reduce) { .ios-cal { animation: none; } }
+.ios-row-skel { cursor: default; pointer-events: none; }

@@ -12,7 +12,7 @@ export function Skeleton({ width = '100%', height = 16, radius = 8, style = {} }
 
 export function SkeletonCard({ lines = 3 }) {
   return (
-    <div style={{ background: '#FFFFFF', borderRadius: 16, padding: 18, border: '1px solid rgba(14,23,38,0.06)' }}>
+    <div className="ios-widget" style={{ padding: 20 }}>
       <Skeleton width="60%" height={14} style={{ marginBottom: 12 }} />
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton key={i} width={i === lines - 1 ? '40%' : '90%'} height={12} style={{ marginBottom: 8 }} />
@@ -30,6 +30,25 @@ export function SkeletonRow() {
         <Skeleton width="30%" height={11} />
       </div>
       <Skeleton width={70} height={16} />
+    </div>
+  )
+}
+
+// Заглушка для списков в стиле iOS (клиенты, перевозчики, лиды, задачи) — та же форма, что и строки.
+// check — вместо аватара круглая отметка, как в задачах.
+export function SkeletonList({ rows = 8, check = false }) {
+  return (
+    <div className={`ios-list${check ? ' ios-list--check' : ''}`} aria-busy="true">
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} className="ios-row ios-row-skel">
+          <Skeleton width={check ? 24 : 42} height={check ? 24 : 42} radius={999} style={{ flexShrink: 0 }} />
+          <div className="ios-row-text">
+            <Skeleton width={`${46 + (i * 17) % 30}%`} height={14} style={{ marginBottom: 7 }} />
+            <Skeleton width={`${28 + (i * 23) % 34}%`} height={11} />
+          </div>
+          {!check && <Skeleton width={8} height={13} radius={4} style={{ flexShrink: 0 }} />}
+        </div>
+      ))}
     </div>
   )
 }

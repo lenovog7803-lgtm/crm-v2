@@ -642,7 +642,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
 
   if (loading) return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.3fr 1fr 1fr', gap: 16 }}>
         {[1, 2, 3].map(i => <SkeletonCard key={i} lines={2} />)}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 12 }}>

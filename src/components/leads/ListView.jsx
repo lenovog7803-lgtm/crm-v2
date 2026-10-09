@@ -3,7 +3,7 @@ import { getLeads } from '../../api'
 import { STAGES, stageById } from '../../constants/leads'
 import LeadEditModal from './LeadEditModal'
 import { logCall, claimLead } from '../../api'
-import { SkeletonRow } from '../Skeleton'
+import { SkeletonList } from '../Skeleton'
 import { EmptyState } from '../EmptyState'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { useCelebration } from '../Celebration'
@@ -113,9 +113,7 @@ export default function ListView({ industry }) {
       </div>
 
       {loading && (
-        <div className="ios-list" style={{ padding: '4px 16px' }}>
-          {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)}
-        </div>
+        <SkeletonList />
       )}
 
       {!loading && filtered.length === 0 && (

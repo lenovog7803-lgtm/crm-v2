@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getCarriers, deleteCarrier as apiDelete } from '../api'
 import { getGradient } from '../utils'
-import { SkeletonCard } from './Skeleton'
+import { SkeletonList } from './Skeleton'
 import { mouseOnly } from '../motion'
 
 // Same cleanup as Clients.jsx — imported phone fields sometimes carry
@@ -68,9 +68,7 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
       </div>
 
       {loading && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 14 }}>
-          {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} lines={3} />)}
-        </div>
+        <SkeletonList />
       )}
       {!loading && (
       // iOS 26: список как в «Контактах» — одна группа-лист, строки с разделителями и › справа

@@ -3,7 +3,7 @@ import { getTasks, updateTask as apiUpdate, deleteTask as apiDelete } from '../a
 import { ModalOverlay, ModalHeader } from './Modal'
 import { fmtDate } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
-import { SkeletonRow } from './Skeleton'
+import { SkeletonList } from './Skeleton'
 import { SlidingTabs } from './SlidingTabs'
 import CheckCircle from './CheckCircle'
 import Select from './Select'
@@ -115,9 +115,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
       </div>
 
       {loading && (
-        <div className="ios-list" style={{ padding: '4px 20px' }}>
-          {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)}
-        </div>
+        <SkeletonList rows={7} check />
       )}
       {!loading && filtered.length === 0 && (
         <div className="ios-list"><EmptyState title="Задач нет" subtitle="Всё сделано — можно выдохнуть. Новая задача появится здесь" /></div>
