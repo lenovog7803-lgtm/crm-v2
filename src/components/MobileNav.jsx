@@ -37,6 +37,7 @@ const MORE_SECTIONS = [
   { title: 'Свой автопарк', fleet: true, items: [
     { key: 'fleet-dashboard', label: 'Дашборд автопарка', icon: 'dashboard', color: '#30B0C7' },
     { key: 'fleet-trips', label: 'Рейсы', icon: 'route', color: '#30B0C7' },
+    { key: 'fleet-plan', label: 'План автопарка', icon: 'target', color: '#30B0C7' },
     { key: 'fleet-clients', label: 'Клиенты автопарка', icon: 'clients', color: '#30B0C7' },
     { key: 'fleet-vehicles', label: 'Машины и водители', icon: 'fleet', color: '#30B0C7' },
   ] },

@@ -301,6 +301,9 @@ export const fleetExportUrl = (month) => `${BASE}/fleet/export${month ? `?month=
 
 // ── Аналитика / акт сверки автопарка ──
 export const getFleetAnalytics = (params = {}) => req('/fleet/analytics?' + new URLSearchParams(params));
+// ── Цели автопарка (вкладка «План») ──
+export const getFleetGoals = (year) => req(`/fleet/goals?year=${year}`);
+export const saveFleetGoals = (payload) => req('/fleet/goals', { method: 'POST', body: JSON.stringify(payload) });
 export const getFleetReconciliation = (clientId, params = {}) => req(`/fleet/clients/${clientId}/reconciliation?` + new URLSearchParams(params));
 
 // ── Telegram-сводка автопарка ──

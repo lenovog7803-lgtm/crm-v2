@@ -36,6 +36,7 @@ import FleetClientDetail from './pages/fleet/FleetClientDetail'
 import FleetOrderDetail from './pages/fleet/FleetOrderDetail'
 import FleetDashboard from './pages/fleet/FleetDashboard'
 import FleetAnalytics from './pages/fleet/FleetAnalytics'
+import FleetPlan from './pages/fleet/FleetPlan'
 import FleetVehicles from './pages/fleet/FleetVehicles'
 
 import CreateOrderModal from './components/CreateOrderModal'
@@ -464,6 +465,7 @@ function MainApp() {
             {page === 'fleet-vehicles' && <ErrorBoundary><FleetVehicles /></ErrorBoundary>}
             {page === 'fleet-dashboard' && <ErrorBoundary><FleetDashboard onOpenTrip={openFleetTrip} onOpenClient={openFleetClient} onNav={handleNav} /></ErrorBoundary>}
             {page === 'fleet-analytics' && <ErrorBoundary><FleetAnalytics onBack={() => handleNav('fleet-dashboard')} /></ErrorBoundary>}
+            {page === 'fleet-plan' && <ErrorBoundary><FleetPlan /></ErrorBoundary>}
 
             {page === 'leads' && <Leads />}
             {page === 'trash' && <Trash />}

@@ -24,6 +24,7 @@ const PAGE_META = {
   kudir: { title: 'КУДиР', subtitle: 'Книга учёта доходов и расходов' },
   'fleet-dashboard': { title: 'Дашборд', subtitle: 'Свой автопарк' },
   'fleet-analytics': { title: 'Аналитика', subtitle: 'Свой автопарк' },
+  'fleet-plan': { title: 'План', subtitle: 'Свой автопарк · цели и выполнение' },
   'fleet-trips': { title: 'Рейсы', subtitle: 'Свой автопарк' },
   'fleet-trip-detail': { title: 'Рейс', subtitle: 'Свой автопарк' },
   'fleet-clients': { title: 'Клиенты', subtitle: 'Свой автопарк' },
