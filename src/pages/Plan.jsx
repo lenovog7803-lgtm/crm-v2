@@ -208,12 +208,6 @@ export default function Plan() {
         ))}
       </div>
 
-      {/* То, что происходит сейчас: качество заявок и продажи по расписанию */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 10 : 16, alignItems: 'start' }}>
-        <TrafficLight orders={live} />
-        <SalesWeek orders={live} />
-      </div>
-
       {/* План и факт по месяцам */}
       <div className="ios-widget" style={{ padding: isMobile ? '16px 14px 10px' : '22px 24px 14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
@@ -293,6 +287,9 @@ export default function Plan() {
           )
         })}
       </div>
+      {/* Раскрывающиеся блоки внизу: качество заявок, продажи по расписанию, прогнозы */}
+      <TrafficLight orders={live} />
+      <SalesWeek orders={live} />
       <Forecasts orders={live} months={months} planYear={planYear} factYear={factYear} pace={pace} year={year} />
 
       <div style={{ fontSize: 12, color: '#A6AEB8', padding: '0 4px' }}>
