@@ -6,6 +6,7 @@ import { fmtDate } from '../utils'
 import { mouseOnly } from '../motion'
 import { PopNumber, SwapText } from './Transitions'
 import Select from './Select'
+import { useRefraction } from '../hooks/useRefraction'
 
 const PAGE_META = {
   dashboard: { title: 'Дашборд', subtitle: 'Обзор бизнеса' },
@@ -61,6 +62,8 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
   const [searchHover, setSearchHover] = useState(false)
   const [searchFocus, setSearchFocus] = useState(false)
   const searchInputRef = useRef(null)
+  const barRef = useRef(null)
+  useRefraction(barRef, { radius: 18, bezel: 22, scale: 40 })  // стекло преломляет фон у краёв (только Chrome)
   const searchCloseTimer = useRef(null)
   const searchOpen = searchHover || searchFocus || !!search
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
@@ -122,7 +125,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
   }))).sort().reverse()
 
   return (
-    <div className={`topbar-mobile liquid-glass${compact ? ' topbar-compact' : ''}`} style={{
+    <div ref={barRef} className={`topbar-mobile liquid-glass${compact ? ' topbar-compact' : ''}`} style={{
       display: 'flex', alignItems: 'center', gap: 16,
       padding: '14px 20px',
       background: 'rgba(255,255,255,0.55)',

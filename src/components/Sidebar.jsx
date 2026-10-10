@@ -5,6 +5,7 @@ import { initials } from '../utils'
 import { SlidingTabs } from './SlidingTabs'
 import { mouseOnly, haptic, rubberband } from '../motion'
 import { PopNumber } from './Transitions'
+import { useRefraction } from '../hooks/useRefraction'
 
 const HIDDEN_MENU_WIDTH = 200
 
@@ -336,6 +337,8 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   const [hiddenMenuOpen, setHiddenMenuOpen] = useState(false)
   const longPressTimer = useRef(null)
   const avatarRef = useRef(null)
+  const asideRef = useRef(null)
+  useRefraction(asideRef, { radius: 22, bezel: 30, scale: 50 })  // стекло преломляет фон у краёв (только Chrome)
   const [hiddenMenuPos, setHiddenMenuPos] = useState({ left: 0, bottom: 0 })
 
   // Sliding active-item indicator — a single pill that glides to the active
@@ -385,7 +388,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   }
 
   return (
-    <aside className="desktop-sidebar liquid-glass" style={{
+    <aside ref={asideRef} className="desktop-sidebar liquid-glass" style={{
       width: expanded ? 240 : 68,
       minWidth: expanded ? 240 : 68,
       transition: 'width 0.2s ease, min-width 0.2s ease',
