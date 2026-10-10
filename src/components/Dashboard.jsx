@@ -4,6 +4,7 @@ import { useIsMobile } from '../hooks/useIsMobile'
 import { useEscapeKey } from '../hooks/useEscapeKey'
 import { CountUp } from './CountUp'
 import { CircularProgress } from './CircularProgress'
+import AreaChart from './AreaChart'
 import { SkeletonCard } from './Skeleton'
 import { mouseOnly } from '../motion'
 import { SwapText } from './Transitions'
@@ -253,134 +254,6 @@ function WidgetHead({ label, color, labelColor = color, right }) {
 const Chevron = ({ color }) => (
   <svg width="8" height="13" viewBox="0 0 8 13" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5 }}><polyline points="1.5 1.5 6.5 6.5 1.5 11.5" /></svg>
 )
-
-function ChartSVG({ current, prev, labels, mode, todayIdx }) {
-  const [hovered, setHovered] = useState(null)
-  const W = 800, H = 200, PL = 52, PR = 8, PT = 10, PB = 28
-
-  if (!current || current.length === 0) {
-    return <div style={{ height: H, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A6AEB8', fontSize: 13 }}>Нет данных за период</div>
-  }
-
-  const safeMax = Math.max(...current, ...(prev || []), 1)
-
-  const pts = current.map((v, i) => ({
-    x: PL + (i / Math.max(current.length - 1, 1)) * (W - PL - PR),
-    y: PT + (1 - Math.max(0, v) / safeMax) * (H - PT - PB),
-    v, i,
-  }))
-  const prevPts = (prev || []).map((v, i) => ({
-    x: PL + (i / Math.max((prev || []).length - 1, 1)) * (W - PL - PR),
-    y: PT + (1 - Math.max(0, v) / safeMax) * (H - PT - PB),
-    v, i,
-  }))
-
-  const smooth = points => {
-    if (points.length < 2) return points.length === 1 ? `M${points[0].x},${points[0].y}` : ''
-    let d = `M${points[0].x},${points[0].y}`
-    for (let i = 1; i < points.length; i++) {
-      const cpx = (points[i - 1].x + points[i].x) / 2
-      d += ` C${cpx},${points[i - 1].y} ${cpx},${points[i].y} ${points[i].x},${points[i].y}`
-    }
-    return d
-  }
-
-  const curPath = smooth(pts)
-  const prevPath = prevPts.length >= 2 ? smooth(prevPts) : ''
-  const todayPt = pts[todayIdx !== undefined ? Math.min(todayIdx, pts.length - 1) : pts.length - 1]
-  const fadeRatio = todayPt ? Math.max(0.02, Math.min(todayPt.x / W, 0.98)) : 1
-  const fillPath = curPath + ` L${pts[pts.length - 1].x},${H - PB} L${pts[0].x},${H - PB} Z`
-  const colW = (W - PL - PR) / Math.max(pts.length, 1)
-
-  const fmtVal = v => {
-    if (v >= 1000000) return `${(v / 1000000).toFixed(1)}M`
-    if (v >= 1000) return `${(v / 1000).toFixed(0)}K`
-    return String(Math.round(v))
-  }
-
-  return (
-    <div style={{ position: 'relative', userSelect: 'none' }}>
-      <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ overflow: 'visible', display: 'block' }}>
-        <defs>
-          <linearGradient id="dashFillG" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#1366F0" stopOpacity="0.32" />
-            <stop offset="0.6" stopColor="#1366F0" stopOpacity="0.08" />
-            <stop offset="1" stopColor="#1366F0" stopOpacity="0" />
-          </linearGradient>
-          <linearGradient id="dashLineG" x1="0" y1="0" x2="1" y2="0">
-            <stop offset={`${Math.max(0, fadeRatio - 0.01)}`} stopColor="#1366F0" stopOpacity="1" />
-            <stop offset={`${Math.min(1, fadeRatio + 0.01)}`} stopColor="#A6AEB8" stopOpacity="0.35" />
-            <stop offset="1" stopColor="#A6AEB8" stopOpacity="0.15" />
-          </linearGradient>
-        </defs>
-
-        {[0, 0.5, 1].map((t, idx) => {
-          const y = PT + (1 - t) * (H - PT - PB)
-          return (
-            <g key={idx}>
-              <line x1={PL} y1={y} x2={W - PR} y2={y} stroke="rgba(14,23,38,0.07)" strokeWidth="1" />
-              <text x={PL - 6} y={y + 4} fontSize="10" fill="#A6AEB8" textAnchor="end">{fmtVal(safeMax * t)}</text>
-            </g>
-          )
-        })}
-
-        {prevPath && <path d={prevPath} stroke="#B8C0CC" strokeWidth="1.5" fill="none" strokeDasharray="6,5" strokeLinecap="round" opacity="0.55" />}
-        <path d={fillPath} fill="url(#dashFillG)" />
-        <path d={curPath} stroke={mode === 'days' ? 'url(#dashLineG)' : '#1366F0'} strokeWidth="3" fill="none" strokeLinecap="round" />
-
-        {todayPt && <>
-          <circle cx={todayPt.x} cy={todayPt.y} r="13" fill="#1366F0" opacity="0.12" />
-          <circle cx={todayPt.x} cy={todayPt.y} r="6" fill="#fff" stroke="#1366F0" strokeWidth="3" />
-        </>}
-
-        {hovered !== null && pts[hovered] && <>
-          <line x1={pts[hovered].x} y1={PT} x2={pts[hovered].x} y2={H - PB} stroke="#1366F0" strokeWidth="1.5" opacity="0.25" />
-          <circle cx={pts[hovered].x} cy={pts[hovered].y} r="7" fill="#fff" stroke="#1366F0" strokeWidth="3" style={{ filter: 'drop-shadow(0 2px 6px rgba(19,102,240,0.35))' }} />
-        </>}
-
-        {pts.map((pt, i) => (
-          <rect key={i} x={pt.x - colW / 2} y={0} width={colW} height={H}
-            fill="transparent" style={{ cursor: 'crosshair' }}
-            onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)} />
-        ))}
-      </svg>
-
-      {hovered !== null && pts[hovered] && (
-        <div style={{
-          position: 'absolute',
-          left: `${Math.max(12, Math.min(pts[hovered].x / W * 100, 86))}%`,
-          top: -6, transform: 'translateX(-50%)',
-          background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-          borderRadius: 16, padding: '10px 14px',
-          border: '1px solid rgba(255,255,255,0.9)',
-          boxShadow: '0 16px 40px rgba(20,30,55,0.18)',
-          pointerEvents: 'none', minWidth: 150, zIndex: 20,
-        }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.04em', marginBottom: 6 }}>{labels[hovered]}</div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 17, color: '#0E1726' }}>
-            {pts[hovered].v.toLocaleString('ru-RU')} Br
-          </div>
-          {prev && prev[hovered] !== undefined && prev[hovered] > 0 && (
-            <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 3 }}>прошлый: {prev[hovered].toLocaleString('ru-RU')} Br</div>
-          )}
-          {prev && prev[hovered] > 0 && (
-            <div style={{ fontSize: 11, fontWeight: 700, marginTop: 2, color: pts[hovered].v >= prev[hovered] ? '#1E9E5A' : '#C81923' }}>
-              {pts[hovered].v >= prev[hovered] ? '+' : ''}{Math.round((pts[hovered].v - prev[hovered]) / prev[hovered] * 100)}%
-            </div>
-          )}
-        </div>
-      )}
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', paddingLeft: PL, paddingRight: PR, marginTop: 2 }}>
-        {labels.map((l, i) => {
-          const step = Math.ceil(labels.length / 8)
-          if (i % step !== 0 && i !== labels.length - 1) return null
-          return <span key={i} style={{ fontSize: 10, color: '#A6AEB8' }}>{l}</span>
-        })}
-      </div>
-    </div>
-  )
-}
 
 function DebtModal({ title, orders, onClose, onOpenOrder }) {
   useEscapeKey(onClose)
@@ -784,17 +657,21 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           </div>
           {chart.prev && chart.prev.length > 0 && chart.prev.some(v => v > 0) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <div style={{ width: 18, height: 2, background: '#B8C0CC', borderRadius: 1 }} />
+              <div style={{ width: 10, height: 10, background: '#1366F0', borderRadius: 3 }} />
+              <span style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600, marginRight: 8 }}>этот период</span>
+              <div style={{ width: 10, height: 10, background: '#9AAFD0', borderRadius: 3 }} />
               <span style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600 }}>прошлый период</span>
             </div>
           )}
         </div>
-        <ChartSVG
-          current={chart.current}
-          prev={chart.prev}
+        <AreaChart
           labels={chart.labels}
-          mode={chart.mode}
-          todayIdx={todayIdx}
+          height={isMobile ? 190 : 230}
+          series={[
+            { key: 'cur', label: 'Этот период', color: '#1366F0', values: chart.current,
+              dashFrom: period === 'month' ? todayIdx : undefined },  // дни после сегодня ещё не наступили — пунктир
+            ...(chart.prev?.some(v => v > 0) ? [{ key: 'prev', label: 'Прошлый период', color: '#9AAFD0', values: chart.prev }] : []),
+          ]}
         />
       </div>
 
