@@ -1,5 +1,6 @@
 // Dynamic Island из cult-ui (github.com/nolly-studio/cult-ui, MIT).
-// Правка для CRM: убрана обрезка по SVG-фигуре #squircle-* (таких фигур в проекте нет).
+// Правки для CRM: убрана обрезка по SVG-фигуре #squircle-* (таких фигур в проекте нет);
+// размеры compact / compactLong / long — тонкие (34 px) под шапку, tall — 340×196.
 "use client"
 
 import React, {
@@ -89,14 +90,14 @@ const DynamicIslandSizePresets: Record<SizePresets, Preset> = {
     borderRadius: 22,
   },
   [SIZE_PRESETS.COMPACT]: {
-    width: 235,
-    aspectRatio: 44 / 235,
-    borderRadius: 46,
+    width: 196,
+    aspectRatio: 34 / 196,
+    borderRadius: 17,
   },
   [SIZE_PRESETS.COMPACT_LONG]: {
-    width: 300,
-    aspectRatio: 44 / 235,
-    borderRadius: 46,
+    width: 280,
+    aspectRatio: 34 / 280,
+    borderRadius: 17,
   },
   [SIZE_PRESETS.COMPACT_MEDIUM]: {
     width: 351,
@@ -104,9 +105,9 @@ const DynamicIslandSizePresets: Record<SizePresets, Preset> = {
     borderRadius: 44,
   },
   [SIZE_PRESETS.LONG]: {
-    width: 371,
-    aspectRatio: 84 / 371,
-    borderRadius: 42,
+    width: 320,
+    aspectRatio: 34 / 320,
+    borderRadius: 17,
   },
   [SIZE_PRESETS.MEDIUM]: {
     width: 371,
@@ -119,9 +120,9 @@ const DynamicIslandSizePresets: Record<SizePresets, Preset> = {
     borderRadius: 42,
   },
   [SIZE_PRESETS.TALL]: {
-    width: 371,
-    aspectRatio: 210 / 371,
-    borderRadius: 42,
+    width: 340,
+    aspectRatio: 196 / 340,
+    borderRadius: 26,
   },
   [SIZE_PRESETS.ULTRA]: {
     width: 630,

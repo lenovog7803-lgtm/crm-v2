@@ -1071,17 +1071,45 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 
 /* ===== Dynamic Island в шапке ===== */
 /* по центру шапки; в покое высотой 44 px, раскрывается вниз поверх страницы */
-.topbar-island { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -22px); z-index: 5; cursor: pointer; outline: none; }
-.topbar-island:focus-visible > div > div { box-shadow: 0 0 0 3px rgba(19,102,240,0.45); }
-.topbar-island #topbar-island { box-shadow: 0 10px 30px -10px rgba(0,0,0,0.45); font-family: var(--font-sys); }
+.topbar-island-anchor { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
+/* сам остров — в слое поверх страницы, на месте метки; ниже модальных окон (1000) */
+.topbar-island { position: fixed; transform: translate(-50%, -17px); z-index: 150; cursor: pointer; outline: none; }
+.topbar-island:focus-visible #topbar-island { outline: 3px solid rgba(19,102,240,0.45); outline-offset: 2px; }
+/* жидкое стекло вместо чёрной капсулы cult-ui (её классы bg-black/border — перебиваем) */
+.topbar-island #topbar-island {
+  font-family: var(--font-sys); color: #0E1726; isolation: isolate; position: relative;
+  background:
+    radial-gradient(120% 90% at 15% -30%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 55%),
+    linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.4) 100%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(220%) brightness(1.06); backdrop-filter: blur(20px) saturate(220%) brightness(1.06);
+  border: none !important;
+  box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(255,255,255,0.4), inset 0 0 16px rgba(255,255,255,0.3),
+    0 0 0 0.5px rgba(14,23,38,0.08), 0 12px 30px -12px rgba(20,30,55,0.3), 0 2px 6px rgba(20,30,55,0.06) !important;
+}
+/* светящийся край стекла */
+.topbar-island #topbar-island::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.35) 22%, rgba(255,255,255,0) 45%, rgba(255,255,255,0) 62%, rgba(255,255,255,0.75) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+}
+/* раскрытый остров лежит над цифрами страницы — стекло чуть плотнее, чтобы текст читался */
+.topbar-island[aria-expanded="true"] #topbar-island {
+  background:
+    radial-gradient(120% 90% at 15% -30%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 55%),
+    linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.66) 100%) !important;
+}
+.island-fg { color: #0E1726; }
+.island-muted { color: #8A93A0; }
 .island-text { letter-spacing: -0.01em; }
 .island-pct { margin-left: 6px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.island-bar { height: 4px; margin-top: 4px; border-radius: 99px; background: rgba(255,255,255,0.14); overflow: hidden; }
+.island-bar { height: 4px; margin-top: 4px; border-radius: 99px; background: rgba(14,23,38,0.08); overflow: hidden; }
 .island-bar > div { height: 100%; border-radius: 99px; transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
-.island-btn { align-self: stretch; border: none; border-radius: 99px; padding: 7px 0; cursor: pointer; font: 600 13px var(--font-sys);
-  background: rgba(255,255,255,0.14); color: #fff; }
-.island-btn:hover { background: rgba(255,255,255,0.22); }
+.island-btn { align-self: stretch; border: none; border-radius: 99px; padding: 6px 0; cursor: pointer; font: 600 13px var(--font-sys);
+  background: rgba(19,102,240,0.1); color: #1366F0; }
+.island-btn:hover { background: rgba(19,102,240,0.16); }
 .island-spin { animation: islandSpin 0.9s linear infinite; flex-shrink: 0; }
 @keyframes islandSpin { to { transform: rotate(360deg); } }
 @media (max-width: 1100px) { .topbar-island { display: none; } }
 @media (prefers-reduced-motion: reduce) { .island-spin { animation-duration: 2.5s; } }
+
+@media (prefers-reduced-transparency: reduce) { .topbar-island #topbar-island { background: #fff !important; backdrop-filter: none; -webkit-backdrop-filter: none; } }
