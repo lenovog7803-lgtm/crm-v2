@@ -1,0 +1,43 @@
+/* Графики Bklit UI (bklit.com, MIT) в CRM.
+   Tailwind — только тема и утилиты, без preflight (сброса стилей), и классы ищутся только в src/bklit:
+   стили остальной CRM он не трогает. Утилиты без слоя: иначе общий сброс CRM (* { padding: 0 })
+   перебивал бы их; классы Tailwind в остальной CRM не используются — пересечений нет. */
+@layer theme;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" source(none);
+@source "./";
+
+/* классы Bklit вида bg-chart-tooltip-background → переменные ниже */
+@theme inline {
+  --color-chart-tooltip-background: var(--chart-tooltip-background);
+  --color-chart-tooltip-foreground: var(--chart-tooltip-foreground);
+  --color-chart-tooltip-muted: var(--chart-tooltip-muted);
+  --color-chart-label: var(--chart-label);
+}
+
+/* цвета графика — светлая тема Bklit, линии в цветах CRM */
+.bklit {
+  --foreground: #0E1726;
+  --muted-foreground: #8A93A0;
+  --chart-1: #1366F0;
+  --chart-2: #9AAFD0;
+  --chart-3: oklch(0.54 0 none);
+  --chart-4: oklch(0.71 0 none);
+  --chart-5: oklch(0.89 0 none);
+  --chart-background: transparent;
+  --chart-foreground: oklch(0.145 0.004 285);
+  --chart-foreground-muted: #A6AEB8;
+  --chart-line-primary: var(--chart-1);
+  --chart-line-secondary: var(--chart-2);
+  --chart-crosshair: oklch(0.4 0.1828 274.34);
+  --chart-grid: rgba(14, 23, 38, 0.08);
+  --chart-brush-border: var(--chart-grid);
+  --chart-tooltip-background: oklch(0.21 0.006 285 / 0.8);
+  --chart-tooltip-foreground: oklch(0.985 0 0);
+  --chart-tooltip-muted: oklch(0.65 0.01 260);
+  --chart-marker-background: oklch(0.97 0.005 260);
+  --chart-marker-border: oklch(0.85 0.01 260);
+  --chart-marker-foreground: oklch(0.3 0.01 260);
+  --chart-label: #A6AEB8;
+  font-family: var(--font-sys);
+}

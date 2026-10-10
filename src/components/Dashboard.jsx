@@ -4,7 +4,7 @@ import { useIsMobile } from '../hooks/useIsMobile'
 import { useEscapeKey } from '../hooks/useEscapeKey'
 import { CountUp } from './CountUp'
 import { CircularProgress } from './CircularProgress'
-import AreaChart from './AreaChart'
+import MarginChart from './MarginChart'
 import { SkeletonCard } from './Skeleton'
 import { mouseOnly } from '../motion'
 import { SwapText } from './Transitions'
@@ -151,6 +151,7 @@ function buildChartData(orders, period) {
       current: days.map(d => byDay[d] || 0),
       prev: days.map(d => prevByDay[d] || 0),
       labels: days.map(String),
+      dates: days.map(d => new Date(year, mo, d)),
       mode: 'days',
       month: mo,
     }
@@ -174,6 +175,7 @@ function buildChartData(orders, period) {
       current: months.map(m => byMonth[m] || 0),
       prev: months.map(m => prevByMonth[m] || 0),
       labels: months.map(m => MONTH_RU_SHORT[m]),
+      dates: months.map(m => new Date(now.getFullYear(), m, 1)),
       mode: 'months',
     }
   }
@@ -193,6 +195,7 @@ function buildChartData(orders, period) {
       current: Array.from({ length: 12 }, (_, m) => byMonth[m] || 0),
       prev: Array.from({ length: 12 }, (_, m) => prevByMonth[m] || 0),
       labels: MONTH_RU_SHORT,
+      dates: MONTH_RU_SHORT.map((_, m) => new Date(now.getFullYear(), m, 1)),
       mode: 'months',
     }
   }
@@ -219,6 +222,7 @@ function buildChartData(orders, period) {
       current: months.map(m => byMonth[m] || 0),
       prev: months.map(m => prevByMonth[m] || 0),
       labels: months.map(m => MONTH_RU_SHORT[m]),
+      dates: months.map(m => new Date(year, m, 1)),
       mode: 'months',
     }
   }
@@ -237,6 +241,7 @@ function buildChartData(orders, period) {
     current: months.map(m => byMonth[m]),
     prev: [],
     labels: months.map(m => MONTH_RU_SHORT[parseInt(m.slice(5, 7)) - 1] + " '" + m.slice(2, 4)),
+    dates: months.map(m => new Date(+m.slice(0, 4), +m.slice(5, 7) - 1, 1)),
     mode: 'months',
   }
 }
@@ -418,7 +423,6 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
 
   const stats = calcStats(allOrders, period, apiData)
   const chart = buildChartData(allOrders, period)
-  const todayIdx = chart.mode === 'days' ? Math.min(new Date().getDate() - 1, chart.current.length - 1) : chart.current.length - 1
 
   const { revenue, cost, margin, clientDebt, carrierDebt, active, done, clientsCount, carriersCount,
     topClients, topByMargin, topDebtors, debtorOrders, carrierDebtOrders } = stats
@@ -664,15 +668,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             </div>
           )}
         </div>
-        <AreaChart
-          labels={chart.labels}
-          height={isMobile ? 190 : 230}
-          series={[
-            { key: 'cur', label: 'Этот период', color: '#1366F0', values: chart.current,
-              dashFrom: period === 'month' ? todayIdx : undefined },  // дни после сегодня ещё не наступили — пунктир
-            ...(chart.prev?.some(v => v > 0) ? [{ key: 'prev', label: 'Прошлый период', color: '#9AAFD0', values: chart.prev }] : []),
-          ]}
-        />
+        <MarginChart dates={chart.dates} current={chart.current} prev={chart.prev} height={isMobile ? 190 : 240} />
       </div>
 
       {/* Bottom 3-col */}
