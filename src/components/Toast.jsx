@@ -7,21 +7,22 @@ const ToastContext = createContext(null)
 // всех, кто вызывает show() (~70 компонентов), и всплывашка выезжала бы рывком.
 const NotificationsContext = createContext([])
 
-// Значок уведомления — цветной «квадратик» как у приложений в уведомлениях iOS.
+// Значки в духе SF Symbols (checkmark.circle.fill, exclamationmark.triangle.fill, info.circle.fill):
+// цветная заливка с белым знаком, нарисованы заново — сами SF Symbols разрешены только в приложениях Apple.
 const ICONS = {
-  success: ['#34C759', '#248A3D', <polyline key="i" points="20 6 9 17 4 12" />],
-  error: ['#FF453A', '#D70015', <g key="i"><line x1="12" y1="7" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></g>],
-  info: ['#0A84FF', '#0060DF', <g key="i"><line x1="12" y1="16" x2="12" y2="11" /><line x1="12" y1="8" x2="12.01" y2="8" /></g>],
-  loading: ['#8E8E93', '#636366', null],
+  success: ['#34C759', <g key="i"><circle cx="12" cy="12" r="11" /><path d="M7.2 12.4l3.2 3.2 6.4-7" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></g>],
+  error: ['#FF3B30', <g key="i"><path d="M10.27 2.9a2 2 0 0 1 3.46 0l9.03 15.6A2 2 0 0 1 21.03 21.5H2.97a2 2 0 0 1-1.73-3l9.03-15.6z" /><path d="M12 8.6v5.4" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" /><circle cx="12" cy="17.6" r="1.35" fill="#fff" /></g>],
+  info: ['#0A84FF', <g key="i"><circle cx="12" cy="12" r="11" /><circle cx="12" cy="7.4" r="1.45" fill="#fff" /><path d="M12 11v6.2" stroke="#fff" strokeWidth="2.3" strokeLinecap="round" /></g>],
+  loading: ['#8E8E93', null],
 }
 const TITLES = { success: 'Готово', error: 'Ошибка', info: 'А2 CRM', loading: 'В процессе' }
 const Icon = ({ kind }) => {
-  const [a, b, path] = ICONS[kind]
+  const [color, glyph] = ICONS[kind]
   return (
-    <span className="notif-icon" style={{ background: `linear-gradient(160deg, ${a}, ${b})`, boxShadow: `0 2px 6px -1px ${b}77, inset 0 1px 0 rgba(255,255,255,0.3)` }}>
+    <span className="notif-icon">
       {kind === 'loading'
-        ? <ThinkingOrb state="working" size={20} color="#fff" aria-label="В процессе" />
-        : <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">{path}</svg>}
+        ? <ThinkingOrb state="working" size={20} theme="light" aria-label="В процессе" />
+        : <svg width="26" height="26" viewBox="0 0 24 24" fill={color} aria-hidden="true">{glyph}</svg>}
     </span>
   )
 }
