@@ -250,7 +250,7 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
     if (prevActive.current && prevActive.current !== activeKey && pillRef.current && !prefersReducedMotion()) {
       pillRef.current.animate(
         [{ transform: 'scale(1, 1)' }, { transform: 'scale(1.38, 0.84)', offset: 0.4 }, { transform: 'scale(0.96, 1.04)', offset: 0.75 }, { transform: 'scale(1, 1)' }],
-        { duration: 520, easing: 'ease-out' },
+        { duration: 360, easing: 'ease-out' },
       )
     }
     prevActive.current = activeKey
@@ -272,7 +272,7 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
         <div ref={pillRef} className="seg-thumb" style={{
           position: 'absolute', left: pill.left, top: '50%', width: PILL_SIZE, height: PILL_SIZE,
           marginTop: -PILL_SIZE / 2,
-          borderRadius: 22, transition: 'left 0.42s cubic-bezier(0.22, 1, 0.36, 1)', pointerEvents: 'none',
+          borderRadius: 22, transition: 'left 0.28s cubic-bezier(0.22, 1, 0.36, 1)', pointerEvents: 'none',
         }} />
       )}
       {navList.map(item => {

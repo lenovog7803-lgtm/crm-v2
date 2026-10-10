@@ -474,7 +474,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                       transform: isRemoving ? `translateX(${dx}px) scale(0.95)` : `translateX(${dx}px)`,
                       transition: isRemoving ? 'opacity 0.2s var(--ease), transform 0.2s var(--ease)' : (dx === 0 ? 'transform 0.2s ease, background 0.15s' : 'none'),
                       animation: isRemoving ? 'none' : 'rise 0.3s var(--ease) both',
-                      animationDelay: `${Math.min(i * 20, 240)}ms`,
+                      animationDelay: `${Math.min(i * 15, 120)}ms`,
                     }}
                     onTouchStart={e => { e.currentTarget.style.background = isSelected ? '#EBF2FF' : 'rgba(14,23,38,0.05)'; handleTouchStart(order.id, e) }}
                     onTouchMove={e => handleTouchMove(order.id, e)}
@@ -589,7 +589,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 transform: isRemoving ? 'scale(0.97)' : 'scale(1)',
                 transition: isRemoving ? 'opacity 0.2s var(--ease), transform 0.2s var(--ease)' : 'background 0.12s',
                 animation: isRemoving ? 'none' : 'rise 0.3s var(--ease) both',
-                animationDelay: `${Math.min(i * 20, 240)}ms`,
+                animationDelay: `${Math.min(i * 15, 120)}ms`,
               }}
               onPointerEnter={mouseOnly(e => { if (!isSelected) e.currentTarget.style.background = flagged ? 'rgba(200,25,35,0.08)' : 'rgba(14,23,38,0.02)' })}
               onPointerLeave={mouseOnly(e => { handleMouseUp(); if (!isSelected) e.currentTarget.style.background = flagged ? 'rgba(200,25,35,0.05)' : 'transparent' })}

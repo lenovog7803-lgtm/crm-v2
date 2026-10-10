@@ -5,7 +5,6 @@ import { initials } from '../utils'
 import { SlidingTabs } from './SlidingTabs'
 import { mouseOnly, haptic, rubberband, prefersReducedMotion } from '../motion'
 import { PopNumber } from './Transitions'
-import { useRefraction } from '../hooks/useRefraction'
 
 const HIDDEN_MENU_WIDTH = 200
 
@@ -337,8 +336,6 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   const [hiddenMenuOpen, setHiddenMenuOpen] = useState(false)
   const longPressTimer = useRef(null)
   const avatarRef = useRef(null)
-  const asideRef = useRef(null)
-  useRefraction(asideRef, { radius: 22, bezel: 30, scale: 50 })  // стекло преломляет фон у краёв (только Chrome)
   const [hiddenMenuPos, setHiddenMenuPos] = useState({ left: 0, bottom: 0 })
 
   // Sliding active-item indicator — a single pill that glides to the active
@@ -365,7 +362,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
     if (prevActive.current && prevActive.current !== activeKey && pillRef.current && !prefersReducedMotion()) {
       pillRef.current.animate(
         [{ transform: 'scale(1, 1)' }, { transform: 'scale(0.94, 1.35)', offset: 0.4 }, { transform: 'scale(1.02, 0.96)', offset: 0.75 }, { transform: 'scale(1, 1)' }],
-        { duration: 520, easing: 'ease-out' },
+        { duration: 360, easing: 'ease-out' },
       )
     }
     prevActive.current = activeKey
@@ -398,7 +395,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   }
 
   return (
-    <aside ref={asideRef} className="desktop-sidebar liquid-glass" style={{
+    <aside className="desktop-sidebar liquid-glass" style={{
       width: expanded ? 240 : 68,
       minWidth: expanded ? 240 : 68,
       transition: 'width 0.2s ease, min-width 0.2s ease',
@@ -460,7 +457,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
             position: 'absolute', left: 0, right: 0, top: pillRect.top, height: pillRect.height,
             borderRadius: 12, background: 'rgba(19,102,240,0.1)',  // тонированная заливка без тени — как выделение в боковой панели iPad/Mac
             opacity: drag ? 0 : 1,  // во время перетаскивания подсветка не мешает
-            transition: 'top 0.42s cubic-bezier(0.22, 1, 0.36, 1), height 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.15s',
+            transition: 'top 0.28s cubic-bezier(0.22, 1, 0.36, 1), height 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.15s',
             pointerEvents: 'none', zIndex: 0,
           }} />
         )}
