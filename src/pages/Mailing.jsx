@@ -21,6 +21,7 @@ import Switch from '../components/Switch'
 import { EmptyState } from '../components/EmptyState'
 import { iosConfirm } from '../components/IOSAlert'
 import CardGradient from '../components/CardGradient'
+import SearchField from '../components/SearchField'
 
 // «Рассылка» — холодные письма по базе. Вся логика (лимиты, рабочие часы,
 // паузы, напоминания, проверка ответов) живёт в backend/mailing.py, здесь
@@ -68,7 +69,7 @@ const inputStyle = {
   width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: 10,
   border: '1px solid #E8EAEE', background: '#fff', fontSize: 13, fontFamily: 'var(--font-sys)', color: '#0E1726',
 }
-const labelStyle = { fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 6 }
+const labelStyle = { fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 6 }
 const sectionTitle = { fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: '#0E1726', marginBottom: 12 }
 
 
@@ -165,7 +166,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {!state.configured && (
-        <div className="card" style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+        <div className="ios-widget" style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
           <div style={{ fontSize: 13, color: '#5A6573' }}>Почта {state.mailboxes?.length === 1 ? `«${state.mailboxes[0].name}» ` : ''}ещё не подключена — без неё рассылку не запустить.</div>
           <button className="btn-ghost" onClick={onGoSettings}>Подключить почту →</button>
         </div>
@@ -277,7 +278,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
       {/* KPI */}
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 12 }}>
         {kpis.map(k => (
-          <div key={k.label} className="card" onClick={() => onGoContacts(k.group)}
+          <div key={k.label} className="ios-widget" onClick={() => onGoContacts(k.group)}
             style={{ padding: isMobile ? '12px 14px' : '18px 20px', cursor: 'pointer' }}>
             <div style={{ fontSize: isMobile ? 10 : 11, color: '#A6AEB8', fontWeight: 600, marginBottom: 6 }}>{k.label}</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: isMobile ? 24 : 32, color: k.color, background: k.bg,
@@ -291,7 +292,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
 
       {/* Разгон + воронка */}
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
-        <div className="card" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
+        <div className="ios-widget" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18 }}>
             <div style={{ position: 'relative', flexShrink: 0 }}>
               <CircularProgress pct={multi ? Math.min(100, (state.limit / Math.max(1, boxes.reduce((n, m) => n + (m.health?.cap || 0), 0))) * 100)
@@ -351,7 +352,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
           )}
         </div>
 
-        <div className="card" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
+        <div className="ios-widget" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
           <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Воронка</div>
           <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 2, marginBottom: 14 }}>за всё время</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
@@ -371,7 +372,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
 
       {/* Новые ответы */}
       {replies.length > 0 && (
-        <div className="card" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
+        <div className="ios-widget" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 12 }}>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Новые ответы</div>
             <button className="btn-ghost" onClick={onGoReplies}>Разобрать →</button>
@@ -395,7 +396,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
       )}
 
       {/* Журнал */}
-      <div className="card" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
+      <div className="ios-widget" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 10 }}>Журнал</div>
         {log.length === 0 && <div style={{ fontSize: 13, color: '#A6AEB8' }}>Пока пусто</div>}
         {(logOpen ? log : log.slice(0, 8)).map(l => (
@@ -481,39 +482,43 @@ function Replies({ campaignId, loginFor, onChanged }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 0 }}>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
         <SlidingTabs options={[{ key: 'all', label: 'Все' }, { key: 'new', label: 'Новые' }]} value={onlyNew ? 'new' : 'all'} onChange={k => setOnlyNew(k === 'new')} />
-        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Поиск по переписке" style={{ ...inputStyle, flex: 1, minWidth: 140 }} />
+        <SearchField value={q} onChange={setQ} placeholder="Поиск по переписке" style={{ flex: 1, minWidth: 140 }} />
       </div>
       {loading && <Loader padding={30} />}
       {!loading && shown.length === 0 && (
-        <div className="card" style={{ padding: 30, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>
+        <div className="ios-widget" style={{ padding: 30, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>
           {onlyNew ? 'Новых писем нет' : 'Здесь появятся компании, которые ответили на рассылку'}
         </div>
       )}
-      {shown.map(c => {
-        const st = STATUS[c.status] || STATUS.replied
-        const active = c.id === openId
-        return (
-          <button key={c.id} onClick={() => open(c)} className="ios-row"
-            style={{ textAlign: 'left', border: 'none', cursor: 'pointer', padding: '12px 14px', borderRadius: 14, fontFamily: 'inherit',
-              background: active ? 'rgba(37,99,235,0.08)' : '#fff', boxShadow: active ? 'inset 0 0 0 1px rgba(37,99,235,0.35)' : '0 1px 2px rgba(14,23,38,0.06)',
-              display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              {c.reply_seen === false && <span style={{ width: 8, height: 8, borderRadius: 99, background: '#2563EB', flexShrink: 0 }} />}
-              <span style={{ fontFamily: 'var(--font-sys)', fontWeight: c.reply_seen === false ? 800 : 600, fontSize: 14, color: '#0E1726', flex: 1, minWidth: 0,
-                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.company || c.email}</span>
-              <span style={{ fontSize: 11, color: '#8A93A0', flexShrink: 0 }}>{fmtTs(c.replied_at).slice(5)}</span>
-            </div>
-            <div style={{ fontSize: 12.5, color: '#5A6573', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {(c.reply_snippet || c.reply_subject || '').replace(/\s+/g, ' ')}
-            </div>
-            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-              <span style={{ padding: '1px 8px', borderRadius: 99, background: st.bg, color: st.color, fontSize: 11, fontWeight: 600 }}>{st.label}</span>
-              {c.awaiting_reply && <span style={{ fontSize: 11, color: '#8A93A0' }}>ждём ответа</span>}
-              {!campaignId && c.campaign_name && <span style={{ fontSize: 11, color: '#8A93A0' }}>{c.campaign_name}</span>}
-            </div>
-          </button>
-        )
-      })}
+      {shown.length > 0 && (
+        <div className="ios-list">
+          {shown.map(c => {
+            const st = STATUS[c.status] || STATUS.replied
+            const unread = c.reply_seen === false
+            return (
+              <button key={c.id} onClick={() => open(c)} className={`mail-row${c.id === openId ? ' is-active' : ''}`}>
+                <span className="mail-dot" style={{ visibility: unread ? 'visible' : 'hidden' }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                    <span style={{ fontWeight: unread ? 700 : 600, fontSize: 15, color: '#0E1726', flex: 1, minWidth: 0,
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.company || c.email}</span>
+                    <span style={{ fontSize: 13, color: '#8A93A0', flexShrink: 0 }}>{fmtTs(c.replied_at).slice(5)}</span>
+                    <svg width="7" height="12" viewBox="0 0 8 13" fill="none" style={{ flexShrink: 0, color: 'rgba(60,60,67,0.3)' }}><path d="M1 1.5L6.5 7L1 12.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  </div>
+                  <div style={{ fontSize: 13.5, color: '#6B7480', marginTop: 2, lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    {(c.reply_snippet || c.reply_subject || '').replace(/\s+/g, ' ')}
+                  </div>
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 5 }}>
+                    <span style={{ padding: '1px 8px', borderRadius: 99, background: st.bg, color: st.color, fontSize: 11.5, fontWeight: 600 }}>{st.label}</span>
+                    {c.awaiting_reply && <span style={{ fontSize: 12, color: '#8A93A0' }}>ждём ответа</span>}
+                    {!campaignId && c.campaign_name && <span style={{ fontSize: 12, color: '#8A93A0' }}>{c.campaign_name}</span>}
+                  </div>
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 
@@ -521,7 +526,7 @@ function Replies({ campaignId, loginFor, onChanged }) {
     ? <MailThread key={current.id} contact={current} gmailHref={gmailLink(loginFor(current.campaign_id), current.email)}
         onBack={isMobile ? () => setOpenId(null) : null}
         onPatch={upd => { patch(current.id, upd); onChanged?.() }} />
-    : <div className="card" style={{ padding: 40, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>Выберите переписку слева</div>
+    : <div className="ios-widget" style={{ padding: 40, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>Выберите переписку слева</div>
 
   if (isMobile) return current ? thread : list
   return (
@@ -590,10 +595,10 @@ function MailThread({ contact: c, gmailHref, onBack, onPatch }) {
   const download = (m, a) => downloadMailAttachment(c.id, m.id, a.index, a.name).catch(e => show('Ошибка: ' + e.message, { type: 'error' }))
 
   return (
-    <div className="card" style={{ padding: 0, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
+    <div className="ios-widget" style={{ padding: 0, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
       <div style={{ padding: '14px 16px', borderBottom: '1px solid rgba(14,23,38,0.06)', display: 'flex', flexDirection: 'column', gap: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {onBack && <button className="btn-ghost" onClick={onBack} aria-label="Назад" style={{ padding: '6px 10px' }}>‹</button>}
+          {onBack && <button className="ios-sheet-close" onClick={onBack} aria-label="Назад" style={{ fontSize: 20 }}>‹</button>}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.company || c.email}</div>
             <div style={{ fontSize: 12, color: '#8A93A0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -604,15 +609,15 @@ function MailThread({ contact: c, gmailHref, onBack, onPatch }) {
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {RESOLVE.map(b => (
             <button key={b.status} className="btn-ghost" disabled={busy} onClick={() => resolve(b.status)}
-              style={c.status === b.status ? { background: b.color, color: '#fff', borderColor: b.color } : { color: b.color }}>
+              style={c.status === b.status ? { background: b.color, color: '#fff', padding: '7px 14px' } : { color: b.color, padding: '7px 14px' }}>
               {b.label}
             </button>
           ))}
-          <a className="btn-ghost" href={gmailHref} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>Gmail ↗</a>
+          <a className="btn-ghost" href={gmailHref} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', padding: '7px 14px' }}>Gmail ↗</a>
         </div>
       </div>
 
-      <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12, background: '#F7F8FA',
+      <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10, background: 'rgba(255,255,255,0.55)',
         maxHeight: onBack ? 'none' : 'calc(100dvh - 400px)', minHeight: 200, overflowY: 'auto' }}>
         {!data && !err && <Loader padding={20} state="listening" label="Загрузка переписки…" />}
         {err && <div style={{ color: '#E0473B', fontSize: 13 }}>{err}</div>}
@@ -620,35 +625,36 @@ function MailThread({ contact: c, gmailHref, onBack, onPatch }) {
           <div style={{ padding: '10px 12px', borderRadius: 12, background: 'rgba(217,119,6,0.08)', color: '#B45309', fontSize: 12.5, fontWeight: 600 }}>{data.hint}</div>
         )}
         {data?.messages?.map(m => (
-          <div key={m.id} style={{ alignSelf: m.from_me ? 'flex-end' : 'flex-start', maxWidth: '88%',
-            background: m.from_me ? '#2563EB' : '#fff', color: m.from_me ? '#fff' : '#0E1726',
-            borderRadius: 16, padding: '10px 14px', boxShadow: m.from_me ? 'none' : '0 1px 2px rgba(14,23,38,0.08)' }}>
-            <div style={{ fontSize: 11, opacity: 0.75, marginBottom: 4 }}>
-              {m.from_me ? 'Вы' : (c.contact_name || c.company || c.email)} · {fmtTs(m.date)}
+          <div key={m.id} style={{ display: 'flex', flexDirection: 'column', alignItems: m.from_me ? 'flex-end' : 'flex-start' }}>
+            <div className={`bubble ${m.from_me ? 'bubble--me' : 'bubble--them'}`}>
+              {m.text || '(без текста)'}
+              {m.attachments?.length > 0 && (
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
+                  {m.attachments.map(a => (
+                    <button key={a.index} onClick={() => download(m, a)}
+                      style={{ border: 'none', cursor: 'pointer', borderRadius: 12, padding: '6px 10px', fontSize: 12.5, fontWeight: 600, fontFamily: 'inherit',
+                        background: m.from_me ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.8)', color: m.from_me ? '#fff' : '#1366F0' }}>
+                      📎 {a.name} · {fmtSize(a.size)}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            <div style={{ whiteSpace: 'pre-wrap', fontSize: 13.5, lineHeight: 1.5, overflowWrap: 'anywhere' }}>{m.text || '(без текста)'}</div>
-            {m.attachments?.length > 0 && (
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
-                {m.attachments.map(a => (
-                  <button key={a.index} onClick={() => download(m, a)}
-                    style={{ border: 'none', cursor: 'pointer', borderRadius: 10, padding: '6px 10px', fontSize: 12, fontWeight: 600, fontFamily: 'inherit',
-                      background: m.from_me ? 'rgba(255,255,255,0.2)' : 'rgba(37,99,235,0.08)', color: m.from_me ? '#fff' : '#1D4ED8' }}>
-                    📎 {a.name} · {fmtSize(a.size)}
-                  </button>
-                ))}
-              </div>
-            )}
+            <div className="bubble-meta">{m.from_me ? 'Вы' : (c.contact_name || c.company || c.email)} · {fmtTs(m.date)}</div>
           </div>
         ))}
         <div ref={endRef} />
       </div>
 
-      <div style={{ padding: 12, borderTop: '1px solid rgba(14,23,38,0.06)', display: 'flex', gap: 8, alignItems: 'flex-end' }}>
-        <textarea value={text} onChange={e => setText(e.target.value)} rows={3} placeholder="Ваш ответ…"
-          onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) send() }}
-          style={{ ...inputStyle, flex: 1, resize: 'vertical', minHeight: 64, fontSize: 16 }} />
-        <button className="btn-primary" disabled={sending || !text.trim()} onClick={send} style={{ flexShrink: 0 }}>
-          <SwapText>{sending ? 'Отправляю…' : sentOk ? 'Отправлено ✓' : 'Отправить'}</SwapText>
+      <div className="composer">
+        <textarea data-plain value={text} onChange={e => setText(e.target.value)} rows={1} placeholder="Ваш ответ…"
+          onInput={e => { e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 180) + 'px' }}
+          onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) send() }} />
+        <button className="composer-send" disabled={sending || !text.trim()} onClick={send}
+          aria-label={sending ? 'Отправляю' : 'Отправить'} title={sentOk ? 'Отправлено' : 'Отправить (⌘ + Enter)'}>
+          {sentOk
+            ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+            : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="19" x2="12" y2="5" /><polyline points="5 12 12 5 19 12" /></svg>}
         </button>
       </div>
     </div>
@@ -737,17 +743,14 @@ function Contacts({ campaignId, campaignName, onChanged, groups = {}, loginFor, 
           const active = group === g.key
           const n = g.key ? groups[g.key] : undefined
           return (
-            <button key={g.key} onClick={() => { setGroup(g.key); setStatus('') }}
-              style={{ padding: '7px 13px', borderRadius: 99, cursor: 'pointer', fontSize: 12.5, fontWeight: 600, fontFamily: 'var(--font-sys)',
-                border: active ? '1px solid #1366F0' : '1px solid rgba(14,23,38,0.12)',
-                background: active ? 'rgba(19,102,240,0.1)' : 'rgba(255,255,255,0.7)', color: active ? '#1366F0' : '#5A6573' }}>
+            <button key={g.key} onClick={() => { setGroup(g.key); setStatus('') }} style={chip(active)}>
               {g.label}{n !== undefined ? ` · ${n}` : ''}
             </button>
           )
         })}
       </div>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Поиск: компания, email, город" style={{ ...inputStyle, width: 260 }} />
+        <SearchField value={q} onChange={setQ} placeholder="Компания, email, город" style={{ width: 260 }} />
         <Select value={status} onChange={e => setStatus(e.target.value)} style={{ ...inputStyle, width: 170 }}>
           <option value="">Все статусы</option>
           {Object.entries(STATUS).map(([k, s]) => <option key={k} value={k}>{s.label}</option>)}
@@ -765,7 +768,7 @@ function Contacts({ campaignId, campaignName, onChanged, groups = {}, loginFor, 
       </div>
 
       {form && (
-        <div className="card" style={{ padding: 16, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10, alignItems: 'end' }}>
+        <div className="ios-widget" style={{ padding: 16, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10, alignItems: 'end' }}>
           {[['company', 'Компания'], ['email', 'Email'], ['contact_name', 'Имя контакта'], ['city', 'Город']].map(([k, l]) => (
             <div key={k}>
               <div style={labelStyle}>{l}</div>
@@ -785,7 +788,7 @@ function Contacts({ campaignId, campaignName, onChanged, groups = {}, loginFor, 
         </div>
       )}
 
-      <div className="card" style={{ padding: 0, overflowX: 'auto' }}>
+      <div className="ios-widget" style={{ padding: 0, overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
             <tr style={{ textAlign: 'left', color: '#8A93A0', fontSize: 11.5 }}>
@@ -811,7 +814,7 @@ function Contacts({ campaignId, campaignName, onChanged, groups = {}, loginFor, 
                 <td style={{ padding: '10px 14px', color: '#5A6573' }}>{c.priority || ''}</td>
                 <td style={{ padding: '10px 14px' }}>
                   <Select
-                    value={c.status}
+                    value={c.status} className="status-pill"
                     onChange={e => setContactStatus(c, e.target.value)}
                     style={{ border: 'none', background: (STATUS[c.status] || STATUS.new).bg, color: (STATUS[c.status] || STATUS.new).color, borderRadius: 99, padding: '4px 8px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
                   >
@@ -901,7 +904,7 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 16, alignItems: 'start' }}>
-      <div className="card" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div className="ios-widget" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 14 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}>
           <div>
             <div style={labelStyle}>Название</div>
@@ -976,7 +979,7 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
         </div>
       </div>
 
-      <div className="card" style={{ padding: 18 }}>
+      <div className="ios-widget" style={{ padding: 18 }}>
         <div style={sectionTitle}>Предпросмотр</div>
         {preview && boxes.length > 1 && (
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginBottom: 14 }}>
@@ -1111,7 +1114,7 @@ function MailboxSettings({ mailbox, onSaved, onDeleted }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div className="card" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <div className="ios-widget" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 18 }}>
         {mailbox.campaigns?.length > 0 && (
           <div style={{ fontSize: 12.5, color: '#5A6573' }}>С этой почты идут: <b>{mailbox.campaigns.join(', ')}</b></div>
         )}
@@ -1188,7 +1191,7 @@ function MailboxSettings({ mailbox, onSaved, onDeleted }) {
         </div>
       </div>
 
-      <div className="card" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div className="ios-widget" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 12 }}>
         <div style={sectionTitle}>Проверка</div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           <button className="btn-ghost" onClick={testConn} disabled={busy}>Проверить подключение</button>
@@ -1210,8 +1213,8 @@ function MailboxSettings({ mailbox, onSaved, onDeleted }) {
 
 const chip = (active) => ({
   padding: '7px 13px', borderRadius: 99, cursor: 'pointer', fontSize: 12.5, fontWeight: 600, fontFamily: 'var(--font-sys)',
-  border: active ? '1px solid #1366F0' : '1px solid rgba(14,23,38,0.12)',
-  background: active ? 'rgba(19,102,240,0.1)' : 'rgba(255,255,255,0.7)', color: active ? '#1366F0' : '#5A6573',
+  border: 'none',
+  background: active ? '#1366F0' : 'rgba(118,118,128,0.12)', color: active ? '#fff' : '#3C4552',
   display: 'inline-flex', alignItems: 'center', gap: 7,
 })
 
@@ -1237,7 +1240,7 @@ function SettingsPage({ campaign, mailboxes, onSaved, onCampaignDeleted }) {
       <SlidingTabs options={[{ key: 'campaign', label: 'Направление и письмо' }, { key: 'mail', label: 'Почта' }]} value={section} onChange={setSection} />
       {section === 'campaign' && (campaign
         ? <CampaignSettings key={campaign.id} campaign={campaign} mailboxes={mailboxes} onSaved={onSaved} onDeleted={onCampaignDeleted} />
-        : <div className="card" style={{ padding: 24, color: '#8A93A0', fontSize: 13 }}>Выберите направление вверху страницы — у каждого своё письмо и своя почта.</div>)}
+        : <div className="ios-widget" style={{ padding: 24, color: '#8A93A0', fontSize: 13 }}>Выберите направление вверху страницы — у каждого своё письмо и своя почта.</div>)}
       {section === 'mail' && (
         <>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -1247,7 +1250,7 @@ function SettingsPage({ campaign, mailboxes, onSaved, onCampaignDeleted }) {
                 {m.login || m.name}
               </button>
             ))}
-            <button onClick={addMailbox} style={{ ...chip(false), borderStyle: 'dashed' }}>+ Почта</button>
+            <button onClick={addMailbox} style={{ ...chip(false), background: 'transparent', color: '#1366F0' }}>+ Почта</button>
           </div>
           {mailbox && <MailboxSettings key={mailbox.id + (mailbox.gmail_connected || '')} mailbox={mailbox} onSaved={onSaved}
             onDeleted={() => { setMid('main'); onSaved?.() }} />}
@@ -1280,14 +1283,14 @@ function SupplierCard({ s, onChange, onRemove }) {
   }
 
   return (
-    <div className="card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+    <div className="ios-widget" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
         <div>
           <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>{s.company}</div>
           <CampaignTag name={s.product} kind="purchase" />
           <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 4 }}>{[s.contact_name, s.email, s.city, s.site].filter(Boolean).join(' · ')}</div>
         </div>
-        <Select value={s.stage} onChange={e => patch({ stage: e.target.value })}
+        <Select value={s.stage} className="status-pill" onChange={e => patch({ stage: e.target.value })}
           style={{ alignSelf: 'flex-start', border: 'none', background: st.bg, color: st.color, borderRadius: 99, padding: '5px 10px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>
           {Object.entries(SUP_STAGES).map(([k, x]) => <option key={k} value={k}>{x.label}</option>)}
         </Select>
@@ -1354,14 +1357,14 @@ function Suppliers({ campaignId }) {
           <button key={k} onClick={() => setStage(k)} style={chip(stage === k)}>{l}</button>
         ))}
         <div style={{ flex: 1 }} />
-        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Поиск: компания, товар, email" style={{ ...inputStyle, width: 240 }} />
+        <SearchField value={q} onChange={setQ} placeholder="Компания, товар, email" style={{ width: 240 }} />
       </div>
       <div style={{ fontSize: 12, color: '#8A93A0' }}>
         Сюда попадают поставщики, ответившие на направления «закупка», когда во «Ответах» нажимаете «Интерес» или «Сделка».
       </div>
       {loading && <Loader padding={30} />}
       {!loading && items.length === 0 && (
-        <div className="card"><EmptyState title="Поставщиков пока нет" subtitle="Здесь появятся компании, ответившие на направления «закупка» с интересом" /></div>
+        <div className="ios-widget"><EmptyState title="Поставщиков пока нет" subtitle="Здесь появятся компании, ответившие на направления «закупка» с интересом" /></div>
       )}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: 14 }}>
         {items.map(s => (
@@ -1392,7 +1395,7 @@ function NewCampaignForm({ mailboxes, onCreated, onCancel }) {
   }
 
   return (
-    <div className="card" style={{ padding: 16, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10, alignItems: 'end' }}>
+    <div className="ios-widget" style={{ padding: 16, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10, alignItems: 'end' }}>
       <div>
         <div style={labelStyle}>Название</div>
         <input autoFocus value={f.name} onChange={e => setF(x => ({ ...x, name: e.target.value }))} placeholder="Краска — закупка" style={inputStyle} />
@@ -1434,7 +1437,7 @@ function CampaignBar({ campaigns, value, onChange, onAdd }) {
           )}
         </button>
       ))}
-      <button onClick={onAdd} style={{ ...chip(false), borderStyle: 'dashed' }}>+ Направление</button>
+      <button onClick={onAdd} style={{ ...chip(false), background: 'transparent', color: '#1366F0' }}>+ Направление</button>
     </div>
   )
 }
