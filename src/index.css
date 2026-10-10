@@ -1069,47 +1069,55 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 @keyframes planDiscIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .plan-disc-body { animation: none; } .plan-disc-chev { transition: none; } }
 
-/* ===== Dynamic Island в шапке ===== */
-/* по центру шапки; в покое высотой 44 px, раскрывается вниз поверх страницы */
+/* ===== Остров в шапке (как Dynamic Island) ===== */
 .topbar-island-anchor { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
-/* сам остров — в слое поверх страницы, на месте метки; ниже модальных окон (1000) */
-.topbar-island { position: fixed; transform: translate(-50%, -17px); z-index: 150; cursor: pointer; outline: none; }
-.topbar-island:focus-visible #topbar-island { outline: 3px solid rgba(19,102,240,0.45); outline-offset: 2px; }
-/* жидкое стекло вместо чёрной капсулы cult-ui (её классы bg-black/border — перебиваем) */
-.topbar-island #topbar-island {
-  font-family: var(--font-sys); color: #0E1726; isolation: isolate; position: relative;
+/* сам остров — в слое поверх страницы, на месте метки (центр шапки); ниже модальных окон (1000) */
+.topbar-island { position: fixed; transform: translate(-50%, -17px); z-index: 150; }
+.island {
+  position: relative; isolation: isolate; overflow: hidden; cursor: pointer; outline: none;
+  font-family: var(--font-sys); color: #0E1726;
+  /* размер меняется переходом — его можно прервать на полпути, без рывков */
+  transition: width 0.42s cubic-bezier(0.32, 0.72, 0, 1), height 0.42s cubic-bezier(0.32, 0.72, 0, 1), border-radius 0.42s cubic-bezier(0.32, 0.72, 0, 1), background 0.3s;
+  /* жидкое стекло, как у уведомлений */
   background:
     radial-gradient(120% 90% at 15% -30%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 55%),
-    linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.4) 100%) !important;
+    linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.4) 100%);
   -webkit-backdrop-filter: blur(20px) saturate(220%) brightness(1.06); backdrop-filter: blur(20px) saturate(220%) brightness(1.06);
-  border: none !important;
   box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(255,255,255,0.4), inset 0 0 16px rgba(255,255,255,0.3),
-    0 0 0 0.5px rgba(14,23,38,0.08), 0 12px 30px -12px rgba(20,30,55,0.3), 0 2px 6px rgba(20,30,55,0.06) !important;
+    0 0 0 0.5px rgba(14,23,38,0.08), 0 12px 30px -12px rgba(20,30,55,0.3), 0 2px 6px rgba(20,30,55,0.06);
 }
 /* светящийся край стекла */
-.topbar-island #topbar-island::before {
+.island::before {
   content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 1.5px; pointer-events: none;
   background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.35) 22%, rgba(255,255,255,0) 45%, rgba(255,255,255,0) 62%, rgba(255,255,255,0.75) 100%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
 }
-/* раскрытый остров лежит над цифрами страницы — стекло чуть плотнее, чтобы текст читался */
-.topbar-island[aria-expanded="true"] #topbar-island {
+/* раскрытый лежит над цифрами страницы — стекло чуть плотнее, чтобы текст читался */
+.island--open { cursor: default;
   background:
     radial-gradient(120% 90% at 15% -30%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 55%),
-    linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.66) 100%) !important;
-}
-.island-fg { color: #0E1726; }
-.island-muted { color: #8A93A0; }
-.island-text { letter-spacing: -0.01em; }
-.island-pct { margin-left: 6px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.7) 100%); }
+.island:focus-visible { box-shadow: 0 0 0 3px rgba(19,102,240,0.4), 0 12px 30px -12px rgba(20,30,55,0.3); }
+/* содержимое новой формы проявляется, когда остров уже почти принял размер */
+.island-content { height: 100%; animation: islandIn 0.3s 0.08s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes islandIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+.island-line { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 14px; font-size: 13px; white-space: nowrap; }
+.island-line b { font-weight: 600; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.island-ellipsis { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+.island-muted { color: #8A93A0; font-size: 12px; }
+.island-pct { margin-left: 4px; font-weight: 700; }
+.island-open { height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 14px 16px; font-size: 12.5px; }
+.island-open-head { display: flex; align-items: baseline; justify-content: space-between; }
+.island-open-head b { font-size: 15px; font-weight: 700; letter-spacing: -0.015em; }
+.island-row { display: flex; justify-content: space-between; }
+.island-row b { font-weight: 600; font-variant-numeric: tabular-nums; }
 .island-bar { height: 4px; margin-top: 4px; border-radius: 99px; background: rgba(14,23,38,0.08); overflow: hidden; }
 .island-bar > div { height: 100%; border-radius: 99px; transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
-.island-btn { align-self: stretch; border: none; border-radius: 99px; padding: 6px 0; cursor: pointer; font: 600 13px var(--font-sys);
+.island-btn { border: none; border-radius: 99px; padding: 6px 0; cursor: pointer; font: 600 13px var(--font-sys);
   background: rgba(19,102,240,0.1); color: #1366F0; }
 .island-btn:hover { background: rgba(19,102,240,0.16); }
 .island-spin { animation: islandSpin 0.9s linear infinite; flex-shrink: 0; }
 @keyframes islandSpin { to { transform: rotate(360deg); } }
 @media (max-width: 1100px) { .topbar-island { display: none; } }
-@media (prefers-reduced-motion: reduce) { .island-spin { animation-duration: 2.5s; } }
-
-@media (prefers-reduced-transparency: reduce) { .topbar-island #topbar-island { background: #fff !important; backdrop-filter: none; -webkit-backdrop-filter: none; } }
+@media (prefers-reduced-motion: reduce) { .island { transition: none; } .island-content { animation: none; } .island-spin { animation-duration: 2.5s; } }
+@media (prefers-reduced-transparency: reduce) { .island, .island--open { background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; } }
