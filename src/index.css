@@ -1106,9 +1106,14 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 /* содержимое — полной ширины по центру капли: не перестраивается, пока капля растёт */
 .topbar-expand-body { position: absolute; top: 7px; left: 0; will-change: transform, opacity;
   padding: 14px 24px 18px; border-top: 0.5px solid rgba(60,60,67,0.1); font-family: var(--font-sys); font-size: 12.5px; color: #0E1726; }
-.topbar-expand-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.topbar-expand-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
 .topbar-expand-head b { font-size: 15px; font-weight: 700; letter-spacing: -0.015em; }
-.topbar-expand-grid { display: grid; grid-template-columns: repeat(3, 1fr) auto; gap: 20px; align-items: end; }
+.topbar-expand-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.island-stat { min-width: 0; }
+.island-stat-v { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.island-stat-of { font-size: 12px; font-weight: 500; color: #A6AEB8; letter-spacing: 0; }
+.island-stat-sub { font-size: 11.5px; color: #8A93A0; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .island-muted { color: #8A93A0; font-size: 12px; }
 .island-row { display: flex; justify-content: space-between; gap: 8px; }
 .island-row b { font-weight: 600; font-variant-numeric: tabular-nums; }

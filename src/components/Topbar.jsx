@@ -413,7 +413,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
       </>
       )}
     </div>
-    {canExpand && <TopbarExpand barRef={barRef} onNav={onNav} page={page} />}
+    {canExpand && <TopbarExpand barRef={barRef} page={page} meta={meta} />}
     </>
   )
 }

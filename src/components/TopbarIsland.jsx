@@ -1,11 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { getGoals } from '../api'
+import { getGoals, getOrders } from '../api'
 import { useNotifications } from './Toast'
 import { motion } from 'motion/react'
 import { prefersReducedMotion } from '../motion'
 
-// Шапка как Dynamic Island: нажатие на пустое место шапки раскрывает её каплей вниз — план месяца;
+// Шапка как Dynamic Island: нажатие на пустое место шапки раскрывает её каплей вниз — сводка своей страницы;
 // фоновые дела («Генерирую акт…» → «Готово») идут строкой прямо в шапке.
 
 // панель заходит под шапку на столько пикселей: шапка (выше по слою) прикрывает её верх — получается один остров
@@ -51,15 +51,137 @@ export function TopbarActivity({ onDone }) {
   )
 }
 
-// Раскрытая часть шапки — план месяца. Движение как у Dynamic Island из cult-ui (тот «чёрный остров»):
+// ---- Что показывает шапка на каждой странице: заголовок и 3–4 цифры, без кнопок ----
+const nd = s => { s = String(s || ''); if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10); const m = s.match(/^(\d{2})\.(\d{2})\.?(\d{4})/); return m ? `${m[3]}-${m[2]}-${m[1]}` : '' }
+const mg = o => (+o.client_rate || 0) - (+o.carrier_rate || 0)
+const dayOf = o => nd(o.unload_date) || nd(o.load_date)
+const owedByClient = o => !o.client_paid && !o.client_cash
+const owedToCarrier = o => !o.carrier_paid && !o.carrier_cash
+const isEmpty = o => +o.client_rate > 0 && (mg(o) < 150 || mg(o) / o.client_rate < 0.15)  // порог «пустой» заявки, как в «Плане»
+const sum = (arr, f) => arr.reduce((t, o) => t + f(o), 0)
+const fmtDay = d => d ? new Date(d + 'T00:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }).replace('.', '') : '—'
+
+function buildIsland(page, meta, goals, orders, now) {
+  const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  const year = String(now.getFullYear())
+  const live = (orders || []).filter(o => o.status !== 'cancelled')
+  const inMonth = live.filter(o => dayOf(o).startsWith(month))
+  const inYear = live.filter(o => dayOf(o).startsWith(year))
+  const ago45 = new Date(now - 45 * 864e5).toISOString().slice(0, 10)
+  const MON = MONTHS[now.getMonth()]
+  const g = goals || {}
+  const plan = () => {
+    const day = now.getDate(), days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+    return {
+      title: `${MON} — план месяца`, sub: goals ? `${pct(g.profit_fact, g.profit_goal)}% выполнено` : 'Загружаю…',
+      stats: [
+        { label: 'Прибыль', value: `${int(g.profit_fact)} Br`, sub: `из ${int(g.profit_goal)}`, bar: pct(g.profit_fact, g.profit_goal), color: '#1366F0' },
+        { label: 'Рейсы', value: int(g.trips_fact), sub: `из ${int(g.trips_goal)}`, bar: pct(g.trips_fact, g.trips_goal), color: '#7C3AED' },
+        { label: 'Маржа на рейс', value: `${int(g.margin_fact)} Br`, sub: `цель ${int(g.margin_goal)}`, bar: pct(g.margin_fact, g.margin_goal), color: '#D97706' },
+        { label: 'Прогноз на месяц', value: `${int(g.profit_fact ? g.profit_fact / day * days : 0)} Br`, sub: 'по текущему темпу' },
+      ],
+    }
+  }
+  if (!orders) return plan()
+
+  if (page === 'orders') {
+    const m = sum(inMonth, mg), rev = sum(inMonth, o => +o.client_rate || 0)
+    const empty = inMonth.filter(isEmpty), owed = live.filter(owedByClient)
+    return { title: `Заявки — ${MON.toLowerCase()}`, sub: `${inMonth.length} за месяц`, stats: [
+      { label: 'Заявок', value: inMonth.length, sub: 'в этом месяце' },
+      { label: 'Маржа', value: `${int(m)} Br`, sub: rev ? `${Math.round(m / rev * 100)}% от выручки` : '' },
+      { label: 'Пустых и в минус', value: `${empty.length} из ${inMonth.length}`, sub: 'ниже 150 Br или 15%', color: empty.length / (inMonth.length || 1) > 0.3 ? '#D97706' : undefined },
+      { label: 'Ждём оплату', value: `${int(sum(owed, o => +o.client_rate || 0))} Br`, sub: `${owed.length} заявок` },
+    ] }
+  }
+  if (page === 'finance') {
+    const owed = live.filter(owedByClient), late = owed.filter(o => dayOf(o) && dayOf(o) < ago45), toCar = live.filter(owedToCarrier)
+    return { title: 'Деньги', sub: 'на сегодня', stats: [
+      { label: 'Клиенты должны', value: `${int(sum(owed, o => +o.client_rate || 0))} Br`, sub: `${owed.length} заявок` },
+      { label: 'Дольше 45 дней', value: `${int(sum(late, o => +o.client_rate || 0))} Br`, sub: `${late.length} заявок`, color: late.length ? '#D63B30' : undefined },
+      { label: 'Мы должны перевозчикам', value: `${int(sum(toCar, o => +o.carrier_rate || 0))} Br`, sub: `${toCar.length} заявок` },
+      { label: `Маржа за ${MON.toLowerCase()}`, value: `${int(sum(inMonth, mg))} Br`, sub: `${inMonth.length} заявок` },
+    ] }
+  }
+  if (page === 'clients') {
+    const by = {}
+    inYear.forEach(o => { by[o.client_id] = (by[o.client_id] || 0) + mg(o) })
+    const totalY = Object.values(by).reduce((a, b) => a + b, 0)
+    const top5 = Object.values(by).sort((a, b) => b - a).slice(0, 5).reduce((a, b) => a + b, 0)
+    const last = {}, first = {}
+    live.forEach(o => { const d = dayOf(o); if (!d) return; if (!last[o.client_id] || d > last[o.client_id]) last[o.client_id] = d; if (!first[o.client_id] || d < first[o.client_id]) first[o.client_id] = d })
+    const ago90 = new Date(now - 90 * 864e5).toISOString().slice(0, 10)
+    const ids = Object.keys(last)
+    const owed = live.filter(owedByClient)
+    return { title: 'Клиенты', sub: `${ids.length} с заявками`, stats: [
+      { label: 'Активные', value: `${ids.filter(id => last[id] >= ago90).length} из ${ids.length}`, sub: 'грузились за 90 дней' },
+      { label: 'Новые', value: ids.filter(id => first[id].startsWith(month)).length, sub: 'первая заявка в этом месяце' },
+      { label: 'Топ-5 клиентов', value: `${totalY ? Math.round(top5 / totalY * 100) : 0}%`, sub: 'маржи за год', color: totalY && top5 / totalY > 0.65 ? '#D97706' : undefined },
+      { label: 'Должны', value: `${int(sum(owed, o => +o.client_rate || 0))} Br`, sub: `${owed.length} заявок` },
+    ] }
+  }
+  if (page === 'carriers') {
+    const ids = new Set(live.map(o => o.carrier_id)), month_ = new Set(inMonth.map(o => o.carrier_id))
+    const toCar = live.filter(owedToCarrier)
+    const top = {}
+    inMonth.forEach(o => { top[o.carrier_name] = (top[o.carrier_name] || 0) + 1 })
+    const [topName, topN] = Object.entries(top).sort((a, b) => b[1] - a[1])[0] || ['—', 0]
+    return { title: 'Перевозчики', sub: `${ids.size} в работе за всё время`, stats: [
+      { label: 'Возили в этом месяце', value: month_.size, sub: `${inMonth.length} рейсов` },
+      { label: 'Чаще всех', value: topName, sub: topN ? `${topN} рейсов за месяц` : '' },
+      { label: 'Мы должны', value: `${int(sum(toCar, o => +o.carrier_rate || 0))} Br`, sub: `${toCar.length} заявок` },
+    ] }
+  }
+  if (page === 'order-detail' && meta?.title) {
+    const o = live.find(x => x.order_number === meta.title)
+    if (o) {
+      const m = mg(o), r = +o.client_rate || 0
+      return { title: 'Сводка заявки', sub: '', stats: [
+        { label: 'Маржа', value: `${int(m)} Br`, sub: r ? `${Math.round(m / r * 100)}% · ${m < 0 ? 'в минус' : isEmpty(o) ? 'пустая' : 'нормальная'}` : '', color: m < 0 ? '#D63B30' : isEmpty(o) ? '#D97706' : '#1E9E5A' },
+        { label: 'Клиент платит', value: `${int(r)} Br`, sub: o.client_paid || o.client_cash ? 'оплачено' : 'ждём оплату', color: o.client_paid || o.client_cash ? '#1E9E5A' : undefined },
+        { label: 'Перевозчику', value: `${int(o.carrier_rate)} Br`, sub: o.carrier_paid || o.carrier_cash ? 'оплачено' : 'не оплачено', color: o.carrier_paid || o.carrier_cash ? '#1E9E5A' : undefined },
+        { label: 'Выгрузка', value: fmtDay(nd(o.unload_date)), sub: o.load_date ? `загрузка ${fmtDay(nd(o.load_date))}` : '' },
+      ] }
+    }
+  }
+  if (page === 'client-detail' && meta?.title) {
+    const mine = live.filter(o => o.client_name === meta.title)
+    if (mine.length) {
+      const yearMine = mine.filter(o => dayOf(o).startsWith(year)), allYear = sum(inYear, mg)
+      const owed = mine.filter(owedByClient), last = mine.map(dayOf).filter(Boolean).sort().pop()
+      return { title: 'Сводка клиента', sub: `${mine.length} заявок за всё время`, stats: [
+        { label: `Маржа за ${year}`, value: `${int(sum(yearMine, mg))} Br`, sub: allYear ? `${Math.round(sum(yearMine, mg) / allYear * 100)}% всей маржи` : '' },
+        { label: 'Заявок за год', value: yearMine.length, sub: yearMine.length ? `в среднем ${int(sum(yearMine, mg) / yearMine.length)} Br` : '' },
+        { label: 'Должен', value: `${int(sum(owed, o => +o.client_rate || 0))} Br`, sub: `${owed.length} заявок`, color: owed.some(o => dayOf(o) < ago45) ? '#D63B30' : undefined },
+        { label: 'Последняя заявка', value: fmtDay(last), sub: '' },
+      ] }
+    }
+  }
+  if (page === 'carrier-detail' && meta?.title) {
+    const mine = live.filter(o => o.carrier_name === meta.title)
+    if (mine.length) {
+      const owed = mine.filter(owedToCarrier), last = mine.map(dayOf).filter(Boolean).sort().pop()
+      return { title: 'Сводка перевозчика', sub: `${mine.length} рейсов за всё время`, stats: [
+        { label: 'Рейсов за год', value: mine.filter(o => dayOf(o).startsWith(year)).length, sub: `${mine.filter(o => dayOf(o).startsWith(month)).length} в этом месяце` },
+        { label: 'Мы должны', value: `${int(sum(owed, o => +o.carrier_rate || 0))} Br`, sub: `${owed.length} заявок` },
+        { label: 'Маржа на его рейсах', value: `${int(sum(mine, mg))} Br`, sub: `в среднем ${int(sum(mine, mg) / mine.length)} Br` },
+        { label: 'Последний рейс', value: fmtDay(last), sub: '' },
+      ] }
+    }
+  }
+  return plan()
+}
+
+// Раскрытая часть шапки — сводка своей страницы. Движение как у Dynamic Island из cult-ui (тот «чёрный остров»):
 // форма перетекает по ширине и высоте на пружине motion (stiffness 400, damping 30) — капля вырастает
 // из «ручки» шапки и сжимается обратно в неё. Пружину можно перехватить на ходу: motion продолжает
 // с текущего размера и скорости. Содержимое лежит с полной шириной и не перестраивается — только проявляется.
 const SPRING = { type: 'spring', stiffness: 400, damping: 30 }
 const INTERACTIVE = 'button, a, input, select, textarea, [role="button"], [role="listbox"], .apple-select'
 
-export function TopbarExpand({ barRef, onNav, page }) {
+export function TopbarExpand({ barRef, page, meta }) {
   const [goals, setGoals] = useState(null)
+  const [orders, setOrders] = useState(null)
   const [rect, setRect] = useState(null)
   const [open, setOpen] = useState(false)
   const [bodyH, setBodyH] = useState(140)
@@ -70,7 +192,10 @@ export function TopbarExpand({ barRef, onNav, page }) {
 
   // цифры грузим заранее и раз в 5 минут — не в момент раскрытия
   useEffect(() => {
-    const load = () => getGoals(month).then(setGoals).catch(() => {})
+    const load = () => {
+      getGoals(month).then(setGoals).catch(() => {})
+      getOrders({ limit: 5000, light: true }).then(r => setOrders(Array.isArray(r) ? r : (r?.orders || r?.data || []))).catch(() => {})
+    }
     load()
     const t = setInterval(load, 5 * 60 * 1000)
     return () => clearInterval(t)
@@ -87,7 +212,14 @@ export function TopbarExpand({ barRef, onNav, page }) {
     window.addEventListener('resize', place)
     return () => { ro.disconnect(); window.removeEventListener('resize', place) }
   }, [barRef])
-  useLayoutEffect(() => { if (bodyRef.current) setBodyH(bodyRef.current.offsetHeight) }, [goals, rect?.width])
+  // высота содержимого — для конечного размера капли (меняется вместе со страницей и цифрами)
+  useLayoutEffect(() => {
+    const el = bodyRef.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setBodyH(el.offsetHeight))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [rect !== null]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { setOpen(false) }, [page])
   // шапка стыкуется с каплей: прямые нижние углы, пока капля открыта (снимаются по окончании закрытия)
@@ -126,14 +258,7 @@ export function TopbarExpand({ barRef, onNav, page }) {
   }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!rect) return null
-  const g = goals || {}
-  const day = now.getDate(), days = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
-  const forecast = g.profit_fact ? g.profit_fact / day * days : 0
-  const rows = [
-    { label: 'Прибыль', f: `${int(g.profit_fact)} Br`, p: int(g.profit_goal), v: pct(g.profit_fact, g.profit_goal), c: '#1366F0' },
-    { label: 'Рейсы', f: int(g.trips_fact), p: int(g.trips_goal), v: pct(g.trips_fact, g.trips_goal), c: '#7C3AED' },
-    { label: 'Маржа на рейс', f: `${int(g.margin_fact)} Br`, p: int(g.margin_goal), v: pct(g.margin_fact, g.margin_goal), c: '#D97706' },
-  ]
+  const island = buildIsland(page, meta, goals, orders, now)
   const reduce = prefersReducedMotion()
 
   return createPortal(
@@ -152,17 +277,20 @@ export function TopbarExpand({ barRef, onNav, page }) {
           animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: -10 }}
           transition={reduce ? { duration: 0 } : { opacity: { duration: open ? 0.22 : 0.08, delay: open ? 0.1 : 0 }, y: SPRING }}>
           <div className="topbar-expand-head">
-            <b>{MONTHS[now.getMonth()]} — план месяца</b>
-            <span className="island-muted">{goals ? `${pct(g.profit_fact, g.profit_goal)}% · прогноз на конец месяца ${int(forecast)} Br` : 'Загружаю…'}</span>
+            <b>{island.title}</b>
+            {island.sub && <span className="island-muted">{island.sub}</span>}
           </div>
           <div className="topbar-expand-grid">
-            {rows.map(r => (
-              <div key={r.label}>
-                <div className="island-row"><span className="island-muted">{r.label}</span><span><b>{r.f}</b> <span className="island-muted">/ {r.p}</span></span></div>
-                <div className="island-bar"><div style={{ width: `${r.v}%`, background: r.c }} /></div>
+            {island.stats.map(st => (
+              <div key={st.label} className="island-stat">
+                <div className="island-muted">{st.label}</div>
+                <div className="island-stat-v" style={st.color && st.bar == null ? { color: st.color } : undefined}>
+                  {st.value}{st.bar != null && st.sub && <span className="island-stat-of"> {st.sub}</span>}
+                </div>
+                {st.bar != null ? <div className="island-bar"><div style={{ width: `${st.bar}%`, background: st.color }} /></div>
+                  : st.sub ? <div className="island-stat-sub">{st.sub}</div> : null}
               </div>
             ))}
-            <button type="button" className="island-btn" tabIndex={open ? 0 : -1} onClick={() => { setOpen(false); onNav?.('plan') }}>Открыть План</button>
           </div>
       </motion.div>
     </div>,
