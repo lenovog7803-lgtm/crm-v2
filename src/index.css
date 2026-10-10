@@ -1068,3 +1068,56 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .plan-disc-body { animation: planDiscIn 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
 @keyframes planDiscIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .plan-disc-body { animation: none; } .plan-disc-chev { transition: none; } }
+
+/* ===== Шапка-остров: раскрывается вниз, как Dynamic Island =====
+   Движение — пружиной в JS (src/motion.js, TopbarIsland.jsx); здесь только вид и раскладка. */
+.topbar-expandable { cursor: pointer; touch-action: pan-y; user-select: none; }
+.topbar-expandable input { cursor: text; user-select: text; }
+/* «ручка» — подсказка, что шапку можно раскрыть; подсвечивается сразу при нажатии */
+.topbar-grabber { position: absolute; left: 50%; bottom: 5px; width: 36px; height: 4px; margin-left: -18px; border-radius: 99px;
+  background: rgba(14,23,38,0.14); transition: background 0.15s; pointer-events: none; }
+@media (hover: hover) { .topbar-expandable:hover .topbar-grabber { background: rgba(19,102,240,0.4); } }
+.topbar-pressed .topbar-grabber { background: #1366F0; transition: none; }
+/* панель пристыкована: пока она хоть немного открыта, нижние углы шапки прямые */
+.topbar-joined { border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+/* фоновое дело — строка по центру шапки */
+.topbar-activity { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: 40%;
+  display: flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 99px; font: 500 13px var(--font-sys); color: #0E1726;
+  background: rgba(255,255,255,0.7); box-shadow: inset 0 1px 0 #fff, 0 0 0 0.5px rgba(14,23,38,0.08), 0 6px 16px -8px rgba(20,30,55,0.25);
+  pointer-events: none; animation: activityIn 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+.topbar-activity span:first-of-type { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@keyframes activityIn { from { opacity: 0; transform: translate(-50%, -50%) scale(0.92); } to { opacity: 1; transform: translate(-50%, -50%); } }
+/* капля под шапкой: рамка во всю ширину шапки, капля — по центру и растёт из ручки (7 px заходит под шапку,
+   там, где ручка) в ширину шапки и вниз. Без размытия: движущееся стекло с blur дёргается */
+.topbar-expand { position: fixed; z-index: 99; }
+.topbar-drop { position: absolute; top: 0; left: 0; border-radius: 0 0 24px 24px; will-change: transform, opacity; isolation: isolate;
+  /* жидкое стекло, как у бокового меню и уведомлений — одинаковое с первого кадра до последнего */
+  background:
+    radial-gradient(120% 120% at 15% -40%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 55%),
+    linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.56) 100%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.04); backdrop-filter: blur(20px) saturate(200%) brightness(1.04);
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.9), inset 0 0 18px rgba(255,255,255,0.35),
+    0 0 0 0.5px rgba(14,23,38,0.06), 0 22px 40px -22px rgba(20,30,55,0.4); }
+/* светящийся край стекла */
+.topbar-drop::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.85) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+@media (prefers-reduced-transparency: reduce) { .topbar-drop { background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; } }
+/* содержимое — полной ширины по центру капли: не перестраивается, пока капля растёт */
+.topbar-expand-body { position: absolute; top: 7px; left: 0; will-change: transform, opacity;
+  padding: 14px 24px 18px; border-top: 0.5px solid rgba(60,60,67,0.1); font-family: var(--font-sys); font-size: 12.5px; color: #0E1726; }
+.topbar-expand-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.topbar-expand-head b { font-size: 15px; font-weight: 700; letter-spacing: -0.015em; }
+.topbar-expand-grid { display: grid; grid-template-columns: repeat(3, 1fr) auto; gap: 20px; align-items: end; }
+.island-muted { color: #8A93A0; font-size: 12px; }
+.island-row { display: flex; justify-content: space-between; gap: 8px; }
+.island-row b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.island-bar { height: 4px; margin-top: 5px; border-radius: 99px; background: rgba(14,23,38,0.08); overflow: hidden; }
+.island-bar > div { height: 100%; border-radius: 99px; }
+.island-btn { border: none; border-radius: 99px; padding: 8px 18px; cursor: pointer; font: 600 13px var(--font-sys);
+  background: rgba(19,102,240,0.1); color: #1366F0; white-space: nowrap; transition: transform 0.1s; }
+.island-btn:hover { background: rgba(19,102,240,0.16); }
+.island-btn:active { transform: scale(0.96); }
+.island-spin { animation: islandSpin 0.9s linear infinite; flex-shrink: 0; }
+@keyframes islandSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .topbar-activity { animation: none; } .island-spin { animation-duration: 2.5s; } }
