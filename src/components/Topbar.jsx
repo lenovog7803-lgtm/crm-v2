@@ -5,8 +5,6 @@ import { fmtDate } from '../utils'
 import { mouseOnly } from '../motion'
 import { PopNumber } from './Transitions'
 import Select from './Select'
-import { TopbarExpand, TopbarActivity } from './TopbarIsland'
-import { useAuth } from '../AuthContext'
 
 const PAGE_META = {
   dashboard: { title: 'Дашборд', subtitle: 'Обзор бизнеса' },
@@ -72,13 +70,6 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
   const bellRef = useRef(null)
   const seenIds = useRef(new Set())
   const isMobile = useIsMobile()
-  const { user } = useAuth()
-  const isDirector = ['director', 'admin'].includes(user?.user?.role)
-  // шапка-остров: нажатие на пустое место шапки раскрывает её вниз (план месяца) — директору, на компьютере, в экспедиции
-  const barRef = useRef(null)
-  const [expanded, setExpanded] = useState(false)
-  const canExpand = !isMobile && isDirector && !String(page || '').startsWith('fleet')
-  useEffect(() => { setExpanded(false) }, [page])
 
   useEffect(() => {
     if (!bellOpen) return
@@ -111,10 +102,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
   }))).sort().reverse()
 
   return (
-    <>
-    <div ref={barRef} className={`topbar-mobile liquid-glass${compact ? ' topbar-compact' : ''}${canExpand ? ' topbar-expandable' : ''}${expanded ? ' topbar-open' : ''}`}
-      onClick={e => { if (canExpand && !e.target.closest('button, a, input, select, textarea, [role="button"], [role="listbox"], .apple-select')) setExpanded(v => !v) }}
-      style={{
+    <div className={`topbar-mobile liquid-glass${compact ? ' topbar-compact' : ''}`} style={{
       display: 'flex', alignItems: 'center', gap: 16,
       padding: '14px 20px',
       background: 'rgba(255,255,255,0.55)',
@@ -155,9 +143,6 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
         <div className="ios-title" style={{ fontSize: compact ? (isMobile ? 17 : 18) : (isMobile ? 24 : 26) }}>{meta.title}</div>
         {!isMobile && <div className="ios-subtitle" style={{ fontSize: 12.5, color: '#8A93A0', marginTop: 2 }}>{meta.subtitle}</div>}
       </div>
-      {/* шапка-остров: фоновые дела строкой по центру, «ручка» раскрытия снизу */}
-      {canExpand && <TopbarActivity />}
-      {canExpand && <span className="topbar-grabber" aria-hidden="true" />}
 
       {/* Mobile search icon */}
       {isMobile && (
@@ -416,7 +401,5 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
       </>
       )}
     </div>
-    {canExpand && <TopbarExpand barRef={barRef} open={expanded} onClose={() => setExpanded(false)} onNav={onNav} />}
-    </>
   )
 }
