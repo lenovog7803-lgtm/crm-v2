@@ -1006,3 +1006,33 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   .mail-row:active { background: rgba(118,118,128,0.14); }
 }
 
+
+/* ===== План: цели и выполнение ===== */
+.plan-bar { height: 6px; border-radius: 99px; background: rgba(14,23,38,0.07); overflow: hidden; }
+.plan-bar > div { height: 100%; border-radius: 99px; background: #1366F0; transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+.plan-bar--hero { height: 8px; margin-top: 14px; background: rgba(255,255,255,0.25); }
+.plan-bar--hero > div { background: #fff; }
+.plan-pill { font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 99px; white-space: nowrap;
+  background: rgba(118,118,128,0.12); color: #5A6573; }
+.plan-pill.g { background: rgba(30,158,90,0.12); color: #1E9E5A; }
+.plan-pill.o { background: rgba(217,119,6,0.13); color: #C26A05; }
+.plan-pill.r { background: rgba(214,59,48,0.11); color: #D63B30; }
+.plan-metric { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: baseline; margin-bottom: 10px; font-size: 13px; color: #5A6573; }
+.plan-metric b { font-weight: 600; color: #0E1726; font-variant-numeric: tabular-nums; }
+.plan-metric .plan-bar { grid-column: 1 / -1; }
+.plan-krs { margin-top: 12px; padding-top: 10px; border-top: 0.5px solid rgba(60,60,67,0.18); display: flex; flex-direction: column; gap: 7px; }
+.plan-kr { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #0E1726; }
+.plan-kr-val { color: #8A93A0; font-size: 12.5px; font-variant-numeric: tabular-nums; text-align: right; }
+.plan-kr-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: rgba(118,118,128,0.25); }
+.plan-kr-dot.ok { background: #1E9E5A; } .plan-kr-dot.wip { background: #D97706; } .plan-kr-dot.fail { background: #D63B30; }
+.plan-month { display: flex; align-items: center; gap: 12px; padding: 11px 16px; font-family: var(--font-sys); }
+.plan-month + .plan-month { border-top: 0.5px solid rgba(60,60,67,0.18); }
+.plan-month-name { width: 74px; font-weight: 600; font-size: 14px; color: #0E1726; display: flex; align-items: center; gap: 6px; }
+.plan-now { font-size: 10px; font-weight: 700; color: #1366F0; background: rgba(19,102,240,0.1); border-radius: 99px; padding: 1px 6px; }
+.plan-month-num { font-size: 13px; font-weight: 600; color: #0E1726; white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; width: 110px; }
+.plan-month-num span { font-weight: 400; color: #A6AEB8; }
+.plan-legend { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; color: #8A93A0; }
+.plan-legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.plan-edit { border-collapse: collapse; font-size: 13px; }
+.plan-edit th { text-align: left; font-weight: 600; color: #8A93A0; font-size: 12px; padding: 0 6px 6px; }
+.plan-edit td { padding: 3px 6px; }

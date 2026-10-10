@@ -21,6 +21,7 @@ const ICONS = {
   dashboard: g(<><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></>),
   route: g(<><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8a4 4 0 0 0 0-8H8a4 4 0 0 1 0-8h8"/></>),
   reports: g(<><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></>),
+  target: g(<><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></>),
   book: g(<><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></>),
   trash: g(<><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></>),
   backup: g(<><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.7-4 3-9 3s-9-1.3-9-3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/></>),
@@ -40,6 +41,7 @@ const MORE_SECTIONS = [
     { key: 'fleet-vehicles', label: 'Машины и водители', icon: 'fleet', color: '#30B0C7' },
   ] },
   { title: 'Отчёты и учёт', director: true, items: [
+    { key: 'plan', label: 'План', icon: 'target', color: '#1366F0' },
     { key: 'reports', label: 'Отчёты', icon: 'reports', color: '#AF52DE' },
     { key: 'kudir', label: 'КУДиР', icon: 'book', color: '#A2845E' },
   ] },

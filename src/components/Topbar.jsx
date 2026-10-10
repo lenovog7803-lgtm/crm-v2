@@ -12,6 +12,7 @@ const PAGE_META = {
   orders: { title: 'Заявки', subtitle: 'Управление грузоперевозками' },
   'order-detail': { title: 'Заявка', subtitle: 'Детали перевозки' },
   finance: { title: 'Финансы', subtitle: 'Платежи и расчёты' },
+  plan: { title: 'План', subtitle: 'Цели по месяцам и кварталам и их выполнение' },
   tasks: { title: 'Задачи', subtitle: 'Текущие дела и напоминания' },
   clients: { title: 'Клиенты', subtitle: 'База клиентов' },
   'client-detail': { title: 'Клиент', subtitle: 'Карточка клиента' },

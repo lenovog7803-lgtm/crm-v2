@@ -24,6 +24,7 @@ import Trash from './components/Trash'
 import Backups from './pages/Backups'
 import Admin from './pages/Admin'
 import Kudir from './pages/Kudir'
+import Plan from './pages/Plan'
 import Reports from './pages/Reports'
 import Mailing from './pages/Mailing'
 import ManagerDashboard from './pages/ManagerDashboard'
@@ -229,6 +230,7 @@ function MainApp() {
     if (key === 'admin' && !isEgorDir) key = 'tasks'
     if (key === 'kudir' && !isDirector) key = 'tasks'
     if (key === 'reports' && !isDirector) key = 'tasks'
+    if (key === 'plan' && !isDirector) key = 'tasks'
     if (key === 'mailing' && !isDirector) key = 'tasks'
     if (isManager && !MANAGER_PAGES.includes(key)) key = 'my-dashboard'
     setPage(key)
@@ -468,6 +470,7 @@ function MainApp() {
             {page === 'backups' && <Backups />}
             {page === 'admin' && isEgorDir && <Admin />}
             {page === 'kudir' && isDirector && <Kudir />}
+            {page === 'plan' && isDirector && <ErrorBoundary><Plan /></ErrorBoundary>}
             {page === 'reports' && isDirector && <Reports />}
             {page === 'mailing' && isDirector && <ErrorBoundary><Mailing /></ErrorBoundary>}
           </div>
