@@ -1,9 +1,9 @@
 import { ShaderGradientCanvas, ShaderGradient } from '@shadergradient/react'
 
-// Живой фон CRM (ShaderGradient, WebGL). Цвета — мягкие версии фирменных: голубой, персиковый, светлый.
+// Живой фон CRM (ShaderGradient, WebGL). Цвета — мягкие голубые тона фирменного синего.
 // Грузится отдельным куском после интерфейса (React.lazy в GradientLayer), поэтому старт CRM не тормозит.
 // colors — три цвета волны; по умолчанию мягкий фон CRM, для карточек передаются свои.
-export default function GradientBackground({ colors = ['#BFD6FF', '#FFE3CC', '#F1F3F7'], speed = 0.12 }) {
+export default function GradientBackground({ colors = ['#B7D0FF', '#D9E8FF', '#EEF4FF'], speed = 0.12 }) {
   return (
     <ShaderGradientCanvas
       style={{ position: 'absolute', inset: 0 }}
