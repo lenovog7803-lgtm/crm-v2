@@ -1469,7 +1469,8 @@ export default function Mailing() {
   const loadMailboxes = () => getMailboxes().then(setMailboxes).catch(e => show('Ошибка загрузки почты: ' + e.message, { type: 'error' }))
   const loadState = () => {
     getMailingReplies(true, campaignId).then(r => setNewReplies(Array.isArray(r) ? r : [])).catch(() => {})
-    return getMailingState(campaignId).then(setState).catch(e => show('Ошибка загрузки рассылки: ' + e.message, { type: 'error' }))
+    // те же данные — шапке (сводка рассылки): своего долгого запроса к почте она не делает
+    return getMailingState(campaignId).then(s => { setState(s); window.dispatchEvent(new CustomEvent('crm:mailing-state', { detail: s })) }).catch(e => show('Ошибка загрузки рассылки: ' + e.message, { type: 'error' }))
   }
   const reloadAll = () => { loadState(); loadCampaigns(); loadMailboxes() }
 

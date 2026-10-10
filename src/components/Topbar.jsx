@@ -74,9 +74,9 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
   const isMobile = useIsMobile()
   const { user } = useAuth()
   const isDirector = ['director', 'admin'].includes(user?.user?.role)
-  // шапка-остров: нажатие на пустое место шапки или протяжка вниз раскрывает её (план месяца) — директору, на компьютере, в экспедиции
+  // шапка-остров: нажатие на пустое место шапки или протяжка вниз раскрывает её (план месяца) — директору, на компьютере
   const barRef = useRef(null)
-  const canExpand = !isMobile && isDirector && !String(page || '').startsWith('fleet')
+  const canExpand = !isMobile && isDirector
 
   useEffect(() => {
     if (!bellOpen) return

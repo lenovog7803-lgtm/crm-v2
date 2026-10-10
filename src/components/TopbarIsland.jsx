@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { getGoals, getOrders } from '../api'
+import { getGoals, getOrders, getFleetAnalytics, getFleetGoals } from '../api'
 import { useNotifications } from './Toast'
 import { motion } from 'motion/react'
 import { prefersReducedMotion } from '../motion'
@@ -61,7 +61,7 @@ const isEmpty = o => +o.client_rate > 0 && (mg(o) < 150 || mg(o) / o.client_rate
 const sum = (arr, f) => arr.reduce((t, o) => t + f(o), 0)
 const fmtDay = d => d ? new Date(d + 'T00:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }).replace('.', '') : '—'
 
-function buildIsland(page, meta, goals, orders, now) {
+function buildIsland(page, meta, goals, orders, now, extra = {}) {
   const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
   const year = String(now.getFullYear())
   const live = (orders || []).filter(o => o.status !== 'cancelled')
@@ -81,6 +81,28 @@ function buildIsland(page, meta, goals, orders, now) {
         { label: 'Прогноз на месяц', value: `${int(g.profit_fact ? g.profit_fact / day * days : 0)} Br`, sub: 'по текущему темпу' },
       ],
     }
+  }
+  if (page === 'mailing') {
+    const m = extra.mailing
+    if (!m) return { title: 'Рассылка', sub: 'загружаю данные почты…', stats: [] }
+    const h = m.health || {}
+    return { title: 'Рассылка', sub: m.running ? 'идёт' : (m.state || 'остановлена').toLowerCase(), stats: [
+      { label: 'Отправлено сегодня', value: `${m.sent_today || 0} из ${m.limit || 0}`, sub: 'лимит на день', bar: pct(m.sent_today, m.limit), color: '#5856D6' },
+      { label: 'Новые ответы', value: m.replies_new || 0, sub: 'ждут ответа', color: m.replies_new ? '#1E9E5A' : undefined },
+      { label: 'Возвраты за 7 дней', value: `${h.bounce_rate ?? 0}%`, sub: `${h.bounced_7d ?? 0} из ${h.sent_7d ?? 0} писем`, color: (h.bounce_rate || 0) > 5 ? '#D63B30' : undefined },
+      { label: 'В очереди', value: m.queue_new ?? 0, sub: `${m.counts?.sent ?? 0} уже отправлено` },
+    ] }
+  }
+  if (String(page).startsWith('fleet')) {
+    const f = extra.fleet
+    if (!f) return { title: `Свой автопарк — ${MON.toLowerCase()}`, sub: 'загружаю…', stats: [] }
+    const mm = (f.a.by_month || []).find(x => x.month === month) || {}, fg = f.goal || {}
+    return { title: `Свой автопарк — ${MON.toLowerCase()}`, sub: f.a.trips_total ? `${f.a.trips_total} рейсов в месяце` : 'рейсов в этом месяце пока нет', stats: [
+      { label: 'Прибыль', value: `${int(mm.profit)} Br`, sub: fg.profit_goal ? `из ${int(fg.profit_goal)}` : 'цель не задана', bar: fg.profit_goal ? pct(Math.max(0, mm.profit || 0), fg.profit_goal) : null, color: (mm.profit || 0) < 0 ? '#D63B30' : '#30B0C7' },
+      { label: 'Рейсы', value: int(f.a.trips_total), sub: fg.trips_goal ? `из ${int(fg.trips_goal)}` : 'цель не задана', bar: fg.trips_goal ? pct(f.a.trips_total, fg.trips_goal) : null, color: '#7C3AED' },
+      { label: 'Выручка', value: `${int(mm.revenue)} Br`, sub: fg.revenue_goal ? `цель ${int(fg.revenue_goal)}` : '' },
+      { label: 'Порожний пробег', value: f.a.trips_total ? `${f.a.empty_km_pct}%` : '—', sub: 'чем меньше, тем лучше', color: (f.a.empty_km_pct || 0) > 30 ? '#D97706' : undefined },
+    ] }
   }
   if (!orders) return plan()
 
@@ -173,13 +195,31 @@ function buildIsland(page, meta, goals, orders, now) {
 }
 
 // Раскрытая часть шапки — сводка своей страницы. Движение как у Dynamic Island из cult-ui (тот «чёрный остров»):
-// форма перетекает по ширине и высоте на пружине motion (stiffness 400, damping 30) — капля вырастает
+// форма перетекает по ширине и высоте на мягкой пружине motion — капля вырастает
 // из «ручки» шапки и сжимается обратно в неё. Пружину можно перехватить на ходу: motion продолжает
 // с текущего размера и скорости. Содержимое лежит с полной шириной и не перестраивается — только проявляется.
-const SPRING = { type: 'spring', stiffness: 400, damping: 30 }
+// мягкая пружина, как у шторок iOS: response ≈ 0.45 с, damping ≈ 0.88 (почти без отскока):
+// stiffness = (2π / 0.45)² ≈ 195, damping = 4π · 0.88 / 0.45 ≈ 24.6
+const SPRING = { type: 'spring', stiffness: 195, damping: 24.6, restDelta: 0.001 }
+// капля «течёт»: по ширине растекается чуть быстрее, по высоте чуть отстаёт и мягко пружинит (~3%);
+// при закрытии — наоборот: сначала сжимается по высоте, потом стягивается в ручку
+const FLOW_OPEN = { scaleX: { type: 'spring', stiffness: 260, damping: 28 }, scaleY: { type: 'spring', stiffness: 170, damping: 19 } }
+const FLOW_CLOSE = { scaleX: { type: 'spring', stiffness: 210, damping: 28, delay: 0.05 }, scaleY: { type: 'spring', stiffness: 300, damping: 32 } }
+// содержимое «материализуется», как стеклянные панели iOS: снимается размытие, текст поднимается на место;
+// карточки сводки — по очереди
+const BODY = {
+  open: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { opacity: { duration: 0.3, delay: 0.12, ease: 'easeOut' }, filter: { duration: 0.35, delay: 0.1, ease: 'easeOut' }, y: SPRING, staggerChildren: 0.04, delayChildren: 0.14 } },
+  closed: { opacity: 0, y: -8, filter: 'blur(4px)', transition: { duration: 0.12, ease: 'easeIn' } },
+}
+const STAT = {
+  open: { opacity: 1, y: 0, transition: { opacity: { duration: 0.28 }, y: { type: 'spring', stiffness: 260, damping: 24 } } },
+  closed: { opacity: 0, y: -6, transition: { duration: 0.08 } },
+}
 const INTERACTIVE = 'button, a, input, select, textarea, [role="button"], [role="listbox"], .apple-select'
 
 export function TopbarExpand({ barRef, page, meta }) {
+  const [mailing, setMailing] = useState(null)
+  const [fleet, setFleet] = useState(null)
   const [goals, setGoals] = useState(null)
   const [orders, setOrders] = useState(null)
   const [rect, setRect] = useState(null)
@@ -212,6 +252,26 @@ export function TopbarExpand({ barRef, page, meta }) {
     window.addEventListener('resize', place)
     return () => { ro.disconnect(); window.removeEventListener('resize', place) }
   }, [barRef])
+  // рассылка: берём то, что уже загрузила страница рассылки (почта отвечает долго — второй запрос не нужен)
+  useEffect(() => {
+    const on = e => setMailing(e.detail)
+    window.addEventListener('crm:mailing-state', on)
+    return () => window.removeEventListener('crm:mailing-state', on)
+  }, [])
+  // автопарк — грузим, только когда открыта его страница, и обновляем раз в 5 минут
+  useEffect(() => {
+    if (!String(page).startsWith('fleet')) return
+    const load = () => {
+      Promise.all([
+        getFleetAnalytics({ date_from: `${month}-01`, date_to: `${month}-31` }),
+        getFleetGoals(now.getFullYear()),
+      ]).then(([a, g]) => setFleet({ a: a || {}, goal: (g?.months || [])[now.getMonth()] })).catch(() => {})
+    }
+    load()
+    const t = setInterval(load, 5 * 60 * 1000)
+    return () => clearInterval(t)
+  }, [page]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // высота содержимого — для конечного размера капли (меняется вместе со страницей и цифрами)
   useLayoutEffect(() => {
     const el = bodyRef.current
@@ -258,7 +318,7 @@ export function TopbarExpand({ barRef, page, meta }) {
   }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!rect) return null
-  const island = buildIsland(page, meta, goals, orders, now)
+  const island = buildIsland(page, meta, goals, orders, now, { mailing, fleet })
   const reduce = prefersReducedMotion()
 
   return createPortal(
@@ -269,27 +329,26 @@ export function TopbarExpand({ barRef, page, meta }) {
       <motion.div className="topbar-drop" style={{ width: rect.width, height: bodyH + 7, transformOrigin: '50% 0' }}
         initial={false}
         animate={open ? { scaleX: 1, scaleY: 1, opacity: 1 } : { scaleX: 36 / rect.width, scaleY: 4 / (bodyH + 7), opacity: 0 }}
-        transition={reduce ? { duration: 0 } : { ...SPRING, opacity: { duration: open ? 0.1 : 0.16, delay: open ? 0 : 0.12 } }}
+        transition={reduce ? { duration: 0 } : { ...(open ? FLOW_OPEN : FLOW_CLOSE), opacity: { duration: open ? 0.14 : 0.2, delay: open ? 0 : 0.22, ease: 'easeOut' } }}
         onAnimationComplete={() => { if (!open) barRef.current?.classList.remove('topbar-joined') }} />
       {/* содержимое — отдельным слоем поверх фона: не растягивается, только проявляется */}
-      <motion.div ref={bodyRef} className="topbar-expand-body" style={{ width: rect.width }}
-          initial={false}
-          animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: -10 }}
-          transition={reduce ? { duration: 0 } : { opacity: { duration: open ? 0.22 : 0.08, delay: open ? 0.1 : 0 }, y: SPRING }}>
+      <motion.div ref={bodyRef} className="topbar-expand-body" style={{ width: rect.width, transformOrigin: '50% 0' }}
+          initial={false} variants={reduce ? undefined : BODY}
+          animate={reduce ? { opacity: open ? 1 : 0 } : open ? 'open' : 'closed'}>
           <div className="topbar-expand-head">
             <b>{island.title}</b>
             {island.sub && <span className="island-muted">{island.sub}</span>}
           </div>
           <div className="topbar-expand-grid">
             {island.stats.map(st => (
-              <div key={st.label} className="island-stat">
+              <motion.div key={st.label} className="island-stat" variants={reduce ? undefined : STAT}>
                 <div className="island-muted">{st.label}</div>
                 <div className="island-stat-v" style={st.color && st.bar == null ? { color: st.color } : undefined}>
                   {st.value}{st.bar != null && st.sub && <span className="island-stat-of"> {st.sub}</span>}
                 </div>
                 {st.bar != null ? <div className="island-bar"><div style={{ width: `${st.bar}%`, background: st.color }} /></div>
                   : st.sub ? <div className="island-stat-sub">{st.sub}</div> : null}
-              </div>
+              </motion.div>
             ))}
           </div>
       </motion.div>
