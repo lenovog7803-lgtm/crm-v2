@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useAuth } from '../AuthContext'
 import { initials } from '../utils'
 import { SlidingTabs } from './SlidingTabs'
-import { mouseOnly, haptic, rubberband } from '../motion'
+import { mouseOnly, haptic, rubberband, prefersReducedMotion } from '../motion'
 import { PopNumber } from './Transitions'
 import { useRefraction } from '../hooks/useRefraction'
 
@@ -346,6 +346,8 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   // switching sections reads as continuous motion rather than a hard cut.
   const navButtonRefs = useRef({})
   const [pillRect, setPillRect] = useState(null)
+  const pillRef = useRef(null)
+  const prevActive = useRef(null)
   const activeKey = navItems.find(item =>
     page === item.key ||
     (item.key === 'orders' && page === 'order-detail') ||
@@ -359,6 +361,14 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
   useLayoutEffect(() => {
     const el = navButtonRefs.current[activeKey]
     if (el) setPillRect({ top: el.offsetTop, height: el.offsetHeight })
+    // «желе», как у переключателей: капля вытягивается по ходу движения (вертикально) и пружинит обратно
+    if (prevActive.current && prevActive.current !== activeKey && pillRef.current && !prefersReducedMotion()) {
+      pillRef.current.animate(
+        [{ transform: 'scale(1, 1)' }, { transform: 'scale(0.94, 1.35)', offset: 0.4 }, { transform: 'scale(1.02, 0.96)', offset: 0.75 }, { transform: 'scale(1, 1)' }],
+        { duration: 520, easing: 'ease-out' },
+      )
+    }
+    prevActive.current = activeKey
   }, [activeKey, expanded, navOrder.join(',')])
 
   const isDirector = profile.role === 'director' || profile.role === 'admin'
@@ -446,11 +456,11 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
       {/* Nav */}
       <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4, position: 'relative' }}>
         {pillRect && (
-          <div style={{
+          <div ref={pillRef} style={{
             position: 'absolute', left: 0, right: 0, top: pillRect.top, height: pillRect.height,
             borderRadius: 12, background: 'rgba(19,102,240,0.1)',  // тонированная заливка без тени — как выделение в боковой панели iPad/Mac
             opacity: drag ? 0 : 1,  // во время перетаскивания подсветка не мешает
-            transition: 'top 0.25s var(--ease), height 0.25s var(--ease), opacity 0.15s',
+            transition: 'top 0.42s cubic-bezier(0.22, 1, 0.36, 1), height 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.15s',
             pointerEvents: 'none', zIndex: 0,
           }} />
         )}

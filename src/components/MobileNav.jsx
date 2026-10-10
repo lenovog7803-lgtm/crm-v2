@@ -2,6 +2,7 @@ import { useRef, useState, useLayoutEffect } from 'react'
 import { useAuth } from '../AuthContext'
 import { ModalOverlay, useSheet } from './Modal'
 import { PopNumber } from './Transitions'
+import { prefersReducedMotion } from '../motion'
 
 // Нижняя панель на телефоне — не больше 5 вкладок (как в iOS); всё остальное — в «Ещё».
 // «Ещё» оформлено как «Настройки» iPhone: серый фон, белые скруглённые группы,
@@ -238,11 +239,21 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
   // icon up — full nav height, centered on the icon.
   const btnRefs = useRef({})
   const [pill, setPill] = useState(null)
+  const pillRef = useRef(null)
+  const prevActive = useRef(null)
   const PILL_SIZE = 48
 
   useLayoutEffect(() => {
     const el = btnRefs.current[activeKey]
     if (el) setPill({ left: el.offsetLeft + (el.offsetWidth - PILL_SIZE) / 2 })
+    // «желе», как у переключателей на компьютере: капля вытягивается по ходу движения и пружинит
+    if (prevActive.current && prevActive.current !== activeKey && pillRef.current && !prefersReducedMotion()) {
+      pillRef.current.animate(
+        [{ transform: 'scale(1, 1)' }, { transform: 'scale(1.38, 0.84)', offset: 0.4 }, { transform: 'scale(0.96, 1.04)', offset: 0.75 }, { transform: 'scale(1, 1)' }],
+        { duration: 520, easing: 'ease-out' },
+      )
+    }
+    prevActive.current = activeKey
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeKey])
 
@@ -258,10 +269,10 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
       paddingInline: 6,
     }}>
       {pill && (
-        <div className="lg-lens" style={{
+        <div ref={pillRef} className="seg-thumb" style={{
           position: 'absolute', left: pill.left, top: '50%', width: PILL_SIZE, height: PILL_SIZE,
           marginTop: -PILL_SIZE / 2,
-          borderRadius: 22, transition: 'left 0.35s cubic-bezier(0.34, 1.3, 0.64, 1)', pointerEvents: 'none',
+          borderRadius: 22, transition: 'left 0.42s cubic-bezier(0.22, 1, 0.36, 1)', pointerEvents: 'none',
         }} />
       )}
       {navList.map(item => {
