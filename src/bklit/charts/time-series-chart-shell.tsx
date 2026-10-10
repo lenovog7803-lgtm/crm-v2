@@ -405,7 +405,8 @@ const TimeSeriesChartCore = memo(function TimeSeriesChartCore({
   );
 
   const dateLabels = useMemo(
-    () => visiblePlotData.map((d) => shortDateFmt.format(xAccessor(d))),
+    // CRM: если у точки есть своя подпись (label) — она вместо даты
+    () => visiblePlotData.map((d) => typeof d.label === "string" ? d.label : shortDateFmt.format(xAccessor(d))),
     [visiblePlotData, xAccessor]
   );
 

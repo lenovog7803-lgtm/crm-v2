@@ -668,7 +668,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             </div>
           )}
         </div>
-        <MarginChart dates={chart.dates} current={chart.current} prev={chart.prev} height={isMobile ? 190 : 240} />
+        <MarginChart dates={chart.dates} current={chart.current} prev={chart.prev} labels={chart.mode === 'months' ? chart.labels : undefined} height={isMobile ? 190 : 240} />
       </div>
 
       {/* Bottom 3-col */}

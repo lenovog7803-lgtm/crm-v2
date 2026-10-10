@@ -248,7 +248,9 @@ const ChartTooltipInner = memo(function ChartTooltipInner({
     if (barXAccessor) {
       return barXAccessor(tooltipData.point);
     }
-    // For line/area charts, use the date
+    // For line/area charts, use the date (CRM: or the point's own label)
+    const own = tooltipData.point.label;
+    if (typeof own === "string") return own;
     return weekdayDateFmt.format(xAccessor(tooltipData.point));
   }, [tooltipData, barXAccessor, xAccessor]);
 

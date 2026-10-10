@@ -12,7 +12,8 @@ const money = v => `${Math.round(v).toLocaleString('ru-RU')} Br`
 // шкала: 1,2K, а не «1k» дважды подряд
 const short = v => v >= 1000 ? `${String(+(v / 1000).toFixed(1)).replace('.', ',')}K` : String(Math.round(v))
 
-export default function MarginChart({ dates, current, prev, height = 230 }) {
+// labels — подписи точек для помесячных периодов («янв», «окт '25»); по дням — дата от Bklit
+export default function MarginChart({ dates, current, prev, labels, height = 230 }) {
   if (!dates.length) {
     return <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A6AEB8', fontSize: 13 }}>Нет данных за период</div>
   }
@@ -21,6 +22,7 @@ export default function MarginChart({ dates, current, prev, height = 230 }) {
   const data = dates.map((date, i) => ({
     date, cur: Math.max(0, current[i] || 0), prev: Math.max(0, prev?.[i] || 0),
     curRaw: current[i] || 0, prevRaw: prev?.[i] || 0,
+    ...(labels ? { label: labels[i] } : {}),
   }))
 
   return (
@@ -32,7 +34,7 @@ export default function MarginChart({ dates, current, prev, height = 230 }) {
         <Area dataKey="cur" fill="var(--chart-line-primary)" />
         <YAxis orientation="left" formatValue={short} />
         <YAxis orientation="right" formatValue={short} />
-        <XAxis />
+        <XAxis tickMode={labels ? 'data' : undefined} />
         <ChartTooltip
           // точка на кривой — цвета своей кривой (по умолчанию Bklit берёт цвет по порядку строк подсказки)
           dotColor={(_, line) => line.dataKey === 'cur' ? 'var(--chart-line-primary)' : 'var(--chart-line-secondary)'}
