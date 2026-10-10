@@ -15,6 +15,7 @@
     "camera-controls": "^3.1.2",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "sonner": "^2.0.8",
     "thinking-orbs": "^0.3.2",
     "three": "^0.186.1",
     "three-stdlib": "^2.36.1"
