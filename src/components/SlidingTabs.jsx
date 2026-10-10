@@ -15,8 +15,8 @@ export function SlidingTabs({ options, value, onChange, pillColor, activeColor =
     // «желе»: капля вытягивается по ходу движения и возвращается — как в iOS 26
     if (prev.current !== value && thumbRef.current && !prefersReducedMotion()) {
       thumbRef.current.animate(
-        [{ transform: 'scale(1, 1)' }, { transform: 'scale(1.12, 0.9)' }, { transform: 'scale(1, 1)' }],
-        { duration: 380, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+        [{ transform: 'scale(1, 1)' }, { transform: 'scale(1.32, 0.8)', offset: 0.4 }, { transform: 'scale(0.96, 1.04)', offset: 0.75 }, { transform: 'scale(1, 1)' }],
+        { duration: 520, easing: 'ease-out' },
       )
     }
     prev.current = value
@@ -29,7 +29,7 @@ export function SlidingTabs({ options, value, onChange, pillColor, activeColor =
           position: 'absolute', left: rect.left, width: rect.width,
           top: pillColor ? 0 : 3, bottom: pillColor ? 0 : 3,
           borderRadius: 99, background: pillColor,
-          transition: 'left 0.32s cubic-bezier(0.22, 1, 0.36, 1), width 0.32s cubic-bezier(0.22, 1, 0.36, 1)',
+          transition: 'left 0.42s cubic-bezier(0.22, 1, 0.36, 1), width 0.42s cubic-bezier(0.22, 1, 0.36, 1)',
           zIndex: 0,
         }} />
       )}
