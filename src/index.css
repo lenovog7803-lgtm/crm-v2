@@ -1070,11 +1070,9 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 @media (prefers-reduced-motion: reduce) { .plan-disc-body { animation: none; } .plan-disc-chev { transition: none; } }
 
 /* ===== Шапка-остров: раскрывается вниз, как Dynamic Island ===== */
-.topbar-expandable { cursor: pointer; transition: border-radius 0.3s cubic-bezier(0.32, 0.72, 0, 1); }
+.topbar-expandable { cursor: pointer; }
 .topbar-expandable button, .topbar-expandable input, .topbar-expandable .apple-select { cursor: pointer; }
 .topbar-expandable input { cursor: text; }
-/* раскрыта: низ шапки и верх раскрытой части стыкуются в одно целое */
-.topbar-open { border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; }
 /* «ручка» — подсказка, что шапку можно раскрыть */
 .topbar-grabber { position: absolute; left: 50%; bottom: 5px; width: 36px; height: 4px; margin-left: -18px; border-radius: 99px;
   background: rgba(14,23,38,0.14); transition: background 0.2s, transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); pointer-events: none; }
@@ -1087,17 +1085,29 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   pointer-events: none; animation: activityIn 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
 .topbar-activity span:first-of-type { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @keyframes activityIn { from { opacity: 0; transform: translate(-50%, -50%) scale(0.92); } to { opacity: 1; transform: translate(-50%, -50%); } }
-/* раскрытая часть: отдельный слой, приклеен к низу шапки; высота растёт через grid 0fr → 1fr */
-.topbar-expand { position: fixed; z-index: 99; display: grid; grid-template-rows: 0fr; pointer-events: none;
-  transition: grid-template-rows 0.42s cubic-bezier(0.32, 0.72, 0, 1); }
-.topbar-expand.is-open { grid-template-rows: 1fr; pointer-events: auto; }
-.topbar-expand-inner { overflow: hidden; min-height: 0; border-radius: 0 0 22px 22px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.62) 100%);
+/* раскрытая часть: отдельный слой, верхом заходит под шапку (шапка выше по слою и прикрывает стык) —
+   выезжает вниз из-под шапки с лёгкой пружинкой, содержимое проявляется по очереди. Анимируются только
+   transform и opacity — их видеокарта двигает без перерисовки страницы. */
+.topbar-expand { position: fixed; z-index: 99; pointer-events: none; }
+.topbar-expand.is-open { pointer-events: auto; }
+.topbar-expand-inner { border-radius: 0 0 24px 24px; transform-origin: 50% 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.74) 0%, rgba(255,255,255,0.64) 100%);
   -webkit-backdrop-filter: blur(24px) saturate(200%); backdrop-filter: blur(24px) saturate(200%);
-  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.6), 0 18px 40px -18px rgba(20,30,55,0.35);
-  opacity: 0; transition: opacity 0.25s; }
-.topbar-expand.is-open .topbar-expand-inner { opacity: 1; }
-.topbar-expand-body { padding: 14px 22px 18px; border-top: 0.5px solid rgba(60,60,67,0.12); font-family: var(--font-sys); font-size: 12.5px; color: #0E1726; }
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.7), 0 0 0 0.5px rgba(14,23,38,0.06), 0 22px 44px -20px rgba(20,30,55,0.38);
+  opacity: 0; transform: translateY(-18px) scaleY(0.92);
+  transition: transform 0.26s cubic-bezier(0.4, 0, 1, 1), opacity 0.2s ease-in; }
+.topbar-expand.is-open .topbar-expand-inner { opacity: 1; transform: none;
+  transition: transform 0.5s cubic-bezier(0.34, 1.25, 0.64, 1), opacity 0.22s ease-out; }
+.topbar-expand-body { padding: 36px 24px 18px; font-family: var(--font-sys); font-size: 12.5px; color: #0E1726; }
+/* содержимое — по очереди: заголовок, полоски, кнопка */
+.topbar-expand-head, .topbar-expand-grid > * { opacity: 0; transform: translateY(-6px); transition: opacity 0.15s, transform 0.15s; }
+.topbar-expand.is-open .topbar-expand-head, .topbar-expand.is-open .topbar-expand-grid > * { opacity: 1; transform: none;
+  transition: opacity 0.3s ease-out, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+.topbar-expand.is-open .topbar-expand-head { transition-delay: 0.06s; }
+.topbar-expand.is-open .topbar-expand-grid > :nth-child(1) { transition-delay: 0.1s; }
+.topbar-expand.is-open .topbar-expand-grid > :nth-child(2) { transition-delay: 0.14s; }
+.topbar-expand.is-open .topbar-expand-grid > :nth-child(3) { transition-delay: 0.18s; }
+.topbar-expand.is-open .topbar-expand-grid > :nth-child(4) { transition-delay: 0.22s; }
 .topbar-expand-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
 .topbar-expand-head b { font-size: 15px; font-weight: 700; letter-spacing: -0.015em; }
 .topbar-expand-grid { display: grid; grid-template-columns: repeat(3, 1fr) auto; gap: 20px; align-items: end; }
@@ -1111,5 +1121,5 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .island-btn:hover { background: rgba(19,102,240,0.16); }
 .island-spin { animation: islandSpin 0.9s linear infinite; flex-shrink: 0; }
 @keyframes islandSpin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .topbar-expand, .topbar-expandable { transition: none; } .topbar-activity { animation: none; } .island-spin { animation-duration: 2.5s; } }
+@media (prefers-reduced-motion: reduce) { .topbar-expand-inner, .topbar-expand.is-open .topbar-expand-inner { transform: none; transition: opacity 0.2s; } .topbar-expand-head, .topbar-expand-grid > * { transform: none !important; } .topbar-activity { animation: none; } .island-spin { animation-duration: 2.5s; } }
 @media (prefers-reduced-transparency: reduce) { .topbar-expand-inner { background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; } }

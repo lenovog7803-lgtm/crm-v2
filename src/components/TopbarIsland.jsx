@@ -5,9 +5,11 @@ import { useNotifications } from './Toast'
 
 // Шапка как Dynamic Island: нажатие на пустое место шапки раскрывает её вниз — план месяца;
 // фоновые дела («Генерирую акт…» → «Готово») идут строкой прямо в шапке.
-// Раскрытая часть — отдельный слой поверх страницы (портал), приклеенный к низу шапки: шапка сама
+// Раскрытая часть — портал в слой .app-frame (рядом с шапкой, под ней), приклеенный к низу шапки: шапка сама
 // из стекла, а вложенное стекло браузер за её пределами не размывает.
 
+// панель заходит под шапку на столько пикселей: шапка (выше по слою) прикрывает её верх — получается один остров
+const TUCK = 22
 const MONTHS = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
 const int = v => Math.round(Number(v) || 0).toLocaleString('ru-RU')
 const pct = (f, p) => (p ? Math.min(100, Math.round(f / p * 100)) : 0)
@@ -57,7 +59,13 @@ export function TopbarExpand({ barRef, open, onClose, onNav }) {
   const now = new Date()
   const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
 
-  useEffect(() => { if (open) getGoals(month).then(setGoals).catch(() => {}) }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
+  // цифры грузим заранее и раз в 5 минут — не в момент раскрытия, чтобы ответ не перестраивал панель посреди анимации
+  useEffect(() => {
+    const load = () => getGoals(month).then(setGoals).catch(() => {})
+    load()
+    const t = setInterval(load, 5 * 60 * 1000)
+    return () => clearInterval(t)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // приклеиваемся к низу шапки и к её ширине
   useLayoutEffect(() => {
@@ -92,7 +100,7 @@ export function TopbarExpand({ barRef, open, onClose, onNav }) {
 
   return createPortal(
     <div ref={panelRef} className={`topbar-expand${open ? ' is-open' : ''}`} aria-hidden={!open}
-      style={{ left: rect.left, top: rect.top - 1, width: rect.width }}>
+      style={{ left: rect.left, top: rect.top - TUCK, width: rect.width }}>
       <div className="topbar-expand-inner">
         <div className="topbar-expand-body">
           <div className="topbar-expand-head">
@@ -111,6 +119,7 @@ export function TopbarExpand({ barRef, open, onClose, onNav }) {
         </div>
       </div>
     </div>,
-    document.body,
+    // в том же слое, что и шапка (.app-frame), — иначе панель оказывается поверх шапки, а должна уходить под неё
+    barRef.current?.closest('.app-frame') || document.body,
   )
 }
