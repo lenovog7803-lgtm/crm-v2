@@ -26,7 +26,7 @@ export default function MarginChart({ dates, current, prev, height = 230 }) {
   return (
     <div className="bklit" style={{ height }}>
       <AreaChart data={data} animationDuration={1100} animationEasing="cubic-bezier(0.85, 0, 0.15, 1)"
-        style={{ height: '100%' }} margin={{ left: 44, right: 44, top: 12, bottom: 28 }}>
+        aspectRatio="auto" margin={{ left: 44, right: 44, top: 12, bottom: 28 }}>
         <Grid horizontal />
         {hasPrev && <Area dataKey="prev" fill="var(--chart-line-secondary)" />}
         <Area dataKey="cur" fill="var(--chart-line-primary)" />

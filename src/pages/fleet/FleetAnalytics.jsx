@@ -5,37 +5,34 @@ import { CountUp } from '../../components/CountUp'
 import { PillBtn } from './fleetUi'
 import { Loader } from '../../components/Loader'
 import DateInput from '../../components/DateInput'
+import { BarChart } from '../../bklit/charts/bar-chart'
+import { Bar } from '../../bklit/charts/bar'
+import { BarXAxis } from '../../bklit/charts/bar-x-axis'
+import { Grid } from '../../bklit/charts/grid'
+import { ChartTooltip } from '../../bklit/charts/tooltip'
+import '../../bklit/bklit.css'
 
 const int = v => Math.round(Number(v) || 0).toLocaleString('ru-RU')
 const MONTHS_RU = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек']
 const mLabel = m => { const [y, mo] = String(m).split('-'); return `${MONTHS_RU[+mo - 1] || mo} ${String(y).slice(2)}` }
 
-// Помесячная прибыль — столбики (синий прибыль / красный убыток).
+// Помесячная прибыль — Bar Chart из Bklit UI (как график маржи на дашборде).
+// У Bklit шкала только от нуля, поэтому убыточный месяц — красный столбик высотой в сумму убытка.
 function ProfitChart({ rows }) {
   if (!rows || rows.length === 0) return <div style={{ fontSize: 12, color: '#A6AEB8' }}>Нет данных за период</div>
-  const max = Math.max(1, ...rows.map(r => Math.abs(r.profit)))
-  const W = Math.max(320, rows.length * 56)
-  const H = 160
-  const bw = W / rows.length * 0.5
+  const data = rows.map(r => ({ month: mLabel(r.month), profit: Math.max(0, r.profit), loss: Math.max(0, -r.profit), raw: r.profit }))
+  const hasLoss = data.some(r => r.loss > 0)
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <svg width={W} height={H + 28} style={{ display: 'block' }}>
-        <line x1="0" y1={H / 2} x2={W} y2={H / 2} stroke="#E8EAEE" strokeWidth="1" />
-        {rows.map((r, i) => {
-          const cx = (i + 0.5) * (W / rows.length)
-          const h = (Math.abs(r.profit) / max) * (H / 2 - 8)
-          const pos = r.profit >= 0
-          return (
-            <g key={r.month}>
-              <rect x={cx - bw / 2} y={pos ? H / 2 - h : H / 2} width={bw} height={Math.max(2, h)} rx="3"
-                fill={pos ? '#1366F0' : '#E0473B'} />
-              <text x={cx} y={pos ? H / 2 - h - 5 : H / 2 + h + 13} textAnchor="middle"
-                fontSize="10" fontFamily="ui-monospace, Menlo, monospace" fill={pos ? '#1366F0' : '#E0473B'}>{int(r.profit)}</text>
-              <text x={cx} y={H + 18} textAnchor="middle" fontSize="10.5" fill="#8A93A0">{mLabel(r.month)}</text>
-            </g>
-          )
-        })}
-      </svg>
+    <div className="bklit" style={{ height: 220 }}>
+      <BarChart data={data} xDataKey="month" stacked aspectRatio="auto" margin={{ left: 8, right: 8, top: 12, bottom: 28 }}>
+        <Grid horizontal />
+        <Bar dataKey="profit" fill="var(--chart-line-primary)" lineCap="round" />
+        {hasLoss && <Bar dataKey="loss" fill="#E0473B" lineCap="round" />}
+        <BarXAxis />
+        <ChartTooltip dotColor={p => p.raw >= 0 ? 'var(--chart-line-primary)' : '#E0473B'} rows={p => [p.raw >= 0
+          ? { color: 'var(--chart-line-primary)', label: 'Прибыль', value: `${int(p.raw)} Br` }
+          : { color: '#E0473B', label: 'Убыток', value: `${int(p.raw)} Br` }]} />
+      </BarChart>
     </div>
   )
 }

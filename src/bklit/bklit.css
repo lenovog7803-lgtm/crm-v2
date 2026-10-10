@@ -41,6 +41,8 @@
   --chart-label: #A6AEB8;
   font-family: var(--font-sys);
 }
+/* график занимает высоту обёртки .bklit (у Bklit по умолчанию — пропорция 2:1 от ширины) */
+.bklit > div { height: 100%; }
 
 /* Подсказка и плашка с датой — liquid glass, как уведомления и меню CRM
    (Bklit по умолчанию рисует их тёмными: bg-chart-tooltip-background и bg-zinc-900) */

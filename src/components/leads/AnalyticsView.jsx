@@ -3,6 +3,8 @@ import { getLeadsAnalytics, getCallsByDay } from '../../api'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { SlidingTabs } from '../SlidingTabs'
 import { Loader, InlineLoader } from '../Loader'
+import { FunnelChart as BklitFunnel } from '../../bklit/charts/funnel-chart'
+import '../../bklit/bklit.css'
 
 const PERIODS = [
   { id: 'week', label: 'Неделя' },
@@ -61,26 +63,27 @@ export function CallsHeatmap({ data, onDayClick }) {
   )
 }
 
+// Воронка — Funnel Chart из Bklit UI. Этап с конверсией ниже 30% — оранжевый, как раньше;
+// под воронкой — сколько лидов на этапе и конверсия из прошлого этапа.
 export function FunnelChart({ funnel }) {
+  const stages = funnel || []
+  if (!stages.length) return <div style={{ fontSize: 12.5, color: '#A6AEB8' }}>Нет данных</div>
+  const troubled = (f, i) => i > 0 && f.conversion < 30
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      {(funnel || []).map((f, i) => {
-        const width = funnel[0] ? Math.max(4, (f.cumulative / (funnel[0].cumulative || 1)) * 100) : 0
-        const troubled = i > 0 && f.conversion < 30
-        return (
-          <div key={f.stage}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-              <span style={{ fontSize: 12.5, color: '#5A6573', fontWeight: 600 }}>{f.label}</span>
-              <span style={{ fontSize: 12, color: troubled ? '#D97706' : '#5A6573' }}>
-                {f.count} · {f.cumulative} лидов {i > 0 && `· ${f.conversion}%`}
-              </span>
-            </div>
-            <div style={{ height: 14, borderRadius: 8, background: 'rgba(14,23,38,0.06)' }}>
-              <div style={{ height: '100%', borderRadius: 8, width: `${width}%`, background: troubled ? '#D97706' : f.color, transition: 'width 0.4s' }} />
-            </div>
-          </div>
-        )
-      })}
+    <div className="bklit">
+      <BklitFunnel
+        // ширина — по корню: «Новых» в сотни раз больше остальных, по прямой шкале воронка сжималась бы в нитку;
+        // подписи — настоящие числа, проценты (они считались бы от корня) не показываем
+        data={stages.map((f, i) => ({ label: f.label, value: Math.sqrt(f.cumulative), displayValue: `${f.cumulative}`, color: troubled(f, i) ? '#D97706' : f.color }))}
+        color="#1366F0" showLabels showValues showPercentage={false}
+        style={{ aspectRatio: 'auto', height: 190 }} />
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 14px', marginTop: 10 }}>
+        {stages.map((f, i) => (
+          <span key={f.stage} style={{ fontSize: 12, color: troubled(f, i) ? '#D97706' : '#5A6573' }}>
+            <b style={{ fontWeight: 600 }}>{f.label}</b>: {f.count}{i > 0 && ` · ${f.conversion}% из прошлого`}
+          </span>
+        ))}
+      </div>
     </div>
   )
 }
