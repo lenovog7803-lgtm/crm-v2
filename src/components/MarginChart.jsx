@@ -33,7 +33,10 @@ export default function MarginChart({ dates, current, prev, height = 230 }) {
         <YAxis orientation="left" formatValue={short} />
         <YAxis orientation="right" formatValue={short} />
         <XAxis />
-        <ChartTooltip rows={p => [
+        <ChartTooltip
+          // точка на кривой — цвета своей кривой (по умолчанию Bklit берёт цвет по порядку строк подсказки)
+          dotColor={(_, line) => line.dataKey === 'cur' ? 'var(--chart-line-primary)' : 'var(--chart-line-secondary)'}
+          rows={p => [
           { color: 'var(--chart-line-primary)', label: 'Этот период', value: money(p.curRaw) },
           ...(hasPrev ? [{ color: 'var(--chart-line-secondary)', label: 'Прошлый период', value: money(p.prevRaw) }] : []),
         ]} />
