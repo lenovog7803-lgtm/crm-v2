@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { getGoals, getOrders, getFleetAnalytics, getFleetGoals } from '../api'
+import { getGoals, getOrders, getFleetAnalytics, getFleetGoals, getTasks, getLeads, getLeadsAnalytics, getKudirEntries, getMissingPP } from '../api'
 import { useNotifications } from './Toast'
 import { motion } from 'motion/react'
 import { prefersReducedMotion } from '../motion'
@@ -102,6 +102,47 @@ function buildIsland(page, meta, goals, orders, now, extra = {}) {
       { label: 'Рейсы', value: int(f.a.trips_total), sub: fg.trips_goal ? `из ${int(fg.trips_goal)}` : 'цель не задана', bar: fg.trips_goal ? pct(f.a.trips_total, fg.trips_goal) : null, color: '#7C3AED' },
       { label: 'Выручка', value: `${int(mm.revenue)} Br`, sub: fg.revenue_goal ? `цель ${int(fg.revenue_goal)}` : '' },
       { label: 'Порожний пробег', value: f.a.trips_total ? `${f.a.empty_km_pct}%` : '—', sub: 'чем меньше, тем лучше', color: (f.a.empty_km_pct || 0) > 30 ? '#D97706' : undefined },
+    ] }
+  }
+  if (page === 'tasks') {
+    const t = extra.tasks
+    if (!t) return { title: 'Задачи', sub: 'загружаю…', stats: [] }
+    const today = now.toISOString().slice(0, 10), weekAgo = new Date(now - 7 * 864e5).toISOString()
+    const pending = t.filter(x => x.status !== 'done')
+    const due = pending.filter(x => (x.due_date || '').slice(0, 10) === today)
+    const late = pending.filter(x => x.due_date && x.due_date.slice(0, 10) < today)
+    const done = t.filter(x => x.status === 'done' && (x.completed_at || '') >= weekAgo)
+    return { title: 'Задачи', sub: `${pending.length} открытых`, stats: [
+      { label: 'На сегодня', value: due.length, sub: due.length ? 'нужно сделать' : 'ничего не горит' },
+      { label: 'Просрочено', value: late.length, sub: late.length ? 'срок прошёл' : 'всё в срок', color: late.length ? '#D63B30' : '#1E9E5A' },
+      { label: 'Сделано за неделю', value: done.length, sub: 'закрытых задач' },
+      { label: 'Без срока', value: pending.filter(x => !x.due_date).length, sub: 'открытые без даты' },
+    ] }
+  }
+  if (page === 'leads') {
+    const l = extra.leads
+    if (!l) return { title: 'База обзвона', sub: 'загружаю…', stats: [] }
+    const today = now.toISOString().slice(0, 10), nowIso = now.toISOString()
+    const active = (l.leads || []).filter(x => !['won', 'lost', 'no_contact'].includes(x.stage))
+    const cbToday = active.filter(x => (x.next_call || '').slice(0, 10) === today)
+    const cbLate = active.filter(x => x.next_call && x.next_call < nowIso && x.next_call.slice(0, 10) < today)
+    const goal = l.goal || 45
+    return { title: 'База обзвона', sub: `${(l.leads || []).length} лидов в базе`, stats: [
+      { label: 'Звонки сегодня', value: l.calls ?? 0, sub: `из ${goal}`, bar: pct(l.calls, goal), color: '#1366F0' },
+      { label: 'Перезвоны на сегодня', value: cbToday.length, sub: 'назначены на сегодня' },
+      { label: 'Просроченные перезвоны', value: cbLate.length, sub: cbLate.length ? 'пора перезвонить' : 'всё вовремя', color: cbLate.length ? '#D63B30' : undefined },
+      { label: 'Ещё не звонили', value: (l.leads || []).filter(x => x.stage === 'new').length, sub: 'новые лиды' },
+    ] }
+  }
+  if (page === 'kudir') {
+    const k = extra.kudir
+    const q = Math.floor(now.getMonth() / 3) + 1
+    if (!k) return { title: `КУДиР — ${q} квартал`, sub: 'загружаю…', stats: [] }
+    return { title: `КУДиР — ${q} квартал ${now.getFullYear()}`, sub: 'по датам оплат в книге', stats: [
+      { label: 'Доход за квартал', value: `${int(k.income)} Br`, sub: `${k.rows} строк в книге` },
+      { label: 'Налог к уплате', value: `${int(k.income * 0.2)} Br`, sub: '20% от дохода', color: '#D97706' },
+      { label: 'Доход за месяц', value: `${int(k.monthIncome)} Br`, sub: MON.toLowerCase() },
+      { label: 'Нет ПП', value: k.missing ?? 0, sub: k.missing ? 'оплат без номера ПП' : 'все ПП на месте', color: k.missing ? '#D63B30' : '#1E9E5A' },
     ] }
   }
   if (!orders) return plan()
@@ -220,6 +261,9 @@ const INTERACTIVE = 'button, a, input, select, textarea, [role="button"], [role=
 export function TopbarExpand({ barRef, page, meta }) {
   const [mailing, setMailing] = useState(null)
   const [fleet, setFleet] = useState(null)
+  const [tasks, setTasks] = useState(null)
+  const [leads, setLeads] = useState(null)
+  const [kudir, setKudir] = useState(null)
   const [goals, setGoals] = useState(null)
   const [orders, setOrders] = useState(null)
   const [rect, setRect] = useState(null)
@@ -258,6 +302,36 @@ export function TopbarExpand({ barRef, page, meta }) {
     window.addEventListener('crm:mailing-state', on)
     return () => window.removeEventListener('crm:mailing-state', on)
   }, [])
+  // задачи, обзвон, КУДиР — грузим, только когда открыта их страница, и обновляем раз в 5 минут
+  useEffect(() => {
+    if (!['tasks', 'leads', 'kudir'].includes(page)) return
+    const load = () => {
+      if (page === 'tasks') getTasks('all').then(r => setTasks(Array.isArray(r) ? r : [])).catch(() => {})
+      // периода «сегодня» в аналитике нет — берём неделю по дням и сегодняшний день
+      if (page === 'leads') Promise.all([getLeads(), getLeadsAnalytics('week')])
+        .then(([ls, a]) => {
+          const today = new Date().toLocaleDateString('sv-SE')
+          setLeads({ leads: Array.isArray(ls) ? ls : [], calls: (a?.calls_by_day || []).find(d => d.date === today)?.calls || 0, goal: a?.daily_goal })
+        }).catch(() => {})
+      if (page === 'kudir') {
+        const y = now.getFullYear(), q0 = Math.floor(now.getMonth() / 3) * 3
+        const from = `${y}-${String(q0 + 1).padStart(2, '0')}-01`, to = new Date(y, q0 + 3, 0).toISOString().slice(0, 10)
+        Promise.all([getKudirEntries(from, to), getMissingPP().catch(() => null)]).then(([r, miss]) => {
+          const entries = r?.entries || []
+          setKudir({
+            income: r?.total_income ?? entries.reduce((t, e) => t + (+e.income_amount || 0), 0),
+            rows: entries.filter(e => +e.income_amount > 0).length,
+            monthIncome: entries.filter(e => (e.entry_date || '').startsWith(month)).reduce((t, e) => t + (+e.income_amount || 0), 0),
+            missing: miss?.total ?? miss?.orders?.length ?? 0,
+          })
+        }).catch(() => {})
+      }
+    }
+    load()
+    const t = setInterval(load, 5 * 60 * 1000)
+    return () => clearInterval(t)
+  }, [page]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // автопарк — грузим, только когда открыта его страница, и обновляем раз в 5 минут
   useEffect(() => {
     if (!String(page).startsWith('fleet')) return
@@ -318,7 +392,7 @@ export function TopbarExpand({ barRef, page, meta }) {
   }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!rect) return null
-  const island = buildIsland(page, meta, goals, orders, now, { mailing, fleet })
+  const island = buildIsland(page, meta, goals, orders, now, { mailing, fleet, tasks, leads, kudir })
   const reduce = prefersReducedMotion()
 
   return createPortal(

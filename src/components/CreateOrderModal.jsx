@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ModalOverlay, ModalHeader } from './Modal'
-import { createOrder, updateOrder, getClients, getCarriers, getToken, syncToSheets } from '../api'
+import { createOrder, updateOrder, getClients, getCarriers, getToken, syncToSheets, getOrders } from '../api'
 import { mouseOnly } from '../motion'
 import { iosConfirm } from './IOSAlert'
 import DateInput from './DateInput'
@@ -43,6 +43,25 @@ function Field({ label, children }) {
 
 function Grid2({ children }) {
   return <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>{children}</div>
+}
+
+// Порог «пустой» заявки — как во вкладке «План»: маржа меньше 150 Br или меньше 15% от ставки клиента
+const MIN_MARGIN = 150, MIN_PCT = 0.15
+const cityKey = s => String(s || '').split(',')[0].trim().toLowerCase().replace(/ё/g, 'е')
+const orderDay = o => String(o.load_date || o.unload_date || o.created_at || '').slice(0, 10)
+
+// Как обычно идёт это направление: по заявкам за 3 месяца (мало — за всё время)
+function routeStats(orders, from, to, excludeId) {
+  const f = cityKey(from), t = cityKey(to)
+  if (!f || !t) return null
+  const same = orders.filter(o => o.id !== excludeId && o.status !== 'cancelled' && +o.client_rate > 0
+    && cityKey(o.route_from) === f && cityKey(o.route_to) === t)
+  const since = new Date(Date.now() - 90 * 864e5).toISOString().slice(0, 10)
+  const recent = same.filter(o => orderDay(o) >= since)
+  const use = recent.length >= 3 ? recent : same
+  if (use.length < 2) return null
+  const avg = k => use.reduce((s, o) => s + (+o[k] || 0), 0) / use.length
+  return { n: use.length, recent: use === recent, client: avg('client_rate'), carrier: avg('carrier_rate'), margin: avg('client_rate') - avg('carrier_rate') }
 }
 
 function SectionTitle({ title }) {
@@ -150,6 +169,10 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
   }
   const [clients, setClients] = useState([])
   const [carriers, setCarriers] = useState([])
+  const [pastOrders, setPastOrders] = useState([])  // для подсказки «как обычно идёт это направление»
+  useEffect(() => {
+    getOrders({ limit: 5000, light: true }).then(r => setPastOrders(Array.isArray(r) ? r : (r?.orders || r?.data || []))).catch(() => {})
+  }, [])
   const [form, setForm] = useState({
     client_id: initialData?.client_id || '',
     client_name: initialData?.client_name || '',
@@ -325,18 +348,8 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
                 placeholder="20" style={iStyle} />
             </Field>
           </div>
-          {margin !== null && (
-            <div style={{
-              padding: '10px 14px', borderRadius: 10,
-              background: margin >= 0 ? 'rgba(19,102,240,0.08)' : 'rgba(200,25,35,0.08)',
-              fontSize: 13, fontWeight: 600,
-              color: margin >= 0 ? '#1366F0' : '#C81923',
-              display: 'flex', alignItems: 'center', gap: 8,
-            }}>
-              <span>Маржа: {margin.toLocaleString('ru-RU')} Br</span>
-              {marginPct !== null && <span style={{ opacity: 0.7 }}>({marginPct}%)</span>}
-            </div>
-          )}
+          <MarginHint margin={margin} marginPct={marginPct} client={Number(form.client_rate) || 0} carrier={Number(form.carrier_rate) || 0}
+            route={routeStats(pastOrders, form.route_from, form.route_to, initialData?.id)} from={form.route_from} to={form.route_to} />
         </div>
 
         {/* 5. ТС и водитель */}
@@ -376,5 +389,43 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
         </div>
       </form>
     </ModalOverlay>
+  )
+}
+
+const int = v => Math.round(Number(v) || 0).toLocaleString('ru-RU')
+
+// Подсказка под ставками: маржа и её оценка (нормальная / пустая / в минус), какая ставка нужна до порога,
+// и как обычно идёт это направление
+function MarginHint({ margin, marginPct, client, carrier, route, from, to }) {
+  const kind = margin === null ? null : margin < 0 ? 'bad' : (margin < MIN_MARGIN || (client > 0 && margin / client < MIN_PCT)) ? 'empty' : 'ok'
+  const tone = { ok: ['rgba(19,102,240,0.08)', '#1366F0'], empty: ['rgba(217,119,6,0.1)', '#B45309'], bad: ['rgba(200,25,35,0.08)', '#C81923'] }
+  // до порога: клиенту не меньше …, или перевозчику не больше …
+  const needClient = Math.ceil(Math.max(carrier + MIN_MARGIN, carrier / (1 - MIN_PCT)))
+  const maxCarrier = Math.floor(Math.min(client - MIN_MARGIN, client * (1 - MIN_PCT)))
+  return (
+    <>
+      {kind && (
+        <div style={{ padding: '10px 14px', borderRadius: 10, background: tone[kind][0], color: tone[kind][1], fontSize: 13, lineHeight: 1.45 }}>
+          <div style={{ fontWeight: 600 }}>
+            {kind === 'bad' ? 'В минус' : kind === 'empty' ? 'Пустая заявка' : 'Маржа нормальная'}: {margin.toLocaleString('ru-RU')} Br{marginPct !== null && ` (${marginPct}%)`}
+          </div>
+          {kind !== 'ok' && client > 0 && carrier > 0 && (
+            <div style={{ fontSize: 12.5, opacity: 0.9 }}>
+              Порог — {MIN_MARGIN} Br и {Math.round(MIN_PCT * 100)}%. Нужно: клиенту от {int(needClient)} Br{maxCarrier > 0 ? ` или перевозчику до ${int(maxCarrier)} Br` : ''}.
+            </div>
+          )}
+          {route && margin !== null && margin < route.margin - 20 && (
+            <div style={{ fontSize: 12.5, opacity: 0.9 }}>Ниже обычной по этому направлению (~{int(route.margin)} Br).</div>
+          )}
+        </div>
+      )}
+      {route && (
+        <div style={{ fontSize: 12.5, color: '#5A6573', padding: '0 4px', lineHeight: 1.5 }}>
+          <b style={{ color: '#0E1726', fontWeight: 600 }}>{from.split(',')[0]} → {to.split(',')[0]}</b>
+          {route.recent ? ' за 3 месяца' : ' за всё время'}: {route.n} заявок · клиент платит обычно ~{int(route.client)} Br ·
+          перевозчику ~{int(route.carrier)} Br · маржа ~{int(route.margin)} Br
+        </div>
+      )}
+    </>
   )
 }
