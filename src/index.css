@@ -1060,3 +1060,11 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .plan-day-n { font-size: 12px; font-weight: 700; color: #0E1726; min-height: 15px; font-variant-numeric: tabular-nums; }
 .plan-day-label { font-size: 11.5px; font-weight: 600; color: #5A6573; }
 .plan-day-label span { color: #A6AEB8; font-weight: 400; }
+
+/* План: раскрывающийся блок */
+.plan-disc-head { width: 100%; display: flex; align-items: center; gap: 12px; border: none; background: transparent; cursor: pointer; font-family: var(--font-sys); border-radius: inherit; }
+.plan-disc-chev { color: #8A93A0; flex-shrink: 0; transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
+.plan-disc-chev.is-open { transform: rotate(180deg); }
+.plan-disc-body { animation: planDiscIn 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes planDiscIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .plan-disc-body { animation: none; } .plan-disc-chev { transition: none; } }

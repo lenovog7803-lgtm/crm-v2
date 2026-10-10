@@ -208,8 +208,6 @@ export default function Plan() {
         ))}
       </div>
 
-      <Forecasts orders={live} months={months} planYear={planYear} factYear={factYear} pace={pace} year={year} />
-
       {/* То, что происходит сейчас: качество заявок и продажи по расписанию */}
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 10 : 16, alignItems: 'start' }}>
         <TrafficLight orders={live} />
@@ -295,6 +293,8 @@ export default function Plan() {
           )
         })}
       </div>
+      <Forecasts orders={live} months={months} planYear={planYear} factYear={factYear} pace={pace} year={year} />
+
       <div style={{ fontSize: 12, color: '#A6AEB8', padding: '0 4px' }}>
         Прибыль считается как на дашборде: маржа × 0,8. Маржа на заявку и доля топ-5 — по чистой марже из заявок.
       </div>

@@ -36,6 +36,26 @@ function Card({ title, right, children }) {
   )
 }
 
+// Раскрывающийся блок: по умолчанию свёрнут, открытость запоминается в этом браузере
+function Disclosure({ id, title, summary, children }) {
+  const isMobile = useIsMobile()
+  const [open, setOpen] = useState(() => { try { return localStorage.getItem(`plan_open:${id}`) === '1' } catch { return false } })
+  const toggle = () => setOpen(o => { try { localStorage.setItem(`plan_open:${id}`, o ? '0' : '1') } catch { /* приватный режим */ } return !o })
+  return (
+    <div className="ios-widget" style={{ padding: 0 }}>
+      <button type="button" className="plan-disc-head" aria-expanded={open} onClick={toggle}
+        style={{ padding: isMobile ? '16px 16px' : '18px 22px' }}>
+        <span style={{ flex: 1, textAlign: 'left' }}>
+          <span style={{ display: 'block', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>{title}</span>
+          {!open && summary && <span style={{ display: 'block', fontSize: 12.5, color: '#8A93A0', marginTop: 2 }}>{summary}</span>}
+        </span>
+        <svg className={`plan-disc-chev${open ? ' is-open' : ''}`} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
+      </button>
+      {open && <div className="plan-disc-body" style={{ padding: isMobile ? '0 16px 16px' : '0 22px 20px' }}>{children}</div>}
+    </div>
+  )
+}
+
 // ===== Прогнозы: сценарии на год и «что нужно, чтобы выйти на план» =====
 export function Forecasts({ orders, months, planYear, factYear, pace, year }) {
   const now = new Date()
@@ -70,8 +90,10 @@ export function Forecasts({ orders, months, planYear, factYear, pace, year }) {
   }, [orders, months, planYear, factYear, pace]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const max = Math.max(planYear, ...f.scenarios.map(s => s.value), 1)
+  const now_ = f.scenarios[1]
   return (
-    <Card title={`Прогнозы на ${year}`}>
+    <Disclosure id="forecasts" title={`Прогнозы на ${year}`}
+      summary={`Как сейчас: ${int(now_.value)} Br — ${planYear ? Math.round(now_.value / planYear * 100) : 0}% плана`}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {f.scenarios.map(s => (
           <div key={s.key}>
@@ -97,7 +119,7 @@ export function Forecasts({ orders, months, planYear, factYear, pace, year }) {
           </div>
         </> : <div><b>План года уже выполнен</b> — всё сверху идёт в плюс.</div>}
       </div>
-    </Card>
+    </Disclosure>
   )
 }
 
