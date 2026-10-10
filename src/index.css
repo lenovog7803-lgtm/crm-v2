@@ -1068,3 +1068,20 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .plan-disc-body { animation: planDiscIn 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
 @keyframes planDiscIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .plan-disc-body { animation: none; } .plan-disc-chev { transition: none; } }
+
+/* ===== Dynamic Island в шапке ===== */
+/* по центру шапки; в покое высотой 44 px, раскрывается вниз поверх страницы */
+.topbar-island { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -22px); z-index: 5; cursor: pointer; outline: none; }
+.topbar-island:focus-visible > div > div { box-shadow: 0 0 0 3px rgba(19,102,240,0.45); }
+.topbar-island #topbar-island { box-shadow: 0 10px 30px -10px rgba(0,0,0,0.45); font-family: var(--font-sys); }
+.island-text { letter-spacing: -0.01em; }
+.island-pct { margin-left: 6px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.island-bar { height: 4px; margin-top: 4px; border-radius: 99px; background: rgba(255,255,255,0.14); overflow: hidden; }
+.island-bar > div { height: 100%; border-radius: 99px; transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+.island-btn { align-self: stretch; border: none; border-radius: 99px; padding: 7px 0; cursor: pointer; font: 600 13px var(--font-sys);
+  background: rgba(255,255,255,0.14); color: #fff; }
+.island-btn:hover { background: rgba(255,255,255,0.22); }
+.island-spin { animation: islandSpin 0.9s linear infinite; flex-shrink: 0; }
+@keyframes islandSpin { to { transform: rotate(360deg); } }
+@media (max-width: 1100px) { .topbar-island { display: none; } }
+@media (prefers-reduced-motion: reduce) { .island-spin { animation-duration: 2.5s; } }

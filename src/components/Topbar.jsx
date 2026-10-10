@@ -5,6 +5,8 @@ import { fmtDate } from '../utils'
 import { mouseOnly } from '../motion'
 import { PopNumber } from './Transitions'
 import Select from './Select'
+import TopbarIsland from './TopbarIsland'
+import { useAuth } from '../AuthContext'
 
 const PAGE_META = {
   dashboard: { title: 'Дашборд', subtitle: 'Обзор бизнеса' },
@@ -70,6 +72,8 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
   const bellRef = useRef(null)
   const seenIds = useRef(new Set())
   const isMobile = useIsMobile()
+  const { user } = useAuth()
+  const isDirector = ['director', 'admin'].includes(user?.user?.role)
 
   useEffect(() => {
     if (!bellOpen) return
@@ -143,6 +147,8 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
         <div className="ios-title" style={{ fontSize: compact ? (isMobile ? 17 : 18) : (isMobile ? 24 : 26) }}>{meta.title}</div>
         {!isMobile && <div className="ios-subtitle" style={{ fontSize: 12.5, color: '#8A93A0', marginTop: 2 }}>{meta.subtitle}</div>}
       </div>
+      {/* Dynamic Island: план месяца и фоновые дела — директору, на компьютере, в экспедиции */}
+      {!isMobile && isDirector && !String(page || '').startsWith('fleet') && <TopbarIsland onNav={onNav} />}
 
       {/* Mobile search icon */}
       {isMobile && (
