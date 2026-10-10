@@ -948,3 +948,21 @@ input[type="number"] {
       linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 22%) !important;
   }
 }
+
+/* ===== iOS 26: переключатель-сегменты — стеклянная дорожка и капля liquid glass ===== */
+.seg-track { padding: 3px; border-radius: 99px; width: max-content; max-width: 100%;
+  background: rgba(118,118,128,0.1);
+  box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.55), inset 0 1px 3px rgba(14,23,38,0.07); }
+.seg-thumb { isolation: isolate; transform-origin: center;
+  background: linear-gradient(180deg, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.62) 100%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%); backdrop-filter: blur(10px) saturate(180%);
+  box-shadow: 0 6px 16px -6px rgba(20,30,55,0.25), 0 1px 2px rgba(20,30,55,0.08),
+    inset 0 1px 0 #fff, inset 0 -1px 0 rgba(255,255,255,0.5), inset 0 0 8px rgba(255,255,255,0.6); }
+/* светящийся край капли: ярче сверху-слева, отблеск снизу-справа */
+.seg-thumb::before { content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: linear-gradient(140deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.2) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.7) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+/* блик по верху капли */
+.seg-thumb::after { content: ''; position: absolute; left: 12%; right: 12%; top: 1px; height: 45%; border-radius: 99px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0)); }
+@media (prefers-reduced-transparency: reduce) { .seg-thumb { background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; } }
