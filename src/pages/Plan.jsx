@@ -12,6 +12,7 @@ import { BarXAxis } from '../bklit/charts/bar-x-axis'
 import { Grid } from '../bklit/charts/grid'
 import { ChartTooltip } from '../bklit/charts/tooltip'
 import '../bklit/bklit.css'
+import { Forecasts, TrafficLight, SalesWeek } from './PlanBlocks'
 
 // «План» — цели на год по месяцам и кварталам и их выполнение.
 // Цели — те же «Цели месяца», что на дашборде (/goals): прибыль (маржа × 0,8, как считает сервер),
@@ -154,14 +155,14 @@ export default function Plan() {
     const pace = lastFull.reduce((s, key) => s + live.filter(o => monthOf(o) === key).reduce((t, o) => t + margin(o) * 0.8, 0), 0) / 3
     const remaining = months.filter(m => !m.started || m.current).length
     const forecast = factYear + pace * remaining
-    return { months, quarters, planYear, factYear, forecast, pace, yearSum, anyFact: months.some(m => m.started) }
+    return { live, months, quarters, planYear, factYear, forecast, pace, yearSum, anyFact: months.some(m => m.started) }
   }, [goals, orders, year]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!data) {
     return <div style={{ display: 'grid', gap: 12 }}><SkeletonCard lines={3} /><SkeletonCard lines={4} /><SkeletonCard lines={4} /></div>
   }
 
-  const { months, quarters, planYear, factYear, forecast, pace, yearSum, anyFact } = data
+  const { live, months, quarters, planYear, factYear, forecast, pace, yearSum, anyFact } = data
   const pctYear = planYear ? Math.round(factYear / planYear * 100) : 0
   const forecastPct = planYear ? Math.round(forecast / planYear * 100) : 0
   const yearTabs = [now.getFullYear(), now.getFullYear() + 1].map(y => ({ key: y, label: String(y) }))
@@ -205,6 +206,14 @@ export default function Plan() {
             <Bar100 pct={t.inverse ? (t.fact ? t.plan / t.fact * 100 : 0) : (t.plan ? t.fact / t.plan * 100 : 0)} color={t.color} />
           </div>
         ))}
+      </div>
+
+      <Forecasts orders={live} months={months} planYear={planYear} factYear={factYear} pace={pace} year={year} />
+
+      {/* То, что происходит сейчас: качество заявок и продажи по расписанию */}
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 10 : 16, alignItems: 'start' }}>
+        <TrafficLight orders={live} />
+        <SalesWeek orders={live} />
       </div>
 
       {/* План и факт по месяцам */}
