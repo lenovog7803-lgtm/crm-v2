@@ -4,7 +4,7 @@ import { useIsMobile } from '../hooks/useIsMobile'
 import { spring, project, rubberband, velocityTracker, prefersReducedMotion } from '../motion'
 
 // Модалка. На телефоне — шторка снизу в духе iOS: выезжает и уходит одним путём (вниз),
-// тянется за пальцем 1:1 за ручку или заголовок, закрывается броском (позиция + скорость),
+// тянется за пальцем 1:1 за ручку, заголовок или любое место у верха прокрутки, закрывается броском (позиция + скорость),
 // иначе возвращается пружиной с той же скоростью. На компьютере — растворение при закрытии.
 const SheetCtx = createContext(null)
 
@@ -67,6 +67,59 @@ export function ModalOverlay({ onClose, children, panelStyle, bodyStyle }) {
   }
   useEscapeKey(() => requestClose())
 
+  // палец отпущен: бросок/дотянуто — закрыть, иначе вернуть с той же скоростью
+  const release = () => {
+    const v = vel.current.velocity()
+    if (y.current + project(v) > height() * 0.4 && v > -150) {
+      requestClose(v)
+    } else {
+      // брошено вверх/недотянуто — возврат; лёгкий отскок, раз был бросок
+      anim.current = spring({ from: y.current, to: 0, velocity: v, damping: Math.abs(v) > 300 ? 0.85 : 1, response: 0.3, onUpdate: setY })
+    }
+  }
+
+  // как в iOS: шторку тянут вниз за любое место, если она прокручена до самого верха —
+  // иначе тот же жест просто прокручивает содержимое. touch-события, потому что только
+  // их можно отменить (preventDefault) до начала родной прокрутки.
+  useEffect(() => {
+    const el = panelRef.current
+    if (!isMobile || !el) return
+    let t = null
+    const start = (e) => {
+      t = null
+      if (e.touches.length !== 1 || e.target.closest('[data-sheet-drag], input, textarea, select, [contenteditable]')) return
+      t = { x0: e.touches[0].clientX, y0: e.touches[0].clientY, active: false }
+    }
+    const move = (e) => {
+      if (!t) return
+      const { clientX, clientY } = e.touches[0]
+      if (!t.active) {
+        const dy = clientY - t.y0, dx = clientX - t.x0
+        if (dy <= 0 || el.scrollTop > 0 || Math.abs(dx) > dy) { t = null; return }  // прокрутка или горизонтальный жест
+        anim.current?.()
+        Object.assign(t, { active: true, y0: clientY, base: y.current })
+        vel.current.reset()
+        vel.current.add(y.current)
+      }
+      e.preventDefault()
+      const raw = t.base + (clientY - t.y0)
+      vel.current.add(raw)
+      setY(raw < 0 ? rubberband(raw, height()) : raw)
+    }
+    const end = () => { if (t?.active) release(); t = null }
+    el.addEventListener('touchstart', start, { passive: true })
+    el.addEventListener('touchmove', move, { passive: false })
+    el.addEventListener('touchend', end)
+    el.addEventListener('touchcancel', end)
+    return () => {
+      el.removeEventListener('touchstart', start)
+      el.removeEventListener('touchmove', move)
+      el.removeEventListener('touchend', end)
+      el.removeEventListener('touchcancel', end)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMobile])
+
   const dragHandlers = isMobile ? {
     onPointerDown: (e) => {
       if (e.button !== 0 || e.target.closest('button, a, input, select, textarea')) return
@@ -85,13 +138,7 @@ export function ModalOverlay({ onClose, children, panelStyle, bodyStyle }) {
     onPointerUp: () => {
       if (!drag.current) return
       drag.current = null
-      const v = vel.current.velocity()
-      if (y.current + project(v) > height() * 0.4 && v > -150) {
-        requestClose(v)
-      } else {
-        // брошено вверх/недотянуто — возврат; лёгкий отскок, раз был бросок
-        anim.current = spring({ from: y.current, to: 0, velocity: v, damping: Math.abs(v) > 300 ? 0.85 : 1, response: 0.3, onUpdate: setY })
-      }
+      release()
     },
     onPointerCancel: () => {
       if (!drag.current) return
@@ -99,6 +146,7 @@ export function ModalOverlay({ onClose, children, panelStyle, bodyStyle }) {
       anim.current = spring({ from: y.current, to: 0, damping: 1, response: 0.3, onUpdate: setY })
     },
     style: { touchAction: 'none', cursor: 'grab' },
+    'data-sheet-drag': '',  // эти зоны тянутся указателем — тач-обработчик шторки их не трогает
   } : null
 
   return (

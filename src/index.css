@@ -554,9 +554,12 @@ input[type="number"] {
   font-family: var(--font-sys); font-size: 13.5px; color: #0E1726;
   background: rgba(248,248,250,0.86); backdrop-filter: blur(30px) saturate(190%); -webkit-backdrop-filter: blur(30px) saturate(190%);
   box-shadow: 0 0 0 0.5px rgba(14,23,38,0.18), 0 12px 32px -8px rgba(14,23,38,0.35), inset 0 1px 0 rgba(255,255,255,0.7);
-  animation: appleMenuIn 160ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: appleMenuIn 260ms cubic-bezier(0.32, 0.72, 0, 1) both;
 }
-@keyframes appleMenuIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: none; } }
+@keyframes appleMenuIn { from { opacity: 0; transform: scale(0.55); } 60% { opacity: 1; } to { opacity: 1; transform: none; } }
+@keyframes popOut { to { opacity: 0; transform: scale(0.6); } }
+/* меню и календарь вырастают из нажатой кнопки и уходят обратно в неё */
+.apple-select-menu.is-closing, .ios-cal.is-closing { animation: popOut 130ms cubic-bezier(0.4, 0, 1, 1) both; pointer-events: none; }
 .apple-select-item {
   display: flex; align-items: center; gap: 6px; min-height: 28px; padding: 4px 12px 4px 6px; border-radius: 7px;
   cursor: default; white-space: nowrap; user-select: none;
@@ -827,9 +830,8 @@ input[type="number"] {
   position: fixed; z-index: 3000; width: 300px; padding: 14px 12px 10px; border-radius: 24px;
   background: rgba(255,255,255,0.88); -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%);
   box-shadow: 0 0 0 0.5px rgba(14,23,38,0.08), 0 24px 60px -16px rgba(20,30,55,0.35), 0 4px 12px rgba(20,30,55,0.08);
-  font-family: var(--font-sys); animation: iosCalIn 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  font-family: var(--font-sys); animation: appleMenuIn 280ms cubic-bezier(0.32, 0.72, 0, 1) both;
 }
-@keyframes iosCalIn { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: none; } }
 .ios-cal-head { display: flex; align-items: center; gap: 4px; padding: 0 6px 10px; }
 .ios-cal-title { flex: 1; font-size: 17px; font-weight: 600; color: #0E1726; letter-spacing: -0.02em; }
 .ios-cal-nav { width: 32px; height: 32px; border-radius: 50%; border: none; background: transparent; color: #1366F0; cursor: pointer;
@@ -853,7 +855,7 @@ input[type="number"] {
 .ios-cal-foot button { border: none; background: transparent; color: #1366F0; font-family: var(--font-sys); font-size: 15px;
   padding: 6px 10px; border-radius: 10px; cursor: pointer; }
 .ios-cal-foot button:hover { background: rgba(19,102,240,0.08); }
-@media (prefers-reduced-motion: reduce) { .ios-cal { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .ios-cal, .ios-cal.is-closing, .apple-select-menu.is-closing { animation: none; } }
 .ios-row-skel { cursor: default; pointer-events: none; }
 
 /* живой градиент (ShaderGradient) — проявляется плавно, когда WebGL готов */
@@ -958,3 +960,15 @@ input[type="number"] {
 /* отклик на нажатие: телефон не ждёт двойной тап (300 мс), кнопка «проседает» сразу при касании */
 button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action: manipulation; }
 .btn-primary:active, .btn-ghost:active { transition-duration: 60ms; }
+
+/* Отклик в момент касания (телефон): всё нажимаемое реагирует сразу, а не после отпускания.
+   У кнопок со своей анимацией нажатия (масштаб, фон) — своя, здесь их не трогаем. */
+@media (hover: none) {
+  :where(button, a, [role="button"], [style*="cursor: pointer"]):not(.btn-primary, .btn-ghost, .ios-row, .ios-row-icon, .ios-check, .ios-switch, .ios-cal-day, .ios-alert-btn, .ios-sheet-close, .composer-send, .call-close, .call-pill, .call-outcome, .call-save, .ios-widget, .grad-card, .mail-row, .seg-track button, .mobile-nav button):not(:disabled):active {
+    opacity: 0.55; transition: opacity 0s;
+  }
+  /* нажимаемые карточки чуть «проседают», как виджеты iOS */
+  :is(.ios-widget, .grad-card)[style*="cursor: pointer"] { transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1); }
+  :is(.ios-widget, .grad-card)[style*="cursor: pointer"]:active { transform: scale(0.97); transition-duration: 60ms; }
+  .mail-row:active { background: rgba(118,118,128,0.14); }
+}

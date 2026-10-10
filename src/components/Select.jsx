@@ -1,6 +1,7 @@
 import { Children, isValidElement, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useIsMobile } from '../hooks/useIsMobile'
+import { prefersReducedMotion } from '../motion'
 
 // Выпадающий список в стиле macOS. Заменяет <select> один в один: тот же value / onChange(e)
 // (e.target.value — строка, как у родного), те же <option> внутри.
@@ -38,6 +39,7 @@ export default function Select({ value, onChange, onBlur, children, style, class
   const [active, setActive] = useState(-1)
   const [pos, setPos] = useState(null)
   const typed = useRef({ s: '', t: 0 })
+  const closeT = useRef(0)
 
   const fire = (v) => {
     const e = { target: { value: v, name: rest.name }, currentTarget: { value: v } }
@@ -50,17 +52,30 @@ export default function Select({ value, onChange, onBlur, children, style, class
     const want = Math.min(320, options.length * 32 + 12)
     const below = window.innerHeight - r.bottom - 12
     const up = below < Math.min(want, 200) && r.top > below
-    setPos({ left: r.left, width: Math.max(r.width, 180), top: up ? undefined : r.bottom + 6, bottom: up ? window.innerHeight - r.top + 6 : undefined,
+    const left = Math.min(r.left, window.innerWidth - Math.max(r.width, 180) - 8)
+    // меню вырастает из кнопки: точка роста — центр кнопки
+    setPos({ left, ox: r.left + r.width / 2 - left, width: Math.max(r.width, 180), top: up ? undefined : r.bottom + 6, bottom: up ? window.innerHeight - r.top + 6 : undefined,
       maxH: Math.max(140, Math.min(320, up ? r.top - 12 : below)), origin: up ? 'bottom' : 'top' })
   }
 
   const openMenu = () => {
     if (disabled) return
+    clearTimeout(closeT.current)
+    menuRef.current?.classList.remove('is-closing')
     place()
     setActive(options.findIndex(o => o.value === current.value))
     setOpen(true)
   }
-  const close = () => { setOpen(false); btnRef.current?.focus() }
+  // закрытие — обратно в кнопку тем же путём
+  const hide = () => {
+    const m = menuRef.current
+    if (!m || prefersReducedMotion()) return setOpen(false)
+    m.classList.add('is-closing')
+    clearTimeout(closeT.current)
+    closeT.current = setTimeout(() => setOpen(false), 130)
+  }
+  useEffect(() => () => clearTimeout(closeT.current), [])
+  const close = () => { hide(); btnRef.current?.focus() }
   const choose = (o) => { if (!o || o.disabled) return; if (o.value !== String(value ?? '')) fire(o.value); close() }
 
   useLayoutEffect(() => {
@@ -70,8 +85,8 @@ export default function Select({ value, onChange, onBlur, children, style, class
 
   useEffect(() => {
     if (!open) return
-    const outside = (e) => { if (!menuRef.current?.contains(e.target) && !btnRef.current?.contains(e.target)) setOpen(false) }
-    const away = (e) => { if (!menuRef.current?.contains(e.target)) setOpen(false) }
+    const outside = (e) => { if (!menuRef.current?.contains(e.target) && !btnRef.current?.contains(e.target)) hide() }
+    const away = (e) => { if (!menuRef.current?.contains(e.target)) hide() }
     document.addEventListener('mousedown', outside)
     window.addEventListener('scroll', away, true)
     window.addEventListener('resize', away)
@@ -124,7 +139,7 @@ export default function Select({ value, onChange, onBlur, children, style, class
       </button>
       {open && pos && createPortal(
         <div ref={menuRef} role="listbox" className="apple-select-menu" onKeyDown={onKeyDown}
-          style={{ left: pos.left, top: pos.top, bottom: pos.bottom, minWidth: pos.width, maxHeight: pos.maxH, transformOrigin: `${pos.origin} left` }}>
+          style={{ left: pos.left, top: pos.top, bottom: pos.bottom, minWidth: pos.width, maxHeight: pos.maxH, transformOrigin: `${pos.ox}px ${pos.origin}` }}>
           {options.map((o, i) => o.separator
             ? <div key={'sep' + i} className="apple-select-sep" />
             : (

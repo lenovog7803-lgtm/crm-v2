@@ -1,35 +1,26 @@
 import { useRef, useState, useLayoutEffect } from 'react'
-import { prefersReducedMotion } from '../motion'
+import { useSpringPill } from '../hooks/useSpringPill'
 
 // Переключатель-сегменты в стиле iOS 26: стеклянная дорожка и «капля» liquid glass,
-// которая перетекает к выбранной вкладке и чуть растягивается в движении.
+// которая перетекает к выбранной вкладке на пружине и растягивается по скорости.
 export function SlidingTabs({ options, value, onChange, pillColor, activeColor = '#1366F0', inactiveColor = '#5A6573', fontSize = 12.5 }) {
   const btnRefs = useRef({})
   const thumbRef = useRef(null)
-  const prev = useRef(value)
   const [rect, setRect] = useState(null)
 
   useLayoutEffect(() => {
     const el = btnRefs.current[value]
     if (el) setRect({ left: el.offsetLeft, width: el.offsetWidth })
-    // «желе»: капля вытягивается по ходу движения и возвращается — как в iOS 26
-    if (prev.current !== value && thumbRef.current && !prefersReducedMotion()) {
-      thumbRef.current.animate(
-        [{ transform: 'scale(1, 1)' }, { transform: 'scale(1.32, 0.8)', offset: 0.4 }, { transform: 'scale(0.96, 1.04)', offset: 0.75 }, { transform: 'scale(1, 1)' }],
-        { duration: 360, easing: 'ease-out' },
-      )
-    }
-    prev.current = value
   }, [value, options])
+  useSpringPill(thumbRef, rect?.left, rect?.width, value)
 
   return (
     <div className={pillColor ? undefined : 'seg-track'} style={{ position: 'relative', display: 'flex', gap: pillColor ? 8 : 2 }}>
       {rect && (
         <div ref={thumbRef} className={pillColor ? undefined : 'seg-thumb'} style={{
-          position: 'absolute', left: rect.left, width: rect.width,
+          position: 'absolute', left: 0,  // место и ширину ставит пружина (useSpringPill)
           top: pillColor ? 0 : 3, bottom: pillColor ? 0 : 3,
           borderRadius: 99, background: pillColor,
-          transition: 'left 0.28s cubic-bezier(0.22, 1, 0.36, 1), width 0.28s cubic-bezier(0.22, 1, 0.36, 1)',
           zIndex: 0,
         }} />
       )}

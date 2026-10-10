@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useIsMobile } from '../hooks/useIsMobile'
-import { haptic } from '../motion'
+import { haptic, prefersReducedMotion } from '../motion'
 
 // Календарь в стиле iOS 26. Заменяет <input type="date"> и <input type="datetime-local"> один в один:
 // value — ISO-строка ('2026-10-09' или '2026-10-09T14:30'), onChange(e) получает e.target.value.
@@ -34,6 +34,7 @@ export default function DateInput({ type = 'date', value, onChange, disabled, st
   const [open, setOpen] = useState(false)
   const [pos, setPos] = useState(null)
   const [view, setView] = useState({ y: 0, m: 0 })
+  const closeT = useRef(0)
 
   const fire = v => onChange?.({ target: { value: v, name: rest.name }, currentTarget: { value: v } })
 
@@ -42,20 +43,33 @@ export default function DateInput({ type = 'date', value, onChange, disabled, st
     if (!r) return
     const H = withTime ? 400 : 356, W = 300
     const up = window.innerHeight - r.bottom < H + 12 && r.top > window.innerHeight - r.bottom
-    setPos({ left: Math.max(8, Math.min(r.left, window.innerWidth - W - 8)), top: up ? undefined : r.bottom + 6, bottom: up ? window.innerHeight - r.top + 6 : undefined, origin: up ? 'bottom' : 'top' })
+    const left = Math.max(8, Math.min(r.left, window.innerWidth - W - 8))
+    // календарь вырастает из поля: точка роста — середина поля
+    setPos({ left, ox: Math.min(W, Math.max(0, r.left + r.width / 2 - left)), top: up ? undefined : r.bottom + 6, bottom: up ? window.innerHeight - r.top + 6 : undefined, origin: up ? 'bottom' : 'top' })
   }
   const openPop = () => {
     if (disabled) return
     const d = valid ? new Date(datePart + 'T00:00') : new Date()
     setView({ y: d.getFullYear(), m: d.getMonth() })
+    clearTimeout(closeT.current)
+    popRef.current?.classList.remove('is-closing')
     place()
     setOpen(true)
   }
-  const close = () => { setOpen(false); btnRef.current?.focus() }
+  // закрытие — обратно в поле тем же путём
+  const hide = () => {
+    const p = popRef.current
+    if (!p || prefersReducedMotion()) return setOpen(false)
+    p.classList.add('is-closing')
+    clearTimeout(closeT.current)
+    closeT.current = setTimeout(() => setOpen(false), 130)
+  }
+  useEffect(() => () => clearTimeout(closeT.current), [])
+  const close = () => { hide(); btnRef.current?.focus() }
 
   useEffect(() => {
     if (!open) return
-    const outside = e => { if (!popRef.current?.contains(e.target) && !btnRef.current?.contains(e.target)) setOpen(false) }
+    const outside = e => { if (!popRef.current?.contains(e.target) && !btnRef.current?.contains(e.target)) hide() }
     // прокрутка формы не закрывает календарь — он едет вместе с полем
     const away = e => { if (!popRef.current?.contains(e.target)) place() }
     const key = e => { if (e.key === 'Escape') { e.stopPropagation(); close() } }
@@ -98,7 +112,7 @@ export default function DateInput({ type = 'date', value, onChange, disabled, st
       </button>
       {open && pos && createPortal(
         <div ref={popRef} role="dialog" aria-label="Календарь" className="ios-cal"
-          style={{ left: pos.left, top: pos.top, bottom: pos.bottom, transformOrigin: `${pos.origin} left` }}>
+          style={{ left: pos.left, top: pos.top, bottom: pos.bottom, transformOrigin: `${pos.ox}px ${pos.origin}` }}>
           <div className="ios-cal-head">
             <div className="ios-cal-title">{MONTHS[view.m]} {view.y}</div>
             <button type="button" className="ios-cal-nav" onClick={() => shift(-1)} aria-label="Предыдущий месяц"><Chev dir={-1} /></button>
