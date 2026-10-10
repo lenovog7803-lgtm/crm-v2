@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useIsMobile } from '../hooks/useIsMobile'
-import { useToast } from './Toast'
+import { useToast, useNotifications } from './Toast'
 import { fmtDate } from '../utils'
 import { mouseOnly } from '../motion'
 import { PopNumber } from './Transitions'
@@ -52,7 +52,8 @@ const fmtQuarter = q => {
 }
 
 export default function Topbar({ compact = false, page, onSignOut, period = 'month', onPeriodChange, availableMonths = [], search = '', onSearchChange, overdueItems = [], onOpenOrder, onNav, onOpenPalette, meta: metaOverride }) {
-  const { notifications, dismiss } = useToast()
+  const { dismiss } = useToast()
+  const notifications = useNotifications()
   // карточки (заявка, клиент, перевозчик) подставляют свой заголовок: номер, имя и т.п.
   const meta = metaOverride || PAGE_META[page] || { title: page, subtitle: '' }
   const [bellOpen, setBellOpen] = useState(false)

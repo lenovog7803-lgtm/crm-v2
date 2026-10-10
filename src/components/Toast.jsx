@@ -1,8 +1,11 @@
-import { createContext, useContext, useState, useCallback, useRef } from 'react'
+import { createContext, useContext, useState, useCallback, useRef, useMemo } from 'react'
 import { Toaster, toast } from 'sonner'
 import { ThinkingOrb } from 'thinking-orbs'
 
 const ToastContext = createContext(null)
+// Список — отдельно: он нужен только колокольчику. Иначе каждое уведомление перерисовывало бы
+// всех, кто вызывает show() (~70 компонентов), и всплывашка выезжала бы рывком.
+const NotificationsContext = createContext([])
 
 // Значок уведомления — цветной «квадратик» как у приложений в уведомлениях iOS.
 const ICONS = {
@@ -84,14 +87,19 @@ export function ToastProvider({ children }) {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, ...patch } : n))
   }, [])
 
+  const actions = useMemo(() => ({ show, update, dismiss, clearAll }), [show, update, dismiss, clearAll])
+
   return (
-    <ToastContext.Provider value={{ notifications, show, update, dismiss, clearAll }}>
+    <ToastContext.Provider value={actions}>
+    <NotificationsContext.Provider value={notifications}>
       {children}
       {/* справа сверху под колокольчиком; на телефоне Sonner сам растягивает на ширину экрана */}
       <Toaster position="top-right" offset={{ top: 84, right: 24 }} mobileOffset={{ top: 'calc(10px + env(safe-area-inset-top))' }}
         visibleToasts={4} gap={8} toastOptions={{ unstyled: true, classNames: { toast: 'notif', title: 'notif-title', description: 'notif-text', actionButton: 'notif-action', icon: 'notif-icon-slot' } }} />
+    </NotificationsContext.Provider>
     </ToastContext.Provider>
   )
 }
 
 export const useToast = () => useContext(ToastContext)
+export const useNotifications = () => useContext(NotificationsContext)
