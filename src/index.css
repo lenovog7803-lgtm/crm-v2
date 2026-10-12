@@ -605,51 +605,6 @@ input[type="number"] {
   .row-flash { animation: none; outline: 2px solid rgba(10,132,255,0.3); }
 }
 
-/* ===== Уведомления в стиле iOS (Sonner, unstyled: раскладку и стопку даёт он, вид — наш) ===== */
-.notif {
-  display: flex; align-items: center; gap: 12px; padding: 13px 15px; border-radius: 26px;
-  font-family: var(--font-sys); isolation: isolate;
-  /* прозрачное стекло уведомлений iOS 26: почти без заливки — фон виден, но размыт и насыщен;
-     блик сверху — слоем фона, т.к. ::after занят Sonner */
-  background:
-    radial-gradient(120% 90% at 15% -30%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 50%),
-    linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.16) 100%);
-  backdrop-filter: blur(14px) saturate(230%) brightness(1.08); -webkit-backdrop-filter: blur(14px) saturate(230%) brightness(1.08);
-  border: none;
-  box-shadow:
-    inset 0 1.5px 0 rgba(255,255,255,0.9),        /* верхняя грань ловит свет */
-    inset 0 -1px 0 rgba(255,255,255,0.35),
-    inset 0 0 18px rgba(255,255,255,0.28),        /* свечение толщи стекла по краю */
-    0 18px 40px -16px rgba(20,30,55,0.32), 0 2px 6px rgba(20,30,55,0.06);
-}
-/* яркий блик по краю: свет сверху-слева и отражение снизу-справа */
-.notif:not([data-swiping="true"])::before {
-  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 1.5px; pointer-events: none;
-  background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.35) 22%, rgba(255,255,255,0) 45%, rgba(255,255,255,0) 62%, rgba(255,255,255,0.7) 100%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
-}
-/* задние карточки собранной стопки не размываем — их почти не видно, а размытие на каждом кадре тормозит */
-[data-sonner-toast].notif[data-expanded="false"][data-front="false"] { backdrop-filter: none; -webkit-backdrop-filter: none;
-  background: linear-gradient(180deg, rgba(250,251,253,0.94), rgba(244,246,250,0.94)); }
-.notif [data-content] { flex: 1; min-width: 0; }
-@media (min-width: 601px) { .notif { width: var(--width, 356px); } }  /* телефон: Sonner сам растягивает на ширину экрана */
-/* раскрытие стопки — мягкая кривая iOS вместо простой; содержимое прижато к верху, чтобы не ехало вместе с высотой */
-[data-sonner-toast].notif { align-items: flex-start;
-  transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.35s ease, height 0.45s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.2s; }
-/* карточки сзади в собранной стопке — пустые «подложки», текст проявляется при раскрытии (у Sonner так только в его стиле) */
-[data-sonner-toast].notif > * { transition: opacity 0.3s ease; }
-[data-sonner-toast].notif[data-expanded="false"][data-front="false"] > * { opacity: 0; }
-@media (prefers-reduced-motion: reduce) { [data-sonner-toast].notif, [data-sonner-toast].notif > * { transition: none; } }
-.notif-icon-slot { display: flex; flex-shrink: 0; }
-.notif-icon { width: 28px; height: 38px; display: inline-flex; align-items: center; justify-content: center; }
-.notif-title { font-size: 12.5px; font-weight: 600; color: rgba(14,23,38,0.55); margin-bottom: 1px; letter-spacing: -0.01em; }
-.notif-text { font-size: 14.5px; font-weight: 500; color: #0E1726; line-height: 1.3; letter-spacing: -0.015em;
-  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.notif-action { flex-shrink: 0; border: none; cursor: pointer; padding: 6px 12px; border-radius: 99px; font: 600 13px var(--font-sys);
-  background: rgba(255,255,255,0.55); color: #1366F0; box-shadow: inset 0 1px 0 #fff, 0 1px 3px rgba(20,30,55,0.1); }
-.notif-action:active { transform: scale(0.95); }
-@media (prefers-reduced-transparency: reduce) { .notif, [data-sonner-toast].notif { background: #F7F8FA; backdrop-filter: none; -webkit-backdrop-filter: none; } }
-
 /* ===== Liquid Glass (как в iOS 26 / macOS Tahoe) — на чистом CSS, без снимков страницы ===== */
 .liquid-glass, .ios-widget {
   isolation: isolate;
@@ -1080,13 +1035,6 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .topbar-pressed .topbar-grabber { background: #1366F0; transition: none; }
 /* панель пристыкована: пока она хоть немного открыта, нижние углы шапки прямые */
 .topbar-joined { border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; }
-/* фоновое дело — строка по центру шапки */
-.topbar-activity { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: 40%;
-  display: flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 99px; font: 500 13px var(--font-sys); color: #0E1726;
-  background: rgba(255,255,255,0.7); box-shadow: inset 0 1px 0 #fff, 0 0 0 0.5px rgba(14,23,38,0.08), 0 6px 16px -8px rgba(20,30,55,0.25);
-  pointer-events: none; animation: activityIn 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
-.topbar-activity span:first-of-type { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-@keyframes activityIn { from { opacity: 0; transform: translate(-50%, -50%) scale(0.92); } to { opacity: 1; transform: translate(-50%, -50%); } }
 /* капля под шапкой: рамка во всю ширину шапки, капля — по центру и растёт из ручки (7 px заходит под шапку,
    там, где ручка) в ширину шапки и вниз. Без размытия: движущееся стекло с blur дёргается */
 .topbar-expand { position: fixed; z-index: 99; }
@@ -1123,6 +1071,3 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   background: rgba(19,102,240,0.1); color: #1366F0; white-space: nowrap; transition: transform 0.1s; }
 .island-btn:hover { background: rgba(19,102,240,0.16); }
 .island-btn:active { transform: scale(0.96); }
-.island-spin { animation: islandSpin 0.9s linear infinite; flex-shrink: 0; }
-@keyframes islandSpin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .topbar-activity { animation: none; } .island-spin { animation-duration: 2.5s; } }

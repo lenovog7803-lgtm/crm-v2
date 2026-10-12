@@ -5,7 +5,8 @@ import { fmtDate } from '../utils'
 import { mouseOnly } from '../motion'
 import { PopNumber } from './Transitions'
 import Select from './Select'
-import { TopbarExpand, TopbarActivity } from './TopbarIsland'
+import { TopbarExpand } from './TopbarIsland'
+import { ThinkingOrb } from 'thinking-orbs'
 import { useAuth } from '../AuthContext'
 
 const PAGE_META = {
@@ -152,8 +153,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
         <div className="ios-title" style={{ fontSize: compact ? (isMobile ? 17 : 18) : (isMobile ? 24 : 26) }}>{meta.title}</div>
         {!isMobile && <div className="ios-subtitle" style={{ fontSize: 12.5, color: '#8A93A0', marginTop: 2 }}>{meta.subtitle}</div>}
       </div>
-      {/* шапка-остров: фоновые дела строкой по центру, «ручка» раскрытия снизу */}
-      {canExpand && <TopbarActivity />}
+      {/* шапка-остров: «ручка» раскрытия снизу */}
       {canExpand && <span className="topbar-grabber" aria-hidden="true" />}
 
       {/* Mobile search icon */}
@@ -302,6 +302,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
                           {n.type === 'error' && (
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                           )}
+                          {n.type === 'loading' && <ThinkingOrb state="working" size={20} theme="light" aria-label="В процессе" />}
                           {n.type === 'info' && (
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="16" x2="12" y2="11"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                           )}

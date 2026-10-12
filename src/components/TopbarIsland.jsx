@@ -1,55 +1,16 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { getGoals, getOrders, getFleetAnalytics, getFleetGoals, getTasks, getLeads, getLeadsAnalytics, getKudirEntries, getMissingPP } from '../api'
-import { useNotifications } from './Toast'
 import { motion } from 'motion/react'
 import { prefersReducedMotion } from '../motion'
 
-// Шапка как Dynamic Island: нажатие на пустое место шапки раскрывает её каплей вниз — сводка своей страницы;
-// фоновые дела («Генерирую акт…» → «Готово») идут строкой прямо в шапке.
+// Шапка как Dynamic Island: нажатие на пустое место шапки раскрывает её каплей вниз — сводка своей страницы.
 
 // панель заходит под шапку на столько пикселей: шапка (выше по слою) прикрывает её верх — получается один остров
 const TUCK = 22
 const MONTHS = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
 const int = v => Math.round(Number(v) || 0).toLocaleString('ru-RU')
 const pct = (f, p) => (p ? Math.min(100, Math.round(f / p * 100)) : 0)
-
-const Spinner = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" className="island-spin" aria-hidden="true">
-    <circle cx="12" cy="12" r="9" fill="none" stroke="rgba(19,102,240,0.18)" strokeWidth="3" />
-    <path d="M21 12a9 9 0 0 0-9-9" fill="none" stroke="#1366F0" strokeWidth="3" strokeLinecap="round" />
-  </svg>
-)
-const Check = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" style={{ flexShrink: 0 }}><circle cx="12" cy="12" r="11" fill="#34C759" /><path d="M7.2 12.4l3.2 3.2 6.4-7" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
-)
-
-// Строка фонового дела в шапке: крутилка, по готовности — галочка на 2,5 с; иначе ничего
-export function TopbarActivity({ onDone }) {
-  const notifications = useNotifications()
-  const [done, setDone] = useState(null)
-  const prev = useRef(new Set())
-  const loading = notifications.filter(n => n.type === 'loading')
-  useEffect(() => {
-    const ids = new Set(loading.map(n => n.id))
-    prev.current.forEach(id => {
-      if (ids.has(id)) return
-      const n = notifications.find(x => x.id === id)
-      if (n && n.type !== 'loading') { setDone(n); onDone?.() }
-    })
-    prev.current = ids
-  }, [notifications]) // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => { if (!done) return; const t = setTimeout(() => setDone(null), 2500); return () => clearTimeout(t) }, [done])
-
-  if (!loading.length && !done) return null
-  return (
-    <div className="topbar-activity" key={loading.length ? 'l' : 'd'} role="status">
-      {loading.length ? <Spinner /> : <Check />}
-      <span>{loading.length ? loading[0].message : done.message}</span>
-      {loading.length > 1 && <span className="island-muted">ещё {loading.length - 1}</span>}
-    </div>
-  )
-}
 
 // ---- Что показывает шапка на каждой странице: заголовок и 3–4 цифры, без кнопок ----
 const nd = s => { s = String(s || ''); if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10); const m = s.match(/^(\d{2})\.(\d{2})\.?(\d{4})/); return m ? `${m[3]}-${m[2]}-${m[1]}` : '' }
