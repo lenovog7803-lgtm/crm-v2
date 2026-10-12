@@ -17,7 +17,7 @@ const STATUSES = [
   { id: 'new', label: 'Новая', color: '#7C3AED', bg: 'rgba(124,58,237,0.1)' },
   { id: 'in_progress', label: 'В работе', color: '#1366F0', bg: 'rgba(19,102,240,0.1)' },
   { id: 'done', label: 'Доставлено', color: '#1E9E5A', bg: 'rgba(30,158,90,0.1)' },
-  { id: 'cancelled', label: 'Отменено', color: '#8A93A0', bg: 'rgba(138,147,160,0.1)' },
+  { id: 'cancelled', label: 'Отменено', color: 'var(--text-3)', bg: 'rgba(138,147,160,0.1)' },
 ]
 
 const DOC_STEPS = [
@@ -68,25 +68,25 @@ function OrderHistorySection({ orderId }) {
         onClick={toggle}
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
       >
-        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8' }}>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)' }}>
           ИСТОРИЯ ИЗМЕНЕНИЙ
         </span>
-        <span style={{ fontSize: 12, color: '#8A93A0' }}>{open ? 'свернуть ▲' : 'показать ▼'}</span>
+        <span style={{ fontSize: 12, color: 'var(--text-3)' }}>{open ? 'свернуть ▲' : 'показать ▼'}</span>
       </div>
 
       {open && (
         <div style={{ marginTop: 12 }}>
           {history.length === 0 ? (
-            <div style={{ fontSize: 12, color: '#A6AEB8', textAlign: 'center', padding: 16 }}>Изменений пока не было</div>
+            <div style={{ fontSize: 12, color: 'var(--text-tertiary)', textAlign: 'center', padding: 16 }}>Изменений пока не было</div>
           ) : (
             history.map((h, i) => (
-              <div key={h.id || i} style={{ display: 'flex', gap: 10, padding: '9px 0', borderBottom: i < history.length - 1 ? '1px solid rgba(14,23,38,0.05)' : 'none' }}>
+              <div key={h.id || i} style={{ display: 'flex', gap: 10, padding: '9px 0', borderBottom: i < history.length - 1 ? '1px solid rgba(var(--ink-rgb), 0.05)' : 'none' }}>
                 <div style={{ width: 6, height: 6, borderRadius: 3, background: '#1366F0', marginTop: 6, flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 12.5, color: '#0E1726' }}>
+                  <div style={{ fontSize: 12.5, color: 'var(--ink)' }}>
                     <b>{HISTORY_FIELD_LABEL[h.field] || h.field}</b>: {h.old_value || '—'} → {h.new_value || '—'}
                   </div>
-                  <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>
                     {h.user} · {new Date(h.timestamp).toLocaleDateString('ru-RU')} в {new Date(h.timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
@@ -100,13 +100,13 @@ function OrderHistorySection({ orderId }) {
 }
 
 const sLabel = {
-  fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', marginBottom: 12,
+  fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: 12,
 }
 
 const iStyle = {
   width: '100%', height: 36, padding: '0 12px', borderRadius: 10,
-  border: '1px solid rgba(14,23,38,0.13)', background: 'rgba(255,255,255,0.7)',
-  fontFamily: 'var(--font-sys)', fontSize: 13, color: '#0E1726', outline: 'none', boxSizing: 'border-box',
+  border: '1px solid rgba(var(--ink-rgb), 0.13)', background: 'rgba(var(--paper-rgb), 0.7)',
+  fontFamily: 'var(--font-sys)', fontSize: 13, color: 'var(--ink)', outline: 'none', boxSizing: 'border-box',
   transition: 'border-color 0.15s',
 }
 
@@ -115,7 +115,7 @@ function SLabel({ children }) {
 }
 
 function FieldLabel({ children }) {
-  return <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', marginBottom: 5 }}>{children}</div>
+  return <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', marginBottom: 5 }}>{children}</div>
 }
 
 function ClickableName({ name, onClick }) {
@@ -214,7 +214,7 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
       }
       style={{
         flex: 1, padding: '14px 18px', borderRadius: 14, cursor: 'pointer',
-        background: isPaid ? 'rgba(30,158,90,0.08)' : hasUnmatchedPayment ? 'rgba(217,119,6,0.08)' : (isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(14,23,38,0.04)'),
+        background: isPaid ? 'rgba(30,158,90,0.08)' : hasUnmatchedPayment ? 'rgba(217,119,6,0.08)' : (isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(var(--ink-rgb), 0.04)'),
         border: isPaid
           ? (isCarrier ? '2px solid rgba(30,158,90,0.28)' : '1px solid rgba(30,158,90,0.25)')
           : hasUnmatchedPayment
@@ -223,14 +223,14 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
         transition: 'all 0.2s',
         userSelect: 'none', WebkitUserSelect: 'none',
       }}
-      onPointerEnter={mouseOnly(e => { if (!isPaid && !hasUnmatchedPayment) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.09)' : 'rgba(14,23,38,0.07)' })}
-      onPointerLeave={mouseOnly(e => { cancelPress(); if (!isPaid && !hasUnmatchedPayment) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(14,23,38,0.04)' })}
+      onPointerEnter={mouseOnly(e => { if (!isPaid && !hasUnmatchedPayment) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.09)' : 'rgba(var(--ink-rgb), 0.07)' })}
+      onPointerLeave={mouseOnly(e => { cancelPress(); if (!isPaid && !hasUnmatchedPayment) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(var(--ink-rgb), 0.04)' })}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{
           width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
           background: isPaid ? '#1E9E5A' : 'transparent',
-          border: `2px solid ${isPaid ? '#1E9E5A' : hasUnmatchedPayment ? '#D97706' : '#C4CAD4'}`,
+          border: `2px solid ${isPaid ? '#1E9E5A' : hasUnmatchedPayment ? '#D97706' : 'var(--text-quaternary)'}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transition: 'all 0.2s',
         }}>
@@ -260,7 +260,7 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
               {' — сумма не сходится'}
             </div>
           ) : (
-            <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>
               {isCarrier ? 'Сумма к перечислению — нажмите чтобы отметить' : 'Нажмите чтобы отметить'}
             </div>
           )}
@@ -399,7 +399,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
   }
 
   if (loading) return <Loader padding={60} />
-  if (!order) return <div style={{ padding: 60, textAlign: 'center', color: '#A6AEB8' }}>Заявка не найдена</div>
+  if (!order) return <div style={{ padding: 60, textAlign: 'center', color: 'var(--text-tertiary)' }}>Заявка не найдена</div>
 
   const view = { ...order, ...draft }
   const isDirty = Object.keys(draft).length > 0
@@ -711,8 +711,8 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
           {/* Row 1: back + order info + save */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <button onClick={onBack} style={{
-              width: 36, height: 36, borderRadius: 11, border: '1px solid rgba(14,23,38,0.12)',
-              background: 'rgba(255,255,255,0.7)', color: '#0E1726', cursor: 'pointer',
+              width: 36, height: 36, borderRadius: 11, border: '1px solid rgba(var(--ink-rgb), 0.12)',
+              background: 'rgba(var(--paper-rgb), 0.7)', color: 'var(--ink)', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -727,9 +727,9 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
             {saveErr && <span style={{ fontSize: 11, color: '#C81923', fontWeight: 700 }}>Ошибка</span>}
             <button onClick={handleSave} disabled={!isDirty || saving} style={{
               minWidth: 36, height: 36, borderRadius: 11, cursor: isDirty ? 'pointer' : 'default',
-              border: `1px solid ${savedOk ? 'rgba(30,158,90,0.4)' : isDirty ? 'rgba(19,102,240,0.4)' : 'rgba(14,23,38,0.1)'}`,
-              background: savedOk ? 'rgba(30,158,90,0.12)' : isDirty ? 'rgba(19,102,240,0.12)' : 'rgba(255,255,255,0.5)',
-              color: savedOk ? '#1E9E5A' : isDirty ? '#1366F0' : '#C4CAD4',
+              border: `1px solid ${savedOk ? 'rgba(30,158,90,0.4)' : isDirty ? 'rgba(19,102,240,0.4)' : 'rgba(var(--ink-rgb), 0.1)'}`,
+              background: savedOk ? 'rgba(30,158,90,0.12)' : isDirty ? 'rgba(19,102,240,0.12)' : 'rgba(var(--paper-rgb), 0.5)',
+              color: savedOk ? '#1E9E5A' : isDirty ? '#1366F0' : 'var(--text-quaternary)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 13, flexShrink: 0,
               padding: isDirty ? '0 14px' : '0 10px',
@@ -761,7 +761,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
             )}
             <button onClick={handleDuplicate} disabled={duplicating} style={{
               width: 34, height: 34, borderRadius: 10, border: 'none', cursor: 'pointer',
-              background: 'rgba(14,23,38,0.06)', color: '#5A6573',
+              background: 'rgba(var(--ink-rgb), 0.06)', color: 'var(--text-secondary)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -793,10 +793,10 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
           {saveErr && <span style={{ fontSize: 12, color: '#C81923', fontWeight: 600, flexShrink: 0 }}>Ошибка</span>}
           <button onClick={handleSave} disabled={!isDirty || saving} style={{
             padding: '11px 26px', borderRadius: 12, cursor: isDirty ? 'pointer' : 'default',
-            border: `1px solid ${savedOk ? 'rgba(30,158,90,0.35)' : isDirty ? 'rgba(19,102,240,0.35)' : 'rgba(255,255,255,0.2)'}`,
-            background: savedOk ? 'rgba(30,158,90,0.15)' : isDirty ? 'rgba(19,102,240,0.15)' : 'rgba(255,255,255,0.07)',
+            border: `1px solid ${savedOk ? 'rgba(30,158,90,0.35)' : isDirty ? 'rgba(19,102,240,0.35)' : 'rgba(255,255,255,calc(0.2 * var(--rim-k)))'}`,
+            background: savedOk ? 'rgba(30,158,90,0.15)' : isDirty ? 'rgba(19,102,240,0.15)' : 'rgba(var(--paper-rgb), 0.07)',
             backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-            color: savedOk ? '#1E9E5A' : isDirty ? '#1366F0' : '#A6AEB8',
+            color: savedOk ? '#1E9E5A' : isDirty ? '#1366F0' : 'var(--text-tertiary)',
             fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14,
             display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0, transition: 'all 0.25s',
           }}>
@@ -812,7 +812,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
               Редактировать
             </button>
           )}
-          <button onClick={handleDuplicate} disabled={duplicating} style={{ padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0, background: 'rgba(14,23,38,0.06)', color: '#5A6573', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button onClick={handleDuplicate} disabled={duplicating} style={{ padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0, background: 'rgba(var(--ink-rgb), 0.06)', color: 'var(--text-secondary)', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             {duplicating ? '...' : 'Дублировать'}
           </button>
@@ -849,7 +849,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
                 <div style={{ fontWeight: 600, fontSize: 13 }}>{fmtDate(view.unload_date) || '—'}</div>
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)', gap: isMobile ? 8 : 24, marginTop: isMobile ? 14 : 22, paddingTop: isMobile ? 14 : 18, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)', gap: isMobile ? 8 : 24, marginTop: isMobile ? 14 : 22, paddingTop: isMobile ? 14 : 18, borderTop: '1px solid rgba(255,255,255,calc(0.1 * var(--rim-k)))' }}>
               <div>
                 <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 3 }}>Клиент</div>
                 <div style={{ fontWeight: 800, fontSize: isMobile ? 15 : 20, fontFamily: 'var(--font-sys)' }}>{fmtMoney(clientRate)}</div>
@@ -879,13 +879,13 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
                   style={{
                     padding: '8px 18px', borderRadius: 20, cursor: 'pointer',
                     fontSize: 13, fontWeight: 600,
-                    background: view.status === s.id ? s.bg : 'rgba(14,23,38,0.04)',
-                    color: view.status === s.id ? s.color : '#8A93A0',
-                    border: `1.5px solid ${view.status === s.id ? s.color + '50' : 'rgba(14,23,38,0.08)'}`,
+                    background: view.status === s.id ? s.bg : 'rgba(var(--ink-rgb), 0.04)',
+                    color: view.status === s.id ? s.color : 'var(--text-3)',
+                    border: `1.5px solid ${view.status === s.id ? s.color + '50' : 'rgba(var(--ink-rgb), 0.08)'}`,
                     transition: 'all 0.2s',
                   }}
                   onPointerEnter={mouseOnly(e => { if (view.status !== s.id) { e.currentTarget.style.background = s.bg; e.currentTarget.style.color = s.color } })}
-                  onPointerLeave={mouseOnly(e => { if (view.status !== s.id) { e.currentTarget.style.background = 'rgba(14,23,38,0.04)'; e.currentTarget.style.color = '#8A93A0' } })}
+                  onPointerLeave={mouseOnly(e => { if (view.status !== s.id) { e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.04)'; e.currentTarget.style.color = 'var(--text-3)' } })}
                 >
                   {s.label}
                 </div>
@@ -924,24 +924,24 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '12px 14px', borderRadius: 12, cursor: 'pointer',
-                      background: isDone ? 'rgba(30,158,90,0.06)' : 'rgba(14,23,38,0.03)',
-                      border: `1px solid ${isDone ? 'rgba(30,158,90,0.2)' : 'rgba(14,23,38,0.07)'}`,
+                      background: isDone ? 'rgba(30,158,90,0.06)' : 'rgba(var(--ink-rgb), 0.03)',
+                      border: `1px solid ${isDone ? 'rgba(30,158,90,0.2)' : 'rgba(var(--ink-rgb), 0.07)'}`,
                       transition: 'all 0.2s', userSelect: 'none', WebkitUserSelect: 'none',
                     }}
-                    onPointerEnter={mouseOnly(e => { if (!isDone) e.currentTarget.style.background = 'rgba(14,23,38,0.06)' })}
-                    onPointerLeave={mouseOnly(e => { cancelDocPress(); if (!isDone) e.currentTarget.style.background = 'rgba(14,23,38,0.03)' })}
+                    onPointerEnter={mouseOnly(e => { if (!isDone) e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.06)' })}
+                    onPointerLeave={mouseOnly(e => { cancelDocPress(); if (!isDone) e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.03)' })}
                   >
                     <div style={{
                       width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
                       background: isDone ? '#1E9E5A' : 'transparent',
-                      border: `2px solid ${isDone ? '#1E9E5A' : '#C4CAD4'}`,
+                      border: `2px solid ${isDone ? '#1E9E5A' : 'var(--text-quaternary)'}`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       transition: 'all 0.2s',
                     }}>
                       <SuccessCheck show={isDone} size={10} strokeWidth={3.5} />
                     </div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: 500, color: isDone ? '#1E9E5A' : '#0E1726' }}>{step.label}</div>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: isDone ? '#1E9E5A' : 'var(--ink)' }}>{step.label}</div>
                       {isDone && date && (
                         <div style={{ fontSize: 11, color: '#1E9E5A', marginTop: 2 }}>
                           {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })} в{' '}
@@ -957,12 +957,12 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
                         </div>
                       )}
                       {isCarrierDocs && (
-                        <div style={{ fontSize: 10.5, color: '#A6AEB8', marginTop: 2 }}>
+                        <div style={{ fontSize: 10.5, color: 'var(--text-tertiary)', marginTop: 2 }}>
                           удерживайте, чтобы {view.carrier_act_number ? 'изменить' : 'вписать'} акт от перевозчика
                         </div>
                       )}
                     </div>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: isDone ? '#1E9E5A' : '#A6AEB8', flexShrink: 0 }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: isDone ? '#1E9E5A' : 'var(--text-tertiary)', flexShrink: 0 }}>
                       {isDone ? 'готово' : 'ожидание'}
                     </div>
                   </div>
@@ -978,7 +978,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
           {/* Client */}
           {order.client_name && (
             <div className="card" style={{ padding: '20px' }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', marginBottom: 14 }}>КЛИЕНТ</div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: 14 }}>КЛИЕНТ</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: 14, flexShrink: 0,
@@ -990,9 +990,9 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
                   {onOpenClient && (order.client_id || order.client_name) ? (
                     <ClickableName name={order.client_name} onClick={openClientDetail} />
                   ) : (
-                    <div style={{ fontWeight: 700, fontSize: 14, color: '#0E1726' }}>{order.client_name}</div>
+                    <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>{order.client_name}</div>
                   )}
-                  {order.client_phone && <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 2 }}>{order.client_phone}</div>}
+                  {order.client_phone && <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>{order.client_phone}</div>}
                 </div>
               </div>
             </div>
@@ -1001,7 +1001,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
           {/* Carrier */}
           {order.carrier_name && (
             <div className="card" style={{ padding: '20px' }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', marginBottom: 14 }}>ПЕРЕВОЗЧИК</div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: 14 }}>ПЕРЕВОЗЧИК</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: 14, flexShrink: 0,
@@ -1018,25 +1018,25 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
                   {onOpenCarrier && (order.carrier_id || order.carrier_name) ? (
                     <ClickableName name={order.carrier_name} onClick={openCarrierDetail} />
                   ) : (
-                    <div style={{ fontWeight: 700, fontSize: 14, color: '#0E1726' }}>{order.carrier_name}</div>
+                    <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>{order.carrier_name}</div>
                   )}
-                  {order.carrier_phone && <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 2 }}>{order.carrier_phone}</div>}
+                  {order.carrier_phone && <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>{order.carrier_phone}</div>}
                 </div>
               </div>
               {(order.vehicle_plate || order.vehicle_type || order.driver_name || order.driver_phone) && (
                 <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {(order.vehicle_plate || order.vehicle_type) && (
-                    <div style={{ padding: '7px 12px', borderRadius: 10, background: 'rgba(14,23,38,0.04)', fontSize: 12, color: '#5A6573', fontFamily: 'var(--font-mono)' }}>
+                    <div style={{ padding: '7px 12px', borderRadius: 10, background: 'rgba(var(--ink-rgb), 0.04)', fontSize: 12, color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
                       {[order.vehicle_plate, order.vehicle_type].filter(Boolean).join(' · ')}
                     </div>
                   )}
                   {(order.driver_name || order.driver_phone) && (
-                    <div style={{ padding: '7px 12px', borderRadius: 10, background: 'rgba(14,23,38,0.04)', fontSize: 12, color: '#5A6573' }}>
+                    <div style={{ padding: '7px 12px', borderRadius: 10, background: 'rgba(var(--ink-rgb), 0.04)', fontSize: 12, color: 'var(--text-secondary)' }}>
                       {[order.driver_name, order.driver_phone].filter(Boolean).join(' · ')}
                     </div>
                   )}
                   {!order.vehicle_plate && !order.driver_name && order.vehicle_info && (
-                    <div style={{ padding: '7px 12px', borderRadius: 10, background: 'rgba(14,23,38,0.04)', fontSize: 12, color: '#5A6573', fontFamily: 'var(--font-mono)' }}>
+                    <div style={{ padding: '7px 12px', borderRadius: 10, background: 'rgba(var(--ink-rgb), 0.04)', fontSize: 12, color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
                       {order.vehicle_info}
                     </div>
                   )}
@@ -1048,7 +1048,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
           {/* Documents */}
           <div className="card" style={{ padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', flex: 1 }}>ДОКУМЕНТЫ</div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)', flex: 1 }}>ДОКУМЕНТЫ</div>
               <button
                 onClick={reauthGoogle}
                 disabled={gAuthBusy}
@@ -1145,23 +1145,23 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
           {/* Cargo info */}
           {Boolean(order.cargo || order.weight_tons || order.payment_days) && (
             <div className="card" style={{ padding: '20px' }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', marginBottom: 14 }}>ГРУЗ И УСЛОВИЯ</div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: 14 }}>ГРУЗ И УСЛОВИЯ</div>
               {Boolean(order.cargo) && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
-                  <span style={{ fontSize: 12, color: '#A6AEB8' }}>Груз</span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#0E1726' }}>{order.cargo}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
+                  <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>Груз</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>{order.cargo}</span>
                 </div>
               )}
               {Boolean(order.weight_tons) && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
-                  <span style={{ fontSize: 12, color: '#A6AEB8' }}>Вес</span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#0E1726', fontFamily: 'var(--font-mono)' }}>{order.weight_tons} т</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
+                  <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>Вес</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', fontFamily: 'var(--font-mono)' }}>{order.weight_tons} т</span>
                 </div>
               )}
               {Boolean(order.payment_days) && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0' }}>
-                  <span style={{ fontSize: 12, color: '#A6AEB8' }}>Срок оплаты</span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#0E1726', fontFamily: 'var(--font-mono)' }}>{order.payment_days} дн.</span>
+                  <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>Срок оплаты</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', fontFamily: 'var(--font-mono)' }}>{order.payment_days} дн.</span>
                 </div>
               )}
             </div>

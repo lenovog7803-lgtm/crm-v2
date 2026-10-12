@@ -5,8 +5,8 @@ import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { SwapText } from '../Transitions'
 import Select from '../Select'
 
-const labelStyle = { fontSize: 13, fontWeight: 500, color: '#6B7480', marginBottom: 6, paddingLeft: 4, display: 'block' }
-const fieldStyle = { width: '100%', background: '#F7F8FA' }
+const labelStyle = { fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', marginBottom: 6, paddingLeft: 4, display: 'block' }
+const fieldStyle = { width: '100%', background: 'var(--fill)' }
 
 export default function LeadEditModal({ lead, onClose, onSaved }) {
   const [form, setForm] = useState({ ...lead })
@@ -43,7 +43,7 @@ export default function LeadEditModal({ lead, onClose, onSaved }) {
     <div
       style={{
         position: 'fixed', inset: 0,
-        background: 'rgba(14,23,38,0.55)',
+        background: 'rgba(var(--ink-rgb), 0.55)',
         backdropFilter: 'blur(6px)',
         zIndex: 1200,
         overflowY: 'auto',
@@ -53,20 +53,20 @@ export default function LeadEditModal({ lead, onClose, onSaved }) {
     >
       <div style={{
         margin: 'auto',
-        background: '#FFFFFF',
+        background: 'var(--surface)',
         borderRadius: 24,
         width: '100%', maxWidth: 560,
-        border: '1px solid rgba(14,23,38,0.08)',
+        border: '1px solid rgba(var(--ink-rgb), 0.08)',
         boxShadow: '0 40px 80px rgba(20,30,55,0.28)',
       }}>
         <div style={{ padding: 26 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>Редактировать лида</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Редактировать лида</div>
           <button
             onClick={onClose}
             style={{
               width: 32, height: 32, borderRadius: 10, border: 'none', cursor: 'pointer',
-              background: '#F7F8FA', color: '#5A6573',
+              background: 'var(--fill)', color: 'var(--text-secondary)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           >

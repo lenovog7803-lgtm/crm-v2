@@ -9,8 +9,8 @@ export function EmptyState({ title, subtitle, actionLabel, onAction, compact = f
         background: 'radial-gradient(circle, rgba(19,102,240,0.08) 0%, rgba(19,102,240,0) 70%)' }}>
         <ThinkingOrb state="breathing" size={64} theme="light" style={{ transform: `scale(${compact ? 0.85 : 1.15})`, opacity: 0.75 }} aria-label={title} />
       </div>
-      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: compact ? 14 : 16, letterSpacing: '-0.01em', color: '#0E1726', marginTop: compact ? 8 : 14 }}>{title}</div>
-      {subtitle && <div style={{ fontSize: 13, color: '#8A93A0', marginTop: 4, maxWidth: 320, lineHeight: 1.45 }}>{subtitle}</div>}
+      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: compact ? 14 : 16, letterSpacing: '-0.01em', color: 'var(--ink)', marginTop: compact ? 8 : 14 }}>{title}</div>
+      {subtitle && <div style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 4, maxWidth: 320, lineHeight: 1.45 }}>{subtitle}</div>}
       {actionLabel && (
         <button className="btn-primary" onClick={onAction} style={{ marginTop: 16 }}>{actionLabel}</button>
       )}

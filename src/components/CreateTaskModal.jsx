@@ -84,7 +84,7 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
           <input className="form-input" placeholder="Напр. Заявка №А2-2847 · БелСталь" value={form.description} onChange={e => set('description', e.target.value)} />
         </div>
         {form.due_time && !form.due_date && (
-          <div style={{ fontSize: 11.5, color: '#8A93A0' }}>Укажите дату — уведомление придёт в этот день в {form.due_time}.</div>
+          <div style={{ fontSize: 11.5, color: 'var(--text-3)' }}>Укажите дату — уведомление придёт в этот день в {form.due_time}.</div>
         )}
         {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center' }}>{error}</div>}
         <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>

@@ -22,7 +22,7 @@ const BULK_STATUSES = [
   { id: 'cancelled', label: 'Отменено' },
 ]
 
-const bulkBtnStyle = { background: 'transparent', border: 'none', color: '#0E1726', fontSize: 13, fontWeight: 600, cursor: 'pointer', padding: '6px 10px', borderRadius: 8, transition: 'background 0.15s' }
+const bulkBtnStyle = { background: 'transparent', border: 'none', color: 'var(--ink)', fontSize: 13, fontWeight: 600, cursor: 'pointer', padding: '6px 10px', borderRadius: 8, transition: 'background 0.15s' }
 
 const DOC_FILTER_OPTIONS = [
   { key: 'docs_to_client_sent',         label: 'Отправлены клиенту',          not: false },
@@ -327,26 +327,26 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
             value={statusChips.some(c => c.key === statusFilter) ? statusFilter : 'all'}
             onChange={setStatusFilter}
           />
-          <div style={{ width: 1, height: 20, background: 'rgba(14,23,38,0.1)', flexShrink: 0 }} />
+          <div style={{ width: 1, height: 20, background: 'rgba(var(--ink-rgb), 0.1)', flexShrink: 0 }} />
           <button onClick={() => setPayFilter(payFilter === 'clientUnpaid' ? null : 'clientUnpaid')} style={{
             padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer', flexShrink: 0,
             fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
-            background: payFilter === 'clientUnpaid' ? 'rgba(30,158,90,0.15)' : 'rgba(14,23,38,0.06)',
-            color: payFilter === 'clientUnpaid' ? '#1E9E5A' : '#5A6573',
+            background: payFilter === 'clientUnpaid' ? 'rgba(30,158,90,0.15)' : 'rgba(var(--ink-rgb), 0.06)',
+            color: payFilter === 'clientUnpaid' ? '#1E9E5A' : 'var(--text-secondary)',
           }}>Не оплачено клиентом</button>
           <button onClick={() => setPayFilter(payFilter === 'carrierUnpaid' ? null : 'carrierUnpaid')} style={{
             padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer', flexShrink: 0,
             fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
-            background: payFilter === 'carrierUnpaid' ? 'rgba(124,58,237,0.15)' : 'rgba(14,23,38,0.06)',
-            color: payFilter === 'carrierUnpaid' ? '#7C3AED' : '#5A6573',
+            background: payFilter === 'carrierUnpaid' ? 'rgba(124,58,237,0.15)' : 'rgba(var(--ink-rgb), 0.06)',
+            color: payFilter === 'carrierUnpaid' ? '#7C3AED' : 'var(--text-secondary)',
           }}>Не оплачено перевозчику</button>
-          <div style={{ width: 1, height: 20, background: 'rgba(14,23,38,0.1)', flexShrink: 0 }} />
+          <div style={{ width: 1, height: 20, background: 'rgba(var(--ink-rgb), 0.1)', flexShrink: 0 }} />
           {/* Doc filter toggle button */}
           <button onClick={() => setShowDocFilter(v => !v)} style={{
             padding: '6px 14px', borderRadius: 12, cursor: 'pointer', flexShrink: 0,
             fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
-            background: docFilters.length > 0 ? 'rgba(19,102,240,0.12)' : showDocFilter ? 'rgba(14,23,38,0.1)' : 'rgba(14,23,38,0.06)',
-            color: docFilters.length > 0 ? '#1366F0' : '#5A6573',
+            background: docFilters.length > 0 ? 'rgba(19,102,240,0.12)' : showDocFilter ? 'rgba(var(--ink-rgb), 0.1)' : 'rgba(var(--ink-rgb), 0.06)',
+            color: docFilters.length > 0 ? '#1366F0' : 'var(--text-secondary)',
             border: docFilters.length > 0 ? '1px solid rgba(19,102,240,0.3)' : '1px solid transparent',
             display: 'flex', alignItems: 'center', gap: 6,
           }}>
@@ -359,10 +359,10 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           <button onClick={() => setPayFilter(payFilter === 'debt' ? null : 'debt')} title="Долг перевозчику" style={{
             width: 34, height: 34, borderRadius: 11, border: 'none', cursor: 'pointer', flexShrink: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: payFilter === 'debt' ? 'rgba(217,119,6,0.18)' : 'rgba(255,255,255,0.55)',
+            background: payFilter === 'debt' ? 'rgba(217,119,6,0.18)' : 'rgba(var(--paper-rgb), 0.55)',
             backdropFilter: 'blur(12px) saturate(160%)',
-            boxShadow: payFilter === 'debt' ? '0 0 0 1.5px rgba(217,119,6,0.45), inset 0 1px 0 rgba(255,255,255,0.4)' : '0 1px 3px rgba(14,23,38,0.1), inset 0 1px 0 rgba(255,255,255,0.7)',
-            color: payFilter === 'debt' ? '#D97706' : '#8A93A0', transition: 'all 0.2s',
+            boxShadow: payFilter === 'debt' ? '0 0 0 1.5px rgba(217,119,6,0.45), inset 0 1px 0 rgba(255,255,255,calc(0.4 * var(--rim-k)))' : '0 1px 3px rgba(14,23,38,0.1), inset 0 1px 0 rgba(255,255,255,calc(0.7 * var(--rim-k)))',
+            color: payFilter === 'debt' ? '#D97706' : 'var(--text-3)', transition: 'all 0.2s',
           }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
@@ -373,7 +373,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
             width: 34, height: 34, borderRadius: 11, border: 'none', cursor: 'pointer', flexShrink: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: 'rgba(19,102,240,0.12)', backdropFilter: 'blur(12px) saturate(160%)',
-            boxShadow: '0 1px 3px rgba(14,23,38,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
+            boxShadow: '0 1px 3px rgba(14,23,38,0.1), inset 0 1px 0 rgba(255,255,255,calc(0.5 * var(--rim-k)))',
             color: '#1366F0', transition: 'all 0.2s',
           }}
             onPointerEnter={mouseOnly(e => { e.currentTarget.style.background = 'rgba(19,102,240,0.22)' })}
@@ -387,18 +387,18 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
 
         {/* Doc filter panel — inline below, no positioning */}
         {showDocFilter && (
-          <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(14,23,38,0.07)' }}>
+          <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(var(--ink-rgb), 0.07)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 2 }}>
               {DOC_FILTER_OPTIONS.map((f, i) => (
                 <>
                   {i % 2 === 0 && i > 0 && (
-                    <div key={`sep-${i}`} style={{ gridColumn: '1/-1', height: 1, background: 'rgba(14,23,38,0.05)', margin: '3px 0' }} />
+                    <div key={`sep-${i}`} style={{ gridColumn: '1/-1', height: 1, background: 'rgba(var(--ink-rgb), 0.05)', margin: '3px 0' }} />
                   )}
                   <label key={f.key} style={{
                     display: 'flex', alignItems: 'center', gap: 8,
                     padding: '7px 10px', cursor: 'pointer', borderRadius: 9,
                     fontSize: 12.5, fontWeight: f.not ? 500 : 600,
-                    color: f.not ? '#8A93A0' : '#0E1726',
+                    color: f.not ? 'var(--text-3)' : 'var(--ink)',
                     background: docFilters.includes(f.key)
                       ? (f.not ? 'rgba(200,25,35,0.07)' : 'rgba(19,102,240,0.07)')
                       : 'transparent',
@@ -465,8 +465,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '13px 16px',
-                      borderBottom: i < filtered.length - 1 ? '0.5px solid rgba(14,23,38,0.1)' : 'none',
-                      background: isFlash ? 'rgba(19,102,240,0.14)' : (isSelected ? '#EBF2FF' : (flagged ? 'rgba(200,25,35,0.03)' : 'transparent')),
+                      borderBottom: i < filtered.length - 1 ? '0.5px solid rgba(var(--ink-rgb), 0.1)' : 'none',
+                      background: isFlash ? 'rgba(19,102,240,0.14)' : (isSelected ? 'rgba(19,102,240,0.12)' : (flagged ? 'rgba(200,25,35,0.03)' : 'transparent')),
                       cursor: 'pointer',
                       WebkitTapHighlightColor: 'rgba(14,23,38,0.06)',
                       touchAction: 'pan-y',
@@ -476,16 +476,16 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                       animation: isRemoving ? 'none' : 'rise 0.3s var(--ease) both',
                       animationDelay: `${Math.min(i * 15, 120)}ms`,
                     }}
-                    onTouchStart={e => { e.currentTarget.style.background = isSelected ? '#EBF2FF' : 'rgba(14,23,38,0.05)'; handleTouchStart(order.id, e) }}
+                    onTouchStart={e => { e.currentTarget.style.background = isSelected ? 'rgba(19,102,240,0.12)' : 'rgba(var(--ink-rgb), 0.05)'; handleTouchStart(order.id, e) }}
                     onTouchMove={e => handleTouchMove(order.id, e)}
-                    onTouchEnd={e => { e.currentTarget.style.background = isSelected ? '#EBF2FF' : (flagged ? 'rgba(200,25,35,0.03)' : 'transparent'); handleTouchEnd(order.id) }}
+                    onTouchEnd={e => { e.currentTarget.style.background = isSelected ? 'rgba(19,102,240,0.12)' : (flagged ? 'rgba(200,25,35,0.03)' : 'transparent'); handleTouchEnd(order.id) }}
                   >
                     {/* Selection checkbox — shown once select mode is on, or while actively swiping past the threshold */}
                     {(selectMode || dx > 60) && (
                       <div style={{
                         width: 20, height: 20, borderRadius: 7, flexShrink: 0,
-                        background: isSelected ? '#1366F0' : '#FFFFFF',
-                        border: `1.5px solid ${isSelected ? '#1366F0' : '#C4CAD4'}`,
+                        background: isSelected ? '#1366F0' : 'var(--surface)',
+                        border: `1.5px solid ${isSelected ? '#1366F0' : 'var(--text-quaternary)'}`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         transition: 'all 0.15s',
                       }}>
@@ -508,7 +508,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                         {missingCarrierDate && <span style={{ fontSize: 10, color: '#D97706', fontWeight: 700 }}>НЕТ ДАТЫ ПЕРЕВОЗЧИКА</span>}
                         {unreconciled && <span style={{ fontSize: 10, color: '#D97706', fontWeight: 700 }}>ПРОВЕРЬТЕ ОПЛАТУ</span>}
                       </div>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: '#0E1726', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{route}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{route}</div>
                       <div style={{ fontSize: 12, color: '#8E8E93' }}>
                         {order.client_name || '—'}
                         {order.load_date ? ` · ${fmtDate(order.load_date)}` : ''}
@@ -520,12 +520,12 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                     {/* Right: margin + chevron */}
                     <div style={{ flexShrink: 0, textAlign: 'right', display: 'flex', alignItems: 'center', gap: 8 }}>
                       <div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: margin < 0 ? '#C81923' : '#0E1726' }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: margin < 0 ? '#C81923' : 'var(--ink)' }}>
                           {margin.toLocaleString('ru-RU')}
                         </div>
                         <div style={{ display: 'flex', gap: 3, justifyContent: 'flex-end', marginTop: 3 }}>
-                          <span style={{ width: 18, height: 18, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, background: order.client_paid ? 'rgba(30,158,90,0.15)' : (hasUnreconciledPayment(order, 'client') ? 'rgba(217,119,6,0.18)' : 'rgba(14,23,38,0.07)'), color: order.client_paid ? '#1E9E5A' : (hasUnreconciledPayment(order, 'client') ? '#D97706' : '#C4CAD4') }} title={hasUnreconciledPayment(order, 'client') ? 'Есть введённый ПП от клиента, но сумма не сошлась со ставкой' : undefined}>К</span>
-                          <span style={{ width: 18, height: 18, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, background: order.carrier_paid ? 'rgba(124,58,237,0.15)' : (hasUnreconciledPayment(order, 'carrier') ? 'rgba(217,119,6,0.18)' : 'rgba(14,23,38,0.07)'), color: order.carrier_paid ? '#7C3AED' : (hasUnreconciledPayment(order, 'carrier') ? '#D97706' : '#C4CAD4') }} title={hasUnreconciledPayment(order, 'carrier') ? 'Есть введённый ПП перевозчику, но сумма не сошлась со ставкой' : undefined}>П</span>
+                          <span style={{ width: 18, height: 18, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, background: order.client_paid ? 'rgba(30,158,90,0.15)' : (hasUnreconciledPayment(order, 'client') ? 'rgba(217,119,6,0.18)' : 'rgba(var(--ink-rgb), 0.07)'), color: order.client_paid ? '#1E9E5A' : (hasUnreconciledPayment(order, 'client') ? '#D97706' : 'var(--text-quaternary)') }} title={hasUnreconciledPayment(order, 'client') ? 'Есть введённый ПП от клиента, но сумма не сошлась со ставкой' : undefined}>К</span>
+                          <span style={{ width: 18, height: 18, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, background: order.carrier_paid ? 'rgba(124,58,237,0.15)' : (hasUnreconciledPayment(order, 'carrier') ? 'rgba(217,119,6,0.18)' : 'rgba(var(--ink-rgb), 0.07)'), color: order.carrier_paid ? '#7C3AED' : (hasUnreconciledPayment(order, 'carrier') ? '#D97706' : 'var(--text-quaternary)') }} title={hasUnreconciledPayment(order, 'carrier') ? 'Есть введённый ПП перевозчику, но сумма не сошлась со ставкой' : undefined}>П</span>
                         </div>
                       </div>
                       <svg width="8" height="13" viewBox="0 0 8 13" fill="none">
@@ -544,11 +544,11 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
         <div style={{
           display: 'grid', gridTemplateColumns: '140px minmax(0, 1fr) minmax(0, 1fr) 110px 90px 70px',
           padding: '12px 20px',
-          borderBottom: '1px solid rgba(14,23,38,0.06)',
-          background: 'rgba(14,23,38,0.02)',
+          borderBottom: '1px solid rgba(var(--ink-rgb), 0.06)',
+          background: 'rgba(var(--ink-rgb), 0.02)',
         }}>
           {['ЗАЯВКА', 'МАРШРУТ', 'КЛИЕНТ', 'МАРЖА', 'ОПЛАТЫ', ''].map(h => (
-            <div key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8' }}>{h}</div>
+            <div key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)' }}>{h}</div>
           ))}
         </div>
         {loading && (
@@ -579,9 +579,9 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
               style={{
                 display: 'flex', alignItems: 'center',
                 padding: '14px 20px',
-                borderBottom: i < filtered.length - 1 ? '1px solid rgba(14,23,38,0.05)' : 'none',
+                borderBottom: i < filtered.length - 1 ? '1px solid rgba(var(--ink-rgb), 0.05)' : 'none',
                 cursor: 'pointer',
-                background: isFlash ? 'rgba(19,102,240,0.14)' : (isSelected ? '#EBF2FF' : (flagged ? 'rgba(200,25,35,0.05)' : 'transparent')),
+                background: isFlash ? 'rgba(19,102,240,0.14)' : (isSelected ? 'rgba(19,102,240,0.12)' : (flagged ? 'rgba(200,25,35,0.05)' : 'transparent')),
                 ...(isSelected
                   ? { boxShadow: 'inset 0 0 0 1.5px #1366F0, 0 0 0 4px rgba(19,102,240,0.12)' }
                   : { borderLeft: flagged ? '3px solid rgba(200,25,35,0.5)' : '3px solid transparent' }),
@@ -591,7 +591,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 animation: isRemoving ? 'none' : 'rise 0.3s var(--ease) both',
                 animationDelay: `${Math.min(i * 15, 120)}ms`,
               }}
-              onPointerEnter={mouseOnly(e => { if (!isSelected) e.currentTarget.style.background = flagged ? 'rgba(200,25,35,0.08)' : 'rgba(14,23,38,0.02)' })}
+              onPointerEnter={mouseOnly(e => { if (!isSelected) e.currentTarget.style.background = flagged ? 'rgba(200,25,35,0.08)' : 'rgba(var(--ink-rgb), 0.02)' })}
               onPointerLeave={mouseOnly(e => { handleMouseUp(); if (!isSelected) e.currentTarget.style.background = flagged ? 'rgba(200,25,35,0.05)' : 'transparent' })}
               onMouseDown={() => handleMouseDown(order.id)}
               onMouseUp={handleMouseUp}
@@ -600,8 +600,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
               {selectMode && (
                 <div style={{
                   width: 18, height: 18, borderRadius: 6, flexShrink: 0, marginRight: 12,
-                  background: isSelected ? '#1366F0' : '#FFFFFF',
-                  border: `1.5px solid ${isSelected ? '#1366F0' : '#C4CAD4'}`,
+                  background: isSelected ? '#1366F0' : 'var(--surface)',
+                  border: `1.5px solid ${isSelected ? '#1366F0' : 'var(--text-quaternary)'}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   {isSelected && <span style={{ color: '#fff', fontSize: 11 }}>✓</span>}
@@ -629,8 +629,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 </div>
               </div>
               <div>
-                <div style={{ fontWeight: 600, fontSize: 13.5, color: '#0E1726' }}>{route}</div>
-                <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 2 }}>
+                <div style={{ fontWeight: 600, fontSize: 13.5, color: 'var(--ink)' }}>{route}</div>
+                <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginTop: 2 }}>
                   {fmtDate(order.load_date) || '—'}{order.weight_tons ? ` · ${order.weight_tons} т` : ''}
                 </div>
               </div>
@@ -643,22 +643,22 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                     color: '#fff', fontSize: 11, fontWeight: 700,
                   }}>{initials(order.client_name)}</div>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {order.client_name}
                     </div>
                     <div style={{
-                      fontSize: 11.5, color: '#A6AEB8', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      fontSize: 11.5, color: 'var(--text-tertiary)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       visibility: order.carrier_name ? 'visible' : 'hidden',
                     }}>
                       {order.carrier_name || '—'}
                     </div>
                   </div>
                 </div>
-              ) : <div style={{ color: '#A6AEB8', fontSize: 13 }}>—</div>}
+              ) : <div style={{ color: 'var(--text-tertiary)', fontSize: 13 }}>—</div>}
               <div>
-                <div style={{ fontWeight: 700, fontSize: 13.5, color: '#0E1726' }}>{margin.toLocaleString('ru-RU')} BYN</div>
-                <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>{marginPct}%</div>
-                <div style={{ fontSize: 10.5, color: '#C4CAD4', marginTop: 2, lineHeight: 1.4 }}>
+                <div style={{ fontWeight: 700, fontSize: 13.5, color: 'var(--ink)' }}>{margin.toLocaleString('ru-RU')} BYN</div>
+                <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>{marginPct}%</div>
+                <div style={{ fontSize: 10.5, color: 'var(--text-quaternary)', marginTop: 2, lineHeight: 1.4 }}>
                   {order.client_rate ? order.client_rate.toLocaleString('ru-RU') : '—'} / {order.carrier_rate ? order.carrier_rate.toLocaleString('ru-RU') : '—'}
                 </div>
               </div>
@@ -666,14 +666,14 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 <span style={{
                   width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 11, fontWeight: 700,
-                  background: order.client_paid ? 'rgba(30,158,90,0.15)' : (hasUnreconciledPayment(order, 'client') ? 'rgba(217,119,6,0.18)' : 'rgba(14,23,38,0.07)'),
-                  color: order.client_paid ? '#1E9E5A' : (hasUnreconciledPayment(order, 'client') ? '#D97706' : '#A6AEB8'),
+                  background: order.client_paid ? 'rgba(30,158,90,0.15)' : (hasUnreconciledPayment(order, 'client') ? 'rgba(217,119,6,0.18)' : 'rgba(var(--ink-rgb), 0.07)'),
+                  color: order.client_paid ? '#1E9E5A' : (hasUnreconciledPayment(order, 'client') ? '#D97706' : 'var(--text-tertiary)'),
                 }} title={hasUnreconciledPayment(order, 'client') ? 'Есть введённый ПП от клиента, но сумма не сошлась со ставкой' : undefined}>К</span>
                 <span style={{
                   width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 11, fontWeight: 700,
-                  background: order.carrier_paid ? 'rgba(124,58,237,0.15)' : (hasUnreconciledPayment(order, 'carrier') ? 'rgba(217,119,6,0.18)' : 'rgba(14,23,38,0.07)'),
-                  color: order.carrier_paid ? '#7C3AED' : (hasUnreconciledPayment(order, 'carrier') ? '#D97706' : '#A6AEB8'),
+                  background: order.carrier_paid ? 'rgba(124,58,237,0.15)' : (hasUnreconciledPayment(order, 'carrier') ? 'rgba(217,119,6,0.18)' : 'rgba(var(--ink-rgb), 0.07)'),
+                  color: order.carrier_paid ? '#7C3AED' : (hasUnreconciledPayment(order, 'carrier') ? '#D97706' : 'var(--text-tertiary)'),
                 }} title={hasUnreconciledPayment(order, 'carrier') ? 'Есть введённый ПП перевозчику, но сумма не сошлась со ставкой' : undefined}>П</span>
               </div>
               <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }} onClick={e => e.stopPropagation()}>
@@ -702,7 +702,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
         })}
         {!loading && loadError && (
           <div style={{ padding: '40px', textAlign: 'center' }}>
-            <div style={{ color: '#A6AEB8', fontSize: 14, marginBottom: 12 }}>Не удалось загрузить заявки</div>
+            <div style={{ color: 'var(--text-tertiary)', fontSize: 14, marginBottom: 12 }}>Не удалось загрузить заявки</div>
             <button onClick={loadOrders} style={{ background: '#1366F0', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Повторить</button>
           </div>
         )}
@@ -719,34 +719,34 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
         }}>
           {showStatusMenu && (
             <div style={{
-              background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-              border: '1px solid rgba(255,255,255,0.7)', borderRadius: 14, padding: 8,
+              background: 'rgba(var(--paper-rgb), 0.65)', backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+              border: '1px solid rgba(255,255,255,calc(0.7 * var(--rim-k)))', borderRadius: 14, padding: 8,
               display: 'flex', flexDirection: 'column', gap: 2,
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 50px -12px rgba(14,23,38,0.35)', minWidth: 180,
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), 0 20px 50px -12px rgba(14,23,38,0.35)', minWidth: 180,
             }}>
               {BULK_STATUSES.map(s => (
                 <button
                   key={s.id}
                   onClick={() => handleBulkStatus(s.id)}
                   style={{ ...bulkBtnStyle, textAlign: 'left', padding: '8px 10px' }}
-                  onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)')}
+                  onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.06)')}
                   onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                 >{s.label}</button>
               ))}
             </div>
           )}
           <div style={{
-            background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-            border: '1px solid rgba(255,255,255,0.7)', borderRadius: 16, padding: '12px 16px',
+            background: 'rgba(var(--paper-rgb), 0.65)', backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            border: '1px solid rgba(255,255,255,calc(0.7 * var(--rim-k)))', borderRadius: 16, padding: '12px 16px',
             display: 'flex', alignItems: 'center', gap: 14,
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 50px -12px rgba(14,23,38,0.35)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), 0 20px 50px -12px rgba(14,23,38,0.35)',
           }}>
-            <span style={{ fontSize: 13, color: '#0E1726', fontWeight: 700 }}>Выбрано: {selected.size}</span>
-            <div style={{ width: 1, height: 20, background: 'rgba(14,23,38,0.12)' }} />
-            <button onClick={() => setShowStatusMenu(v => !v)} style={bulkBtnStyle} onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)')} onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}>Сменить статус</button>
-            <button onClick={() => setShowCorrespondenceModal(true)} style={bulkBtnStyle} onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)')} onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}>Корреспонденция</button>
+            <span style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 700 }}>Выбрано: {selected.size}</span>
+            <div style={{ width: 1, height: 20, background: 'rgba(var(--ink-rgb), 0.12)' }} />
+            <button onClick={() => setShowStatusMenu(v => !v)} style={bulkBtnStyle} onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.06)')} onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}>Сменить статус</button>
+            <button onClick={() => setShowCorrespondenceModal(true)} style={bulkBtnStyle} onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.06)')} onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}>Корреспонденция</button>
             <button onClick={handleBulkDelete} style={{ ...bulkBtnStyle, color: '#C81923' }} onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(200,25,35,0.08)')} onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}>Удалить</button>
-            <button onClick={clearSelection} style={{ ...bulkBtnStyle, color: '#8A93A0' }} onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(14,23,38,0.06)')} onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}>Отмена</button>
+            <button onClick={clearSelection} style={{ ...bulkBtnStyle, color: 'var(--text-3)' }} onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.06)')} onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}>Отмена</button>
           </div>
         </div>
       )}
@@ -799,16 +799,16 @@ function CorrespondenceModal({ orderIds, onClose, onSaved }) {
   }
 
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 440, padding: 26 }}>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#0E1726', marginBottom: 4 }}>
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
+      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 440, padding: 26 }}>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 4 }}>
           Отметить корреспонденцию
         </div>
-        <div style={{ fontSize: 12, color: '#8A93A0', marginBottom: 18 }}>
+        <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 18 }}>
           Заявок выбрано: {orderIds.length}
         </div>
 
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>
           Тип
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 18 }}>
@@ -818,10 +818,10 @@ function CorrespondenceModal({ orderIds, onClose, onSaved }) {
               onClick={() => setType(o.id)}
               style={{
                 padding: '12px 14px', borderRadius: 12, cursor: 'pointer', textAlign: 'left', fontSize: 13,
-                background: type === o.id ? 'rgba(19,102,240,0.1)' : '#F7F8FA',
-                border: `1.5px solid ${type === o.id ? '#1366F0' : '#E8EAEE'}`,
+                background: type === o.id ? 'rgba(19,102,240,0.1)' : 'var(--fill)',
+                border: `1.5px solid ${type === o.id ? '#1366F0' : 'var(--line)'}`,
                 fontWeight: type === o.id ? 600 : 400,
-                color: type === o.id ? '#1366F0' : '#0E1726',
+                color: type === o.id ? '#1366F0' : 'var(--ink)',
               }}
             >
               {o.label}
@@ -829,24 +829,24 @@ function CorrespondenceModal({ orderIds, onClose, onSaved }) {
           ))}
         </div>
 
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
           Дата и время
         </div>
         <DateInput
           type="datetime-local"
           value={date}
           onChange={e => setDate(e.target.value)}
-          style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 14, marginBottom: 22, boxSizing: 'border-box' }}
+          style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--fill)', fontSize: 14, marginBottom: 22, boxSizing: 'border-box' }}
         />
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', color: '#5A6573', cursor: 'pointer' }}>
+          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', color: 'var(--text-secondary)', cursor: 'pointer' }}>
             Отмена
           </button>
           <button
             onClick={save}
             disabled={saving || !type}
-            style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: type ? '#1366F0' : '#E8EAEE', color: type ? '#FFFFFF' : '#8A93A0', fontWeight: 700, cursor: type ? 'pointer' : 'not-allowed' }}
+            style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: type ? '#1366F0' : 'var(--line)', color: type ? '#FFFFFF' : 'var(--text-3)', fontWeight: 700, cursor: type ? 'pointer' : 'not-allowed' }}
           >
             <SwapText>{saving ? 'Сохраняю…' : 'Отметить'}</SwapText>
           </button>

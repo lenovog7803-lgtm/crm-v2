@@ -18,7 +18,7 @@ const fmt = (n) => new Intl.NumberFormat('ru-RU').format(Math.round(n || 0))
 function StatCard({ label, value, color = '#0E1726' }) {
   return (
     <div className="card" style={{ padding: 18 }}>
-      <div style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600, marginBottom: 6 }}>{label}</div>
+      <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: 6 }}>{label}</div>
       <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 26, color }}>{value}</div>
     </div>
   )
@@ -37,9 +37,9 @@ export function CallsHeatmap({ data, onDayClick }) {
 
   return (
     <div className="card" style={{ padding: 20 }}>
-      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Активность обзвона</div>
+      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 14 }}>Активность обзвона</div>
       {data.length === 0 ? (
-        <div style={{ fontSize: 12.5, color: '#A6AEB8' }}>Нет данных за период</div>
+        <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)' }}>Нет данных за период</div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 16px)', gap: 4 }}>
           {data.map((d) => (
@@ -52,7 +52,7 @@ export function CallsHeatmap({ data, onDayClick }) {
           ))}
         </div>
       )}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12, fontSize: 11, color: '#8A93A0' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12, fontSize: 11, color: 'var(--text-3)' }}>
         меньше
         {['#F0F1F4', '#CFE0FF', '#8FB6FF', '#4C8CFF', '#1366F0'].map(c => (
           <div key={c} style={{ width: 12, height: 12, borderRadius: 3, background: c }} />
@@ -67,7 +67,7 @@ export function CallsHeatmap({ data, onDayClick }) {
 // под воронкой — сколько лидов на этапе и конверсия из прошлого этапа.
 export function FunnelChart({ funnel }) {
   const stages = funnel || []
-  if (!stages.length) return <div style={{ fontSize: 12.5, color: '#A6AEB8' }}>Нет данных</div>
+  if (!stages.length) return <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)' }}>Нет данных</div>
   const troubled = (f, i) => i > 0 && f.conversion < 30
   return (
     <div className="bklit">
@@ -79,7 +79,7 @@ export function FunnelChart({ funnel }) {
         style={{ aspectRatio: 'auto', height: 190 }} />
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 14px', marginTop: 10 }}>
         {stages.map((f, i) => (
-          <span key={f.stage} style={{ fontSize: 12, color: troubled(f, i) ? '#D97706' : '#5A6573' }}>
+          <span key={f.stage} style={{ fontSize: 12, color: troubled(f, i) ? '#D97706' : 'var(--text-secondary)' }}>
             <b style={{ fontWeight: 600 }}>{f.label}</b>: {f.count}{i > 0 && ` · ${f.conversion}% из прошлого`}
           </span>
         ))}
@@ -99,23 +99,23 @@ function DayCallsModal({ date, onClose }) {
   }, [date])
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 520, padding: 26 }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
+      <div style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 520, padding: 26 }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 }}>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#0E1726' }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)' }}>
             Звонки за {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
           </div>
-          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: '#F7F8FA', cursor: 'pointer', fontSize: 18, color: '#8A93A0', flexShrink: 0 }}>×</button>
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.1)', background: 'var(--fill)', cursor: 'pointer', fontSize: 18, color: 'var(--text-3)', flexShrink: 0 }}>×</button>
         </div>
-        <div style={{ fontSize: 12, color: '#8A93A0', marginBottom: 16 }}>{loading ? <InlineLoader state="composing" /> : `${calls.length} звонков`}</div>
+        <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 16 }}>{loading ? <InlineLoader state="composing" /> : `${calls.length} звонков`}</div>
         <div style={{ maxHeight: '55vh', overflowY: 'auto' }}>
           {!loading && calls.length === 0 && (
-            <div style={{ fontSize: 12.5, color: '#A6AEB8', textAlign: 'center', padding: 20 }}>Звонков в этот день не было</div>
+            <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)', textAlign: 'center', padding: 20 }}>Звонков в этот день не было</div>
           )}
           {calls.map((c, i) => (
-            <div key={c.id || i} style={{ padding: '9px 0', borderBottom: '1px solid #F0F1F4' }}>
-              <div style={{ fontSize: 13, fontWeight: 500, color: '#0E1726' }}>{c.lead_name}</div>
-              <div style={{ fontSize: 11, color: '#8A93A0', marginTop: 2 }}>
+            <div key={c.id || i} style={{ padding: '9px 0', borderBottom: '1px solid var(--fill-2)' }}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink)' }}>{c.lead_name}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>
                 {c.outcome} · {new Date(c.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
                 {c.comment ? ` · ${c.comment}` : ''}
               </div>
@@ -156,11 +156,11 @@ export default function AnalyticsView() {
 
       {/* 1. Звонки против плана */}
       <div className="card" style={{ padding: 20 }}>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 4 }}>Звонки против плана</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 4 }}>Звонки против плана</div>
         <div style={{ display: 'flex', gap: 20, marginBottom: 16, flexWrap: 'wrap' }}>
-          <div style={{ fontSize: 12.5, color: '#5A6573' }}>Всего звонков: <b style={{ color: '#0E1726' }}>{data.total_calls}</b></div>
-          <div style={{ fontSize: 12.5, color: '#5A6573' }}>Среднее в день: <b style={{ color: '#0E1726' }}>{avgPerDay}</b></div>
-          <div style={{ fontSize: 12.5, color: '#5A6573' }}>Дней с выполненным планом: <b style={{ color: '#1E9E5A' }}>{daysGoalMet}</b> из {days.length}</div>
+          <div style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Всего звонков: <b style={{ color: 'var(--ink)' }}>{data.total_calls}</b></div>
+          <div style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Среднее в день: <b style={{ color: 'var(--ink)' }}>{avgPerDay}</b></div>
+          <div style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Дней с выполненным планом: <b style={{ color: '#1E9E5A' }}>{daysGoalMet}</b> из {days.length}</div>
         </div>
         <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', gap: 6, height: 140, paddingTop: 10 }}>
           <div style={{
@@ -174,11 +174,11 @@ export default function AnalyticsView() {
             return (
               <div key={d.date} title={`${d.date}: ${d.calls}`} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                 <div style={{ width: '100%', maxWidth: 26, height: h, borderRadius: 6, background: met ? '#1E9E5A' : '#1366F0' }} />
-                <span style={{ fontSize: 9, color: '#A6AEB8' }}>{d.date.slice(5)}</span>
+                <span style={{ fontSize: 9, color: 'var(--text-tertiary)' }}>{d.date.slice(5)}</span>
               </div>
             )
           })}
-          {days.length === 0 && <div style={{ fontSize: 12.5, color: '#A6AEB8' }}>Нет данных за период</div>}
+          {days.length === 0 && <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)' }}>Нет данных за период</div>}
         </div>
       </div>
 
@@ -186,27 +186,27 @@ export default function AnalyticsView() {
 
       {/* 2. Воронка конверсий */}
       <div className="card" style={{ padding: 20 }}>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Воронка конверсий</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 14 }}>Воронка конверсий</div>
         <FunnelChart funnel={data.funnel} />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 20 }}>
         {/* 3. Причины отказов */}
         <div className="card" style={{ padding: 20 }}>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Причины отказов</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 14 }}>Причины отказов</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {(data.lost_reasons || []).map(r => (
               <div key={r.reason}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 12.5, color: '#5A6573' }}>{r.reason}</span>
-                  <span style={{ fontSize: 12, color: '#A6AEB8' }}>{r.count} · {totalLost ? Math.round(r.count / totalLost * 100) : 0}%</span>
+                  <span style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>{r.reason}</span>
+                  <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>{r.count} · {totalLost ? Math.round(r.count / totalLost * 100) : 0}%</span>
                 </div>
-                <div style={{ height: 10, borderRadius: 6, background: 'rgba(14,23,38,0.06)' }}>
+                <div style={{ height: 10, borderRadius: 6, background: 'rgba(var(--ink-rgb), 0.06)' }}>
                   <div style={{ height: '100%', borderRadius: 6, width: `${(r.count / maxLostCount) * 100}%`, background: '#E0473B' }} />
                 </div>
               </div>
             ))}
-            {(!data.lost_reasons || data.lost_reasons.length === 0) && <div style={{ fontSize: 12.5, color: '#A6AEB8' }}>Отказов не было</div>}
+            {(!data.lost_reasons || data.lost_reasons.length === 0) && <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)' }}>Отказов не было</div>}
           </div>
         </div>
 
@@ -221,29 +221,29 @@ export default function AnalyticsView() {
 
       {/* 4. Конверсия по отраслям */}
       <div className="card" style={{ padding: 20, overflow: 'auto' }}>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Конверсия по отраслям</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 14 }}>Конверсия по отраслям</div>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
               {['Отрасль', 'Всего', 'Обзвонено', 'Клиентов', 'Отказов', 'Конверсия'].map(h => (
-                <th key={h} style={{ textAlign: 'left', padding: '8px 12px', fontSize: 10.5, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</th>
+                <th key={h} style={{ textAlign: 'left', padding: '8px 12px', fontSize: 10.5, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {(data.by_industry || []).map((row, i) => (
               <tr key={row.industry} style={{ background: i < 3 ? 'rgba(30,158,90,0.06)' : undefined }}>
-                <td style={{ padding: '10px 12px', fontSize: 13, fontWeight: 600, color: '#0E1726', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{row.industry}</td>
-                <td style={{ padding: '10px 12px', fontSize: 13, borderTop: '1px solid rgba(14,23,38,0.05)' }}>{row.total}</td>
-                <td style={{ padding: '10px 12px', fontSize: 13, borderTop: '1px solid rgba(14,23,38,0.05)' }}>{row.called}</td>
-                <td style={{ padding: '10px 12px', fontSize: 13, borderTop: '1px solid rgba(14,23,38,0.05)' }}>{row.won}</td>
-                <td style={{ padding: '10px 12px', fontSize: 13, borderTop: '1px solid rgba(14,23,38,0.05)' }}>{row.lost}</td>
-                <td style={{ padding: '10px 12px', fontSize: 13, fontWeight: 700, color: i < 3 ? '#1E9E5A' : '#0E1726', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{row.conversion}%</td>
+                <td style={{ padding: '10px 12px', fontSize: 13, fontWeight: 600, color: 'var(--ink)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{row.industry}</td>
+                <td style={{ padding: '10px 12px', fontSize: 13, borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{row.total}</td>
+                <td style={{ padding: '10px 12px', fontSize: 13, borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{row.called}</td>
+                <td style={{ padding: '10px 12px', fontSize: 13, borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{row.won}</td>
+                <td style={{ padding: '10px 12px', fontSize: 13, borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{row.lost}</td>
+                <td style={{ padding: '10px 12px', fontSize: 13, fontWeight: 700, color: i < 3 ? '#1E9E5A' : 'var(--ink)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{row.conversion}%</td>
               </tr>
             ))}
           </tbody>
         </table>
-        {(!data.by_industry || data.by_industry.length === 0) && <div style={{ padding: 20, textAlign: 'center', color: '#A6AEB8' }}>Нет данных</div>}
+        {(!data.by_industry || data.by_industry.length === 0) && <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-tertiary)' }}>Нет данных</div>}
       </div>
 
       {heatmapDay && <DayCallsModal date={heatmapDay} onClose={() => setHeatmapDay(null)} />}

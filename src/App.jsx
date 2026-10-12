@@ -532,7 +532,7 @@ function AppContent() {
   const { user, loading } = useAuth()
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#EDEFF3' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
         <Loader padding={0} state="breathing" />
       </div>
     )

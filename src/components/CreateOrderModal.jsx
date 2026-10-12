@@ -22,12 +22,12 @@ const POPULAR_CITIES = [
 
 const iStyle = {
   width: '100%', height: 38, padding: '0 12px', borderRadius: 10,
-  border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)',
-  fontFamily: 'var(--font-sys)', fontSize: 13, color: '#0E1726', outline: 'none', boxSizing: 'border-box',
+  border: '1px solid rgba(var(--ink-rgb), 0.14)', background: 'rgba(var(--paper-rgb), 0.8)',
+  fontFamily: 'var(--font-sys)', fontSize: 13, color: 'var(--ink)', outline: 'none', boxSizing: 'border-box',
 }
 
 const labelSt = {
-  fontSize: 13, fontWeight: 500, color: '#6B7480',
+  fontSize: 13, fontWeight: 500, color: 'var(--text-2b)',
   marginBottom: 6, paddingLeft: 4, display: 'block',
   whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
 }
@@ -66,7 +66,7 @@ function routeStats(orders, from, to, excludeId) {
 
 function SectionTitle({ title }) {
   return (
-    <div style={{ fontSize: 16, fontWeight: 700, color: '#0E1726', letterSpacing: '-0.01em' }}>
+    <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.01em' }}>
       {title}
     </div>
   )
@@ -91,15 +91,15 @@ function ComboSelect({ value, onTextChange, onSelect, items, placeholder, labelF
       {show && matches.length > 0 && (
         <div style={{
           position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 200,
-          background: 'rgba(255,255,255,0.98)', backdropFilter: 'blur(20px)',
-          borderRadius: 12, border: '1px solid rgba(255,255,255,0.85)',
+          background: 'rgba(var(--paper-rgb), 0.98)', backdropFilter: 'blur(20px)',
+          borderRadius: 12, border: '1px solid rgba(255,255,255,calc(0.85 * var(--rim-k)))',
           boxShadow: '0 16px 40px rgba(20,30,55,0.15)', overflow: 'hidden', marginTop: 4,
         }}>
           {matches.map(item => (
             <div
               key={item.id}
               onMouseDown={() => { onSelect(item); setShow(false) }}
-              style={{ padding: '10px 14px', fontSize: 13, color: '#0E1726', cursor: 'pointer', borderBottom: '1px solid rgba(14,23,38,0.05)', transition: 'background 0.1s' }}
+              style={{ padding: '10px 14px', fontSize: 13, color: 'var(--ink)', cursor: 'pointer', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)', transition: 'background 0.1s' }}
               onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.07)')}
               onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
             >
@@ -139,15 +139,15 @@ function CityInput({ value, onChange, placeholder }) {
       {show && suggestions.length > 0 && (
         <div style={{
           position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 200,
-          background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(20px)',
-          borderRadius: 12, border: '1px solid rgba(255,255,255,0.85)',
+          background: 'rgba(var(--paper-rgb), 0.97)', backdropFilter: 'blur(20px)',
+          borderRadius: 12, border: '1px solid rgba(255,255,255,calc(0.85 * var(--rim-k)))',
           boxShadow: '0 16px 40px rgba(20,30,55,0.15)', overflow: 'hidden', marginTop: 4,
         }}>
           {suggestions.map(city => (
             <div
               key={city}
               onMouseDown={() => { onChange(city); setShow(false) }}
-              style={{ padding: '10px 14px', fontSize: 13, color: '#0E1726', cursor: 'pointer', borderBottom: '1px solid rgba(14,23,38,0.05)', transition: 'background 0.1s' }}
+              style={{ padding: '10px 14px', fontSize: 13, color: 'var(--ink)', cursor: 'pointer', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)', transition: 'background 0.1s' }}
               onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.07)')}
               onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
             >
@@ -420,8 +420,8 @@ function MarginHint({ margin, marginPct, client, carrier, route, from, to }) {
         </div>
       )}
       {route && (
-        <div style={{ fontSize: 12.5, color: '#5A6573', padding: '0 4px', lineHeight: 1.5 }}>
-          <b style={{ color: '#0E1726', fontWeight: 600 }}>{from.split(',')[0]} → {to.split(',')[0]}</b>
+        <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', padding: '0 4px', lineHeight: 1.5 }}>
+          <b style={{ color: 'var(--ink)', fontWeight: 600 }}>{from.split(',')[0]} → {to.split(',')[0]}</b>
           {route.recent ? ' за 3 месяца' : ' за всё время'}: {route.n} заявок · клиент платит обычно ~{int(route.client)} Br ·
           перевозчику ~{int(route.carrier)} Br · маржа ~{int(route.margin)} Br
         </div>

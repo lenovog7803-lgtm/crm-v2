@@ -9,12 +9,12 @@ export default function CallWindow({ lead, onClose, onClaim, onEdit, onSave, sav
   const isMobile = useIsMobile()
   return (
     <div className="call-window-scrim" style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'grid', overflowY: 'auto',
-      padding: isMobile ? 10 : 24, background: 'rgba(14,23,38,0.22)',
+      padding: isMobile ? 10 : 24, background: 'rgba(var(--ink-rgb), 0.22)',
       backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', animation: 'pageIn 0.18s ease-out' }}>
       <div className="leads-call-modal call-window" style={{ width: '100%', maxWidth: 1040, margin: 'auto', borderRadius: 28, overflow: 'hidden' }}>
         {/* панель окна: заголовок слева, действия справа — как тулбар macOS */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: isMobile ? '12px 14px' : '14px 18px 4px 22px' }}>
-          <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#8A93A0', letterSpacing: '-0.01em' }}>Звонок</div>
+          <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: 'var(--text-3)', letterSpacing: '-0.01em' }}>Звонок</div>
           {!lead.assigned_to && onClaim && (
             <button onClick={e => onClaim(lead.id, e)} className="call-pill call-pill--blue">Взять в работу</button>
           )}

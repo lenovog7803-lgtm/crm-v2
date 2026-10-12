@@ -190,11 +190,11 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)',
+      position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)',
       zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24,
     }}>
       <div onClick={e => e.stopPropagation()} style={{
-        margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 460,
+        margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 460,
         padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)',
       }}>
         <div style={{
@@ -203,7 +203,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
         }}>
           {isCarrier ? 'Платим перевозчику' : 'Получаем от клиента'}
         </div>
-        <div style={{ fontSize: 14, color: '#5A6573', marginBottom: 4 }}>{who}</div>
+        <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 4 }}>{who}</div>
         <div style={{
           fontFamily: 'var(--font-mono)', fontSize: 28, fontWeight: 700,
           color: isCarrier ? '#E0473B' : '#1E9E5A', marginBottom: 22,
@@ -213,38 +213,38 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
 
         <label style={{
           display: 'flex', alignItems: 'center', gap: 9, marginBottom: 18, cursor: 'pointer',
-          padding: '10px 12px', borderRadius: 12, background: isCash ? '#FFF7E8' : '#F7F8FA',
-          border: `1px solid ${isCash ? '#F0B84D' : '#E8EAEE'}`,
+          padding: '10px 12px', borderRadius: 12, background: isCash ? 'rgba(217,119,6,0.1)' : 'var(--fill)',
+          border: `1px solid ${isCash ? '#F0B84D' : 'var(--line)'}`,
         }}>
           <Switch size="sm"
             checked={isCash}
             onChange={e => setIsCash(e.target.checked)}
             style={{ width: 16, height: 16, accentColor: '#D97706', cursor: 'pointer' }}
           />
-          <span style={{ fontSize: 13, fontWeight: 600, color: isCash ? '#8A5A00' : '#5A6573' }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: isCash ? '#8A5A00' : 'var(--text-secondary)' }}>
             Оплачено наличными
           </span>
         </label>
 
         {isCash ? (
           <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>
               Дата получения
             </div>
             <DateInput
               type="date"
               value={cashDate}
               onChange={e => setCashDate(e.target.value)}
-              style={{ width: '100%', padding: '9px 10px', borderRadius: 10, border: '1px solid #E8EAEE', background: '#FFFFFF', fontSize: 13, color: '#0E1726', boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '9px 10px', borderRadius: 10, border: '1px solid var(--line)', background: 'var(--surface)', fontSize: 13, color: 'var(--ink)', boxSizing: 'border-box' }}
             />
-            <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 6 }}>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 6 }}>
               Без номера ПП — эта заявка не будет попадать в проверки «нет ПП» и «сумма не сходится».
             </div>
           </div>
         ) : (
         <div style={{ marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
               Платёжные поручения
             </div>
             <button
@@ -267,21 +267,21 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
                   onChange={e => updateExisting(p.id, 'pp_number', e.target.value)}
                   disabled={busy}
                   placeholder="№ ПП"
-                  style={{ width: 90, padding: '9px 10px', borderRadius: 10, border: `1px solid ${dirty ? '#1366F0' : '#E8EAEE'}`, background: '#FFFFFF', fontSize: 12, color: '#0E1726', boxSizing: 'border-box' }}
+                  style={{ width: 90, padding: '9px 10px', borderRadius: 10, border: `1px solid ${dirty ? '#1366F0' : 'var(--line)'}`, background: 'var(--surface)', fontSize: 12, color: 'var(--ink)', boxSizing: 'border-box' }}
                 />
                 <DateInput
                   type="date"
                   value={p.pp_date}
                   onChange={e => updateExisting(p.id, 'pp_date', e.target.value)}
                   disabled={busy}
-                  style={{ width: 130, padding: '9px 10px', borderRadius: 10, border: `1px solid ${dirty ? '#1366F0' : '#E8EAEE'}`, background: '#FFFFFF', fontSize: 12, color: '#0E1726', boxSizing: 'border-box' }}
+                  style={{ width: 130, padding: '9px 10px', borderRadius: 10, border: `1px solid ${dirty ? '#1366F0' : 'var(--line)'}`, background: 'var(--surface)', fontSize: 12, color: 'var(--ink)', boxSizing: 'border-box' }}
                 />
                 <input
                   type="number"
                   value={p.amount}
                   onChange={e => updateExisting(p.id, 'amount', e.target.value === '' ? '' : Number(e.target.value))}
                   disabled={busy}
-                  style={{ flex: 1, padding: '9px 10px', borderRadius: 10, border: `1px solid ${dirty ? '#1366F0' : '#E8EAEE'}`, background: '#FFFFFF', fontSize: 12, color: '#0E1726', boxSizing: 'border-box', minWidth: 0 }}
+                  style={{ flex: 1, padding: '9px 10px', borderRadius: 10, border: `1px solid ${dirty ? '#1366F0' : 'var(--line)'}`, background: 'var(--surface)', fontSize: 12, color: 'var(--ink)', boxSizing: 'border-box', minWidth: 0 }}
                 />
                 {dirty && (
                   <button
@@ -314,19 +314,19 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
                 onChange={e => updateRow(p.id, 'pp_number', e.target.value)}
                 placeholder="№ ПП"
                 autoFocus={p.id === 'new-0'}
-                style={{ width: 90, padding: '9px 10px', borderRadius: 10, border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 12, color: '#0E1726', boxSizing: 'border-box' }}
+                style={{ width: 90, padding: '9px 10px', borderRadius: 10, border: '1px solid var(--line)', background: 'var(--fill)', fontSize: 12, color: 'var(--ink)', boxSizing: 'border-box' }}
               />
               <DateInput
                 type="date"
                 value={p.pp_date}
                 onChange={e => updateRow(p.id, 'pp_date', e.target.value)}
-                style={{ width: 130, padding: '9px 10px', borderRadius: 10, border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 12, color: '#0E1726', boxSizing: 'border-box' }}
+                style={{ width: 130, padding: '9px 10px', borderRadius: 10, border: '1px solid var(--line)', background: 'var(--fill)', fontSize: 12, color: 'var(--ink)', boxSizing: 'border-box' }}
               />
               <input
                 type="number"
                 value={p.amount}
                 onChange={e => updateRow(p.id, 'amount', e.target.value === '' ? '' : Number(e.target.value))}
-                style={{ flex: 1, padding: '9px 10px', borderRadius: 10, border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 12, color: '#0E1726', boxSizing: 'border-box', minWidth: 0 }}
+                style={{ flex: 1, padding: '9px 10px', borderRadius: 10, border: '1px solid var(--line)', background: 'var(--fill)', fontSize: 12, color: 'var(--ink)', boxSizing: 'border-box', minWidth: 0 }}
               />
               <button
                 onClick={() => removeRow(p.id)}
@@ -358,7 +358,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
         {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center', marginBottom: 16 }}>{error}</div>}
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', fontSize: 14, color: '#5A6573', cursor: 'pointer' }}>
+          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', fontSize: 14, color: 'var(--text-secondary)', cursor: 'pointer' }}>
             Отмена
           </button>
           <button

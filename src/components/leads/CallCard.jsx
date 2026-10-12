@@ -53,13 +53,13 @@ export default function CallCard({ lead, onEdit, part }) {
             boxShadow: `0 6px 16px -6px ${avB}90, inset 0 1px 0 rgba(255,255,255,0.35)`,
           }}>{initials(lead.name)}</div>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 21, letterSpacing: '-0.02em', color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.name}</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 21, letterSpacing: '-0.02em', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.name}</div>
             {lead.phone ? (
               <a href={`tel:${lead.phone.replace(/[^\d+]/g, '')}`} className="call-pill call-pill--green" style={{ marginTop: 6 }} title="Позвонить">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" /></svg>
                 <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}>{lead.phone}</span>
               </a>
-            ) : <div style={{ fontSize: 13, color: '#A6AEB8', marginTop: 4 }}>нет телефона</div>}
+            ) : <div style={{ fontSize: 13, color: 'var(--text-tertiary)', marginTop: 4 }}>нет телефона</div>}
           </div>
         </div>
         <button onClick={() => onEdit(lead)} className="call-pill" style={{ flexShrink: 0 }}>
@@ -84,7 +84,7 @@ export default function CallCard({ lead, onEdit, part }) {
       )}
 
       {(lead.contact_person || lead.contact_position) && (
-        <div style={{ fontSize: 13, color: '#5A6573' }}>
+        <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
           {[lead.contact_person, lead.contact_position].filter(Boolean).join(' · ')}
         </div>
       )}
@@ -104,16 +104,16 @@ export default function CallCard({ lead, onEdit, part }) {
   )
   const historyEl = (
     <>      {lead.notes && (
-        <div style={{ fontSize: 13.5, color: '#3A4454', lineHeight: 1.55, background: 'rgba(14,23,38,0.035)', borderRadius: 14, padding: '12px 14px' }}>
+        <div style={{ fontSize: 13.5, color: 'var(--text-strong)', lineHeight: 1.55, background: 'rgba(var(--ink-rgb), 0.035)', borderRadius: 14, padding: '12px 14px' }}>
           {lead.notes}
         </div>
       )}
 
       <div>
-        <div style={{ fontSize: 13, fontWeight: 700, color: '#0E1726', marginBottom: 10, letterSpacing: '-0.01em' }}>
-          История звонков {timeline.length > 0 && <span style={{ color: '#A6AEB8', fontWeight: 600 }}>{timeline.length}</span>}
+        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)', marginBottom: 10, letterSpacing: '-0.01em' }}>
+          История звонков {timeline.length > 0 && <span style={{ color: 'var(--text-tertiary)', fontWeight: 600 }}>{timeline.length}</span>}
         </div>
-        {timeline.length === 0 && <div style={{ fontSize: 12.5, color: '#A6AEB8' }}>Звонков ещё не было</div>}
+        {timeline.length === 0 && <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)' }}>Звонков ещё не было</div>}
         <div className="call-timeline" style={{ display: 'flex', flexDirection: 'column', maxHeight: 240, overflowY: 'auto' }}>
           {timeline.map((h) => {
             if (h.kind === 'note') {
@@ -122,13 +122,13 @@ export default function CallCard({ lead, onEdit, part }) {
                   <div style={{
                     width: 28, height: 28, borderRadius: 9, flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'rgba(138,147,160,0.15)', color: '#8A93A0',
+                    background: 'rgba(138,147,160,0.15)', color: 'var(--text-3)',
                   }}><NoteIcon width={12} height={12} /></div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 11, color: '#8A93A0', fontWeight: 700 }}>
+                    <div style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 700 }}>
                       {h.author ? `${h.author} · ` : ''}{h.created_at ? new Date(h.created_at).toLocaleString('ru-RU') : ''}
                     </div>
-                    {h.text && <div style={{ fontSize: 13.5, color: '#3A4454', marginTop: 2 }}>{h.text}</div>}
+                    {h.text && <div style={{ fontSize: 13.5, color: 'var(--text-strong)', marginTop: 2 }}>{h.text}</div>}
                   </div>
                 </div>
               )
@@ -139,13 +139,13 @@ export default function CallCard({ lead, onEdit, part }) {
                 <div style={{
                   width: 28, height: 28, borderRadius: 9, flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: (o?.color || '#8A93A0') + '1A', color: o?.color || '#8A93A0',
+                  background: (o?.color || '#8A93A0') + '1A', color: o?.color || 'var(--text-3)',
                 }}><OutcomeIcon id={o?.id || 'reached'} size={12} /></div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 11, color: o?.color || '#8A93A0', fontWeight: 700 }}>
+                  <div style={{ fontSize: 11, color: o?.color || 'var(--text-3)', fontWeight: 700 }}>
                     {o?.label || h.outcome} · {new Date(h.created_at).toLocaleString('ru-RU')}
                   </div>
-                  {h.comment && <div style={{ fontSize: 13.5, color: '#3A4454', marginTop: 2 }}>{h.comment}</div>}
+                  {h.comment && <div style={{ fontSize: 13.5, color: 'var(--text-strong)', marginTop: 2 }}>{h.comment}</div>}
                   {h.lost_reason && <div style={{ fontSize: 12, color: '#E0473B', marginTop: 2 }}>Причина: {h.lost_reason}</div>}
                 </div>
               </div>

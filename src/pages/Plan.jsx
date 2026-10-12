@@ -201,8 +201,8 @@ export default function Plan() {
         ].map(t => (
           <div key={t.label} className="ios-widget" style={{ padding: isMobile ? '14px 16px' : '18px 20px' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: t.color, marginBottom: 6 }}>{t.label}</div>
-            <div style={{ fontWeight: 800, fontSize: 24, letterSpacing: '-0.02em', color: '#0E1726' }}>{anyFact ? `${int(t.fact)}${t.unit || ''}` : '—'}</div>
-            <div style={{ fontSize: 12, color: '#8A93A0', margin: '2px 0 8px' }}>{t.note || `из ${int(t.plan)}`}</div>
+            <div style={{ fontWeight: 800, fontSize: 24, letterSpacing: '-0.02em', color: 'var(--ink)' }}>{anyFact ? `${int(t.fact)}${t.unit || ''}` : '—'}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-3)', margin: '2px 0 8px' }}>{t.note || `из ${int(t.plan)}`}</div>
             <Bar100 pct={t.inverse ? (t.fact ? t.plan / t.fact * 100 : 0) : (t.plan ? t.fact / t.plan * 100 : 0)} color={t.color} />
           </div>
         ))}
@@ -211,7 +211,7 @@ export default function Plan() {
       {/* План и факт по месяцам */}
       <div className="ios-widget" style={{ padding: isMobile ? '16px 14px 10px' : '22px 24px 14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-          <div style={{ flex: 1, fontWeight: 700, fontSize: 15, color: '#0E1726' }}>Прибыль по месяцам</div>
+          <div style={{ flex: 1, fontWeight: 700, fontSize: 15, color: 'var(--ink)' }}>Прибыль по месяцам</div>
           <span className="plan-legend"><i style={{ background: '#C9D8F5' }} />план</span>
           <span className="plan-legend"><i style={{ background: '#1366F0' }} />факт</span>
         </div>
@@ -237,10 +237,10 @@ export default function Plan() {
           return (
             <div key={q.q} className="ios-widget" style={{ padding: isMobile ? '16px 16px' : '20px 22px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ fontWeight: 800, fontSize: 17, color: '#0E1726' }}>{q.q + 1} квартал</div>
+                <div style={{ fontWeight: 800, fontSize: 17, color: 'var(--ink)' }}>{q.q + 1} квартал</div>
                 <span className={`plan-pill ${st.cls}`}>{st.label}</span>
               </div>
-              <div style={{ fontSize: 13, color: '#5A6573', margin: '2px 0 12px' }}>{okr.title}</div>
+              <div style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '2px 0 12px' }}>{okr.title}</div>
               <div className="plan-metric">
                 <span>Прибыль</span><b>{int(q.fact)} / {int(q.plan)}</b>
                 <Bar100 pct={q.plan ? q.fact / q.plan * 100 : 0} />
@@ -292,7 +292,7 @@ export default function Plan() {
       <SalesWeek orders={live} />
       <Forecasts orders={live} months={months} planYear={planYear} factYear={factYear} pace={pace} year={year} />
 
-      <div style={{ fontSize: 12, color: '#A6AEB8', padding: '0 4px' }}>
+      <div style={{ fontSize: 12, color: 'var(--text-tertiary)', padding: '0 4px' }}>
         Прибыль считается как на дашборде: маржа × 0,8. Маржа на заявку и доля топ-5 — по чистой марже из заявок.
       </div>
 
@@ -329,7 +329,7 @@ function GoalsEditor({ year, goals, onClose, onSaved }) {
   return (
     <ModalOverlay onClose={onClose} panelStyle={{ maxWidth: 640 }}>
       <ModalHeader title={`Цели на ${year}`} onClose={onClose} />
-      <div style={{ fontSize: 13, color: '#5A6573', marginBottom: 12 }}>
+      <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 12 }}>
         Те же цели, что в «Цели месяца» на дашборде. Прибыль — маржа × 0,8.
       </div>
       <button className="btn-ghost" style={{ borderRadius: 99, marginBottom: 14 }}

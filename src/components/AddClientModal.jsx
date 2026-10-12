@@ -5,7 +5,7 @@ import Select from './Select'
 import { iosConfirm } from './IOSAlert'
 
 const sectionLabel = {
-  fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em', color: '#0E1726',
+  fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em', color: 'var(--ink)',
   marginBottom: 2,
 }
 

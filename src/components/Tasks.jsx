@@ -17,10 +17,10 @@ const TYPE_LABELS = { call: 'Звонок', reminder: 'Напоминание', 
 
 const inputStyle = {
   width: '100%', height: 38, padding: '0 12px', borderRadius: 10,
-  border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)',
-  fontFamily: 'var(--font-sys)', fontSize: 13, color: '#0E1726', outline: 'none', boxSizing: 'border-box',
+  border: '1px solid rgba(var(--ink-rgb), 0.14)', background: 'rgba(var(--paper-rgb), 0.8)',
+  fontFamily: 'var(--font-sys)', fontSize: 13, color: 'var(--ink)', outline: 'none', boxSizing: 'border-box',
 }
-const labelStyle = { fontSize: 13, fontWeight: 600, color: '#8A93A0', marginBottom: 6, paddingLeft: 4, display: 'block' }
+const labelStyle = { fontSize: 13, fontWeight: 600, color: 'var(--text-3)', marginBottom: 6, paddingLeft: 4, display: 'block' }
 
 export default function Tasks({ onAdd, refreshKey, search = '' }) {
   const isMobile = useIsMobile()
@@ -133,7 +133,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
                   <CheckCircle checked={done} onChange={() => handleToggle(task)} color="#1E9E5A" size={24} />
                 </span>
                 <div className="ios-row-text">
-                  <div className="ios-row-title" style={{ fontWeight: 500, color: done ? '#A6AEB8' : '#0E1726', textDecoration: done ? 'line-through' : 'none' }}>
+                  <div className="ios-row-title" style={{ fontWeight: 500, color: done ? 'var(--text-tertiary)' : 'var(--ink)', textDecoration: done ? 'line-through' : 'none' }}>
                     {task.title || task.description || '—'}
                   </div>
                   <div className="ios-row-sub">

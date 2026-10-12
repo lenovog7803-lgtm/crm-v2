@@ -2,7 +2,7 @@ export function Skeleton({ width = '100%', height = 16, radius = 8, style = {} }
   return (
     <div style={{
       width, height, borderRadius: radius,
-      background: 'linear-gradient(90deg, #EEF0F3 25%, #F7F8FA 50%, #EEF0F3 75%)',
+      background: 'linear-gradient(90deg, var(--fill-2) 25%, var(--fill) 50%, var(--fill-2) 75%)',
       backgroundSize: '200% 100%',
       animation: 'skeletonShimmer 1.4s ease-in-out infinite',
       ...style,

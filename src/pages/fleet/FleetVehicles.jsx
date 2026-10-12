@@ -10,7 +10,7 @@ import { SwapText } from '../../components/Transitions'
 import { EmptyState } from '../../components/EmptyState'
 import { iosConfirm } from '../../components/IOSAlert'
 
-const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#FFFFFF', boxSizing: 'border-box', width: '100%' }
+const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid var(--line)', fontSize: 13, background: 'var(--surface)', boxSizing: 'border-box', width: '100%' }
 
 const VEHICLE_SECTIONS = [
   { fields: [
@@ -64,14 +64,14 @@ function EntityModal({ title, sections, initial, onClose, onSave }) {
   }
 
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 480, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#0E1726', marginBottom: 18 }}>{title}</div>
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
+      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 480, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 18 }}>{title}</div>
 
         {sections.map((sec, si) => (
-          <div key={si} style={si > 0 ? { marginTop: 16, paddingTop: 14, borderTop: '1px solid #F0F1F4' } : undefined}>
+          <div key={si} style={si > 0 ? { marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--fill-2)' } : undefined}>
             {sec.title && (
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>
                 {sec.title}
               </div>
             )}
@@ -92,7 +92,7 @@ function EntityModal({ title, sections, initial, onClose, onSave }) {
         ))}
 
         <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', color: '#5A6573', cursor: 'pointer' }}>Отмена</button>
+          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
           <button onClick={submit} disabled={saving} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: '#1366F0', color: '#fff', fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
             <SwapText>{saving ? 'Сохраняю…' : initial ? 'Сохранить' : 'Добавить'}</SwapText>
           </button>
@@ -138,8 +138,8 @@ export default function FleetVehicles() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, gap: 12, flexWrap: 'wrap' }}>
         <div>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 22, color: '#0E1726' }}>Машины и водители</div>
-          <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>Свой автопарк</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 22, color: 'var(--ink)' }}>Машины и водители</div>
+          <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>Свой автопарк</div>
         </div>
         <button onClick={() => setModal({ kind: tab === 'vehicles' ? 'vehicle' : 'driver' })} className="btn-primary">
           + {tab === 'vehicles' ? 'Машина' : 'Водитель'}
@@ -166,12 +166,12 @@ export default function FleetVehicles() {
               return (
                 <div key={v.id} className="card" style={cardStyle} onClick={() => setModal({ kind: 'vehicle', item: v })} title="Нажмите, чтобы изменить">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-                    <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>{v.model || v.brand || '—'}</div>
-                    <button onClick={e => removeVehicle(e, v.id)} style={{ border: 'none', background: 'transparent', color: '#C4CAD4', cursor: 'pointer', fontSize: 14 }}>✕</button>
+                    <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: 'var(--ink)' }}>{v.model || v.brand || '—'}</div>
+                    <button onClick={e => removeVehicle(e, v.id)} style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 14 }}>✕</button>
                   </div>
-                  {(v.plate || v.plate_truck) && <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: '#5A6573', marginTop: 4 }}>{v.plate || v.plate_truck}</div>}
-                  {v.capacity_tons ? <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 6 }}>{v.capacity_tons} т</div> : null}
-                  {dims.length === 3 && <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>{dims.join(' × ')} м</div>}
+                  {(v.plate || v.plate_truck) && <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>{v.plate || v.plate_truck}</div>}
+                  {v.capacity_tons ? <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6 }}>{v.capacity_tons} т</div> : null}
+                  {dims.length === 3 && <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{dims.join(' × ')} м</div>}
                 </div>
               )
             })}
@@ -185,16 +185,16 @@ export default function FleetVehicles() {
             {drivers.map(d => (
               <div key={d.id} className="card" style={cardStyle} onClick={() => setModal({ kind: 'driver', item: d })} title="Нажмите, чтобы изменить">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-                  <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>{d.name}</div>
-                  <button onClick={e => removeDriver(e, d.id)} style={{ border: 'none', background: 'transparent', color: '#C4CAD4', cursor: 'pointer', fontSize: 14 }}>✕</button>
+                  <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: 'var(--ink)' }}>{d.name}</div>
+                  <button onClick={e => removeDriver(e, d.id)} style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 14 }}>✕</button>
                 </div>
                 {(d.phone_ru || d.phone_by || d.phone) && (
-                  <div style={{ fontSize: 12, color: '#5A6573', marginTop: 6 }}>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 6 }}>
                     {[d.phone_ru && `РУ ${d.phone_ru}`, d.phone_by && `БАЙ ${d.phone_by}`, !d.phone_ru && !d.phone_by && d.phone].filter(Boolean).join(' · ')}
                   </div>
                 )}
                 {d.passport && (
-                  <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>
+                  <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>
                     № {d.passport}{d.passport_issued_by ? `, выдан ${d.passport_issued_by}` : ''}{d.passport_issue_date ? `, ${d.passport_issue_date}` : ''}
                   </div>
                 )}

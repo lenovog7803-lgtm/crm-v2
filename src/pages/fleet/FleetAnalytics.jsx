@@ -19,7 +19,7 @@ const mLabel = m => { const [y, mo] = String(m).split('-'); return `${MONTHS_RU[
 // Помесячная прибыль — Bar Chart из Bklit UI (как график маржи на дашборде).
 // У Bklit шкала только от нуля, поэтому убыточный месяц — красный столбик высотой в сумму убытка.
 function ProfitChart({ rows }) {
-  if (!rows || rows.length === 0) return <div style={{ fontSize: 12, color: '#A6AEB8' }}>Нет данных за период</div>
+  if (!rows || rows.length === 0) return <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>Нет данных за период</div>
   const data = rows.map(r => ({ month: mLabel(r.month), profit: Math.max(0, r.profit), loss: Math.max(0, -r.profit), raw: r.profit }))
   const hasLoss = data.some(r => r.loss > 0)
   return (
@@ -40,24 +40,24 @@ function ProfitChart({ rows }) {
 function PnlTable({ title, rows, cols }) {
   return (
     <div className="card" style={{ padding: '18px 20px', overflow: 'hidden' }}>
-      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 12 }}>{title}</div>
+      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 12 }}>{title}</div>
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
           <thead>
-            <tr style={{ textAlign: 'left', color: '#A6AEB8' }}>
+            <tr style={{ textAlign: 'left', color: 'var(--text-tertiary)' }}>
               {cols.map(c => <th key={c.key} style={{ padding: '8px 10px', fontWeight: 600, textAlign: c.right ? 'right' : 'left' }}>{c.label}</th>)}
             </tr>
           </thead>
           <tbody>
-            {rows.length === 0 && <tr><td colSpan={cols.length} style={{ padding: 16, textAlign: 'center', color: '#A6AEB8' }}>Нет данных</td></tr>}
+            {rows.length === 0 && <tr><td colSpan={cols.length} style={{ padding: 16, textAlign: 'center', color: 'var(--text-tertiary)' }}>Нет данных</td></tr>}
             {rows.map((r, i) => (
-              <tr key={i} style={{ borderTop: '1px solid #F0F1F4' }}>
+              <tr key={i} style={{ borderTop: '1px solid var(--fill-2)' }}>
                 {cols.map(c => (
                   <td key={c.key} style={{
                     padding: '9px 10px', textAlign: c.right ? 'right' : 'left',
                     fontFamily: c.mono ? 'var(--font-mono)' : 'inherit',
                     fontWeight: c.bold ? 700 : 400,
-                    color: c.color ? c.color(r[c.key]) : '#0E1726',
+                    color: c.color ? c.color(r[c.key]) : 'var(--ink)',
                   }}>{c.fmt ? c.fmt(r[c.key], r) : r[c.key]}</td>
                 ))}
               </tr>
@@ -84,7 +84,7 @@ export default function FleetAnalytics({ onBack }) {
 
   if (!d) return <Loader padding={20} state="composing" />
 
-  const inp = { height: 38, padding: '0 12px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-sys)', fontSize: 13, color: '#0E1726' }
+  const inp = { height: 38, padding: '0 12px', borderRadius: 12, border: '1px solid rgba(var(--ink-rgb), 0.14)', background: 'rgba(var(--paper-rgb), 0.8)', fontFamily: 'var(--font-sys)', fontSize: 13, color: 'var(--ink)' }
   const profitColor = v => (Number(v) >= 0 ? '#1E9E5A' : '#E0473B')
 
   return (
@@ -92,11 +92,11 @@ export default function FleetAnalytics({ onBack }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <PillBtn variant="neutral" icon="back" onClick={onBack}>Дашборд</PillBtn>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color: '#0E1726' }}>Аналитика автопарка</div>
-          <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>{d.trips_total} рейсов · {int(d.total_km)} км</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color: 'var(--ink)' }}>Аналитика автопарка</div>
+          <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{d.trips_total} рейсов · {int(d.total_km)} км</div>
         </div>
         <DateInput type="date" value={from} onChange={e => setFrom(e.target.value)} style={inp} />
-        <span style={{ color: '#A6AEB8' }}>—</span>
+        <span style={{ color: 'var(--text-tertiary)' }}>—</span>
         <DateInput type="date" value={to} onChange={e => setTo(e.target.value)} style={inp} />
       </div>
 
@@ -109,7 +109,7 @@ export default function FleetAnalytics({ onBack }) {
           { label: 'Убыточных рейсов', v: (d.loss_trips || []).length, c: '#E0473B' },
         ].map(k => (
           <div key={k.label} className="card" style={{ padding: '16px 18px' }}>
-            <div style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600, marginBottom: 6 }}>{k.label}</div>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: 6 }}>{k.label}</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 24, color: k.c }}>{k.v}</div>
           </div>
         ))}
@@ -117,7 +117,7 @@ export default function FleetAnalytics({ onBack }) {
 
       {/* График по месяцам */}
       <div className="card" style={{ padding: '18px 20px' }}>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 12 }}>Прибыль по месяцам</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 12 }}>Прибыль по месяцам</div>
         <ProfitChart rows={d.by_month || []} />
       </div>
 

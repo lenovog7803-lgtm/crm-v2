@@ -49,13 +49,13 @@
 .bklit .bg-chart-tooltip-background,
 .bklit .bg-zinc-900 {
   background:
-    radial-gradient(120% 90% at 15% -30%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 50%),
-    linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.42) 100%) !important;
+    radial-gradient(120% 90% at 15% -30%, rgba(var(--paper-rgb), 0.55) 0%, rgba(var(--paper-rgb), 0) 50%),
+    linear-gradient(180deg, rgba(var(--paper-rgb), 0.62) 0%, rgba(var(--paper-rgb), 0.42) 100%) !important;
   -webkit-backdrop-filter: blur(18px) saturate(220%) brightness(1.06);
   backdrop-filter: blur(18px) saturate(220%) brightness(1.06);
-  color: #0E1726;
-  box-shadow: inset 0 1.5px 0 rgba(255,255,255,0.9), inset 0 -1px 0 rgba(255,255,255,0.35),
-    inset 0 0 0 0.5px rgba(255,255,255,0.6), 0 14px 34px -12px rgba(20,30,55,0.3), 0 2px 6px rgba(20,30,55,0.06) !important;
+  color: var(--ink);
+  box-shadow: inset 0 1.5px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), inset 0 -1px 0 rgba(255,255,255,calc(0.35 * var(--rim-k))),
+    inset 0 0 0 0.5px rgba(255,255,255,calc(0.6 * var(--rim-k))), 0 14px 34px -12px rgba(20,30,55,0.3), 0 2px 6px rgba(20,30,55,0.06) !important;
 }
 .bklit .bg-chart-tooltip-background { border-radius: 16px; }
-.bklit .bg-zinc-900 .text-white, .bklit .bg-zinc-900.text-white { color: #0E1726; }
+.bklit .bg-zinc-900 .text-white, .bklit .bg-zinc-900.text-white { color: var(--ink); }

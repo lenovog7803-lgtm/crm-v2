@@ -15,7 +15,7 @@ const short = v => v >= 1000 ? `${String(+(v / 1000).toFixed(1)).replace('.', ',
 // labels — подписи точек для помесячных периодов («янв», «окт '25»); по дням — дата от Bklit
 export default function MarginChart({ dates, current, prev, labels, height = 230 }) {
   if (!dates.length) {
-    return <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A6AEB8', fontSize: 13 }}>Нет данных за период</div>
+    return <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)', fontSize: 13 }}>Нет данных за период</div>
   }
   const hasPrev = prev?.some(v => v > 0)
   // отрицательная маржа рисуется как 0 — площадь не уходит под ось; в подсказке — настоящее число

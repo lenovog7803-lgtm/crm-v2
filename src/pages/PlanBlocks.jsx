@@ -33,8 +33,8 @@ function Disclosure({ id, title, summary, tabs, children }) {
       <button type="button" className="plan-disc-head" aria-expanded={open} onClick={toggle}
         style={{ padding: isMobile ? '16px 16px' : '18px 22px' }}>
         <span style={{ flex: 1, textAlign: 'left' }}>
-          <span style={{ display: 'block', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>{title}</span>
-          {!open && summary && <span style={{ display: 'block', fontSize: 12.5, color: '#8A93A0', marginTop: 2 }}>{summary}</span>}
+          <span style={{ display: 'block', fontWeight: 700, fontSize: 15, color: 'var(--ink)' }}>{title}</span>
+          {!open && summary && <span style={{ display: 'block', fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>{summary}</span>}
         </span>
         <svg className={`plan-disc-chev${open ? ' is-open' : ''}`} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
       </button>
@@ -70,7 +70,7 @@ export function Forecasts({ orders, months, planYear, factYear, pace, year }) {
     const perOrder = last3Orders.length ? last3Mg * PROFIT / last3Orders.length : 0
     const scenarios = [
       { key: 'bad', label: 'Плохой', note: topName ? `уходит «${topName.replace(/^(ООО|ЧТУП|ИП)\s*/, '').replace(/[«»"“”]/g, '')}» (${Math.round(topShare * 100)}% маржи)` : 'уходит крупнейший клиент', value: factYear + pace * (1 - topShare) * remaining, color: '#D63B30' },
-      { key: 'now', label: 'Как сейчас', note: `темп ${int(pace)} Br в месяц`, value: factYear + pace * remaining, color: '#8A93A0' },
+      { key: 'now', label: 'Как сейчас', note: `темп ${int(pace)} Br в месяц`, value: factYear + pace * remaining, color: 'var(--text-3)' },
       { key: 'plan', label: 'По плану', note: 'оставшиеся месяцы — точно по цели', value: factYear + futurePlan + (cur ? Math.max(0, cur.plan - cur.fact) : 0), color: '#1366F0' },
       { key: 'best', label: 'Лучший темп', note: `как в лучший квартал: ${int(best)} Br в месяц`, value: factYear + best * remaining, color: '#1E9E5A' },
     ]
@@ -89,9 +89,9 @@ export function Forecasts({ orders, months, planYear, factYear, pace, year }) {
           <div key={s.key}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, fontSize: 13 }}>
               <b style={{ color: s.color, fontWeight: 600, width: 96, flexShrink: 0 }}>{s.label}</b>
-              <span style={{ flex: 1, color: '#8A93A0', fontSize: 12, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.note}</span>
-              <b style={{ fontVariantNumeric: 'tabular-nums', color: '#0E1726' }}>{int(s.value)} Br</b>
-              <span style={{ width: 44, textAlign: 'right', fontSize: 12, color: s.value >= planYear ? '#1E9E5A' : '#8A93A0' }}>{planYear ? Math.round(s.value / planYear * 100) : 0}%</span>
+              <span style={{ flex: 1, color: 'var(--text-3)', fontSize: 12, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.note}</span>
+              <b style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--ink)' }}>{int(s.value)} Br</b>
+              <span style={{ width: 44, textAlign: 'right', fontSize: 12, color: s.value >= planYear ? '#1E9E5A' : 'var(--text-3)' }}>{planYear ? Math.round(s.value / planYear * 100) : 0}%</span>
             </div>
             <div className="plan-scn">
               <div style={{ width: `${s.value / max * 100}%`, background: s.color }} />
@@ -137,7 +137,7 @@ export function TrafficLight({ orders }) {
       summary={list.length ? `${{ month: 'Этот месяц', prev: 'Прошлый месяц', year: 'Год' }[range]}: пустых ${groups.yellow.length}, в минус ${groups.red.length} из ${list.length} (${Math.round(bad.length / total * 100)}%)` : 'Заявок за период нет'}
       tabs={<SlidingTabs value={range} onChange={setRange} fontSize={12}
         options={[{ key: 'month', label: 'Этот месяц' }, { key: 'prev', label: 'Прошлый' }, { key: 'year', label: 'Год' }]} />}>
-      {list.length === 0 ? <div style={{ fontSize: 13, color: '#A6AEB8' }}>Заявок за период нет</div> : <>
+      {list.length === 0 ? <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>Заявок за период нет</div> : <>
         <div className="plan-light-bar">
           {segs.map(s => groups[s.key].length > 0 && <div key={s.key} style={{ flex: groups[s.key].length, background: s.color }} />)}
         </div>
@@ -152,7 +152,7 @@ export function TrafficLight({ orders }) {
         </div>
         {bad.length > 0 && (
           <div className="plan-light-worst">
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#8A93A0', marginBottom: 6 }}>У кого больше всего пустых и минусовых</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-3)', marginBottom: 6 }}>У кого больше всего пустых и минусовых</div>
             {worst.map(([name, c]) => (
               <div key={name} className="plan-kr">
                 <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
@@ -202,7 +202,7 @@ export function SalesWeek({ orders }) {
     <Disclosure id="sales" title="Неделя продаж"
       summary={calls === null ? 'Загружаю…' : `${shift ? 'Прошлая неделя' : 'Эта неделя'}: звонков ${totCalls} из ${GOAL_CALLS}, писем ${letters === null ? '…' : totLetters} из ${GOAL_LETTERS}, дней продаж ${salesDone} из 3`}
       tabs={<SlidingTabs value={shift} onChange={setShift} fontSize={12} options={[{ key: 0, label: 'Эта неделя' }, { key: 1, label: 'Прошлая' }]} />}>
-      {calls === null ? <div style={{ fontSize: 13, color: '#A6AEB8' }}>Загружаю…</div> : <>
+      {calls === null ? <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>Загружаю…</div> : <>
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 10, marginBottom: 14 }}>
           {[
             { label: 'Звонки', v: totCalls, goal: GOAL_CALLS, color: '#1366F0' },
@@ -212,9 +212,9 @@ export function SalesWeek({ orders }) {
           ].map(t => (
             <div key={t.label} className="plan-week-stat">
               <div style={{ fontSize: 12.5, fontWeight: 600, color: t.color }}>{t.label}</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: '#0E1726', letterSpacing: '-0.02em' }}>{t.v}{t.goal != null && <span style={{ fontSize: 13, fontWeight: 500, color: '#A6AEB8' }}> / {t.goal}</span>}</div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--ink)', letterSpacing: '-0.02em' }}>{t.v}{t.goal != null && <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-tertiary)' }}> / {t.goal}</span>}</div>
               {t.goal != null && <div className="plan-bar" style={{ marginTop: 6 }}><div style={{ width: `${Math.min(100, (+t.v || 0) / t.goal * 100)}%`, background: t.color }} /></div>}
-              {t.note && <div style={{ fontSize: 11.5, color: '#8A93A0', marginTop: 5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.note}</div>}
+              {t.note && <div style={{ fontSize: 11.5, color: 'var(--text-3)', marginTop: 5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.note}</div>}
             </div>
           ))}
         </div>
@@ -234,7 +234,7 @@ export function SalesWeek({ orders }) {
             )
           })}
         </div>
-        <div style={{ display: 'flex', gap: 14, marginTop: 8, fontSize: 11.5, color: '#8A93A0', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 14, marginTop: 8, fontSize: 11.5, color: 'var(--text-3)', flexWrap: 'wrap' }}>
           <span className="plan-legend"><i style={{ background: '#1366F0' }} />звонки</span>
           <span className="plan-legend"><i style={{ background: '#5856D6' }} />письма</span>
           <span className="plan-legend"><i style={{ background: 'rgba(217,119,6,0.18)' }} />дни продаж по расписанию</span>

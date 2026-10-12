@@ -263,25 +263,25 @@ const Chevron = ({ color }) => (
 function DebtModal({ title, orders, onClose, onOpenOrder }) {
   useEscapeKey(onClose)
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.45)', backdropFilter: 'blur(8px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 20 }}>
-      <div style={{ margin: 'auto', background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(30px)', borderRadius: 24, maxWidth: 560, width: '90%', border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 40px 80px rgba(20,30,55,0.3)', animation: 'modalIn 0.22s var(--ease) both' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.45)', backdropFilter: 'blur(8px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 20 }}>
+      <div style={{ margin: 'auto', background: 'rgba(var(--paper-rgb), 0.97)', backdropFilter: 'blur(30px)', borderRadius: 24, maxWidth: 560, width: '90%', border: '1px solid rgba(255,255,255,calc(0.8 * var(--rim-k)))', boxShadow: '0 40px 80px rgba(20,30,55,0.3)', animation: 'modalIn 0.22s var(--ease) both' }}>
         <div style={{ padding: 28 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
-            <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: 'transparent', cursor: 'pointer', fontSize: 20, color: '#8A93A0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>{title}</div>
+            <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.1)', background: 'transparent', cursor: 'pointer', fontSize: 20, color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
           </div>
-          {orders.length === 0 && <div style={{ color: '#A6AEB8', fontSize: 13, textAlign: 'center', padding: '20px 0' }}>Нет неоплаченных заявок</div>}
+          {orders.length === 0 && <div style={{ color: 'var(--text-tertiary)', fontSize: 13, textAlign: 'center', padding: '20px 0' }}>Нет неоплаченных заявок</div>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {orders.map((o, i) => (
               <div key={i}
                 onClick={() => { onOpenOrder && onOpenOrder(o.id); onClose() }}
-                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', borderRadius: 12, borderBottom: '1px solid rgba(14,23,38,0.06)', cursor: onOpenOrder ? 'pointer' : 'default', transition: 'background 0.1s' }}
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', borderRadius: 12, borderBottom: '1px solid rgba(var(--ink-rgb), 0.06)', cursor: onOpenOrder ? 'pointer' : 'default', transition: 'background 0.1s' }}
                 onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.05)')}
                 onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
               >
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: '#1366F0', fontWeight: 600 }}>{o.order_number || `#${o.id}`}</div>
-                  <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {o.client_name || o.carrier_name || '—'}{(o.route_from && o.route_to) ? ` · ${o.route_from} → ${o.route_to}` : ''}
                   </div>
                 </div>
@@ -299,9 +299,9 @@ function DebtModal({ title, orders, onClose, onOpenOrder }) {
 
 function TopRow({ rank, name, value, color, bg }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
       <span style={{ width: 24, height: 24, borderRadius: 8, flexShrink: 0, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>{rank}</span>
-      <span style={{ flex: 1, fontSize: 13, fontWeight: 500, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
+      <span style={{ flex: 1, fontSize: 13, fontWeight: 500, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
       <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 700, color, flexShrink: 0 }}>{value}</span>
     </div>
   )
@@ -310,18 +310,18 @@ function TopRow({ rank, name, value, color, bg }) {
 function FullListModal({ title, subtitle, items, valueOf, color, bg, onClose }) {
   useEscapeKey(onClose)
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 20 }}>
-      <div style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 520, border: '1px solid rgba(14,23,38,0.08)', boxShadow: '0 40px 80px rgba(20,30,55,0.28)', animation: 'modalIn 0.22s var(--ease) both' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 20 }}>
+      <div style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 520, border: '1px solid rgba(var(--ink-rgb), 0.08)', boxShadow: '0 40px 80px rgba(20,30,55,0.28)', animation: 'modalIn 0.22s var(--ease) both' }}>
         <div style={{ padding: 26 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
             <div>
-              <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>{title}</div>
-              <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>{subtitle}</div>
+              <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>{title}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{subtitle}</div>
             </div>
-            <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: '#F7F8FA', cursor: 'pointer', fontSize: 18, color: '#8A93A0', flexShrink: 0 }}>×</button>
+            <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.1)', background: 'var(--fill)', cursor: 'pointer', fontSize: 18, color: 'var(--text-3)', flexShrink: 0 }}>×</button>
           </div>
           {items.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 30, fontSize: 13, color: '#8A93A0' }}>Нет данных</div>
+            <div style={{ textAlign: 'center', padding: 30, fontSize: 13, color: 'var(--text-3)' }}>Нет данных</div>
           ) : (
             items.map((c, i) => (
               <TopRow key={i} rank={i + 1} name={c.name} value={valueOf(c)} color={color} bg={bg} />
@@ -345,20 +345,20 @@ function GoalEditModal({ goalKey, value, onChange, onClose, onSave }) {
   const [saving, setSaving] = useState(false)
   useEscapeKey(onClose)
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.45)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 1000, display: 'grid', padding: 20 }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.45)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 1000, display: 'grid', padding: 20 }}>
       <div style={{
-        margin: 'auto', background: 'rgba(255,255,255,0.85)',
+        margin: 'auto', background: 'rgba(var(--paper-rgb), 0.85)',
         backdropFilter: 'blur(28px) saturate(180%)', WebkitBackdropFilter: 'blur(28px) saturate(180%)',
         borderRadius: 20, width: '100%', maxWidth: 340,
-        border: '1px solid rgba(255,255,255,0.8)',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 40px 80px -20px rgba(20,30,55,0.35)',
+        border: '1px solid rgba(255,255,255,calc(0.8 * var(--rim-k)))',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), 0 40px 80px -20px rgba(20,30,55,0.35)',
         animation: 'modalIn 0.22s var(--ease) both',
       }}>
         <div style={{ padding: 24 }}>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: '#0E1726', marginBottom: 4 }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: 'var(--ink)', marginBottom: 4 }}>
             План: {meta.label}
           </div>
-          <div style={{ fontSize: 12, color: '#A6AEB8', marginBottom: 16 }}>Действует только для текущего месяца</div>
+          <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 16 }}>Действует только для текущего месяца</div>
           <div style={{ position: 'relative' }}>
             <input
               autoFocus
@@ -370,7 +370,7 @@ function GoalEditModal({ goalKey, value, onChange, onClose, onSave }) {
               className="form-input"
               style={{ width: '100%', fontSize: 16, fontWeight: 700, paddingRight: 48 }}
             />
-            <span style={{ position: 'absolute', right: 13, top: '50%', transform: 'translateY(-50%)', fontSize: 12, color: '#A6AEB8', fontWeight: 600 }}>{meta.unit}</span>
+            <span style={{ position: 'absolute', right: 13, top: '50%', transform: 'translateY(-50%)', fontSize: 12, color: 'var(--text-tertiary)', fontWeight: 600 }}>{meta.unit}</span>
           </div>
           <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
             <button className="btn-ghost" onClick={onClose} style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
@@ -499,9 +499,9 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             // мягкий синий (это же — запасная заливка, если живого градиента нет)
             background: 'radial-gradient(120% 80% at 10% -20%, rgba(255,255,255,0.3), transparent 50%), linear-gradient(150deg, #6E9CEB 0%, #5585DC 55%, #4A74C9 100%)',
             backdropFilter: 'blur(28px) saturate(180%)', WebkitBackdropFilter: 'blur(28px) saturate(180%)',
-            border: '1px solid rgba(255,255,255,0.35)',
+            border: '1px solid rgba(255,255,255,calc(0.35 * var(--rim-k)))',
             borderRadius: 26, padding: isMobile ? '16px 18px' : '22px 24px', color: '#fff',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4), 0 18px 44px -22px rgba(40,90,190,0.45)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.4 * var(--rim-k))), 0 18px 44px -22px rgba(40,90,190,0.45)',
             transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
             position: 'relative', overflow: 'hidden', isolation: 'isolate',
           }}>
@@ -526,7 +526,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             </span>
             <span style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.72)' }}>BYN</span>
           </div>
-          <div style={{ display: 'flex', gap: isMobile ? 16 : 28, marginTop: isMobile ? 14 : 20, paddingTop: isMobile ? 12 : 14, borderTop: '1px solid rgba(255,255,255,0.25)' }}>
+          <div style={{ display: 'flex', gap: isMobile ? 16 : 28, marginTop: isMobile ? 14 : 20, paddingTop: isMobile ? 12 : 14, borderTop: '1px solid rgba(255,255,255,calc(0.25 * var(--rim-k)))' }}>
             <div>
               <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 2 }}>Выручка</div>
               <div style={{ fontWeight: 600, fontSize: isMobile ? 14 : 16, fontVariantNumeric: 'tabular-nums' }}><CountUp value={revenue} format={v => `${Math.round(v).toLocaleString('ru-RU')} BYN`} /></div>
@@ -547,12 +547,12 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             style={{ padding: isMobile ? '16px 18px' : '22px 24px', cursor: 'pointer' }}>
             <WidgetHead label={w.label} color={w.color} right={<Chevron color={w.color} />} />
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-              <span style={{ fontWeight: 700, fontSize: isMobile ? 28 : 34, letterSpacing: '-0.03em', color: '#0E1726', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontWeight: 700, fontSize: isMobile ? 28 : 34, letterSpacing: '-0.03em', color: 'var(--ink)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                 <CountUp value={w.value} />
               </span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#A6AEB8' }}>BYN</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-tertiary)' }}>BYN</span>
             </div>
-            <div style={{ marginTop: isMobile ? 10 : 16, fontSize: 13, color: '#8A93A0' }}>
+            <div style={{ marginTop: isMobile ? 10 : 16, fontSize: 13, color: 'var(--text-3)' }}>
               <span style={{ fontWeight: 600, color: w.color }}>{w.count}</span> заявок
             </div>
           </div>
@@ -573,7 +573,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             onClick={kpi.onClick}
             {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.9), 0 14px 40px -22px rgba(20,30,55,0.2)', 'inset 0 1px 0 rgba(255,255,255,0.9), 0 18px 44px -18px rgba(20,30,55,0.3)')}
             style={{ padding: isMobile ? '12px 14px' : '16px 18px', cursor: 'pointer' }}>
-            <div style={{ fontSize: isMobile ? 12 : 13, color: '#8A93A0', fontWeight: 600, marginBottom: isMobile ? 6 : 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{kpi.label}</div>
+            <div style={{ fontSize: isMobile ? 12 : 13, color: 'var(--text-3)', fontWeight: 600, marginBottom: isMobile ? 6 : 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{kpi.label}</div>
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 8 }}>
               <div style={{ fontWeight: 700, fontSize: isMobile ? 26 : 32, color: kpi.color, lineHeight: 1, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}>
                 <CountUp value={kpi.value} format={v => Math.round(v).toLocaleString('ru-RU')} />
@@ -587,7 +587,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           that resolves to one specific month (goals don't exist per-quarter). */}
       {goals && (
         <div className="card ios-widget" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: isMobile ? 12 : 18 }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: isMobile ? 12 : 18 }}>
             Цели месяца
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: isMobile ? 14 : 20 }}>
@@ -603,7 +603,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
                   onClick={() => { setEditingGoal(g.key); setGoalInput(String(g.goal)) }}
                   title="Изменить план на этот месяц"
                   style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', borderRadius: 12, padding: 4, margin: -4, transition: 'background 0.15s var(--ease)' }}
-                  onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(14,23,38,0.04)')}
+                  onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.04)')}
                   onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                 >
                   <div style={{ position: 'relative', flexShrink: 0 }}>
@@ -616,9 +616,9 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
                     }}>{Math.round(pct)}%</div>
                   </div>
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600 }}>{g.label}</div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#0E1726', marginTop: 2, whiteSpace: 'nowrap' }}>
-                      {g.fmt(g.fact)} <span style={{ fontWeight: 500, color: '#A6AEB8' }}>/ {g.fmt(g.goal)}</span>
+                    <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600 }}>{g.label}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)', marginTop: 2, whiteSpace: 'nowrap' }}>
+                      {g.fmt(g.fact)} <span style={{ fontWeight: 500, color: 'var(--text-tertiary)' }}>/ {g.fmt(g.goal)}</span>
                     </div>
                   </div>
                 </div>
@@ -656,15 +656,15 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       <div className="card ios-widget" style={{ padding: isMobile ? '16px 14px 12px' : '24px 24px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
           <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>Маржа</div>
-            <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 2 }}>ставка клиента − ставка перевозчика</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: 'var(--ink)' }}>Маржа</div>
+            <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>ставка клиента − ставка перевозчика</div>
           </div>
           {chart.prev && chart.prev.length > 0 && chart.prev.some(v => v > 0) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <div style={{ width: 10, height: 10, background: '#1366F0', borderRadius: 3 }} />
-              <span style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600, marginRight: 8 }}>этот период</span>
+              <span style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, marginRight: 8 }}>этот период</span>
               <div style={{ width: 10, height: 10, background: '#9AAFD0', borderRadius: 3 }} />
-              <span style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600 }}>прошлый период</span>
+              <span style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600 }}>прошлый период</span>
             </div>
           )}
         </div>
@@ -676,8 +676,8 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         {/* Top clients */}
         <div className="card ios-widget" style={{ padding: isMobile ? '14px 14px' : '20px 20px', minWidth: 0 }}>
           <div onClick={() => setOpenModal('clients')} style={{ cursor: 'pointer', marginBottom: 14 }}>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Топ клиентов</div>
-            <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 4 }}>по выручке за период</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>Топ клиентов</div>
+            <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 4 }}>по выручке за период</div>
           </div>
           {topClients.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -687,14 +687,14 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
                   color="#1366F0" bg="rgba(19,102,240,0.1)" />
               ))}
             </div>
-          ) : <div style={{ color: '#A6AEB8', fontSize: 13 }}>Нет данных за период</div>}
+          ) : <div style={{ color: 'var(--text-tertiary)', fontSize: 13 }}>Нет данных за период</div>}
         </div>
 
         {/* Top by margin */}
         <div className="card ios-widget" style={{ padding: isMobile ? '14px 14px' : '20px 20px', minWidth: 0 }}>
           <div onClick={() => setOpenModal('margin')} style={{ cursor: 'pointer', marginBottom: isMobile ? 10 : 14 }}>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Топ по марже</div>
-            <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 4 }}>% маржинальности</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>Топ по марже</div>
+            <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 4 }}>% маржинальности</div>
           </div>
           {topByMargin.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -704,14 +704,14 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
                   color="#1E9E5A" bg="rgba(30,158,90,0.1)" />
               ))}
             </div>
-          ) : <div style={{ color: '#A6AEB8', fontSize: 13 }}>Нет данных за период</div>}
+          ) : <div style={{ color: 'var(--text-tertiary)', fontSize: 13 }}>Нет данных за период</div>}
         </div>
 
         {/* Debtors */}
         <div className="card ios-widget" style={{ padding: isMobile ? '14px 14px' : '20px 20px', minWidth: 0 }}>
           <div onClick={() => setOpenModal('debtors')} style={{ cursor: 'pointer', marginBottom: isMobile ? 10 : 14 }}>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>Должники</div>
-            <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 4 }}>неоплаченные доставки</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>Должники</div>
+            <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 4 }}>неоплаченные доставки</div>
           </div>
           {topDebtors.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -721,7 +721,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
                   color="#D97706" bg="rgba(217,119,6,0.12)" />
               ))}
             </div>
-          ) : <div style={{ color: '#A6AEB8', fontSize: 13 }}>Нет должников</div>}
+          ) : <div style={{ color: 'var(--text-tertiary)', fontSize: 13 }}>Нет должников</div>}
         </div>
       </div>
 

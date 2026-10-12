@@ -35,8 +35,8 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color: '#0E1726' }}>Дашборд</div>
-          <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>Свой автопарк</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color: 'var(--ink)' }}>Дашборд</div>
+          <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>Свой автопарк</div>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           <PillBtn variant="edit" icon="plus" onClick={() => onNav?.('fleet-analytics')}>Аналитика</PillBtn>
@@ -56,8 +56,8 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
             <PillBtn variant="neutral" icon="dup">Excel</PillBtn>
           </a>
           <Select value={month} onChange={e => setMonth(e.target.value)} style={{
-            height: 38, padding: '0 14px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.14)',
-            background: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-sys)', fontSize: 13, color: '#0E1726', cursor: 'pointer',
+            height: 38, padding: '0 14px', borderRadius: 12, border: '1px solid rgba(var(--ink-rgb), 0.14)',
+            background: 'rgba(var(--paper-rgb), 0.8)', fontFamily: 'var(--font-sys)', fontSize: 13, color: 'var(--ink)', cursor: 'pointer',
           }}>
             <option value="">Всё время</option>
             {(d.months || []).map(m => <option key={m} value={m}>{monthLabel(m)}</option>)}
@@ -92,21 +92,21 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
         {/* Оранжевая: дебиторка */}
         <div className="ios-widget" style={{ padding: '24px 24px' }}>
           <div className="grad-kicker" style={{ color: '#D97706' }}>Ожидается от клиентов</div>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: '#0E1726' }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
             <CountUp value={d.debt_sum} />
           </div>
-          <div style={{ fontSize: 11, color: '#8A93A0', marginTop: 6 }}>BYN</div>
-          <div style={{ marginTop: 14, fontSize: 12, color: '#8A93A0', fontWeight: 600 }}>оплачено {money(d.paid_sum)}</div>
+          <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 6 }}>BYN</div>
+          <div style={{ marginTop: 14, fontSize: 12, color: 'var(--text-3)', fontWeight: 600 }}>оплачено {money(d.paid_sum)}</div>
         </div>
 
         {/* Фиолетовая: расходы по рейсам */}
         <div className="ios-widget" style={{ padding: '24px 24px' }}>
           <div className="grad-kicker" style={{ color: '#7C3AED' }}>Расходы по рейсам</div>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: '#0E1726' }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
             <CountUp value={d.expenses} />
           </div>
-          <div style={{ fontSize: 11, color: '#8A93A0', marginTop: 6 }}>BYN</div>
-          <div style={{ marginTop: 14, fontSize: 12, color: '#8A93A0', fontWeight: 600 }}>
+          <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 6 }}>BYN</div>
+          <div style={{ marginTop: 14, fontSize: 12, color: 'var(--text-3)', fontWeight: 600 }}>
             топливо {money(d.fuel_cost)} · прочее {money(d.other_expenses)} · ЗП {money(d.driver_salary_total)}
           </div>
           {d.expenses_unpaid > 0.5 && (
@@ -125,23 +125,23 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
           { label: 'Себестоимость', value: null, raw: `${(d.cost_per_km || 0).toFixed(2)}`, color: '#7C3AED', bg: 'rgba(124,58,237,0.08)', sub: `доход ${(d.revenue_per_km || 0).toFixed(2)} Br/км` },
         ].map(kpi => (
           <div key={kpi.label} className="card" onClick={kpi.onClick} style={{ padding: '18px 20px', cursor: kpi.onClick ? 'pointer' : 'default' }}>
-            <div style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600, marginBottom: 6 }}>{kpi.label}</div>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: 6 }}>{kpi.label}</div>
             <div style={{
               fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, color: kpi.color,
               background: kpi.bg, borderRadius: 12, padding: '8px 14px', display: 'inline-block', lineHeight: 1,
             }}>{kpi.value != null ? <CountUp value={kpi.value} /> : kpi.raw}</div>
-            {kpi.sub && <div style={{ fontSize: 11.5, color: '#8A93A0', marginTop: 6 }}>{kpi.sub}</div>}
+            {kpi.sub && <div style={{ fontSize: 11.5, color: 'var(--text-3)', marginTop: 6 }}>{kpi.sub}</div>}
           </div>
         ))}
       </div>
 
       {/* По рейсам */}
       <div className="card" style={{ padding: '18px 20px', overflow: 'hidden' }}>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 12 }}>По рейсам</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 12 }}>По рейсам</div>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
             <thead>
-              <tr style={{ textAlign: 'left', color: '#A6AEB8' }}>
+              <tr style={{ textAlign: 'left', color: 'var(--text-tertiary)' }}>
                 <th style={{ padding: '8px 10px', fontWeight: 600 }}>Рейс</th>
                 <th style={{ padding: '8px 10px', fontWeight: 600 }}>Статус</th>
                 <th style={{ padding: '8px 10px', fontWeight: 600, textAlign: 'right' }}>Выручка</th>
@@ -151,20 +151,20 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
               </tr>
             </thead>
             <tbody>
-              {trips.length === 0 && <tr><td colSpan={6} style={{ padding: 16, textAlign: 'center', color: '#A6AEB8' }}>Рейсов пока нет</td></tr>}
+              {trips.length === 0 && <tr><td colSpan={6} style={{ padding: 16, textAlign: 'center', color: 'var(--text-tertiary)' }}>Рейсов пока нет</td></tr>}
               {trips.map(t => (
-                <tr key={t.id} onClick={() => onOpenTrip?.(t.id)} style={{ borderTop: '1px solid #F0F1F4', cursor: onOpenTrip ? 'pointer' : 'default' }}>
-                  <td style={{ padding: '9px 10px', color: '#0E1726' }}>
+                <tr key={t.id} onClick={() => onOpenTrip?.(t.id)} style={{ borderTop: '1px solid var(--fill-2)', cursor: onOpenTrip ? 'pointer' : 'default' }}>
+                  <td style={{ padding: '9px 10px', color: 'var(--ink)' }}>
                     <span style={{ fontFamily: 'var(--font-mono)', color: '#1366F0', marginRight: 6 }}>Р{t.trip_number || 0}</span>
                     {t.name || t.route || '—'}
                   </td>
                   <td style={{ padding: '9px 10px' }}>
                     <span style={{ fontSize: 10.5, fontWeight: 700, color: stColor(t.status), background: `${stColor(t.status)}1a`, borderRadius: 99, padding: '2px 8px' }}>{stLabel(t.status)}</span>
                   </td>
-                  <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'var(--font-mono)', color: '#0E1726' }}>{int(t.revenue)}</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'var(--font-mono)', color: 'var(--ink)' }}>{int(t.revenue)}</td>
                   <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'var(--font-mono)', color: '#E0473B' }}>{int(t.expenses)}</td>
                   <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'var(--font-mono)', fontWeight: 700, color: t.profit >= 0 ? '#1E9E5A' : '#E0473B' }}>{int(t.profit)}</td>
-                  <td style={{ padding: '9px 10px', textAlign: 'right', color: '#8A93A0' }}>{t.margin_pct}%</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', color: 'var(--text-3)' }}>{t.margin_pct}%</td>
                 </tr>
               ))}
             </tbody>
@@ -184,7 +184,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
               {d.overdue.map((o, i) => (
                 <div key={o.order_id || i}
                   onClick={() => o.client_id && onOpenClient?.(o.client_id)}
-                  style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '8px 0', borderBottom: i < d.overdue.length - 1 ? '1px solid #F0F1F4' : 'none', fontSize: 12.5, cursor: o.client_id ? 'pointer' : 'default' }}>
+                  style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '8px 0', borderBottom: i < d.overdue.length - 1 ? '1px solid var(--fill-2)' : 'none', fontSize: 12.5, cursor: o.client_id ? 'pointer' : 'default' }}>
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     <span style={{ fontFamily: 'var(--font-mono)', color: '#1366F0', marginRight: 6 }}>{o.order_number}</span>{o.client_name}
                   </span>
@@ -198,11 +198,11 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
           {d.driver_debts && d.driver_debts.length > 0 && (
             <div className="card" style={{ padding: '18px 20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
-                <div style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 700, letterSpacing: '0.1em' }}>ДОЛГ ВОДИТЕЛЯМ</div>
+                <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 700, letterSpacing: '0.1em' }}>ДОЛГ ВОДИТЕЛЯМ</div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#D97706' }}>{int(d.driver_debt_total)} Br</div>
               </div>
               {d.driver_debts.map((dr, i) => (
-                <div key={dr.id || i} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '8px 0', borderBottom: i < d.driver_debts.length - 1 ? '1px solid #F0F1F4' : 'none', fontSize: 13 }}>
+                <div key={dr.id || i} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '8px 0', borderBottom: i < d.driver_debts.length - 1 ? '1px solid var(--fill-2)' : 'none', fontSize: 13 }}>
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{dr.name}</span>
                   <span style={{ flexShrink: 0, color: '#D97706', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{int(dr.sum)}</span>
                 </div>
@@ -216,15 +216,15 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
         {[['ДОЛЖНИКИ', d.debtors, '#D97706'], ['ТОП КЛИЕНТОВ', d.top_clients, '#1E9E5A']].map(([title, items, accent]) => (
           <div key={title} className="card" style={{ padding: '18px 20px' }}>
-            <div style={{ fontSize: 11, color: '#A6AEB8', fontWeight: 600, letterSpacing: '0.1em', marginBottom: 10 }}>{title}</div>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.1em', marginBottom: 10 }}>{title}</div>
             {(!items || items.length === 0) ? (
-              <div style={{ fontSize: 12.5, color: '#8A93A0' }}>нет</div>
+              <div style={{ fontSize: 12.5, color: 'var(--text-3)' }}>нет</div>
             ) : items.map((it, i) => (
               <div key={i}
                 onClick={() => it.id && onOpenClient?.(it.id)}
                 style={{
                   display: 'flex', justifyContent: 'space-between', gap: 12, padding: '8px 0',
-                  borderBottom: i < items.length - 1 ? '1px solid #F0F1F4' : 'none', fontSize: 13, color: '#0E1726',
+                  borderBottom: i < items.length - 1 ? '1px solid var(--fill-2)' : 'none', fontSize: 13, color: 'var(--ink)',
                   cursor: it.id ? 'pointer' : 'default',
                 }}
                 onPointerEnter={mouseOnly(e => { if (it.id) e.currentTarget.style.background = 'rgba(19,102,240,0.05)' })}

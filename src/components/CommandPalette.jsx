@@ -48,7 +48,7 @@ const QUICK = [
 function Kbd({ children }) {
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 22, height: 22, padding: '0 6px', borderRadius: 6,
-      background: 'rgba(14,23,38,0.06)', border: '1px solid rgba(14,23,38,0.08)', fontSize: 12, fontWeight: 600, color: '#5A6573', fontFamily: SYS }}>
+      background: 'rgba(var(--ink-rgb), 0.06)', border: '1px solid rgba(var(--ink-rgb), 0.08)', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', fontFamily: SYS }}>
       {children}
     </span>
   )
@@ -128,7 +128,7 @@ export default function CommandPalette({ open, onClose, onOpenOrder, onOpenClien
           background: active ? 'rgba(10,132,255,0.14)' : 'transparent', transition: 'background 80ms' }}>
         <AppIcon kind={kind} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 15, fontWeight: 600, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.01em' }}>{title}</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.01em' }}>{title}</div>
           {sub && <div style={{ fontSize: 13, color: '#6B7380', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sub}</div>}
         </div>
         {trailing}
@@ -137,21 +137,21 @@ export default function CommandPalette({ open, onClose, onOpenOrder, onOpenClien
   }
 
   const sectionTitle = (t) => (
-    <div style={{ padding: '10px 12px 4px', fontSize: 12, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.02em' }}>{t}</div>
+    <div style={{ padding: '10px 12px 4px', fontSize: 12, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.02em' }}>{t}</div>
   )
 
   return (
-    <div onMouseDown={close} style={{ position: 'fixed', inset: 0, zIndex: 2100, background: 'rgba(14,23,38,0.06)',
+    <div onMouseDown={close} style={{ position: 'fixed', inset: 0, zIndex: 2100, background: 'rgba(var(--ink-rgb), 0.06)',
       animation: closing ? 'fadeOut 0.14s ease-in both' : 'pageIn 0.18s ease-out' }}>
       <div onMouseDown={e => e.stopPropagation()} className="spotlight liquid-glass"
         style={{
           position: 'absolute', left: '50%', top: isMobile ? '8vh' : '16vh', transform: 'translateX(-50%)',
           width: isMobile ? 'calc(100% - 24px)' : 680, maxHeight: isMobile ? '78vh' : '64vh',
           display: 'flex', flexDirection: 'column', overflow: 'hidden', fontFamily: SYS,
-          borderRadius: 26, background: 'rgba(250,250,252,0.72)',
+          borderRadius: 26, background: 'rgba(var(--paper-rgb), 0.72)',
           backdropFilter: 'blur(40px) saturate(190%)', WebkitBackdropFilter: 'blur(40px) saturate(190%)',
-          border: '1px solid rgba(255,255,255,0.65)',
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 0 0 0.5px rgba(14,23,38,0.12), 0 30px 80px -20px rgba(14,23,38,0.45)',
+          border: '1px solid rgba(255,255,255,calc(0.65 * var(--rim-k)))',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.8 * var(--rim-k))), 0 0 0 0.5px rgba(14,23,38,0.12), 0 30px 80px -20px rgba(14,23,38,0.45)',
           animation: closing ? 'spotlightOut 0.14s ease-in both' : 'spotlightIn 0.26s cubic-bezier(0.22, 1, 0.36, 1) both',
         }}>
         {/* строка поиска */}
@@ -167,12 +167,12 @@ export default function CommandPalette({ open, onClose, onOpenOrder, onOpenClien
             placeholder="Поиск в CRM"
             aria-label="Поиск в CRM"
             style={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontFamily: SYS,
-              fontSize: isMobile ? 20 : 28, fontWeight: 400, letterSpacing: '-0.02em', color: '#0E1726' }}
+              fontSize: isMobile ? 20 : 28, fontWeight: 400, letterSpacing: '-0.02em', color: 'var(--ink)' }}
           />
           {loading && <ThinkingOrb state="searching" size={20} theme="light" aria-label="Ищу…" />}
         </div>
 
-        <div ref={listRef} style={{ overflowY: 'auto', borderTop: '1px solid rgba(14,23,38,0.08)', padding: '6px 10px 10px' }}>
+        <div ref={listRef} style={{ overflowY: 'auto', borderTop: '1px solid rgba(var(--ink-rgb), 0.08)', padding: '6px 10px 10px' }}>
           {!searching && (
             <>
               {sectionTitle('Перейти')}
@@ -181,7 +181,7 @@ export default function CommandPalette({ open, onClose, onOpenOrder, onOpenClien
             </>
           )}
           {searching && !loading && results.length === 0 && (
-            <div style={{ padding: '22px 12px', textAlign: 'center', fontSize: 14, color: '#8A93A0' }}>Ничего не найдено по «{query.trim()}»</div>
+            <div style={{ padding: '22px 12px', textAlign: 'center', fontSize: 14, color: 'var(--text-3)' }}>Ничего не найдено по «{query.trim()}»</div>
           )}
           {searching && groups.map(g => (
             <div key={g.type}>
@@ -192,7 +192,7 @@ export default function CommandPalette({ open, onClose, onOpenOrder, onOpenClien
         </div>
 
         {!isMobile && (
-          <div style={{ display: 'flex', gap: 16, alignItems: 'center', padding: '10px 22px', borderTop: '1px solid rgba(14,23,38,0.06)', fontSize: 12, color: '#8A93A0' }}>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center', padding: '10px 22px', borderTop: '1px solid rgba(var(--ink-rgb), 0.06)', fontSize: 12, color: 'var(--text-3)' }}>
             <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Kbd>↑</Kbd><Kbd>↓</Kbd> выбор</span>
             <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Kbd>↵</Kbd> открыть</span>
             <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Kbd>esc</Kbd> закрыть</span>

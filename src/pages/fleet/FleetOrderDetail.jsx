@@ -15,13 +15,13 @@ import { iosConfirm } from '../../components/IOSAlert'
 import DateInput from '../../components/DateInput'
 import CardGradient from '../../components/CardGradient'
 
-const sLabel = { fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', marginBottom: 12 }
+const sLabel = { fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: 12 }
 const SLabel = ({ children }) => <div style={sLabel}>{children}</div>
 const iStyle = {
-  width: '100%', padding: '10px 12px', borderRadius: 10, border: '1px solid #E8EAEE',
-  background: '#F7F8FA', fontSize: 13, color: '#0E1726', boxSizing: 'border-box',
+  width: '100%', padding: '10px 12px', borderRadius: 10, border: '1px solid var(--line)',
+  background: 'var(--fill)', fontSize: 13, color: 'var(--ink)', boxSizing: 'border-box',
 }
-const lbl = { fontSize: 10, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6 }
+const lbl = { fontSize: 10, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6 }
 const today = () => new Date().toISOString().slice(0, 10)
 const joinDot = (...xs) => xs.filter(Boolean).join('  ·  ')
 const money = (v, cur) => `${Math.round(Number(v) || 0).toLocaleString('ru-RU')} ${cur || 'BYN'}`
@@ -32,21 +32,21 @@ function Step({ done, label, sub, onToggle }) {
     <div onClick={onToggle} style={{
       display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12,
       cursor: onToggle ? 'pointer' : 'default', userSelect: 'none',
-      background: done ? 'rgba(30,158,90,0.06)' : 'rgba(14,23,38,0.03)',
-      border: `1px solid ${done ? 'rgba(30,158,90,0.2)' : 'rgba(14,23,38,0.07)'}`,
+      background: done ? 'rgba(30,158,90,0.06)' : 'rgba(var(--ink-rgb), 0.03)',
+      border: `1px solid ${done ? 'rgba(30,158,90,0.2)' : 'rgba(var(--ink-rgb), 0.07)'}`,
     }}>
       <div style={{
         width: 20, height: 20, borderRadius: 6, flexShrink: 0,
-        background: done ? '#1E9E5A' : 'transparent', border: `2px solid ${done ? '#1E9E5A' : '#C4CAD4'}`,
+        background: done ? '#1E9E5A' : 'transparent', border: `2px solid ${done ? '#1E9E5A' : 'var(--text-quaternary)'}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
         {done && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>}
       </div>
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 13, fontWeight: 500, color: done ? '#1E9E5A' : '#0E1726' }}>{label}</div>
+        <div style={{ fontSize: 13, fontWeight: 500, color: done ? '#1E9E5A' : 'var(--ink)' }}>{label}</div>
         {sub && <div style={{ fontSize: 11, color: '#1E9E5A', marginTop: 2 }}>{sub}</div>}
       </div>
-      <div style={{ fontSize: 11, fontWeight: 600, color: done ? '#1E9E5A' : '#A6AEB8', flexShrink: 0 }}>{done ? 'готово' : 'отметить'}</div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: done ? '#1E9E5A' : 'var(--text-tertiary)', flexShrink: 0 }}>{done ? 'готово' : 'отметить'}</div>
     </div>
   )
 }
@@ -58,9 +58,9 @@ function StepModal({ title, fields, onClose, onConfirm }) {
   const set = (k, v) => setVals(p => ({ ...p, [k]: v }))
   const go = async () => { setSaving(true); try { await onConfirm(vals) } catch { setSaving(false) } }
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 400, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#0E1726', marginBottom: 18 }}>{title}</div>
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
+      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 400, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 18 }}>{title}</div>
         {fields.map((f, i) => (
           <div key={f.key} style={{ marginBottom: 14 }}>
             <div style={lbl}>{f.label}</div>
@@ -69,7 +69,7 @@ function StepModal({ title, fields, onClose, onConfirm }) {
           </div>
         ))}
         <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', fontSize: 14, color: '#5A6573', cursor: 'pointer' }}>Отмена</button>
+          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', fontSize: 14, color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
           <button onClick={go} disabled={saving} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: '#1E9E5A', color: '#FFFFFF', fontSize: 14, fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
             <SwapText>{saving ? 'Сохраняю…' : 'Подтвердить'}</SwapText>
           </button>
@@ -82,9 +82,9 @@ function StepModal({ title, fields, onClose, onConfirm }) {
 function InfoRow({ label, value }) {
   if (value === '' || value == null) return null
   return (
-    <div style={{ display: 'flex', gap: 12, fontSize: 12.5, padding: '6px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
-      <span style={{ color: '#A6AEB8', minWidth: 120, flexShrink: 0 }}>{label}</span>
-      <span style={{ color: '#0E1726', fontWeight: 500 }}>{value}</span>
+    <div style={{ display: 'flex', gap: 12, fontSize: 12.5, padding: '6px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
+      <span style={{ color: 'var(--text-tertiary)', minWidth: 120, flexShrink: 0 }}>{label}</span>
+      <span style={{ color: 'var(--ink)', fontWeight: 500 }}>{value}</span>
     </div>
   )
 }
@@ -93,7 +93,7 @@ function InfoRow({ label, value }) {
 function DocRow({ label, url, color, bg, busy, onClick }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, background: bg, borderRadius: 10, padding: '10px 12px', fontSize: 12.5, fontWeight: 500, color: url ? color : '#8A93A0', overflow: 'hidden' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, background: bg, borderRadius: 10, padding: '10px 12px', fontSize: 12.5, fontWeight: 500, color: url ? color : 'var(--text-3)', overflow: 'hidden' }}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
         </svg>
@@ -154,24 +154,24 @@ function PaymentsCard({ order, cur, onReload, onFull }) {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 700, marginBottom: 6 }}>
         <span style={{ color: '#1E9E5A' }}>{money(paidAmt, cur === 'BYN' ? 'Br' : cur)}</span>
-        <span style={{ color: '#A6AEB8' }}>из {money(rate, cur === 'BYN' ? 'Br' : cur)}</span>
+        <span style={{ color: 'var(--text-tertiary)' }}>из {money(rate, cur === 'BYN' ? 'Br' : cur)}</span>
       </div>
-      <div style={{ height: 6, borderRadius: 4, background: 'rgba(14,23,38,0.06)', overflow: 'hidden', marginBottom: 6 }}>
+      <div style={{ height: 6, borderRadius: 4, background: 'rgba(var(--ink-rgb), 0.06)', overflow: 'hidden', marginBottom: 6 }}>
         <div style={{ width: `${pct}%`, height: '100%', background: order.paid ? '#1E9E5A' : '#1366F0', transition: 'width 0.3s' }} />
       </div>
-      <div style={{ fontSize: 11, color: overdue ? '#C81923' : '#A6AEB8', marginBottom: 12 }}>
+      <div style={{ fontSize: 11, color: overdue ? '#C81923' : 'var(--text-tertiary)', marginBottom: 12 }}>
         {remaining > 0 ? `Осталось ${money(remaining, cur === 'BYN' ? 'Br' : cur)}` : 'Полностью оплачен'}
         {order.due_date && `  ·  срок ${fmtDate(order.due_date)}`}
       </div>
 
       {pays.map(p => (
-        <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, padding: '7px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
-          <span style={{ color: '#8A93A0' }}>
+        <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, padding: '7px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
+          <span style={{ color: 'var(--text-3)' }}>
             {fmtDate(p.date)}{p.cash ? '  ·  наличными' : p.pp_number ? `  ·  ПП №${p.pp_number}` : ''}
           </span>
           <span style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-            <b style={{ fontFamily: 'var(--font-mono)', color: '#0E1726' }}>{money(p.amount, cur === 'BYN' ? 'Br' : cur)}</b>
-            <button onClick={() => delPay(p.id)} style={{ border: 'none', background: 'transparent', color: '#C4CAD4', cursor: 'pointer', fontSize: 13 }}>✕</button>
+            <b style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink)' }}>{money(p.amount, cur === 'BYN' ? 'Br' : cur)}</b>
+            <button onClick={() => delPay(p.id)} style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 13 }}>✕</button>
           </span>
         </div>
       ))}
@@ -184,12 +184,12 @@ function PaymentsCard({ order, cur, onReload, onFull }) {
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <DateInput type="date" value={date} onChange={e => setDate(e.target.value)} style={{ ...iStyle, flex: 1 }} />
-            <label style={{ display: 'flex', gap: 6, alignItems: 'center', fontSize: 12, color: '#5A6573', whiteSpace: 'nowrap' }}>
+            <label style={{ display: 'flex', gap: 6, alignItems: 'center', fontSize: 12, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
               <Switch size="sm" checked={cash} onChange={e => setCash(e.target.checked)} /> наличными
             </label>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => setAdding(false)} style={{ flex: 1, padding: 10, borderRadius: 10, background: '#F7F8FA', border: '1px solid #E8EAEE', color: '#5A6573', cursor: 'pointer', fontSize: 12 }}>Отмена</button>
+            <button onClick={() => setAdding(false)} style={{ flex: 1, padding: 10, borderRadius: 10, background: 'var(--fill)', border: '1px solid var(--line)', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 12 }}>Отмена</button>
             <button onClick={addPay} className="btn-primary" style={{ flex: 2, padding: 10, fontSize: 12 }}>Добавить платёж</button>
           </div>
         </div>
@@ -223,15 +223,15 @@ function OrderComments({ orderId, comments, onReload }) {
     <div className="card" style={{ padding: '20px 20px' }}>
       <SLabel>КОММЕНТАРИИ</SLabel>
       {list.map(c => (
-        <div key={c.id} style={{ padding: '7px 0', borderBottom: '1px solid rgba(14,23,38,0.05)', fontSize: 12.5, color: '#3A424E' }}>
+        <div key={c.id} style={{ padding: '7px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)', fontSize: 12.5, color: '#3A424E' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-            <span style={{ color: '#A6AEB8', fontSize: 11 }}>{c.author || '—'} · {fmtDate(c.created_at)}</span>
-            <button onClick={() => del(c.id)} style={{ border: 'none', background: 'transparent', color: '#C4CAD4', cursor: 'pointer', fontSize: 12 }}>✕</button>
+            <span style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>{c.author || '—'} · {fmtDate(c.created_at)}</span>
+            <button onClick={() => del(c.id)} style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 12 }}>✕</button>
           </div>
           <div style={{ marginTop: 2, whiteSpace: 'pre-wrap' }}>{c.text}</div>
         </div>
       ))}
-      {list.length === 0 && <div style={{ fontSize: 12, color: '#A6AEB8', padding: '2px 0 10px' }}>Пока нет</div>}
+      {list.length === 0 && <div style={{ fontSize: 12, color: 'var(--text-tertiary)', padding: '2px 0 10px' }}>Пока нет</div>}
       <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
         <input value={text} onChange={e => setText(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} placeholder="Добавить комментарий…" style={{ ...iStyle }} />
         <button onClick={add} className="btn-primary" style={{ padding: '8px 14px', fontSize: 12 }}>ОК</button>
@@ -291,8 +291,8 @@ export default function FleetOrderDetail({ orderId, onBack }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
         <PillBtn variant="neutral" icon="back" onClick={onBack}>Назад</PillBtn>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 16, color: '#0E1726' }}>{order.order_number || order.client_name || 'Загрузка'}</span>
-          <span style={{ fontSize: 12, color: '#A6AEB8', marginLeft: 10 }}>{order.client_name} · {order.trip_name || 'Рейс'} · {order.direction === 'backward' ? 'обратка' : 'прямой'}</span>
+          <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 16, color: 'var(--ink)' }}>{order.order_number || order.client_name || 'Загрузка'}</span>
+          <span style={{ fontSize: 12, color: 'var(--text-tertiary)', marginLeft: 10 }}>{order.client_name} · {order.trip_name || 'Рейс'} · {order.direction === 'backward' ? 'обратка' : 'прямой'}</span>
         </div>
         <PillBtn variant="edit" icon="edit" onClick={() => setEditing(true)}>Редактировать</PillBtn>
         <PillBtn variant="neutral" icon="dup" onClick={async () => {
@@ -321,7 +321,7 @@ export default function FleetOrderDetail({ orderId, onBack }) {
                 <div style={{ fontWeight: 600, fontSize: 13 }}>{fmtDate(order.unload_date)}</div></div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginTop: 22, paddingTop: 18, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginTop: 22, paddingTop: 18, borderTop: '1px solid rgba(255,255,255,calc(0.1 * var(--rim-k)))' }}>
               <div>
                 <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 3 }}>Цена клиенту</div>
                 <div style={{ fontWeight: 800, fontSize: 20, fontFamily: 'var(--font-sys)' }}>{money(order.rate, cur)}</div>
@@ -389,10 +389,10 @@ export default function FleetOrderDetail({ orderId, onBack }) {
                 background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 14,
               }}>{initials(order.client_name || '—')}</div>
-              <div style={{ fontWeight: 700, fontSize: 14, color: '#0E1726', minWidth: 0 }}>{order.client_name || 'Не указан'}</div>
+              <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink)', minWidth: 0 }}>{order.client_name || 'Не указан'}</div>
             </div>
             {(order.shipper_name || order.consignee_name) && (
-              <div style={{ marginTop: 12, fontSize: 12, color: '#8A93A0', lineHeight: 1.6 }}>
+              <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-3)', lineHeight: 1.6 }}>
                 {order.shipper_name && <div>Отправитель: {joinDot(order.shipper_name, order.shipper_phone)}</div>}
                 {order.consignee_name && <div>Получатель: {joinDot(order.consignee_name, order.consignee_phone)}</div>}
               </div>
@@ -424,7 +424,7 @@ export default function FleetOrderDetail({ orderId, onBack }) {
             <DocRow label="Акт выполненных работ" url={order.doc_url_act}
               color="#1E9E5A" bg="rgba(30,158,90,0.08)" busy={genBusy === 'act'}
               onClick={() => (order.doc_url_act ? window.open(order.doc_url_act, '_blank') : generate('act'))} />
-            <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 6 }}>Генерация подключится с реквизитами юрлица и шаблонами.</div>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 6 }}>Генерация подключится с реквизитами юрлица и шаблонами.</div>
           </div>
 
           {/* Документы перевозки — номера, вносятся по ходу */}

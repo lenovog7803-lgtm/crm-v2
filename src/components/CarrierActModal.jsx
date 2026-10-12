@@ -20,11 +20,11 @@ export default function CarrierActModal({ initialValue, initialDate, onClose, on
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)',
+      position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)',
       zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24,
     }} onClick={onClose}>
       <div onClick={e => e.stopPropagation()} style={{
-        margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 380,
+        margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 380,
         padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)',
       }}>
         <div style={{
@@ -33,11 +33,11 @@ export default function CarrierActModal({ initialValue, initialDate, onClose, on
         }}>
           Документы от перевозчика получены
         </div>
-        <div style={{ fontSize: 14, color: '#5A6573', marginBottom: 20 }}>
+        <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 20 }}>
           Укажите номер акта — без него отметка не сохранится
         </div>
 
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
           Номер акта
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16 }}>
@@ -47,15 +47,15 @@ export default function CarrierActModal({ initialValue, initialDate, onClose, on
             onKeyDown={e => { if (e.key === 'Enter') confirm() }}
             placeholder="напр. 214"
             autoFocus
-            style={{ flex: 1, minWidth: 0, padding: '11px 14px', borderRadius: 12, border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 14, color: '#0E1726', boxSizing: 'border-box' }}
+            style={{ flex: 1, minWidth: 0, padding: '11px 14px', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--fill)', fontSize: 14, color: 'var(--ink)', boxSizing: 'border-box' }}
           />
           <button
             type="button"
             onClick={() => setValue('Б/Н')}
             style={{
-              padding: '11px 14px', borderRadius: 12, border: '1px solid #E8EAEE', whiteSpace: 'nowrap',
-              background: value.trim().toUpperCase() === 'Б/Н' ? 'rgba(19,102,240,0.1)' : '#F7F8FA',
-              color: value.trim().toUpperCase() === 'Б/Н' ? '#1366F0' : '#5A6573',
+              padding: '11px 14px', borderRadius: 12, border: '1px solid var(--line)', whiteSpace: 'nowrap',
+              background: value.trim().toUpperCase() === 'Б/Н' ? 'rgba(19,102,240,0.1)' : 'var(--fill)',
+              color: value.trim().toUpperCase() === 'Б/Н' ? '#1366F0' : 'var(--text-secondary)',
               fontSize: 12, fontWeight: 700, cursor: 'pointer',
             }}
           >
@@ -63,18 +63,18 @@ export default function CarrierActModal({ initialValue, initialDate, onClose, on
           </button>
         </div>
 
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
           Дата акта
         </div>
         <DateInput
           type="date"
           value={date}
           onChange={e => setDate(e.target.value)}
-          style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 14, color: '#0E1726', boxSizing: 'border-box', marginBottom: 22 }}
+          style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--fill)', fontSize: 14, color: 'var(--ink)', boxSizing: 'border-box', marginBottom: 22 }}
         />
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', fontSize: 14, color: '#5A6573', cursor: 'pointer' }}>
+          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', fontSize: 14, color: 'var(--text-secondary)', cursor: 'pointer' }}>
             Отмена
           </button>
           <button
@@ -82,7 +82,7 @@ export default function CarrierActModal({ initialValue, initialDate, onClose, on
             disabled={saving || !value.trim()}
             style={{
               flex: 2, padding: 13, borderRadius: 12, border: 'none',
-              background: value.trim() ? '#1E9E5A' : '#C4CAD4', color: '#FFFFFF', fontSize: 14, fontWeight: 700,
+              background: value.trim() ? '#1E9E5A' : 'var(--text-quaternary)', color: '#FFFFFF', fontSize: 14, fontWeight: 700,
               cursor: value.trim() && !saving ? 'pointer' : 'default',
             }}
           >

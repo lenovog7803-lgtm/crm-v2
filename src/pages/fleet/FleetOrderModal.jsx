@@ -7,10 +7,10 @@ import Select from '../../components/Select'
 
 const iStyle = {
   width: '100%', height: 38, padding: '0 12px', borderRadius: 10,
-  border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)',
-  fontFamily: 'var(--font-sys)', fontSize: 13, color: '#0E1726', outline: 'none', boxSizing: 'border-box',
+  border: '1px solid rgba(var(--ink-rgb), 0.14)', background: 'rgba(var(--paper-rgb), 0.8)',
+  fontFamily: 'var(--font-sys)', fontSize: 13, color: 'var(--ink)', outline: 'none', boxSizing: 'border-box',
 }
-const labelSt = { fontSize: 13, fontWeight: 500, color: '#6B7480', marginBottom: 6, paddingLeft: 4, display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }
+const labelSt = { fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', marginBottom: 6, paddingLeft: 4, display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }
 
 export function fmtDate(v) {
   if (!v) return '—'
@@ -21,7 +21,7 @@ export function fmtDate(v) {
 const Field = ({ label, children }) => <div><label style={labelSt}>{label}</label>{children}</div>
 const Grid2 = ({ children }) => <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 12 }}>{children}</div>
 const SectionTitle = ({ title }) => (
-  <div style={{ fontSize: 16, fontWeight: 700, color: '#0E1726', letterSpacing: '-0.01em' }}>{title}</div>
+  <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.01em' }}>{title}</div>
 )
 const vehLabel = v => [v?.model, v?.plate || v?.plate_truck].filter(Boolean).join(', ')
 
@@ -109,7 +109,7 @@ export function FleetOrderModal({ tripId, direction, order, trip, onClose, onSav
       />
       <div style={{ marginTop: -14, marginBottom: 20, fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: '#1366F0' }}>
         {editing ? (order.order_number || '№ —') : '№ присвоится после создания'}
-        {dir ? <span style={{ color: '#A6AEB8', fontFamily: 'var(--font-sys)', fontWeight: 500, marginLeft: 10 }}>{dir === 'forward' ? 'прямой' : 'обратка'}</span> : null}
+        {dir ? <span style={{ color: 'var(--text-tertiary)', fontFamily: 'var(--font-sys)', fontWeight: 500, marginLeft: 10 }}>{dir === 'forward' ? 'прямой' : 'обратка'}</span> : null}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -126,7 +126,7 @@ export function FleetOrderModal({ tripId, direction, order, trip, onClose, onSav
         <div className="ios-form-group">
           <SectionTitle title="ТС И водитель" />
           <Field label="ТС И водитель — из рейса, автоматически">
-            <div style={{ ...iStyle, height: 'auto', minHeight: 38, padding: '9px 12px', display: 'flex', alignItems: 'center', color: '#5A6573', background: 'rgba(14,23,38,0.03)' }}>
+            <div style={{ ...iStyle, height: 'auto', minHeight: 38, padding: '9px 12px', display: 'flex', alignItems: 'center', color: 'var(--text-secondary)', background: 'rgba(var(--ink-rgb), 0.03)' }}>
               {tcLine || '— не задано в рейсе —'}
             </div>
           </Field>

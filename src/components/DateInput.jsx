@@ -107,7 +107,7 @@ export default function DateInput({ type = 'date', value, onChange, disabled, st
       <button type="button" ref={btnRef} disabled={disabled} aria-haspopup="dialog" aria-expanded={open}
         onClick={() => (open ? close() : openPop())}
         className={`apple-select date-input ${className}${open ? ' is-open' : ''}`} style={style} title={rest.title}>
-        <span className="apple-select-label" style={{ color: valid ? undefined : 'rgba(60,60,67,0.45)' }}>{label}</span>
+        <span className="apple-select-label" style={{ color: valid ? undefined : 'rgba(var(--sep-rgb), 0.45)' }}>{label}</span>
         <CalIcon />
       </button>
       {open && pos && createPortal(
@@ -139,7 +139,7 @@ export default function DateInput({ type = 'date', value, onChange, disabled, st
           )}
           <div className="ios-cal-foot">
             <button type="button" onClick={() => pick(todayIso)}>Сегодня</button>
-            {value && !rest.required && <button type="button" onClick={() => { fire(''); close() }} style={{ color: '#8A93A0' }}>Очистить</button>}
+            {value && !rest.required && <button type="button" onClick={() => { fire(''); close() }} style={{ color: 'var(--text-3)' }}>Очистить</button>}
             {withTime && <button type="button" onClick={close} style={{ marginLeft: 'auto', fontWeight: 600 }}>Готово</button>}
           </div>
         </div>,

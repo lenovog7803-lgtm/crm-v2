@@ -8,6 +8,7 @@ import Select from './Select'
 import { TopbarExpand } from './TopbarIsland'
 import { ThinkingOrb } from 'thinking-orbs'
 import { useAuth } from '../AuthContext'
+import { useTheme } from '../theme'
 
 const PAGE_META = {
   dashboard: { title: 'Дашборд', subtitle: 'Обзор бизнеса' },
@@ -74,6 +75,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
   const seenIds = useRef(new Set())
   const isMobile = useIsMobile()
   const { user } = useAuth()
+  const [theme, toggleTheme] = useTheme()
   const isDirector = ['director', 'admin'].includes(user?.user?.role)
   // шапка-остров: нажатие на пустое место шапки или протяжка вниз раскрывает её (план месяца) — директору, на компьютере
   const barRef = useRef(null)
@@ -115,12 +117,12 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
       style={{
       display: 'flex', alignItems: 'center', gap: 16,
       padding: '14px 20px',
-      background: 'rgba(255,255,255,0.55)',
+      background: 'rgba(var(--paper-rgb), 0.55)',
       backdropFilter: 'blur(24px) saturate(180%)',
       WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-      border: '1px solid rgba(255,255,255,0.7)',
+      border: '1px solid rgba(255,255,255,calc(0.7 * var(--rim-k)))',
       borderRadius: 18,
-      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 4px 16px -8px rgba(20,30,55,0.12)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), 0 4px 16px -8px rgba(20,30,55,0.12)',
       marginBottom: 0,
       flexShrink: 0,
       position: 'relative',
@@ -137,12 +139,12 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
             style={{
               flex: 1, paddingLeft: 12, paddingRight: 12,
               height: 38, borderRadius: 11,
-              border: '1px solid rgba(14,23,38,0.12)',
-              background: 'rgba(255,255,255,0.7)',
-              fontFamily: 'var(--font-sys)', fontSize: 14, color: '#0E1726', outline: 'none',
+              border: '1px solid rgba(var(--ink-rgb), 0.12)',
+              background: 'rgba(var(--paper-rgb), 0.7)',
+              fontFamily: 'var(--font-sys)', fontSize: 14, color: 'var(--ink)', outline: 'none',
             }}
           />
-          <button onClick={() => { setMobileSearchOpen(false); onSearchChange && onSearchChange('') }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8A93A0', padding: 4, fontSize: 13, fontFamily: 'var(--font-sys)', fontWeight: 600 }}>
+          <button onClick={() => { setMobileSearchOpen(false); onSearchChange && onSearchChange('') }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', padding: 4, fontSize: 13, fontFamily: 'var(--font-sys)', fontWeight: 600 }}>
             Отмена
           </button>
         </div>
@@ -151,14 +153,14 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
       <div style={{ flex: 1, minWidth: 0 }}>
         {/* большой заголовок iOS: крупный вверху страницы, сжимается при прокрутке */}
         <div className="ios-title" style={{ fontSize: compact ? (isMobile ? 17 : 18) : (isMobile ? 24 : 26) }}>{meta.title}</div>
-        {!isMobile && <div className="ios-subtitle" style={{ fontSize: 12.5, color: '#8A93A0', marginTop: 2 }}>{meta.subtitle}</div>}
+        {!isMobile && <div className="ios-subtitle" style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>{meta.subtitle}</div>}
       </div>
       {/* шапка-остров: «ручка» раскрытия снизу */}
       {canExpand && <span className="topbar-grabber" aria-hidden="true" />}
 
       {/* Mobile search icon */}
       {isMobile && (
-        <button onClick={() => setMobileSearchOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5A6573', padding: 6, display: 'flex' }}>
+        <button onClick={() => setMobileSearchOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 6, display: 'flex' }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
@@ -205,9 +207,9 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
           onChange={e => onPeriodChange && onPeriodChange(e.target.value)}
           style={{
             height: 38, padding: '0 12px', borderRadius: 11,
-            border: '1px solid rgba(14,23,38,0.12)',
-            background: 'rgba(255,255,255,0.7)',
-            fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600, color: '#0E1726',
+            border: '1px solid rgba(var(--ink-rgb), 0.12)',
+            background: 'rgba(var(--paper-rgb), 0.7)',
+            fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600, color: 'var(--ink)',
             outline: 'none', cursor: 'pointer',
           }}
         >
@@ -224,9 +226,9 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
         className="topbar-trash"
         onClick={() => onNav && onNav('trash')}
         title="Корзина"
-        style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', color: '#5A6573', padding: 6, borderRadius: 10 }}
+        style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 6, borderRadius: 10 }}
         onPointerEnter={mouseOnly(e => e.currentTarget.style.color = '#C81923')}
-        onPointerLeave={mouseOnly(e => e.currentTarget.style.color = '#5A6573')}
+        onPointerLeave={mouseOnly(e => e.currentTarget.style.color = 'var(--text-secondary)')}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
@@ -239,7 +241,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
           onClick={() => setBellOpen(v => !v)}
           style={{
             position: 'relative', background: bellOpen ? 'rgba(200,25,35,0.08)' : 'none', border: 'none', cursor: 'pointer',
-            color: badgeCount > 0 ? '#C81923' : '#5A6573', padding: 6, borderRadius: 10,
+            color: badgeCount > 0 ? '#C81923' : 'var(--text-secondary)', padding: 6, borderRadius: 10,
             animation: bellPulse ? 'bellPulse 0.6s ease' : 'none',
           }}
         >
@@ -261,15 +263,15 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
         {bellOpen && (
           <div className="t-dropdown-in" style={{
             position: 'absolute', top: 'calc(100% + 10px)', right: 0, zIndex: 9999,
-            background: 'rgba(255,255,255,0.98)', backdropFilter: 'blur(24px)',
-            borderRadius: 18, border: '1px solid rgba(255,255,255,0.9)',
+            background: 'rgba(var(--paper-rgb), 0.98)', backdropFilter: 'blur(24px)',
+            borderRadius: 18, border: '1px solid rgba(255,255,255,calc(0.9 * var(--rim-k)))',
             boxShadow: '0 20px 60px rgba(20,30,55,0.18)',
             minWidth: 320, maxWidth: 380, overflow: 'hidden',
           }}>
             {notifications.length > 0 && (
               <>
-                <div style={{ padding: '14px 16px 10px', borderBottom: '1px solid rgba(14,23,38,0.07)' }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', color: '#A6AEB8' }}>
+                <div style={{ padding: '14px 16px 10px', borderBottom: '1px solid rgba(var(--ink-rgb), 0.07)' }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', color: 'var(--text-tertiary)' }}>
                     УВЕДОМЛЕНИЯ · {notifications.length}
                   </span>
                 </div>
@@ -284,7 +286,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
                         style={{
                           display: 'flex', alignItems: 'flex-start', gap: 12,
                           padding: '11px 16px 11px 13px', cursor: 'pointer',
-                          borderBottom: '1px solid rgba(14,23,38,0.05)',
+                          borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)',
                           borderLeft: `3px solid ${accent}`,
                           transition: 'background 0.12s',
                         }}
@@ -308,10 +310,10 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
                           )}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 12.5, color: '#0E1726', lineHeight: 1.4 }}>{n.message}</div>
+                          <div style={{ fontSize: 12.5, color: 'var(--ink)', lineHeight: 1.4 }}>{n.message}</div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
                             {n.created_at && (
-                              <span style={{ fontSize: 11, color: '#A6AEB8' }}>
+                              <span style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
                                 {new Date(n.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
                               </span>
                             )}
@@ -332,13 +334,13 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
               </>
             )}
 
-            <div style={{ padding: '14px 16px 10px', borderBottom: '1px solid rgba(14,23,38,0.07)' }}>
-              <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', color: '#A6AEB8' }}>
+            <div style={{ padding: '14px 16px 10px', borderBottom: '1px solid rgba(var(--ink-rgb), 0.07)' }}>
+              <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', color: 'var(--text-tertiary)' }}>
                 {overdueItems.length > 0 ? `ПРОСРОЧЕНО · ${overdueItems.length}` : 'ПРОСРОЧЕННЫЕ'}
               </span>
             </div>
             {overdueItems.length === 0 ? (
-              <div style={{ padding: '24px 16px', textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>Просроченных нет</div>
+              <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 13 }}>Просроченных нет</div>
             ) : (
               <div style={{ maxHeight: 340, overflowY: 'auto' }}>
                 {overdueItems.map(item => (
@@ -348,7 +350,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '11px 16px', cursor: item.type === 'order' ? 'pointer' : 'default',
-                      borderBottom: '1px solid rgba(14,23,38,0.05)', transition: 'background 0.12s',
+                      borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)', transition: 'background 0.12s',
                     }}
                     onPointerEnter={mouseOnly(e => { if (item.type === 'order') e.currentTarget.style.background = 'rgba(200,25,35,0.05)' })}
                     onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
@@ -370,7 +372,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
                       )}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12.5, fontWeight: 600, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</div>
+                      <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</div>
                       <div style={{ fontSize: 11, color: '#C81923', marginTop: 2 }}>Просрочено · {fmtDate(item.date)}</div>
                     </div>
                   </div>
@@ -397,11 +399,22 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
         }
       `}</style>
 
+      {/* Тёмная / светлая тема */}
+      <button onClick={toggleTheme} title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'} aria-label={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'} style={{
+        background: 'rgba(var(--ink-rgb), 0.06)', border: 'none', cursor: 'pointer',
+        color: 'var(--text-3)', padding: 8, borderRadius: 10,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        {theme === 'dark'
+          ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>}
+      </button>
+
       {/* Sign out */}
       {onSignOut && (
         <button className="topbar-signout" onClick={onSignOut} title="Выйти" style={{
-          background: 'rgba(14,23,38,0.06)', border: 'none', cursor: 'pointer',
-          color: '#8A93A0', padding: 8, borderRadius: 10,
+          background: 'rgba(var(--ink-rgb), 0.06)', border: 'none', cursor: 'pointer',
+          color: 'var(--text-3)', padding: 8, borderRadius: 10,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -164,7 +164,7 @@ export default function Finance({ refreshKey }) {
 
   const recList = recType === 'client' ? clients : carriers
   const recLabelKey = recType === 'client' ? 'name' : 'company_name'
-  const iStyle = { height: 36, padding: '0 10px', fontSize: 13, borderRadius: 10, border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-sys)', color: '#0E1726', outline: 'none' }
+  const iStyle = { height: 36, padding: '0 10px', fontSize: 13, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.14)', background: 'rgba(var(--paper-rgb), 0.8)', fontFamily: 'var(--font-sys)', color: 'var(--ink)', outline: 'none' }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 10 : 16 }}>
@@ -177,7 +177,7 @@ export default function Finance({ refreshKey }) {
             <div className="grad-kicker">Чистая прибыль</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.03em', lineHeight: 1 }}>{netProfit.toLocaleString('ru-RU')}</div>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>BYN</div>
-            <div style={{ display: 'flex', gap: 20, marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.25)' }}>
+            <div style={{ display: 'flex', gap: 20, marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,calc(0.25 * var(--rim-k)))' }}>
               <div>
                 <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>Поступления</div>
                 <div style={{ fontWeight: 700, fontSize: 13 }}>{totalIncome.toLocaleString('ru-RU')} BYN</div>
@@ -189,17 +189,17 @@ export default function Finance({ refreshKey }) {
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
-            <div onClick={() => setShowInModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '14px 14px', color: '#0E1726' }}>
+            <div onClick={() => setShowInModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '14px 14px', color: 'var(--ink)' }}>
               <div className="grad-kicker" style={{ color: '#1E9E5A' }}>Поступления</div>
               <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
-              <div style={{ fontSize: 11, color: '#8A93A0', marginTop: 2 }}>BYN</div>
-              <div style={{ marginTop: 6, fontSize: 11.5, color: '#8A93A0', fontWeight: 600 }}>{paidClientOrders.length} заявок оплачено</div>
+              <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
+              <div style={{ marginTop: 6, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{paidClientOrders.length} заявок оплачено</div>
             </div>
-            <div onClick={() => setShowOutModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '14px 14px', color: '#0E1726' }}>
+            <div onClick={() => setShowOutModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '14px 14px', color: 'var(--ink)' }}>
               <div className="grad-kicker" style={{ color: '#7C3AED' }}>Списания</div>
               <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
-              <div style={{ fontSize: 11, color: '#8A93A0', marginTop: 2 }}>BYN</div>
-              <div style={{ marginTop: 6, fontSize: 11.5, color: '#8A93A0', fontWeight: 600 }}>{paidCarrierOrders.length} заявок оплачено</div>
+              <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
+              <div style={{ marginTop: 6, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{paidCarrierOrders.length} заявок оплачено</div>
             </div>
           </div>
         </div>
@@ -210,7 +210,7 @@ export default function Finance({ refreshKey }) {
             <div className="grad-kicker">Чистая прибыль</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 38, letterSpacing: '-0.03em', lineHeight: 1 }}>{netProfit.toLocaleString('ru-RU')}</div>
             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>BYN</div>
-            <div style={{ display: 'flex', gap: 24, marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.25)' }}>
+            <div style={{ display: 'flex', gap: 24, marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,calc(0.25 * var(--rim-k)))' }}>
               <div>
                 <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>Поступления</div>
                 <div style={{ fontWeight: 700, fontSize: 15 }}>{totalIncome.toLocaleString('ru-RU')} BYN</div>
@@ -221,17 +221,17 @@ export default function Finance({ refreshKey }) {
               </div>
             </div>
           </div>
-          <div onClick={() => setShowInModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '26px 24px', color: '#0E1726' }}>
+          <div onClick={() => setShowInModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '26px 24px', color: 'var(--ink)' }}>
             <div className="grad-kicker" style={{ color: '#1E9E5A' }}>Поступления</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
-            <div style={{ fontSize: 11, color: '#8A93A0', marginTop: 2 }}>BYN</div>
-            <div style={{ marginTop: 14, fontSize: 11.5, color: '#8A93A0', fontWeight: 600 }}>{paidClientOrders.length} заявок оплачено</div>
+            <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
+            <div style={{ marginTop: 14, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{paidClientOrders.length} заявок оплачено</div>
           </div>
-          <div onClick={() => setShowOutModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '26px 24px', color: '#0E1726' }}>
+          <div onClick={() => setShowOutModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '26px 24px', color: 'var(--ink)' }}>
             <div className="grad-kicker" style={{ color: '#7C3AED' }}>Списания</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
-            <div style={{ fontSize: 11, color: '#8A93A0', marginTop: 2 }}>BYN</div>
-            <div style={{ marginTop: 14, fontSize: 11.5, color: '#8A93A0', fontWeight: 600 }}>{paidCarrierOrders.length} заявок оплачено</div>
+            <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
+            <div style={{ marginTop: 14, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{paidCarrierOrders.length} заявок оплачено</div>
           </div>
         </div>
       )}
@@ -244,7 +244,7 @@ export default function Finance({ refreshKey }) {
           { label: 'Маржа', val: marginPct + '%', color: '#D97706' },
         ].map(k => (
           <div key={k.label} className="card" style={{ padding: isMobile ? '10px 12px' : '16px 18px' }}>
-            <div style={{ fontSize: isMobile ? 10 : 11, color: '#A6AEB8', fontWeight: 600, marginBottom: isMobile ? 4 : 6 }}>{k.label}</div>
+            <div style={{ fontSize: isMobile ? 10 : 11, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: isMobile ? 4 : 6 }}>{k.label}</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: isMobile ? 14 : 18, color: k.color }}>{k.val}</div>
           </div>
         ))}
@@ -253,7 +253,7 @@ export default function Finance({ refreshKey }) {
       {/* Payments — ручные записи с ПП и датой */}
       <div className="card" style={{ padding: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: showAdd ? 12 : 14, flexWrap: 'wrap' }}>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', flex: 1 }}>Платежи</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', flex: 1 }}>Платежи</div>
           <SlidingTabs
             options={[{ key: 'all', label: 'Все' }, { key: 'income', label: 'Поступления' }, { key: 'expense', label: 'Списания' }]}
             value={typeFilter}
@@ -274,7 +274,7 @@ export default function Finance({ refreshKey }) {
 
         {/* Форма добавления платежа */}
         {showAdd && (
-          <form onSubmit={handleAddPayment} style={{ marginBottom: 14, padding: '14px 16px', borderRadius: 14, background: 'rgba(14,23,38,0.03)', border: '1px solid rgba(14,23,38,0.07)' }}>
+          <form onSubmit={handleAddPayment} style={{ marginBottom: 14, padding: '14px 16px', borderRadius: 14, background: 'rgba(var(--ink-rgb), 0.03)', border: '1px solid rgba(var(--ink-rgb), 0.07)' }}>
             {/* Тип */}
             <div style={{ marginBottom: 12 }}>
               <SlidingTabs
@@ -286,7 +286,7 @@ export default function Finance({ refreshKey }) {
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 1fr 1fr', gap: 10, alignItems: 'end' }}>
               {/* Контрагент */}
               <div>
-                <div style={{ fontSize: 10.5, fontWeight: 700, color: '#A6AEB8', letterSpacing: '0.08em', marginBottom: 5 }}>{addType === 'income' ? 'КЛИЕНТ' : 'ПЕРЕВОЗЧИК'}</div>
+                <div style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--text-tertiary)', letterSpacing: '0.08em', marginBottom: 5 }}>{addType === 'income' ? 'КЛИЕНТ' : 'ПЕРЕВОЗЧИК'}</div>
                 <Select value={addPartyId} onChange={e => setAddPartyId(e.target.value)} required style={{ ...iStyle, width: '100%' }}>
                   <option value="">— Выберите —</option>
                   {(addType === 'income' ? clients : carriers).map(x => (
@@ -296,17 +296,17 @@ export default function Finance({ refreshKey }) {
               </div>
               {/* ПП */}
               <div>
-                <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>№ ПП</div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', paddingLeft: 4, marginBottom: 5 }}>№ ПП</div>
                 <input value={addPP} onChange={e => setAddPP(e.target.value)} required placeholder="12345" style={{ ...iStyle, width: '100%' }} />
               </div>
               {/* Дата */}
               <div>
-                <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>Дата</div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', paddingLeft: 4, marginBottom: 5 }}>Дата</div>
                 <DateInput type="date" value={addDate} onChange={e => setAddDate(e.target.value)} required style={{ ...iStyle, width: '100%' }} />
               </div>
               {/* Сумма */}
               <div>
-                <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>Сумма (BYN)</div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', paddingLeft: 4, marginBottom: 5 }}>Сумма (BYN)</div>
                 <input type="number" value={addAmount} onChange={e => setAddAmount(e.target.value)} required placeholder="0.00" step="0.01" style={{ ...iStyle, width: '100%' }} />
               </div>
             </div>
@@ -317,8 +317,8 @@ export default function Finance({ refreshKey }) {
                 fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600,
               }}>{addLoading ? 'Сохранение...' : 'Добавить платёж'}</button>
               <button type="button" onClick={() => setShowAdd(false)} style={{
-                padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(14,23,38,0.12)', cursor: 'pointer',
-                background: 'transparent', color: '#5A6573', fontFamily: 'var(--font-sys)', fontSize: 13,
+                padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.12)', cursor: 'pointer',
+                background: 'transparent', color: 'var(--text-secondary)', fontFamily: 'var(--font-sys)', fontSize: 13,
               }}>Отмена</button>
             </div>
           </form>
@@ -335,10 +335,10 @@ export default function Finance({ refreshKey }) {
             return (
               <div key={`${p.kind}-${p.id}`}
                 onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.05)')}
-                onPointerLeave={mouseOnly(e => e.currentTarget.style.background = i % 2 === 0 ? 'rgba(14,23,38,0.02)' : 'transparent')}
+                onPointerLeave={mouseOnly(e => e.currentTarget.style.background = i % 2 === 0 ? 'rgba(var(--ink-rgb), 0.02)' : 'transparent')}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 12, padding: '10px 8px', borderRadius: 11,
-                  background: i % 2 === 0 ? 'rgba(14,23,38,0.02)' : 'transparent',
+                  background: i % 2 === 0 ? 'rgba(var(--ink-rgb), 0.02)' : 'transparent',
                   transition: 'background 0.15s var(--ease)',
                 }}>
                 <div style={{
@@ -348,14 +348,14 @@ export default function Finance({ refreshKey }) {
                   color: '#fff', fontSize: 11, fontWeight: 700,
                 }}>{initials(p.name)}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
-                  <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                  <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginTop: 1 }}>
                     {p.kind === 'income' ? 'Поступление' : 'Списание'}
                     {p.pp_number ? ` · ПП ${p.pp_number}` : ''}
                     {p.order_number ? <span style={{ color: '#1366F0', fontFamily: 'var(--font-mono)' }}> · {p.order_number}</span> : ''}
                   </div>
                 </div>
-                <div style={{ fontSize: 11.5, color: '#A6AEB8', flexShrink: 0 }}>{fmtDate(p.date) || '—'}</div>
+                <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', flexShrink: 0 }}>{fmtDate(p.date) || '—'}</div>
                 <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: p.kind === 'income' ? '#1E9E5A' : '#1366F0', flexShrink: 0 }}>
                   {p.kind === 'income' ? '+' : '-'}{(p.amount || 0).toLocaleString('ru-RU')} BYN
                 </div>
@@ -372,7 +372,7 @@ export default function Finance({ refreshKey }) {
             )
           })}
           {!loading && filtered.length === 0 && (
-            <div style={{ padding: '30px', textAlign: 'center', color: '#A6AEB8', fontSize: 14 }}>Нет платежей</div>
+            <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 14 }}>Нет платежей</div>
           )}
         </div>
         {filtered.length > PREVIEW && (
@@ -386,7 +386,7 @@ export default function Finance({ refreshKey }) {
 
       {/* Акт сверки — таблица */}
       <div className="card" style={{ padding: '20px' }}>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Акт сверки</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 14 }}>Акт сверки</div>
         <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
           <SlidingTabs
             options={[{ key: 'clients', label: 'Клиенты' }, { key: 'carriers', label: 'Перевозчики' }]}
@@ -401,18 +401,18 @@ export default function Finance({ refreshKey }) {
         {actRows.length > 0 ? (
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid rgba(14,23,38,0.08)' }}>
+              <tr style={{ borderBottom: '1px solid rgba(var(--ink-rgb), 0.08)' }}>
                 {['№', 'Заявка', 'Дата выгрузки', 'Сумма', 'Сальдо'].map(h => (
-                  <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8' }}>{h}</th>
+                  <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {actRows.map(row => (
-                <tr key={row.id} style={{ borderBottom: '1px solid rgba(14,23,38,0.04)' }}>
-                  <td style={{ padding: '10px 12px', color: '#A6AEB8' }}>{row.n}</td>
+                <tr key={row.id} style={{ borderBottom: '1px solid rgba(var(--ink-rgb), 0.04)' }}>
+                  <td style={{ padding: '10px 12px', color: 'var(--text-tertiary)' }}>{row.n}</td>
                   <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)', fontSize: 12, color: '#1366F0' }}>{row.order_number || '—'}</td>
-                  <td style={{ padding: '10px 12px', color: '#5A6573' }}>{fmtDate(row.unload_date) || '—'}</td>
+                  <td style={{ padding: '10px 12px', color: 'var(--text-secondary)' }}>{fmtDate(row.unload_date) || '—'}</td>
                   <td style={{ padding: '10px 12px', color: '#1E9E5A', fontWeight: 700 }}>{(row.amt || 0).toLocaleString('ru-RU')} BYN</td>
                   <td style={{ padding: '10px 12px', fontWeight: 700, color: row.balance >= 0 ? '#1E9E5A' : '#C81923' }}>{row.balance.toLocaleString('ru-RU')} BYN</td>
                 </tr>
@@ -420,7 +420,7 @@ export default function Finance({ refreshKey }) {
             </tbody>
           </table>
         ) : (
-          <div style={{ padding: '24px', textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>
+          <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 13 }}>
             Выберите контрагента для формирования акта сверки
           </div>
         )}
@@ -428,17 +428,17 @@ export default function Finance({ refreshKey }) {
 
       {/* Генерация акта сверки */}
       <div className="card" style={{ padding: '20px' }}>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Сформировать акт сверки (документ)</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 14 }}>Сформировать акт сверки (документ)</div>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            <label style={{ fontSize: 11, fontWeight: 600, color: '#A6AEB8' }}>Тип</label>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)' }}>Тип</label>
             <Select value={recType} onChange={e => { setRecType(e.target.value); setRecPartyId(''); setRecPartyName('') }} style={iStyle}>
               <option value="client">Клиент</option>
               <option value="carrier">Перевозчик</option>
             </Select>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5, flex: 1 }}>
-            <label style={{ fontSize: 11, fontWeight: 600, color: '#A6AEB8' }}>{recType === 'client' ? 'Клиент' : 'Перевозчик'}</label>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)' }}>{recType === 'client' ? 'Клиент' : 'Перевозчик'}</label>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <PartySearchSelect
                 items={recList}
@@ -459,7 +459,7 @@ export default function Finance({ refreshKey }) {
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-            <label style={{ fontSize: 11, fontWeight: 600, color: '#A6AEB8' }}>Период</label>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)' }}>Период</label>
             <Select value={recPeriod} onChange={e => setRecPeriod(e.target.value)} style={iStyle}>
               <option value="month">Этот месяц</option>
               <option value="last_month">Прошлый месяц</option>
@@ -471,19 +471,19 @@ export default function Finance({ refreshKey }) {
           <button onClick={handleGenerateReconciliation} disabled={recLoading || !recPartyId} style={{
             height: 36, padding: '0 20px', borderRadius: 11, border: 'none',
             cursor: recPartyId ? 'pointer' : 'not-allowed',
-            background: recPartyId ? '#1366F0' : 'rgba(14,23,38,0.08)',
-            color: recPartyId ? '#fff' : '#A6AEB8',
+            background: recPartyId ? '#1366F0' : 'rgba(var(--ink-rgb), 0.08)',
+            color: recPartyId ? '#fff' : 'var(--text-tertiary)',
             fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600, opacity: recLoading ? 0.7 : 1,
           }}>{recLoading ? 'Генерация...' : 'Сформировать акт'}</button>
         </div>
         {recHistory.length > 0 && (
           <div style={{ marginTop: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#A6AEB8', letterSpacing: '0.08em', marginBottom: 8 }}>ИСТОРИЯ</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-tertiary)', letterSpacing: '0.08em', marginBottom: 8 }}>ИСТОРИЯ</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
               {recHistory.slice(0, 5).map((r, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12.5 }}>
-                  <span style={{ color: '#5A6573' }}>{fmtDate(r.date || r.created_at)}</span>
-                  <span style={{ fontWeight: 600, color: '#0E1726', flex: 1 }}>{r.counterparty_name || r.counterparty_id}</span>
+                  <span style={{ color: 'var(--text-secondary)' }}>{fmtDate(r.date || r.created_at)}</span>
+                  <span style={{ fontWeight: 600, color: 'var(--ink)', flex: 1 }}>{r.counterparty_name || r.counterparty_id}</span>
                   {r.url && <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: '#1366F0', fontWeight: 600, textDecoration: 'none' }}>Открыть</a>}
                 </div>
               ))}
@@ -495,37 +495,37 @@ export default function Finance({ refreshKey }) {
       {/* Модалка — детали поступлений */}
       {showInModal && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.4)', backdropFilter: 'blur(8px)',
+          position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.4)', backdropFilter: 'blur(8px)',
           zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 16,
         }}>
           <div onClick={e => e.stopPropagation()} style={{
             margin: 'auto',
-            background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(30px)', borderRadius: 24,
+            background: 'rgba(var(--paper-rgb), 0.95)', backdropFilter: 'blur(30px)', borderRadius: 24,
             width: '90%', maxWidth: 560,
-            border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 40px 80px rgba(20,30,55,0.3)',
+            border: '1px solid rgba(255,255,255,calc(0.8 * var(--rim-k)))', boxShadow: '0 40px 80px rgba(20,30,55,0.3)',
           }}>
             <div style={{ padding: 28 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
-                  <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>Поступления от клиентов</div>
-                  <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 2 }}>Итого: {totalIncome.toLocaleString('ru-RU')} BYN · {paidClientOrders.length} заявок</div>
+                  <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Поступления от клиентов</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>Итого: {totalIncome.toLocaleString('ru-RU')} BYN · {paidClientOrders.length} заявок</div>
                 </div>
-                <button onClick={() => setShowInModal(false)} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: 'transparent', cursor: 'pointer', fontSize: 18, color: '#A6AEB8' }}>×</button>
+                <button onClick={() => setShowInModal(false)} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.1)', background: 'transparent', cursor: 'pointer', fontSize: 18, color: 'var(--text-tertiary)' }}>×</button>
               </div>
               {paidClientOrders.length === 0 ? (
-                <div style={{ textAlign: 'center', color: '#A6AEB8', padding: 40 }}>Нет оплаченных заявок</div>
+                <div style={{ textAlign: 'center', color: 'var(--text-tertiary)', padding: 40 }}>Нет оплаченных заявок</div>
               ) : paidClientOrders.map((o, i) => {
                 const [avA, avB] = getGradient(o.client_name || '')
                 return (
-                  <div key={o.id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid rgba(14,23,38,0.06)' }}>
+                  <div key={o.id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.06)' }}>
                     <div style={{
                       width: 36, height: 36, borderRadius: 10, flexShrink: 0,
                       background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12, fontWeight: 700,
                     }}>{initials(o.client_name)}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#0E1726' }}>{o.client_name || '—'}</div>
-                      <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>{o.client_name || '—'}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>
                         {o.order_number} · {o.route_from} → {o.route_to}
                         {o.client_paid_date ? ` · ${new Date(o.client_paid_date).toLocaleDateString('ru-RU')}` : ''}
                       </div>
@@ -544,37 +544,37 @@ export default function Finance({ refreshKey }) {
       {/* Модалка — детали списаний */}
       {showOutModal && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.4)', backdropFilter: 'blur(8px)',
+          position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.4)', backdropFilter: 'blur(8px)',
           zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 16,
         }}>
           <div onClick={e => e.stopPropagation()} style={{
             margin: 'auto',
-            background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(30px)', borderRadius: 24,
+            background: 'rgba(var(--paper-rgb), 0.95)', backdropFilter: 'blur(30px)', borderRadius: 24,
             width: '90%', maxWidth: 560,
-            border: '1px solid rgba(255,255,255,0.8)', boxShadow: '0 40px 80px rgba(20,30,55,0.3)',
+            border: '1px solid rgba(255,255,255,calc(0.8 * var(--rim-k)))', boxShadow: '0 40px 80px rgba(20,30,55,0.3)',
           }}>
             <div style={{ padding: 28 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
-                  <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: '#0E1726' }}>Оплачено перевозчикам</div>
+                  <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Оплачено перевозчикам</div>
                   <div style={{ fontSize: 12, color: '#E0473B', fontWeight: 600, marginTop: 2 }}>Итого: -{totalExpense.toLocaleString('ru-RU')} BYN · {paidCarrierOrders.length} заявок</div>
                 </div>
-                <button onClick={() => setShowOutModal(false)} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(14,23,38,0.1)', background: 'transparent', cursor: 'pointer', fontSize: 18, color: '#A6AEB8' }}>×</button>
+                <button onClick={() => setShowOutModal(false)} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.1)', background: 'transparent', cursor: 'pointer', fontSize: 18, color: 'var(--text-tertiary)' }}>×</button>
               </div>
               {paidCarrierOrders.length === 0 ? (
-                <div style={{ textAlign: 'center', color: '#A6AEB8', padding: 40 }}>Нет оплаченных заявок</div>
+                <div style={{ textAlign: 'center', color: 'var(--text-tertiary)', padding: 40 }}>Нет оплаченных заявок</div>
               ) : paidCarrierOrders.map((o, i) => {
                 const [avA, avB] = getGradient(o.carrier_name || '')
                 return (
-                  <div key={o.id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 8px', borderBottom: '1px solid rgba(14,23,38,0.06)', borderLeft: '3px solid rgba(224,71,59,0.35)', background: 'rgba(224,71,59,0.03)' }}>
+                  <div key={o.id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 8px', borderBottom: '1px solid rgba(var(--ink-rgb), 0.06)', borderLeft: '3px solid rgba(224,71,59,0.35)', background: 'rgba(224,71,59,0.03)' }}>
                     <div style={{
                       width: 36, height: 36, borderRadius: 10, flexShrink: 0,
                       background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12, fontWeight: 700,
                     }}>{initials(o.carrier_name)}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#0E1726' }}>{o.carrier_name || '—'}</div>
-                      <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>{o.carrier_name || '—'}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>
                         {o.order_number} · {o.route_from} → {o.route_to}
                         {o.carrier_paid_date ? ` · ${new Date(o.carrier_paid_date).toLocaleDateString('ru-RU')}` : ''}
                       </div>
@@ -620,18 +620,18 @@ function PartySearchSelect({ items, labelKey, value, onChange, placeholder }) {
         onFocus={() => { setQuery(''); setOpen(true) }}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         placeholder={placeholder}
-        style={{ height: 36, padding: '0 10px', fontSize: 13, borderRadius: 10, border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)', fontFamily: 'var(--font-sys)', color: '#0E1726', outline: 'none', width: '100%', boxSizing: 'border-box' }}
+        style={{ height: 36, padding: '0 10px', fontSize: 13, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.14)', background: 'rgba(var(--paper-rgb), 0.8)', fontFamily: 'var(--font-sys)', color: 'var(--ink)', outline: 'none', width: '100%', boxSizing: 'border-box' }}
       />
       {open && (
-        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, maxHeight: 240, overflowY: 'auto', background: '#fff', border: '1px solid #E8EAEE', borderRadius: 10, boxShadow: '0 8px 24px rgba(14,23,38,0.14)', zIndex: 20 }}>
+        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, maxHeight: 240, overflowY: 'auto', background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 10, boxShadow: '0 8px 24px rgba(14,23,38,0.14)', zIndex: 20 }}>
           {filtered.length === 0 ? (
-            <div style={{ padding: '10px 12px', fontSize: 12.5, color: '#8A93A0' }}>Ничего не найдено</div>
+            <div style={{ padding: '10px 12px', fontSize: 12.5, color: 'var(--text-3)' }}>Ничего не найдено</div>
           ) : filtered.slice(0, 200).map(item => (
             <div
               key={item.id}
               onMouseDown={() => { onChange(item.id, item[labelKey] || item.name || ''); setOpen(false); setQuery('') }}
-              style={{ padding: '8px 12px', fontSize: 12.5, cursor: 'pointer', color: '#0E1726' }}
-              onPointerEnter={mouseOnly(e => { e.currentTarget.style.background = '#F7F8FA' })}
+              style={{ padding: '8px 12px', fontSize: 12.5, cursor: 'pointer', color: 'var(--ink)' }}
+              onPointerEnter={mouseOnly(e => { e.currentTarget.style.background = 'var(--fill)' })}
               onPointerLeave={mouseOnly(e => { e.currentTarget.style.background = 'transparent' })}
             >
               {item[labelKey] || item.name}
@@ -678,20 +678,20 @@ function PPLedgerModal({ type, entityId, entityName, onClose }) {
   }
 
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 520, padding: 26 }}>
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
+      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 520, padding: 26 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
           <div>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#0E1726' }}>{type === 'client' ? 'Платежи клиента' : 'Платежи перевозчику'}</div>
-            <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>{entityName} · всего {total.toLocaleString('ru-RU')} Br</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)' }}>{type === 'client' ? 'Платежи клиента' : 'Платежи перевозчику'}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{entityName} · всего {total.toLocaleString('ru-RU')} Br</div>
           </div>
-          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid #E8EAEE', background: '#F7F8FA', cursor: 'pointer', fontSize: 18, color: '#8A93A0' }}>×</button>
+          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid var(--line)', background: 'var(--fill)', cursor: 'pointer', fontSize: 18, color: 'var(--text-3)' }}>×</button>
         </div>
 
         <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-          <input value={ppNumber} onChange={e => setPpNumber(e.target.value)} placeholder="№ ПП" style={{ width: 90, padding: '9px 10px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 12 }} />
-          <DateInput type="date" value={ppDate} onChange={e => setPpDate(e.target.value)} style={{ width: 130, padding: '9px 10px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 12 }} />
-          <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Сумма" style={{ flex: 1, padding: '9px 10px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 12 }} />
+          <input value={ppNumber} onChange={e => setPpNumber(e.target.value)} placeholder="№ ПП" style={{ width: 90, padding: '9px 10px', borderRadius: 10, border: '1px solid var(--line)', fontSize: 12 }} />
+          <DateInput type="date" value={ppDate} onChange={e => setPpDate(e.target.value)} style={{ width: 130, padding: '9px 10px', borderRadius: 10, border: '1px solid var(--line)', fontSize: 12 }} />
+          <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Сумма" style={{ flex: 1, padding: '9px 10px', borderRadius: 10, border: '1px solid var(--line)', fontSize: 12 }} />
           <button onClick={add} style={{ width: 34, height: 34, borderRadius: 10, background: '#1366F0', color: '#fff', border: 'none', fontSize: 16, cursor: 'pointer' }}>+</button>
         </div>
 
@@ -699,10 +699,10 @@ function PPLedgerModal({ type, entityId, entityName, onClose }) {
           {entries.length === 0 ? (
             <EmptyState compact title="Платежей пока нет" subtitle="Платежи появятся, когда вы отметите оплату в заявке" />
           ) : entries.map(e => (
-            <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: '1px solid #F0F1F4' }}>
+            <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: '1px solid var(--fill-2)' }}>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 500, color: '#0E1726' }}>ПП № {e.pp_number}</div>
-                <div style={{ fontSize: 11, color: '#8A93A0' }}>{new Date(e.pp_date).toLocaleDateString('ru-RU')}</div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink)' }}>ПП № {e.pp_number}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-3)' }}>{new Date(e.pp_date).toLocaleDateString('ru-RU')}</div>
               </div>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: accentColor }}>
                 {Number(e.amount).toLocaleString('ru-RU')} Br

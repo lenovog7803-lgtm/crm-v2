@@ -160,7 +160,7 @@ export function ModalOverlay({ onClose, children, panelStyle, bodyStyle }) {
           position: 'fixed', inset: 0, zIndex: 1000, overflow: 'hidden', display: 'grid', padding: 0,
         } : {
           position: 'fixed', inset: 0,
-          background: 'rgba(14,23,38,0.22)',
+          background: 'rgba(var(--ink-rgb), 0.22)',
           backdropFilter: 'blur(6px)',
           WebkitBackdropFilter: 'blur(6px)',
           zIndex: 1000,
@@ -172,11 +172,11 @@ export function ModalOverlay({ onClose, children, panelStyle, bodyStyle }) {
       >
         {isMobile && (
           <div ref={scrimRef} onClick={() => requestClose()}
-            style={{ position: 'absolute', inset: 0, background: 'rgba(14,23,38,0.3)', opacity: 0, willChange: 'opacity' }} />
+            style={{ position: 'absolute', inset: 0, background: 'rgba(var(--ink-rgb), 0.3)', opacity: 0, willChange: 'opacity' }} />
         )}
         <div ref={panelRef} className="modal-panel ios-sheet" style={{
           margin: 'auto',
-          background: isMobile ? '#FFFFFF' : 'rgba(255,255,255,0.97)',
+          background: isMobile ? 'var(--surface)' : 'rgba(var(--paper-rgb), 0.97)',
           backdropFilter: isMobile ? 'none' : 'blur(24px) saturate(180%)',
           // до первого кадра шторка уже за экраном — без вспышки в конечном положении
           transform: isMobile ? 'translate3d(0, 100%, 0)' : undefined,
@@ -194,7 +194,7 @@ export function ModalOverlay({ onClose, children, panelStyle, bodyStyle }) {
           {isMobile && (
             <div {...dragHandlers} style={{ ...dragHandlers.style, position: 'absolute', top: 0, left: 0, right: 0, height: 28,
               display: 'flex', justifyContent: 'center', paddingTop: 8 }}>
-              <div style={{ width: 38, height: 5, borderRadius: 99, background: 'rgba(14,23,38,0.18)' }} />
+              <div style={{ width: 38, height: 5, borderRadius: 99, background: 'rgba(var(--ink-rgb), 0.18)' }} />
             </div>
           )}
           <div style={{ padding: 32, ...bodyStyle }}>
@@ -222,7 +222,7 @@ export function ModalHeader({ title, onClose }) {
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>
-      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 17, letterSpacing: '-0.02em', color: '#0E1726', textAlign: 'center',
+      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 17, letterSpacing: '-0.02em', color: 'var(--ink)', textAlign: 'center',
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</div>
       <span />
     </div>

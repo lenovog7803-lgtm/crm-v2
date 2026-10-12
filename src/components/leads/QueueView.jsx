@@ -86,10 +86,10 @@ export default function QueueView({ industry, onCounts }) {
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: ringColor }}>{pct}%</div>
         </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#8A93A0' }}>Звонки сегодня</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-3)' }}>Звонки сегодня</div>
           <div style={{ marginTop: 2 }}>
-            <span style={{ fontWeight: 700, fontSize: 28, letterSpacing: '-0.03em', color: '#0E1726', fontVariantNumeric: 'tabular-nums' }}>{todayCalls}</span>
-            <span style={{ fontSize: 15, fontWeight: 600, color: '#A6AEB8' }}> из {DAILY_GOAL}</span>
+            <span style={{ fontWeight: 700, fontSize: 28, letterSpacing: '-0.03em', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{todayCalls}</span>
+            <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-tertiary)' }}> из {DAILY_GOAL}</span>
           </div>
         </div>
       </div>
@@ -108,15 +108,15 @@ export default function QueueView({ industry, onCounts }) {
               <polyline points="22 4 12 14.01 9 11.01" />
             </svg>
           </div>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: '#0E1726' }}>Очередь пуста</div>
-          <div style={{ fontSize: 13, color: '#A6AEB8', marginTop: 6 }}>Все звонки на сегодня обработаны</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: 'var(--ink)' }}>Очередь пуста</div>
+          <div style={{ fontSize: 13, color: 'var(--text-tertiary)', marginTop: 6 }}>Все звонки на сегодня обработаны</div>
         </div>
       )}
 
       {!loading && lead && (
         <>
           <div className="card" style={{ padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 12.5, fontWeight: 600, color: '#5A6573' }}>{index + 1} из {queue.length} в очереди</span>
+            <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-secondary)' }}>{index + 1} из {queue.length} в очереди</span>
             <div style={{ display: 'flex', gap: 8 }}>
               {!lead.assigned_to && (
                 <button onClick={handleClaim} className="btn-primary" style={{ padding: '8px 14px', fontSize: 12.5 }}>Взять в работу</button>

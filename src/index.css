@@ -22,6 +22,21 @@
   --text-secondary: #5A6573;
   --text-tertiary: #A6AEB8;
   --text-quaternary: #C4CAD4;
+
+  /* Нейтральные цвета темы: текст, поверхности, линии. Фирменные (синий, зелёный…) — общие для обеих тем */
+  --ink: #0E1726; --ink-rgb: 14,23,38; --text-strong: #3A4454; --text-2b: #6B7480; --text-3: #8A93A0;
+  --line: #E8EAEE; --fill-2: #F0F1F4; --fill: #F7F8FA; --bg: #EDEFF3; --surface: #FFFFFF;
+  --paper-rgb: 255,255,255; --sep-rgb: 60,60,67;
+  --rim-k: 1;  /* сила белых бликов стекла */
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --ink: #F2F4F7; --ink-rgb: 236,240,246; --text-strong: #C9D0D9; --text-secondary: #A3ADBA; --text-2b: #97A1AD; --text-3: #858F9C;
+  --text-tertiary: #6C7684; --text-quaternary: #4B5360;
+  --line: #2A3039; --fill-2: #232830; --fill: #1B1F26; --bg: #0B0E13; --surface: #171B21;
+  --paper-rgb: 28,32,40; --sep-rgb: 235,235,245;
+  --rim-k: 0.14;
+  color-scheme: dark;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,13 +46,13 @@ html, body, #root { height: 100%; }
 html { -webkit-tap-highlight-color: transparent; }
 button, [role="button"], .no-callout { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 body {
-  font-family: var(--font-sys); background: #EDEFF3; -webkit-font-smoothing: antialiased;
+  font-family: var(--font-sys); background: var(--bg); -webkit-font-smoothing: antialiased;
   /* Digits line up in columns instead of jittering column width as sums
      change — matters everywhere money renders in a list or table. */
   font-variant-numeric: tabular-nums;
 }
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-thumb { background: rgba(14,23,38,0.15); border-radius: 8px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb { background: rgba(var(--ink-rgb), 0.15); border-radius: 8px; border: 2px solid transparent; background-clip: content-box; }
 
 /* No spinner arrows on any number input — easy to fat-finger a click on
    them and silently bump a rate/sum by 1, manual typing only. */
@@ -76,12 +91,12 @@ input[type="number"] {
 }
 
 .card {
-  background: rgba(255,255,255,0.6);
+  background: rgba(var(--paper-rgb), 0.6);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,calc(0.7 * var(--rim-k)));
   border-radius: var(--radius-lg);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 14px 40px -22px rgba(20,30,55,0.2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), 0 14px 40px -22px rgba(20,30,55,0.2);
   transition: box-shadow 0.2s var(--ease), transform 0.2s var(--ease);
 }
 
@@ -90,7 +105,7 @@ input[type="number"] {
   padding: 10px 18px; border-radius: 999px; border: none; cursor: pointer;
   background: linear-gradient(180deg, #2A7BFF 0%, #1366F0 100%); color: #fff;
   font-family: var(--font-sys); font-size: 14px; font-weight: 600; letter-spacing: -0.01em;
-  box-shadow: 0 8px 20px -10px rgba(19,102,240,0.75), inset 0 1px 0 rgba(255,255,255,0.28);
+  box-shadow: 0 8px 20px -10px rgba(19,102,240,0.75), inset 0 1px 0 rgba(255,255,255,calc(0.28 * var(--rim-k)));
   transition: filter 0.15s var(--ease), transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
 }
 @media (hover: hover) { .btn-primary:hover { filter: brightness(1.06); } }
@@ -101,8 +116,8 @@ input[type="number"] {
   display: flex; align-items: center; gap: 7px;
   padding: 9px 16px; border-radius: 999px;
   border: none; background: rgba(118,118,128,0.12);
-  color: #0E1726; font-family: var(--font-sys); font-size: 13.5px; font-weight: 600; letter-spacing: -0.01em; cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+  color: var(--ink); font-family: var(--font-sys); font-size: 13.5px; font-weight: 600; letter-spacing: -0.01em; cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.55 * var(--rim-k)));
   transition: background 0.15s var(--ease), transform 0.15s var(--ease);
 }
 @media (hover: hover) { .btn-ghost:hover { background: rgba(118,118,128,0.2); } }
@@ -114,7 +129,7 @@ input[type="number"] {
    stuck on a sidebar item permanently since nothing else ever reset it.
    :hover can't get stuck; the browser owns it. */
 .sidebar-nav-btn { background: transparent; transition: color 0.15s var(--ease); }
-@media (hover: hover) { .sidebar-nav-btn:hover { background: rgba(14,23,38,0.05); } }
+@media (hover: hover) { .sidebar-nav-btn:hover { background: rgba(var(--ink-rgb), 0.05); } }
 .sidebar-nav-btn.active:hover { background: transparent; }
 
 .section-label {
@@ -123,14 +138,14 @@ input[type="number"] {
 }
 
 .form-field { display: flex; flex-direction: column; gap: 6px; }
-.form-label { font-size: 13px; font-weight: 500; color: #6B7480; padding-left: 4px; }
+.form-label { font-size: 13px; font-weight: 500; color: var(--text-2b); padding-left: 4px; }
 .form-input {
-  padding: 10px 13px; border-radius: 11px; border: 1px solid rgba(14,23,38,0.11);
-  background: #fff; font-family: var(--font-sys); font-size: 14px; color: #0E1726;
+  padding: 10px 13px; border-radius: 11px; border: 1px solid rgba(var(--ink-rgb), 0.11);
+  background: var(--surface); font-family: var(--font-sys); font-size: 14px; color: var(--ink);
   outline: none;
   transition: background 0.15s var(--ease), box-shadow 0.15s var(--ease), border-color 0.15s var(--ease);
 }
-.form-input:focus { background: #fff; border-color: rgba(19,102,240,0.45); box-shadow: 0 0 0 3.5px rgba(19,102,240,0.16); }
+.form-input:focus { background: var(--surface); border-color: rgba(19,102,240,0.45); box-shadow: 0 0 0 3.5px rgba(19,102,240,0.16); }
 
 /* App layout */
 .app-root {
@@ -139,7 +154,7 @@ input[type="number"] {
   height: 100vh;
   height: 100dvh; /* iPhone Safari: высота без прыжков из-за адресной строки */
   overflow: hidden;
-  background: #EDEFF3;
+  background: var(--bg);
 }
 
 .aurora-bg {
@@ -236,7 +251,7 @@ input[type="number"] {
     margin-bottom: 0 !important;
     padding: 10px 16px !important;
     /* материал, а не сплошная плашка: полупрозрачно + размытие, без жёсткой линии */
-    background: rgba(251,251,253,0.72) !important;
+    background: rgba(var(--paper-rgb), 0.72) !important;
     backdrop-filter: blur(20px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
     border-bottom: none !important;
@@ -298,22 +313,22 @@ input[type="number"] {
 
 /* «Уменьшить прозрачность»: плотные поверхности без размытия */
 @media (prefers-reduced-transparency: reduce) {
-  .card { background: #FFFFFF !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
-  .modal-overlay { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(14,23,38,0.55) !important; }
-  .modal-panel { background: #FFFFFF !important; backdrop-filter: none !important; }
-  .mobile-nav, .topbar-mobile { background: #FBFBFD !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .card { background: var(--surface) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .modal-overlay { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(var(--ink-rgb), 0.55) !important; }
+  .modal-panel { background: var(--surface) !important; backdrop-filter: none !important; }
+  .mobile-nav, .topbar-mobile { background: var(--surface) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
   .aurora-bg { display: none; }
 }
 
 /* «Увеличить контраст»: почти сплошной фон и чёткая граница */
 @media (prefers-contrast: more) {
-  .card { background: #FFFFFF !important; border: 1px solid rgba(14,23,38,0.35) !important; }
-  :root { --text-tertiary: #5A6573; --text-quaternary: #8A93A0; }
+  .card { background: var(--surface) !important; border: 1px solid rgba(var(--ink-rgb), 0.35) !important; }
+  :root:not([data-theme="dark"]) { --text-tertiary: #5A6573; --text-quaternary: #8A93A0; }
 }
 
 /* Строки списка в стиле iOS: серая подсветка сразу при нажатии */
 .ios-row { -webkit-tap-highlight-color: transparent; transition: background-color 0.2s ease-out; }
-.ios-row:active { background: #D1D1D6 !important; transition: none; }
+.ios-row:active { background: rgba(var(--ink-rgb), 0.12) !important; transition: none; }
 
 /* ===== transitions.dev: галочка успеха, «выпрыгивающие» цифры, смена текста ===== */
 :root {
@@ -427,19 +442,19 @@ input[type="number"] {
 .search-pill {
   position: relative; display: flex; align-items: center; flex-shrink: 0;
   width: 38px; height: 38px; border-radius: 12px; cursor: text; overflow: hidden;
-  background: rgba(255,255,255,0.7);
-  border: 1px solid rgba(14,23,38,0.10);
-  box-shadow: 0 1px 2px rgba(14,23,38,0.06), inset 0 1px 0 rgba(255,255,255,0.7);
+  background: rgba(var(--paper-rgb), 0.7);
+  border: 1px solid rgba(var(--ink-rgb), 0.10);
+  box-shadow: 0 1px 2px rgba(14,23,38,0.06), inset 0 1px 0 rgba(255,255,255,calc(0.7 * var(--rim-k)));
   backdrop-filter: blur(12px) saturate(160%); -webkit-backdrop-filter: blur(12px) saturate(160%);
   transition: width 420ms cubic-bezier(0.22, 1, 0.36, 1), border-color 200ms ease, box-shadow 200ms ease, background 200ms ease;
 }
-.search-pill.is-open { width: 300px; background: rgba(255,255,255,0.92); }
+.search-pill.is-open { width: 300px; background: rgba(var(--paper-rgb), 0.92); }
 .search-pill:focus-within {
   border-color: rgba(19,102,240,0.45);
   box-shadow: 0 0 0 4px rgba(19,102,240,0.12), 0 6px 18px -8px rgba(19,102,240,0.35);
 }
 .search-pill-icon {
-  position: absolute; left: 10px; top: 50%; color: #5A6573; pointer-events: none;
+  position: absolute; left: 10px; top: 50%; color: var(--text-secondary); pointer-events: none;
   transform: translateY(-50%) rotate(0deg) scale(1);
   transition: color 200ms ease, transform 420ms cubic-bezier(0.34, 1.45, 0.64, 1);
 }
@@ -448,15 +463,15 @@ input[type="number"] {
 .search-pill.is-open:focus-within .search-pill-icon { transform: translateY(-50%) rotate(0deg) scale(0.92); }
 .search-pill-input {
   width: 100%; height: 100%; border: none; outline: none; background: transparent;
-  padding: 0 46px 0 34px; font-family: var(--font-sys); font-size: 13.5px; color: #0E1726;
+  padding: 0 46px 0 34px; font-family: var(--font-sys); font-size: 13.5px; color: var(--ink);
   opacity: 0; filter: blur(3px); transform: translateX(8px);
   transition: opacity 220ms ease 0ms, filter 220ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .search-pill.is-open .search-pill-input { opacity: 1; filter: blur(0); transform: none; transition-delay: 90ms; }
-.search-pill-input::placeholder { color: #A6AEB8; }
+.search-pill-input::placeholder { color: var(--text-tertiary); }
 .search-pill-kbd {
   position: absolute; right: 6px; top: 50%; height: 24px; padding: 0 7px; border-radius: 7px;
-  border: 1px solid rgba(14,23,38,0.1); background: rgba(255,255,255,0.85); color: #8A93A0; cursor: pointer;
+  border: 1px solid rgba(var(--ink-rgb), 0.1); background: rgba(var(--paper-rgb), 0.85); color: var(--text-3); cursor: pointer;
   font-family: var(--font-sys); font-size: 11px; font-weight: 600;
   opacity: 0; transform: translateY(-50%) scale(0.8); pointer-events: none;
   transition: opacity 200ms ease, transform 300ms cubic-bezier(0.34, 1.45, 0.64, 1);
@@ -479,38 +494,38 @@ input[type="number"] {
   .spotlight { animation: none !important; }
 }
 @media (prefers-reduced-transparency: reduce) {
-  .spotlight { background: #FAFAFC !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .spotlight { background: var(--surface) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
 }
 
 /* ===== Окно звонка в стиле macOS ===== */
 .call-window {
   font-family: var(--font-sys);
-  background: rgba(246,247,250,0.82);
+  background: rgba(var(--paper-rgb), 0.82);
   backdrop-filter: blur(40px) saturate(190%); -webkit-backdrop-filter: blur(40px) saturate(190%);
-  border: 1px solid rgba(255,255,255,0.7);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 0 0 0.5px rgba(14,23,38,0.14), 0 40px 100px -24px rgba(14,23,38,0.5);
+  border: 1px solid rgba(255,255,255,calc(0.7 * var(--rim-k)));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.85 * var(--rim-k))), 0 0 0 0.5px rgba(14,23,38,0.14), 0 40px 100px -24px rgba(14,23,38,0.5);
   animation: callWindowIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 @keyframes callWindowIn { from { opacity: 0; transform: scale(0.97) translateY(6px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
 /* «листы» внутри окна: белые, без рамок, мягкая тень — как группы в настройках macOS */
 .call-window .card.call-sheet {
-  background: rgba(255,255,255,0.86) !important; border: none !important; border-radius: 20px !important;
+  background: rgba(var(--paper-rgb), 0.86) !important; border: none !important; border-radius: 20px !important;
   box-shadow: 0 0 0 0.5px rgba(14,23,38,0.08), 0 1px 3px rgba(14,23,38,0.05) !important;
   backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
 }
 .call-close {
   width: 30px; height: 30px; border-radius: 99px; border: none; cursor: pointer; flex-shrink: 0;
   display: inline-flex; align-items: center; justify-content: center;
-  background: rgba(14,23,38,0.07); color: #5A6573; transition: background 150ms, color 150ms, transform 150ms;
+  background: rgba(var(--ink-rgb), 0.07); color: var(--text-secondary); transition: background 150ms, color 150ms, transform 150ms;
 }
 .call-close:hover { background: rgba(224,71,59,0.14); color: #E0473B; }
 .call-close:active { transform: scale(0.92); }
 .call-pill {
   display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 13px; border-radius: 99px;
   border: none; cursor: pointer; text-decoration: none; font-family: var(--font-sys); font-size: 13px; font-weight: 600;
-  background: rgba(14,23,38,0.06); color: #3A4454; transition: background 150ms, transform 150ms;
+  background: rgba(var(--ink-rgb), 0.06); color: var(--text-strong); transition: background 150ms, transform 150ms;
 }
-.call-pill:hover { background: rgba(14,23,38,0.1); }
+.call-pill:hover { background: rgba(var(--ink-rgb), 0.1); }
 .call-pill:active { transform: scale(0.97); }
 .call-pill--blue { background: #0A84FF; color: #fff; box-shadow: 0 4px 12px -4px rgba(10,132,255,0.6); }
 .call-pill--blue:hover { background: #0071E3; }
@@ -518,42 +533,42 @@ input[type="number"] {
 .call-pill--green:hover { background: rgba(48,209,88,0.24); }
 .call-icon-btn {
   width: 28px; height: 28px; border-radius: 99px; border: none; cursor: pointer;
-  background: rgba(14,23,38,0.06); color: #5A6573; transition: background 150ms;
+  background: rgba(var(--ink-rgb), 0.06); color: var(--text-secondary); transition: background 150ms;
 }
-.call-icon-btn:hover { background: rgba(14,23,38,0.11); }
+.call-icon-btn:hover { background: rgba(var(--ink-rgb), 0.11); }
 .call-outcome { transition: background 150ms, box-shadow 150ms, transform 150ms; }
 .call-outcome:hover { transform: translateY(-1px); }
 .call-outcome:active { transform: scale(0.98); }
-.call-timeline .call-tl-row { display: flex; gap: 12px; padding: 10px 4px; border-bottom: 0.5px solid rgba(14,23,38,0.08); }
+.call-timeline .call-tl-row { display: flex; gap: 12px; padding: 10px 4px; border-bottom: 0.5px solid rgba(var(--ink-rgb), 0.08); }
 .call-timeline .call-tl-row:last-child { border-bottom: none; }
 .call-save {
   width: 100%; height: 48px; border-radius: 14px; border: none; font-family: var(--font-sys); font-size: 15px; font-weight: 600;
   display: flex; align-items: center; justify-content: center; cursor: not-allowed;
-  background: rgba(14,23,38,0.06); color: #8A93A0; transition: background 200ms, color 200ms, box-shadow 200ms, transform 150ms;
+  background: rgba(var(--ink-rgb), 0.06); color: var(--text-3); transition: background 200ms, color 200ms, box-shadow 200ms, transform 150ms;
 }
-.call-save.is-ready { cursor: pointer; background: linear-gradient(180deg, #2F95FF, #0A7BF5); color: #fff; box-shadow: 0 8px 20px -8px rgba(10,132,255,0.7), inset 0 1px 0 rgba(255,255,255,0.25); }
+.call-save.is-ready { cursor: pointer; background: linear-gradient(180deg, #2F95FF, #0A7BF5); color: #fff; box-shadow: 0 8px 20px -8px rgba(10,132,255,0.7), inset 0 1px 0 rgba(255,255,255,calc(0.25 * var(--rim-k))); }
 .call-save.is-ready:active { transform: scale(0.985); }
 @media (prefers-reduced-motion: reduce) { .call-window { animation: none; } }
-@media (prefers-reduced-transparency: reduce) { .call-window { background: #F6F7FA; backdrop-filter: none; -webkit-backdrop-filter: none; } }
+@media (prefers-reduced-transparency: reduce) { .call-window { background: var(--fill); backdrop-filter: none; -webkit-backdrop-filter: none; } }
 
 /* ===== Выпадающие списки в стиле macOS ===== */
 .apple-select {
   display: inline-flex; align-items: center; justify-content: space-between; gap: 10px;
   min-height: 34px; padding: 0 10px 0 12px; border-radius: 10px; cursor: pointer; text-align: left;
-  font-family: inherit; font-size: 13px; color: #0E1726;
-  background: rgba(255,255,255,0.85); border: 1px solid rgba(14,23,38,0.12);
-  box-shadow: 0 1px 2px rgba(14,23,38,0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+  font-family: inherit; font-size: 13px; color: var(--ink);
+  background: rgba(var(--paper-rgb), 0.85); border: 1px solid rgba(var(--ink-rgb), 0.12);
+  box-shadow: 0 1px 2px rgba(14,23,38,0.06), inset 0 1px 0 rgba(255,255,255,calc(0.8 * var(--rim-k)));
   transition: border-color 150ms, box-shadow 150ms, background 150ms;
 }
-.apple-select:hover { border-color: rgba(14,23,38,0.2); }
+.apple-select:hover { border-color: rgba(var(--ink-rgb), 0.2); }
 .apple-select:focus-visible, .apple-select.is-open { outline: none; border-color: rgba(10,132,255,0.55); box-shadow: 0 0 0 3.5px rgba(10,132,255,0.18); }
 .apple-select:disabled { opacity: 0.5; cursor: default; }
 .apple-select-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .apple-select-menu {
   position: fixed; z-index: 3000; overflow-y: auto; padding: 5px; border-radius: 12px;
-  font-family: var(--font-sys); font-size: 13.5px; color: #0E1726;
-  background: rgba(248,248,250,0.86); backdrop-filter: blur(30px) saturate(190%); -webkit-backdrop-filter: blur(30px) saturate(190%);
-  box-shadow: 0 0 0 0.5px rgba(14,23,38,0.18), 0 12px 32px -8px rgba(14,23,38,0.35), inset 0 1px 0 rgba(255,255,255,0.7);
+  font-family: var(--font-sys); font-size: 13.5px; color: var(--ink);
+  background: rgba(var(--paper-rgb), 0.86); backdrop-filter: blur(30px) saturate(190%); -webkit-backdrop-filter: blur(30px) saturate(190%);
+  box-shadow: 0 0 0 0.5px rgba(14,23,38,0.18), 0 12px 32px -8px rgba(14,23,38,0.35), inset 0 1px 0 rgba(255,255,255,calc(0.7 * var(--rim-k)));
   animation: appleMenuIn 260ms cubic-bezier(0.32, 0.72, 0, 1) both;
 }
 @keyframes appleMenuIn { from { opacity: 0; transform: scale(0.55); } 60% { opacity: 1; } to { opacity: 1; transform: none; } }
@@ -565,9 +580,9 @@ input[type="number"] {
   cursor: default; white-space: nowrap; user-select: none;
 }
 .apple-select-item[data-active="true"]:not(.is-disabled) { background: #0A84FF; color: #fff; }
-.apple-select-item.is-disabled { color: #A6AEB8; }
+.apple-select-item.is-disabled { color: var(--text-tertiary); }
 .apple-select-check { width: 16px; flex-shrink: 0; text-align: center; font-size: 12px; font-weight: 700; }
-.apple-select-sep { height: 1px; margin: 5px 8px; background: rgba(14,23,38,0.1); }
+.apple-select-sep { height: 1px; margin: 5px 8px; background: rgba(var(--ink-rgb), 0.1); }
 /* телефон: родной список, кнопка в том же стиле, своя стрелка вместо системной */
 .apple-select-native {
   -webkit-appearance: none; appearance: none; padding-right: 30px !important;
@@ -588,7 +603,7 @@ input[type="number"] {
 .ios-switch:disabled { opacity: 0.5; cursor: default; }
 .ios-switch:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(10,132,255,0.35); }
 .ios-switch-knob {
-  position: absolute; top: 2px; left: 2px; width: 21px; height: 21px; border-radius: 99px; background: #fff;
+  position: absolute; top: 2px; left: 2px; width: 21px; height: 21px; border-radius: 99px; background: var(--surface);
   box-shadow: 0 2px 5px rgba(0,0,0,0.18), 0 0 0 0.5px rgba(0,0,0,0.04);
   transition: transform 300ms cubic-bezier(0.34, 1.36, 0.64, 1), background 160ms ease, box-shadow 160ms ease;
 }
@@ -608,13 +623,13 @@ input[type="number"] {
 /* ===== Liquid Glass (как в iOS 26 / macOS Tahoe) — на чистом CSS, без снимков страницы ===== */
 .liquid-glass, .ios-widget {
   isolation: isolate;
-  background: linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.40) 100%) !important;
+  background: linear-gradient(180deg, rgba(var(--paper-rgb), 0.62) 0%, rgba(var(--paper-rgb), 0.40) 100%) !important;
   backdrop-filter: blur(28px) saturate(210%) brightness(1.04) !important;
   -webkit-backdrop-filter: blur(28px) saturate(210%) brightness(1.04) !important;
-  border: 1px solid rgba(255,255,255,0.5) !important;
+  border: 1px solid rgba(255,255,255,calc(0.5 * var(--rim-k))) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.95),
-    inset 0 -1px 0 rgba(255,255,255,0.3),
+    inset 0 1px 0 rgba(255,255,255,calc(0.95 * var(--rim-k))),
+    inset 0 -1px 0 rgba(255,255,255,calc(0.3 * var(--rim-k))),
     0 12px 32px -14px rgba(20,30,55,0.25),
     0 1px 2px rgba(20,30,55,0.05) !important;
 }
@@ -622,33 +637,33 @@ input[type="number"] {
 /* светящийся край: свет падает сверху-слева и отражается снизу-справа */
 .liquid-glass::before, .ios-widget::before {
   content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 1px; pointer-events: none;
-  background: linear-gradient(140deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.15) 35%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.55) 100%);
+  background: linear-gradient(140deg, rgba(255,255,255,calc(0.95 * var(--rim-k))) 0%, rgba(255,255,255,calc(0.15 * var(--rim-k))) 35%, rgba(255,255,255,calc(0 * var(--rim-k))) 60%, rgba(255,255,255,calc(0.55 * var(--rim-k))) 100%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
 }
 /* мягкий блик по верху — «толщина» стекла */
 .liquid-glass::after, .ios-widget::after {
   content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
-  background: radial-gradient(140% 70% at 20% -20%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 55%);
+  background: radial-gradient(140% 70% at 20% -20%, rgba(255,255,255,calc(0.55 * var(--rim-k))) 0%, rgba(255,255,255,calc(0 * var(--rim-k))) 55%);
 }
 /* «линза» — выделение активного пункта/вкладки как капля стекла */
 .lg-lens {
-  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.7)) !important;
+  background: linear-gradient(180deg, rgba(var(--paper-rgb), 0.92), rgba(var(--paper-rgb), 0.7)) !important;
   box-shadow: 0 6px 16px -6px rgba(20,30,55,0.22), 0 1px 2px rgba(20,30,55,0.06),
     inset 0 1px 0 #fff, inset 0 0 0 0.5px rgba(14,23,38,0.06) !important;
 }
 @media (prefers-reduced-transparency: reduce) {
-  .liquid-glass { background: #F7F8FA !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .liquid-glass { background: var(--fill) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
   .liquid-glass::before, .liquid-glass::after { display: none; }
 }
 @media (prefers-contrast: more) {
-  .liquid-glass { background: rgba(255,255,255,0.95) !important; border-color: rgba(14,23,38,0.25) !important; }
+  .liquid-glass { background: rgba(var(--paper-rgb), 0.95) !important; border-color: rgba(var(--ink-rgb), 0.25) !important; }
 }
 
 /* плавающая панель вкладок на телефоне — чуть прозрачнее и с глубокой тенью, чтобы «парила» над контентом */
 .lg-tabbar.liquid-glass {
-  background: linear-gradient(180deg, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.42) 100%) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -1px 0 rgba(255,255,255,0.35),
+  background: linear-gradient(180deg, rgba(var(--paper-rgb), 0.58) 0%, rgba(var(--paper-rgb), 0.42) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.95 * var(--rim-k))), inset 0 -1px 0 rgba(255,255,255,calc(0.35 * var(--rim-k))),
     0 18px 40px -14px rgba(20,30,55,0.35), 0 2px 6px rgba(20,30,55,0.08) !important;
 }
 
@@ -656,7 +671,7 @@ input[type="number"] {
 .ios-check {
   flex-shrink: 0; padding: 0; cursor: pointer; border-radius: 50%;
   display: inline-flex; align-items: center; justify-content: center;
-  background: transparent; border: 1.6px solid rgba(60,60,67,0.3);
+  background: transparent; border: 1.6px solid rgba(var(--sep-rgb), 0.3);
   transition: background 200ms ease, border-color 200ms ease, transform 150ms ease;
 }
 .ios-check.is-on { background: var(--check-on, #0A84FF); border-color: var(--check-on, #0A84FF); }
@@ -664,9 +679,9 @@ input[type="number"] {
 .ios-check:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(10,132,255,0.3); }
 /* при нажатии ползунок становится стеклянной каплей — сквозь него видно дорожку (Liquid Glass) */
 .ios-switch:active:not(:disabled) .ios-switch-knob {
-  background: rgba(255,255,255,0.45);
+  background: rgba(var(--paper-rgb), 0.45);
   backdrop-filter: blur(2px) saturate(180%); -webkit-backdrop-filter: blur(2px) saturate(180%);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), inset 0 0 0 0.5px rgba(255,255,255,0.7), 0 3px 10px rgba(0,0,0,0.18);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.95 * var(--rim-k))), inset 0 0 0 0.5px rgba(255,255,255,calc(0.7 * var(--rim-k))), 0 3px 10px rgba(0,0,0,0.18);
   transform: scale(1.25) translateX(var(--knob-x, 0px));
 }
 .ios-switch.is-on { --knob-x: 15px; }
@@ -678,28 +693,28 @@ input[type="number"] {
 .app-root input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not(.search-pill-input):not([data-plain]),
 .app-root textarea:not([data-plain]),
 .app-root .apple-select:not(.status-pill) {
-  background: #fff !important;
-  border: 1px solid rgba(14,23,38,0.11) !important;
+  background: var(--surface) !important;
+  border: 1px solid rgba(var(--ink-rgb), 0.11) !important;
   border-radius: 11px !important;
   box-shadow: 0 1px 2px rgba(14,23,38,0.04) !important;
-  color: #0E1726;
+  color: var(--ink);
   caret-color: #1366F0;
   transition: background 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 .app-root input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not(.search-pill-input):not([data-plain]):focus,
 .app-root textarea:not([data-plain]):focus,
 .app-root .apple-select:not(.status-pill):focus-visible, .app-root .apple-select:not(.status-pill).is-open {
-  background: #fff !important;
+  background: var(--surface) !important;
   border-color: rgba(19,102,240,0.45) !important;
   box-shadow: 0 0 0 3.5px rgba(19,102,240,0.16) !important;
   outline: none;
 }
-.app-root input::placeholder, .app-root textarea::placeholder { color: rgba(60,60,67,0.45); }
+.app-root input::placeholder, .app-root textarea::placeholder { color: rgba(var(--sep-rgb), 0.45); }
 /* поля внутри стеклянных/тёмных мест, где серая заливка не к месту */
 .app-root .spotlight input, .app-root .search-pill input { background: transparent !important; box-shadow: none !important; border: none !important; }
 
 /* ===== iOS 26: большой заголовок, который сжимается при прокрутке ===== */
-.ios-title { font-family: var(--font-sys); font-weight: 700; color: #0E1726; letter-spacing: -0.025em; line-height: 1.1;
+.ios-title { font-family: var(--font-sys); font-weight: 700; color: var(--ink); letter-spacing: -0.025em; line-height: 1.1;
   transition: font-size 260ms cubic-bezier(0.22, 1, 0.36, 1), letter-spacing 260ms; }
 .ios-subtitle { transition: opacity 200ms ease, max-height 260ms cubic-bezier(0.22, 1, 0.36, 1); overflow: hidden; max-height: 20px; }
 .topbar-compact .ios-subtitle { opacity: 0; max-height: 0; }
@@ -707,24 +722,24 @@ input[type="number"] {
 /* ===== iOS 26: алерт подтверждения ===== */
 .ios-alert-scrim {
   position: fixed; inset: 0; z-index: 5000; display: flex; align-items: center; justify-content: center; padding: 24px;
-  background: rgba(14,23,38,0.22); animation: pageIn 0.16s ease-out;
+  background: rgba(var(--ink-rgb), 0.22); animation: pageIn 0.16s ease-out;
 }
 .ios-alert-scrim[data-closing="true"] { animation: fadeOut 0.16s ease-in both; }
 .ios-alert {
   width: 300px; max-width: 100%; padding: 22px 18px 16px; border-radius: 30px; text-align: center; font-family: var(--font-sys);
-  background: rgba(250,250,252,0.82); backdrop-filter: blur(40px) saturate(190%); -webkit-backdrop-filter: blur(40px) saturate(190%);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 0.5px rgba(14,23,38,0.14), 0 30px 70px -20px rgba(14,23,38,0.45);
+  background: rgba(var(--paper-rgb), 0.82); backdrop-filter: blur(40px) saturate(190%); -webkit-backdrop-filter: blur(40px) saturate(190%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), 0 0 0 0.5px rgba(14,23,38,0.14), 0 30px 70px -20px rgba(14,23,38,0.45);
   animation: iosAlertIn 0.22s cubic-bezier(0.34, 1.3, 0.64, 1) both;
 }
 .ios-alert-scrim[data-closing="true"] .ios-alert { animation: iosAlertOut 0.16s ease-in both; }
 @keyframes iosAlertIn { from { opacity: 0; transform: scale(1.12); } to { opacity: 1; transform: scale(1); } }
 @keyframes iosAlertOut { to { opacity: 0; transform: scale(0.96); } }
-.ios-alert-title { font-size: 17px; font-weight: 600; color: #0E1726; letter-spacing: -0.02em; line-height: 1.3; }
-.ios-alert-body { margin-top: 6px; font-size: 13.5px; color: #5A6573; line-height: 1.4; }
+.ios-alert-title { font-size: 17px; font-weight: 600; color: var(--ink); letter-spacing: -0.02em; line-height: 1.3; }
+.ios-alert-body { margin-top: 6px; font-size: 13.5px; color: var(--text-secondary); line-height: 1.4; }
 .ios-alert-actions { display: flex; gap: 8px; margin-top: 18px; }
 .ios-alert-btn {
   flex: 1; height: 44px; border-radius: 999px; border: none; cursor: pointer; font-family: var(--font-sys);
-  font-size: 15.5px; font-weight: 600; background: rgba(118,118,128,0.14); color: #0E1726; transition: filter 0.12s, transform 0.12s;
+  font-size: 15.5px; font-weight: 600; background: rgba(118,118,128,0.14); color: var(--ink); transition: filter 0.12s, transform 0.12s;
 }
 .ios-alert-btn:active { transform: scale(0.97); }
 .ios-alert-btn--primary { background: #1366F0; color: #fff; }
@@ -734,15 +749,15 @@ input[type="number"] {
 
 /* ===== iOS 26: модальные окна — стеклянные шторки ===== */
 .modal-panel.ios-sheet {
-  background: rgba(248,248,250,0.86) !important;
+  background: rgba(var(--paper-rgb), 0.86) !important;
   backdrop-filter: blur(40px) saturate(190%) !important; -webkit-backdrop-filter: blur(40px) saturate(190%) !important;
   border-radius: 32px !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 0.5px rgba(14,23,38,0.14), 0 40px 100px -24px rgba(14,23,38,0.45) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), 0 0 0 0.5px rgba(14,23,38,0.14), 0 40px 100px -24px rgba(14,23,38,0.45) !important;
 }
 .ios-sheet-close {
   width: 34px; height: 34px; border-radius: 999px; border: none; cursor: pointer; flex-shrink: 0;
-  display: inline-flex; align-items: center; justify-content: center; color: #3A4454;
-  background: rgba(118,118,128,0.14); box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+  display: inline-flex; align-items: center; justify-content: center; color: var(--text-strong);
+  background: rgba(118,118,128,0.14); box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.7 * var(--rim-k)));
   transition: background 0.15s, transform 0.15s;
 }
 .ios-sheet-close:hover { background: rgba(118,118,128,0.24); }
@@ -754,7 +769,7 @@ input[type="number"] {
 
 /* ===== iOS 26: списки как в «Настройках» / «Контактах» ===== */
 .ios-list {
-  background: rgba(255,255,255,0.86); border-radius: 22px; overflow: hidden;
+  background: rgba(var(--paper-rgb), 0.86); border-radius: 22px; overflow: hidden;
   box-shadow: 0 0 0 0.5px rgba(14,23,38,0.07), 0 1px 3px rgba(14,23,38,0.05);
 }
 .ios-row {
@@ -762,16 +777,16 @@ input[type="number"] {
   cursor: pointer; font-family: var(--font-sys); transition: background 0.12s;
 }
 /* разделитель с отступом от аватара — как в iOS */
-.ios-row + .ios-row::before { content: ''; position: absolute; top: 0; left: 70px; right: 0; height: 0.5px; background: rgba(60,60,67,0.18); }
+.ios-row + .ios-row::before { content: ''; position: absolute; top: 0; left: 70px; right: 0; height: 0.5px; background: rgba(var(--sep-rgb), 0.18); }
 @media (hover: hover) { .ios-row:hover { background: rgba(118,118,128,0.07); } }
 .ios-row:active { background: rgba(118,118,128,0.14); }
 .ios-row-avatar {
   width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-  color: #fff; font-weight: 600; font-size: 15px; letter-spacing: -0.01em; box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+  color: #fff; font-weight: 600; font-size: 15px; letter-spacing: -0.01em; box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.3 * var(--rim-k)));
 }
 .ios-row-text { flex: 1; min-width: 0; }
-.ios-row-title { font-size: 15.5px; font-weight: 600; color: #0E1726; letter-spacing: -0.015em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ios-row-sub { font-size: 13px; color: #8A93A0; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ios-row-title { font-size: 15.5px; font-weight: 600; color: var(--ink); letter-spacing: -0.015em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ios-row-sub { font-size: 13px; color: var(--text-3); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ios-row-actions { display: flex; gap: 6px; flex-shrink: 0; }
 .ios-row-icon {
   width: 32px; height: 32px; border-radius: 50%; border: none; cursor: pointer; text-decoration: none;
@@ -782,7 +797,7 @@ input[type="number"] {
 .ios-row-icon--red { background: rgba(255,59,48,0.1); color: #FF3B30; }
 /* удаление видно при наведении, на телефоне — всегда */
 @media (hover: hover) { .ios-row .ios-row-del { opacity: 0; } .ios-row:hover .ios-row-del { opacity: 1; } }
-.ios-row-chevron { color: rgba(60,60,67,0.3); flex-shrink: 0; margin-left: 2px; }
+.ios-row-chevron { color: rgba(var(--sep-rgb), 0.3); flex-shrink: 0; margin-left: 2px; }
 .ios-row-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 99px; flex-shrink: 0;
   background: rgba(255,149,0,0.12); color: #D97706; font-size: 12.5px; font-weight: 700; }
 
@@ -792,7 +807,7 @@ input[type="number"] {
   transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
 @media (prefers-reduced-transparency: reduce) {
-  .ios-widget { background: #fff !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .ios-widget { background: var(--surface) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
   .ios-widget::before, .ios-widget::after { display: none; }
 }
 @media (max-width: 768px) { .ios-widget { border-radius: 22px; } }
@@ -808,7 +823,7 @@ input[type="number"] {
 /* iOS 26: группа полей в форме — белая карточка на сером листе («Настройки») */
 .ios-form-group {
   display: flex; flex-direction: column; gap: 12px;
-  background: rgba(244,246,249,0.75); border-radius: 20px; padding: 16px;
+  background: rgba(var(--paper-rgb), 0.75); border-radius: 20px; padding: 16px;
   box-shadow: inset 0 0 0 1px rgba(14,23,38,0.05);
 }
 
@@ -816,19 +831,19 @@ input[type="number"] {
 .date-input { cursor: pointer; text-align: left; gap: 8px; }
 .ios-cal {
   position: fixed; z-index: 3000; width: 300px; padding: 14px 12px 10px; border-radius: 24px;
-  background: rgba(255,255,255,0.88); -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%);
+  background: rgba(var(--paper-rgb), 0.88); -webkit-backdrop-filter: blur(30px) saturate(180%); backdrop-filter: blur(30px) saturate(180%);
   box-shadow: 0 0 0 0.5px rgba(14,23,38,0.08), 0 24px 60px -16px rgba(20,30,55,0.35), 0 4px 12px rgba(20,30,55,0.08);
   font-family: var(--font-sys); animation: appleMenuIn 280ms cubic-bezier(0.32, 0.72, 0, 1) both;
 }
 .ios-cal-head { display: flex; align-items: center; gap: 4px; padding: 0 6px 10px; }
-.ios-cal-title { flex: 1; font-size: 17px; font-weight: 600; color: #0E1726; letter-spacing: -0.02em; }
+.ios-cal-title { flex: 1; font-size: 17px; font-weight: 600; color: var(--ink); letter-spacing: -0.02em; }
 .ios-cal-nav { width: 32px; height: 32px; border-radius: 50%; border: none; background: transparent; color: #1366F0; cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center; transition: background 0.12s; }
 .ios-cal-nav:hover { background: rgba(19,102,240,0.1); }
 .ios-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 2px; }
-.ios-cal-wd { text-align: center; font-size: 12px; font-weight: 600; color: rgba(60,60,67,0.4); padding-bottom: 6px; }
+.ios-cal-wd { text-align: center; font-size: 12px; font-weight: 600; color: rgba(var(--sep-rgb), 0.4); padding-bottom: 6px; }
 .ios-cal-day { height: 38px; width: 38px; margin: 0 auto; border-radius: 50%; border: none; background: transparent; cursor: pointer;
-  font-family: var(--font-sys); font-size: 17px; font-weight: 400; color: #0E1726; font-variant-numeric: tabular-nums;
+  font-family: var(--font-sys); font-size: 17px; font-weight: 400; color: var(--ink); font-variant-numeric: tabular-nums;
   transition: background 0.12s, color 0.12s, transform 0.12s; }
 .ios-cal-day:hover { background: rgba(19,102,240,0.08); }
 .ios-cal-day:active { transform: scale(0.9); }
@@ -836,10 +851,10 @@ input[type="number"] {
 .ios-cal-day.is-sel { background: #1366F0; color: #fff; font-weight: 600; }
 .ios-cal-day.is-sel.is-today { background: #1366F0; }
 .ios-cal-time { display: flex; align-items: center; justify-content: space-between; margin: 8px 6px 0; padding-top: 10px;
-  border-top: 0.5px solid rgba(60,60,67,0.18); font-size: 15px; color: #0E1726; }
+  border-top: 0.5px solid rgba(var(--sep-rgb), 0.18); font-size: 15px; color: var(--ink); }
 .ios-cal-time input { border: none; outline: none; background: rgba(118,118,128,0.12); border-radius: 8px; padding: 5px 10px;
-  font-family: var(--font-sys); font-size: 16px; color: #0E1726; font-variant-numeric: tabular-nums; }
-.ios-cal-foot { display: flex; gap: 6px; margin-top: 8px; padding: 8px 4px 0; border-top: 0.5px solid rgba(60,60,67,0.18); }
+  font-family: var(--font-sys); font-size: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.ios-cal-foot { display: flex; gap: 6px; margin-top: 8px; padding: 8px 4px 0; border-top: 0.5px solid rgba(var(--sep-rgb), 0.18); }
 .ios-cal-foot button { border: none; background: transparent; color: #1366F0; font-family: var(--font-sys); font-size: 15px;
   padding: 6px 10px; border-radius: 10px; cursor: pointer; }
 .ios-cal-foot button:hover { background: rgba(19,102,240,0.08); }
@@ -852,52 +867,52 @@ input[type="number"] {
 
 /* экран входа — лёгкое стекло iOS 26, логотип как иконка приложения */
 .login-card { z-index: 1; width: 420px; max-width: calc(100vw - 32px); padding: 44px 36px 36px; border-radius: 36px !important; font-family: var(--font-sys);
-  background: linear-gradient(160deg, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.38) 100%) !important;
+  background: linear-gradient(160deg, rgba(var(--paper-rgb), 0.58) 0%, rgba(var(--paper-rgb), 0.38) 100%) !important;
   -webkit-backdrop-filter: blur(40px) saturate(180%); backdrop-filter: blur(40px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.65) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 40px 100px -30px rgba(20,30,55,0.35) !important; }
+  border: 1px solid rgba(255,255,255,calc(0.65 * var(--rim-k))) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.85 * var(--rim-k))), 0 40px 100px -30px rgba(20,30,55,0.35) !important; }
 .login-card::after { display: none; }
-.login-icon { width: 88px; height: 88px; margin: 0 auto 22px; border-radius: 24px; background: #fff;
+.login-icon { width: 88px; height: 88px; margin: 0 auto 22px; border-radius: 24px; background: var(--surface);
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 0 0 0.5px rgba(14,23,38,0.08), 0 12px 30px -10px rgba(20,30,55,0.3), inset 0 -2px 0 rgba(14,23,38,0.04); }
 .login-icon img { width: 62px; height: auto; display: block; }
 /* поля входа — отдельные, подпись сверху, как было изначально */
 .login-field { display: flex; flex-direction: column; gap: 6px; }
-.login-field span { font-size: 13px; font-weight: 500; color: #6B7480; padding-left: 4px; }
+.login-field span { font-size: 13px; font-weight: 500; color: var(--text-2b); padding-left: 4px; }
 .login-field input { width: 100%; box-sizing: border-box; height: 50px; padding: 0 16px; border-radius: 14px; outline: none;
-  border: 1px solid rgba(14,23,38,0.1); background: rgba(255,255,255,0.85); box-shadow: 0 1px 2px rgba(14,23,38,0.04);
-  font-family: var(--font-sys); font-size: 16px; color: #0E1726; caret-color: #1366F0; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s; }
-.login-field input:focus { background: #fff; border-color: rgba(19,102,240,0.45); box-shadow: 0 0 0 4px rgba(19,102,240,0.14); }
+  border: 1px solid rgba(var(--ink-rgb), 0.1); background: rgba(var(--paper-rgb), 0.85); box-shadow: 0 1px 2px rgba(14,23,38,0.04);
+  font-family: var(--font-sys); font-size: 16px; color: var(--ink); caret-color: #1366F0; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s; }
+.login-field input:focus { background: var(--surface); border-color: rgba(19,102,240,0.45); box-shadow: 0 0 0 4px rgba(19,102,240,0.14); }
 
 /* ===== главные карточки с живым градиентом (дашборд, финансы, рассылка, автопарк, маршрут) ===== */
 .grad-card { position: relative; overflow: hidden; isolation: isolate; color: #fff; border-radius: 26px !important;
-  border: 1px solid rgba(255,255,255,0.35) !important; transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease); }
+  border: 1px solid rgba(255,255,255,calc(0.35 * var(--rim-k))) !important; transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease); }
 @media (hover: hover) { .grad-card[role="button"]:hover, .grad-card.is-link:hover { transform: translateY(-3px); } }
 .grad-blue { background: radial-gradient(120% 80% at 10% -20%, rgba(255,255,255,0.3), transparent 50%), linear-gradient(150deg, #6E9CEB 0%, #5585DC 55%, #4A74C9 100%) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 18px 44px -22px rgba(40,90,190,0.45) !important; }
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.4 * var(--rim-k))), 0 18px 44px -22px rgba(40,90,190,0.45) !important; }
 .grad-orange { background: radial-gradient(120% 80% at 10% -20%, rgba(255,255,255,0.3), transparent 50%), linear-gradient(150deg, #EAA766 0%, #DC8E48 55%, #C97A36 100%) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 18px 44px -22px rgba(200,120,50,0.45) !important; }
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.4 * var(--rim-k))), 0 18px 44px -22px rgba(200,120,50,0.45) !important; }
 .grad-purple { background: radial-gradient(120% 80% at 10% -20%, rgba(255,255,255,0.3), transparent 50%), linear-gradient(150deg, #A68CE8 0%, #8C6FDB 55%, #7A5CCB 100%) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 18px 44px -22px rgba(120,90,200,0.45) !important; }
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.4 * var(--rim-k))), 0 18px 44px -22px rgba(120,90,200,0.45) !important; }
 .grad-green { background: radial-gradient(120% 80% at 10% -20%, rgba(255,255,255,0.3), transparent 50%), linear-gradient(150deg, #55B585 0%, #3FA374 55%, #2E8C60 100%) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 18px 44px -22px rgba(40,140,90,0.45) !important; }
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.4 * var(--rim-k))), 0 18px 44px -22px rgba(40,140,90,0.45) !important; }
 .grad-red { background: radial-gradient(120% 80% at 10% -20%, rgba(255,255,255,0.3), transparent 50%), linear-gradient(150deg, #E2716B 0%, #D35A54 55%, #BC4640 100%) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 18px 44px -22px rgba(200,70,60,0.45) !important; }
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.4 * var(--rim-k))), 0 18px 44px -22px rgba(200,70,60,0.45) !important; }
 /* подпись карточки — обычным регистром, белым */
 .grad-kicker { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.92); letter-spacing: -0.01em; margin-bottom: 8px; }
 
 /* ===== iOS: строка поиска ===== */
 .ios-search { display: flex; align-items: center; gap: 7px; height: 36px; padding: 0 10px; border-radius: 11px; box-sizing: border-box;
-  background: rgba(118,118,128,0.12); color: rgba(60,60,67,0.6); cursor: text; min-width: 0; transition: background 0.15s, box-shadow 0.15s; }
+  background: rgba(118,118,128,0.12); color: rgba(var(--sep-rgb), 0.6); cursor: text; min-width: 0; transition: background 0.15s, box-shadow 0.15s; }
 .ios-search:focus-within { background: rgba(118,118,128,0.16); box-shadow: 0 0 0 3px rgba(19,102,240,0.14); }
-.ios-search input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; font-family: var(--font-sys); font-size: 15px; color: #0E1726; caret-color: #1366F0; }
-.ios-search input::placeholder { color: rgba(60,60,67,0.6); }
-.ios-search-clear { border: none; background: transparent; padding: 0; display: flex; cursor: pointer; color: rgba(60,60,67,0.35); }
+.ios-search input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; font-family: var(--font-sys); font-size: 15px; color: var(--ink); caret-color: #1366F0; }
+.ios-search input::placeholder { color: rgba(var(--sep-rgb), 0.6); }
+.ios-search-clear { border: none; background: transparent; padding: 0; display: flex; cursor: pointer; color: rgba(var(--sep-rgb), 0.35); }
 
 /* ===== iOS Mail: список переписок ===== */
 .mail-row { position: relative; display: flex; gap: 10px; width: 100%; text-align: left; border: none; background: transparent; cursor: pointer;
   padding: 11px 14px 11px 8px; font-family: var(--font-sys); transition: background 0.12s; }
-.mail-row + .mail-row::before { content: ''; position: absolute; top: 0; left: 26px; right: 0; height: 0.5px; background: rgba(60,60,67,0.18); }
+.mail-row + .mail-row::before { content: ''; position: absolute; top: 0; left: 26px; right: 0; height: 0.5px; background: rgba(var(--sep-rgb), 0.18); }
 @media (hover: hover) { .mail-row:hover { background: rgba(118,118,128,0.07); } }
 .mail-row.is-active { background: rgba(19,102,240,0.1); }
 .mail-dot { width: 10px; height: 10px; border-radius: 50%; background: #1366F0; flex-shrink: 0; margin-top: 5px; }
@@ -905,11 +920,11 @@ input[type="number"] {
 /* ===== iMessage: переписка ===== */
 .bubble { max-width: 78%; padding: 9px 14px; border-radius: 20px; font-size: 14.5px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
 .bubble--me { align-self: flex-end; background: #1366F0; color: #fff; border-bottom-right-radius: 6px; }
-.bubble--them { align-self: flex-start; background: #E9E9EB; color: #0E1726; border-bottom-left-radius: 6px; }
-.bubble-meta { font-size: 11px; color: #8A93A0; margin: 2px 6px 0; }
-.composer { display: flex; align-items: flex-end; gap: 8px; padding: 10px 12px; border-top: 0.5px solid rgba(60,60,67,0.18); }
+.bubble--them { align-self: flex-start; background: #E9E9EB; color: var(--ink); border-bottom-left-radius: 6px; }
+.bubble-meta { font-size: 11px; color: var(--text-3); margin: 2px 6px 0; }
+.composer { display: flex; align-items: flex-end; gap: 8px; padding: 10px 12px; border-top: 0.5px solid rgba(var(--sep-rgb), 0.18); }
 .composer textarea { flex: 1; min-height: 38px; max-height: 180px; resize: none; box-sizing: border-box; padding: 8px 14px; border-radius: 19px;
-  border: 1px solid rgba(60,60,67,0.2); background: #fff; outline: none; font-family: var(--font-sys); font-size: 15px; line-height: 1.4; color: #0E1726; }
+  border: 1px solid rgba(var(--sep-rgb), 0.2); background: var(--surface); outline: none; font-family: var(--font-sys); font-size: 15px; line-height: 1.4; color: var(--ink); }
 .composer textarea:focus { border-color: rgba(19,102,240,0.45); }
 .composer-send { width: 34px; height: 34px; border-radius: 50%; border: none; flex-shrink: 0; margin-bottom: 2px; cursor: pointer;
   background: #1366F0; color: #fff; display: flex; align-items: center; justify-content: center; transition: transform 0.12s, opacity 0.15s; }
@@ -923,27 +938,27 @@ input[type="number"] {
 @media (max-width: 768px) {
   .liquid-glass, .ios-widget {
     box-shadow:
-      inset 0 1.5px 0 rgba(255,255,255,0.95),
-      inset 0 -1px 0 rgba(255,255,255,0.45),
-      inset 0 0 0 1px rgba(255,255,255,0.35),
+      inset 0 1.5px 0 rgba(255,255,255,calc(0.95 * var(--rim-k))),
+      inset 0 -1px 0 rgba(255,255,255,calc(0.45 * var(--rim-k))),
+      inset 0 0 0 1px rgba(255,255,255,calc(0.35 * var(--rim-k))),
       inset 0 0 14px rgba(255,255,255,0.35),
       inset 0 -10px 18px -12px rgba(20,30,55,0.12),
       0 12px 32px -14px rgba(20,30,55,0.28) !important;
   }
   .liquid-glass::after, .ios-widget::after {
-    background: radial-gradient(120% 60% at 25% -15%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 50%),
-      linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 22%) !important;
+    background: radial-gradient(120% 60% at 25% -15%, rgba(255,255,255,calc(0.75 * var(--rim-k))) 0%, rgba(255,255,255,calc(0 * var(--rim-k))) 50%),
+      linear-gradient(180deg, rgba(255,255,255,calc(0.28 * var(--rim-k))) 0%, rgba(255,255,255,calc(0 * var(--rim-k))) 22%) !important;
   }
 }
 
 /* ===== iOS 26: переключатель-сегменты — белая капсула без дорожки и без тени ===== */
 .seg-track { padding: 3px; border-radius: 99px; width: max-content; max-width: 100%; }
-.seg-thumb { isolation: isolate; transform-origin: center; background: rgba(255,255,255,0.95); }
+.seg-thumb { isolation: isolate; transform-origin: center; background: rgba(var(--paper-rgb), 0.95); }
 /* тонкий светящийся край вместо тени — капсула не «висит», а лежит в стекле */
 .seg-thumb::before { content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
-  background: linear-gradient(140deg, rgba(255,255,255,1) 0%, rgba(14,23,38,0.05) 50%, rgba(255,255,255,1) 100%);
+  background: linear-gradient(140deg, rgba(var(--paper-rgb), 1) 0%, rgba(var(--ink-rgb), 0.05) 50%, rgba(var(--paper-rgb), 1) 100%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
-@media (prefers-reduced-transparency: reduce) { .seg-thumb { background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; } }
+@media (prefers-reduced-transparency: reduce) { .seg-thumb { background: var(--surface); backdrop-filter: none; -webkit-backdrop-filter: none; } }
 
 /* отклик на нажатие: телефон не ждёт двойной тап (300 мс), кнопка «проседает» сразу при касании */
 button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action: manipulation; }
@@ -963,48 +978,48 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 
 
 /* ===== План: цели и выполнение ===== */
-.plan-bar { height: 6px; border-radius: 99px; background: rgba(14,23,38,0.07); overflow: hidden; }
+.plan-bar { height: 6px; border-radius: 99px; background: rgba(var(--ink-rgb), 0.07); overflow: hidden; }
 .plan-bar > div { height: 100%; border-radius: 99px; background: #1366F0; transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
 .plan-bar--hero { height: 8px; margin-top: 14px; background: rgba(255,255,255,0.25); }
-.plan-bar--hero > div { background: #fff; }
+.plan-bar--hero > div { background: var(--surface); }
 .plan-pill { font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 99px; white-space: nowrap;
-  background: rgba(118,118,128,0.12); color: #5A6573; }
+  background: rgba(118,118,128,0.12); color: var(--text-secondary); }
 .plan-pill.g { background: rgba(30,158,90,0.12); color: #1E9E5A; }
 .plan-pill.o { background: rgba(217,119,6,0.13); color: #C26A05; }
 .plan-pill.r { background: rgba(214,59,48,0.11); color: #D63B30; }
-.plan-metric { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: baseline; margin-bottom: 10px; font-size: 13px; color: #5A6573; }
-.plan-metric b { font-weight: 600; color: #0E1726; font-variant-numeric: tabular-nums; }
+.plan-metric { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: baseline; margin-bottom: 10px; font-size: 13px; color: var(--text-secondary); }
+.plan-metric b { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 .plan-metric .plan-bar { grid-column: 1 / -1; }
-.plan-krs { margin-top: 12px; padding-top: 10px; border-top: 0.5px solid rgba(60,60,67,0.18); display: flex; flex-direction: column; gap: 7px; }
-.plan-kr { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #0E1726; }
-.plan-kr-val { color: #8A93A0; font-size: 12.5px; font-variant-numeric: tabular-nums; text-align: right; }
+.plan-krs { margin-top: 12px; padding-top: 10px; border-top: 0.5px solid rgba(var(--sep-rgb), 0.18); display: flex; flex-direction: column; gap: 7px; }
+.plan-kr { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); }
+.plan-kr-val { color: var(--text-3); font-size: 12.5px; font-variant-numeric: tabular-nums; text-align: right; }
 .plan-kr-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: rgba(118,118,128,0.25); }
 .plan-kr-dot.ok { background: #1E9E5A; } .plan-kr-dot.wip { background: #D97706; } .plan-kr-dot.fail { background: #D63B30; }
 .plan-month { display: flex; align-items: center; gap: 12px; padding: 11px 16px; font-family: var(--font-sys); }
-.plan-month + .plan-month { border-top: 0.5px solid rgba(60,60,67,0.18); }
-.plan-month-name { width: 74px; font-weight: 600; font-size: 14px; color: #0E1726; display: flex; align-items: center; gap: 6px; }
+.plan-month + .plan-month { border-top: 0.5px solid rgba(var(--sep-rgb), 0.18); }
+.plan-month-name { width: 74px; font-weight: 600; font-size: 14px; color: var(--ink); display: flex; align-items: center; gap: 6px; }
 .plan-now { font-size: 10px; font-weight: 700; color: #1366F0; background: rgba(19,102,240,0.1); border-radius: 99px; padding: 1px 6px; }
-.plan-month-num { font-size: 13px; font-weight: 600; color: #0E1726; white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; width: 110px; }
-.plan-month-num span { font-weight: 400; color: #A6AEB8; }
-.plan-legend { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; color: #8A93A0; }
+.plan-month-num { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; width: 110px; }
+.plan-month-num span { font-weight: 400; color: var(--text-tertiary); }
+.plan-legend { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; color: var(--text-3); }
 .plan-legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
 .plan-edit { border-collapse: collapse; font-size: 13px; }
-.plan-edit th { text-align: left; font-weight: 600; color: #8A93A0; font-size: 12px; padding: 0 6px 6px; }
+.plan-edit th { text-align: left; font-weight: 600; color: var(--text-3); font-size: 12px; padding: 0 6px 6px; }
 .plan-edit td { padding: 3px 6px; }
 
 /* План: прогнозы, светофор, неделя продаж */
-.plan-scn { position: relative; height: 8px; border-radius: 99px; background: rgba(14,23,38,0.06); margin-top: 5px; }
+.plan-scn { position: relative; height: 8px; border-radius: 99px; background: rgba(var(--ink-rgb), 0.06); margin-top: 5px; }
 .plan-scn > div { height: 100%; border-radius: 99px; opacity: 0.85; transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
 .plan-scn > i { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; border-radius: 2px; background: #0E1726; opacity: 0.5; }
-.plan-need { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: rgba(19,102,240,0.06); font-size: 13.5px; line-height: 1.5; color: #0E1726; }
+.plan-need { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: rgba(19,102,240,0.06); font-size: 13.5px; line-height: 1.5; color: var(--ink); }
 .plan-light-bar { display: flex; gap: 3px; height: 14px; border-radius: 99px; overflow: hidden; }
 .plan-light-bar > div { min-width: 6px; }
-.plan-light-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; font-size: 12.5px; color: #0E1726; }
+.plan-light-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; font-size: 12.5px; color: var(--ink); }
 .plan-light-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 .plan-light-n { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin-top: 2px; }
-.plan-light-n span { font-size: 12px; font-weight: 500; color: #8A93A0; }
-.plan-light-sub { font-size: 11.5px; color: #8A93A0; }
-.plan-light-worst { margin-top: 14px; padding-top: 10px; border-top: 0.5px solid rgba(60,60,67,0.18); display: flex; flex-direction: column; gap: 6px; }
+.plan-light-n span { font-size: 12px; font-weight: 500; color: var(--text-3); }
+.plan-light-sub { font-size: 11.5px; color: var(--text-3); }
+.plan-light-worst { margin-top: 14px; padding-top: 10px; border-top: 0.5px solid rgba(var(--sep-rgb), 0.18); display: flex; flex-direction: column; gap: 6px; }
 .plan-week-stat { padding: 10px 12px; border-radius: 14px; background: rgba(118,118,128,0.06); min-width: 0; }
 .plan-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 .plan-day { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0 6px; border-radius: 12px; }
@@ -1012,13 +1027,13 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .plan-day.is-future { opacity: 0.45; }
 .plan-day-bars { height: 70px; width: 18px; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; }
 .plan-day-bars > div { width: 100%; border-radius: 4px; transition: height 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
-.plan-day-n { font-size: 12px; font-weight: 700; color: #0E1726; min-height: 15px; font-variant-numeric: tabular-nums; }
-.plan-day-label { font-size: 11.5px; font-weight: 600; color: #5A6573; }
-.plan-day-label span { color: #A6AEB8; font-weight: 400; }
+.plan-day-n { font-size: 12px; font-weight: 700; color: var(--ink); min-height: 15px; font-variant-numeric: tabular-nums; }
+.plan-day-label { font-size: 11.5px; font-weight: 600; color: var(--text-secondary); }
+.plan-day-label span { color: var(--text-tertiary); font-weight: 400; }
 
 /* План: раскрывающийся блок */
 .plan-disc-head { width: 100%; display: flex; align-items: center; gap: 12px; border: none; background: transparent; cursor: pointer; font-family: var(--font-sys); border-radius: inherit; }
-.plan-disc-chev { color: #8A93A0; flex-shrink: 0; transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
+.plan-disc-chev { color: var(--text-3); flex-shrink: 0; transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
 .plan-disc-chev.is-open { transform: rotate(180deg); }
 .plan-disc-body { animation: planDiscIn 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
 @keyframes planDiscIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
@@ -1030,7 +1045,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .topbar-expandable input { cursor: text; user-select: text; }
 /* «ручка» — подсказка, что шапку можно раскрыть; подсвечивается сразу при нажатии */
 .topbar-grabber { position: absolute; left: 50%; bottom: 5px; width: 36px; height: 4px; margin-left: -18px; border-radius: 99px;
-  background: rgba(14,23,38,0.14); transition: background 0.15s; pointer-events: none; }
+  background: rgba(var(--ink-rgb), 0.14); transition: background 0.15s; pointer-events: none; }
 @media (hover: hover) { .topbar-expandable:hover .topbar-grabber { background: rgba(19,102,240,0.4); } }
 .topbar-pressed .topbar-grabber { background: #1366F0; transition: none; }
 /* панель пристыкована: пока она хоть немного открыта, нижние углы шапки прямые */
@@ -1041,31 +1056,31 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .topbar-drop { position: absolute; top: 0; left: 0; border-radius: 0 0 24px 24px; will-change: transform, opacity; isolation: isolate;
   /* жидкое стекло, как у бокового меню и уведомлений — одинаковое с первого кадра до последнего */
   background:
-    radial-gradient(120% 120% at 15% -40%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 55%),
-    linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.56) 100%);
+    radial-gradient(120% 120% at 15% -40%, rgba(var(--paper-rgb), 0.75) 0%, rgba(var(--paper-rgb), 0) 55%),
+    linear-gradient(180deg, rgba(var(--paper-rgb), 0.7) 0%, rgba(var(--paper-rgb), 0.56) 100%);
   -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.04); backdrop-filter: blur(20px) saturate(200%) brightness(1.04);
-  box-shadow: inset 0 -1px 0 rgba(255,255,255,0.9), inset 0 0 18px rgba(255,255,255,0.35),
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), inset 0 0 18px rgba(255,255,255,calc(0.35 * var(--rim-k))),
     0 0 0 0.5px rgba(14,23,38,0.06), 0 22px 40px -22px rgba(20,30,55,0.4); }
 /* светящийся край стекла */
 .topbar-drop::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 1.5px; pointer-events: none;
-  background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.85) 100%);
+  background: linear-gradient(135deg, rgba(var(--paper-rgb), 0.4) 0%, rgba(var(--paper-rgb), 0) 40%, rgba(var(--paper-rgb), 0) 60%, rgba(var(--paper-rgb), 0.85) 100%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
-@media (prefers-reduced-transparency: reduce) { .topbar-drop { background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; } }
+@media (prefers-reduced-transparency: reduce) { .topbar-drop { background: var(--surface); backdrop-filter: none; -webkit-backdrop-filter: none; } }
 /* содержимое — полной ширины по центру капли: не перестраивается, пока капля растёт */
 .topbar-expand-body { position: absolute; top: 7px; left: 0; will-change: transform, opacity;
-  padding: 14px 24px 18px; border-top: 0.5px solid rgba(60,60,67,0.1); font-family: var(--font-sys); font-size: 12.5px; color: #0E1726; }
+  padding: 14px 24px 18px; border-top: 0.5px solid rgba(var(--sep-rgb), 0.1); font-family: var(--font-sys); font-size: 12.5px; color: var(--ink); }
 .topbar-expand-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
 .topbar-expand-head b { font-size: 15px; font-weight: 700; letter-spacing: -0.015em; }
 .topbar-expand-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .island-stat { min-width: 0; }
 .island-stat-v { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; margin-top: 2px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.island-stat-of { font-size: 12px; font-weight: 500; color: #A6AEB8; letter-spacing: 0; }
-.island-stat-sub { font-size: 11.5px; color: #8A93A0; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.island-muted { color: #8A93A0; font-size: 12px; }
+.island-stat-of { font-size: 12px; font-weight: 500; color: var(--text-tertiary); letter-spacing: 0; }
+.island-stat-sub { font-size: 11.5px; color: var(--text-3); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.island-muted { color: var(--text-3); font-size: 12px; }
 .island-row { display: flex; justify-content: space-between; gap: 8px; }
 .island-row b { font-weight: 600; font-variant-numeric: tabular-nums; }
-.island-bar { height: 4px; margin-top: 5px; border-radius: 99px; background: rgba(14,23,38,0.08); overflow: hidden; }
+.island-bar { height: 4px; margin-top: 5px; border-radius: 99px; background: rgba(var(--ink-rgb), 0.08); overflow: hidden; }
 .island-bar > div { height: 100%; border-radius: 99px; }
 .island-btn { border: none; border-radius: 99px; padding: 8px 18px; cursor: pointer; font: 600 13px var(--font-sys);
   background: rgba(19,102,240,0.1); color: #1366F0; white-space: nowrap; transition: transform 0.1s; }

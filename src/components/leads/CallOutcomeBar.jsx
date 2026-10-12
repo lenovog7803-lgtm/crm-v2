@@ -5,7 +5,7 @@ import { SwapText } from '../Transitions'
 import Select from '../Select'
 import DateInput from '../DateInput'
 
-const labelStyle = { fontSize: 13, fontWeight: 700, color: '#0E1726', letterSpacing: '-0.01em', marginBottom: 10, display: 'block' }
+const labelStyle = { fontSize: 13, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.01em', marginBottom: 10, display: 'block' }
 
 export default function CallOutcomeBar({ lead, onSave, saving, columns = 4 }) {
   const [outcome, setOutcome] = useState(null)
@@ -58,7 +58,7 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 4 }) {
             aria-pressed={outcome === o.id}
             style={{
               display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 14,
-              background: outcome === o.id ? o.color + '1F' : 'rgba(255,255,255,0.75)',
+              background: outcome === o.id ? o.color + '1F' : 'rgba(var(--paper-rgb), 0.75)',
               boxShadow: outcome === o.id ? `inset 0 0 0 1.5px ${o.color}66` : 'inset 0 0 0 1px rgba(14,23,38,0.07), 0 1px 2px rgba(14,23,38,0.04)',
               border: 'none', cursor: 'pointer', textAlign: 'left',
             }}
@@ -70,7 +70,7 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 4 }) {
               color: outcome === o.id ? '#fff' : o.color,
               transition: 'all 0.15s var(--ease)',
             }}><OutcomeIcon id={o.id} size={14} /></span>
-            <span style={{ fontFamily: 'var(--font-sys)', fontSize: 13.5, fontWeight: outcome === o.id ? 700 : 500, color: outcome === o.id ? o.color : '#0E1726' }}>
+            <span style={{ fontFamily: 'var(--font-sys)', fontSize: 13.5, fontWeight: outcome === o.id ? 700 : 500, color: outcome === o.id ? o.color : 'var(--ink)' }}>
               {o.label}
             </span>
           </button>
@@ -80,7 +80,7 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 4 }) {
       {cfg?.needsReason && (
         <div style={{ marginBottom: 16 }}>
           <span style={labelStyle}>Причина отказа</span>
-          <Select value={lostReason} onChange={e => { setLostReason(e.target.value); setError('') }} className="form-input" style={{ width: '100%', background: '#F7F8FA' }}>
+          <Select value={lostReason} onChange={e => { setLostReason(e.target.value); setError('') }} className="form-input" style={{ width: '100%', background: 'var(--fill)' }}>
             <option value="">Выберите причину…</option>
             {LOST_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
           </Select>
@@ -95,7 +95,7 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 4 }) {
             onChange={e => { setComment(e.target.value); setError('') }}
             placeholder="О чём говорили, что решили…"
             autoFocus
-            style={{ width: '100%', minHeight: 70, padding: '11px 13px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', background: '#F7F8FA', fontSize: 13, fontFamily: 'var(--font-sys)', color: '#0E1726', resize: 'vertical', boxSizing: 'border-box' }}
+            style={{ width: '100%', minHeight: 70, padding: '11px 13px', borderRadius: 12, border: '1px solid rgba(var(--ink-rgb), 0.12)', background: 'var(--fill)', fontSize: 13, fontFamily: 'var(--font-sys)', color: 'var(--ink)', resize: 'vertical', boxSizing: 'border-box' }}
           />
         </div>
       )}
@@ -115,10 +115,10 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 4 }) {
             value={nextCall}
             onChange={e => setNextCall(e.target.value)}
             className="form-input"
-            style={{ width: '100%', background: '#F7F8FA' }}
+            style={{ width: '100%', background: 'var(--fill)' }}
           />
           {!nextCall && (
-            <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 6 }}>
+            <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginTop: 6 }}>
               Если не указать дату — бэкенд поставит её сам по каденции.
             </div>
           )}

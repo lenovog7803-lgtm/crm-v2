@@ -9,9 +9,9 @@ import { EmptyState } from './EmptyState'
 
 function Row({ label, value, mono }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, padding: '8px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
-      <span style={{ fontSize: 12, color: '#A6AEB8', fontWeight: 500, flexShrink: 0 }}>{label}</span>
-      <span style={{ fontSize: 13, fontWeight: 600, color: '#0E1726', textAlign: 'right', fontFamily: mono ? 'var(--font-mono)' : undefined, wordBreak: 'break-all' }}>{value || '—'}</span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, padding: '8px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
+      <span style={{ fontSize: 12, color: 'var(--text-tertiary)', fontWeight: 500, flexShrink: 0 }}>{label}</span>
+      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', textAlign: 'right', fontFamily: mono ? 'var(--font-mono)' : undefined, wordBreak: 'break-all' }}>{value || '—'}</span>
     </div>
   )
 }
@@ -26,14 +26,14 @@ function StarIcon() {
 
 const iStyle = {
   width: '100%', height: 34, padding: '0 10px', fontSize: 13, borderRadius: 9,
-  border: '1px solid rgba(14,23,38,0.14)', background: 'rgba(255,255,255,0.8)',
-  fontFamily: 'var(--font-sys)', color: '#0E1726', outline: 'none', boxSizing: 'border-box',
+  border: '1px solid rgba(var(--ink-rgb), 0.14)', background: 'rgba(var(--paper-rgb), 0.8)',
+  fontFamily: 'var(--font-sys)', color: 'var(--ink)', outline: 'none', boxSizing: 'border-box',
 }
 
 function EditField({ label, value, onChange, mono, type = 'text' }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
-      <span style={{ fontSize: 12, color: '#A6AEB8', fontWeight: 500, flexShrink: 0, minWidth: 90 }}>{label}</span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
+      <span style={{ fontSize: 12, color: 'var(--text-tertiary)', fontWeight: 500, flexShrink: 0, minWidth: 90 }}>{label}</span>
       <input
         type={type}
         value={value || ''}
@@ -46,8 +46,8 @@ function EditField({ label, value, onChange, mono, type = 'text' }) {
 
 function EditSelect({ label, value, onChange, options }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: '1px solid rgba(14,23,38,0.05)' }}>
-      <span style={{ fontSize: 12, color: '#A6AEB8', fontWeight: 500, flexShrink: 0, minWidth: 90 }}>{label}</span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
+      <span style={{ fontSize: 12, color: 'var(--text-tertiary)', fontWeight: 500, flexShrink: 0, minWidth: 90 }}>{label}</span>
       <Select value={value || ''} onChange={e => onChange(e.target.value)} style={iStyle}>
         {options.map(o => <option key={o} value={o}>{o}</option>)}
       </Select>
@@ -82,7 +82,7 @@ export default function CarrierDetail({ carrierId, onMeta, onBack, onDelete, onO
   }, [carrierId])
 
   if (loading) return <Loader padding={60} />
-  if (!carrier) return <div style={{ padding: 60, textAlign: 'center', color: '#A6AEB8' }}>Перевозчик не найден</div>
+  if (!carrier) return <div style={{ padding: 60, textAlign: 'center', color: 'var(--text-tertiary)' }}>Перевозчик не найден</div>
 
   const name = carrier.company_name || carrier.name || '—'
   const driver = carrier.driver_name || carrier.driver || ''
@@ -146,7 +146,7 @@ export default function CarrierDetail({ carrierId, onMeta, onBack, onDelete, onO
         <div style={{ flex: 1 }} />
         {editing ? (
           <>
-            <button onClick={cancelEdit} style={{ padding: '9px 16px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', cursor: 'pointer', background: 'transparent', color: '#5A6573', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13 }}>
+            <button onClick={cancelEdit} style={{ padding: '9px 16px', borderRadius: 12, border: '1px solid rgba(var(--ink-rgb), 0.12)', cursor: 'pointer', background: 'transparent', color: 'var(--text-secondary)', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13 }}>
               Отмена
             </button>
             <button onClick={saveEdit} disabled={saving} style={{ padding: '9px 18px', borderRadius: 12, border: 'none', cursor: 'pointer', background: '#1366F0', color: '#fff', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13 }}>
@@ -203,8 +203,8 @@ export default function CarrierDetail({ carrierId, onMeta, onBack, onDelete, onO
           </div>
         ) : (
           <>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color: '#0E1726', letterSpacing: '-0.02em' }}>{name}</div>
-            <div style={{ fontSize: 14, color: '#A6AEB8', marginTop: 4 }}>{driver}</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.02em' }}>{name}</div>
+            <div style={{ fontSize: 14, color: 'var(--text-tertiary)', marginTop: 4 }}>{driver}</div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 10 }}>
               <StarIcon />
               <span style={{ fontSize: 16, fontWeight: 700, color: '#D97706' }}>{carrier.rating || '5.0'}</span>
@@ -281,7 +281,7 @@ export default function CarrierDetail({ carrierId, onMeta, onBack, onDelete, onO
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10,
                     padding: '10px 10px', borderRadius: 10,
-                    borderBottom: '1px solid rgba(14,23,38,0.05)',
+                    borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)',
                     cursor: onOpenOrder ? 'pointer' : 'default',
                     transition: 'background 0.12s',
                   }}
@@ -290,11 +290,11 @@ export default function CarrierDetail({ carrierId, onMeta, onBack, onDelete, onO
                 >
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: '#1366F0', fontWeight: 600 }}>{o.order_number || o.id}</div>
-                    <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {o.route_from && o.route_to ? `${o.route_from} → ${o.route_to}` : '—'}
                     </div>
                   </div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 13, color: '#0E1726', flexShrink: 0 }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 13, color: 'var(--ink)', flexShrink: 0 }}>
                     {(o.carrier_rate || 0).toLocaleString('ru-RU')} Br
                   </div>
                   <span style={{

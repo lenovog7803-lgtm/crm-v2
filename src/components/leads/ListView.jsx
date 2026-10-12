@@ -106,7 +106,7 @@ export default function ListView({ industry }) {
           <option value="">Все стадии</option>
           {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
         </Select>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: '#5A6573', cursor: 'pointer' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: 'var(--text-secondary)', cursor: 'pointer' }}>
           <Switch size="sm" checked={filters.overdueOnly} onChange={e => set('overdueOnly')(e.target.checked)} />
           Только просроченные
         </label>
@@ -141,12 +141,12 @@ export default function ListView({ industry }) {
                   <div className="ios-row-hide-sm" style={{ width: 86, textAlign: 'right', flexShrink: 0 }}>
                     {l.next_call ? (
                       <>
-                        <div style={{ fontSize: 13, color: overdue ? '#FF3B30' : '#0E1726', fontWeight: overdue ? 600 : 500, fontVariantNumeric: 'tabular-nums' }}>
+                        <div style={{ fontSize: 13, color: overdue ? '#FF3B30' : 'var(--ink)', fontWeight: overdue ? 600 : 500, fontVariantNumeric: 'tabular-nums' }}>
                           {new Date(l.next_call).toLocaleDateString('ru-RU')}
                         </div>
-                        {(l.call_attempts || 0) > 0 && <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 1 }}>{l.call_attempts} попыт.</div>}
+                        {(l.call_attempts || 0) > 0 && <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginTop: 1 }}>{l.call_attempts} попыт.</div>}
                       </>
-                    ) : <span style={{ fontSize: 13, color: '#C4CAD4' }}>—</span>}
+                    ) : <span style={{ fontSize: 13, color: 'var(--text-quaternary)' }}>—</span>}
                   </div>
                   {!l.assigned_to ? (
                     <button onClick={e => handleClaim(l.id, e)} style={{ padding: '6px 16px', borderRadius: 99, border: 'none', cursor: 'pointer', background: 'rgba(118,118,128,0.12)', color: '#1366F0', fontSize: 13, fontWeight: 700, fontFamily: 'var(--font-sys)', flexShrink: 0 }}>Взять</button>
@@ -159,7 +159,7 @@ export default function ListView({ industry }) {
               )
             })}
             {visibleCount < filtered.length && (
-              <div style={{ textAlign: 'center', padding: 14, fontSize: 12, color: '#8A93A0' }}>
+              <div style={{ textAlign: 'center', padding: 14, fontSize: 12, color: 'var(--text-3)' }}>
                 показано {visible.length} из {filtered.length} · докрутите вниз
               </div>
             )}

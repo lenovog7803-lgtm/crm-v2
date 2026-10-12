@@ -1,7 +1,7 @@
 // Кнопки-действия в стиле карточки заявки экспедирования (OrderDetail).
 const VARIANTS = {
   edit: { bg: 'rgba(19,102,240,0.08)', color: '#1366F0' },
-  neutral: { bg: 'rgba(14,23,38,0.06)', color: '#5A6573' },
+  neutral: { bg: 'rgba(14,23,38,0.06)', color: 'var(--text-secondary)' },
   delete: { bg: 'rgba(200,25,35,0.1)', color: '#C81923' },
   green: { bg: 'rgba(30,158,90,0.1)', color: '#1E9E5A' },
 }

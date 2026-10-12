@@ -45,8 +45,8 @@ function KanbanColumn({ stage, items, dragId, overStage, onDragStart, onDragOver
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 4px' }}>
         <span style={{ width: 8, height: 8, borderRadius: 4, background: stage.color, flexShrink: 0 }} />
-        <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 12.5, color: '#0E1726' }}>{stage.label}</span>
-        <span style={{ fontSize: 11.5, color: '#A6AEB8', marginLeft: 'auto' }}>{sorted.length}</span>
+        <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 12.5, color: 'var(--ink)' }}>{stage.label}</span>
+        <span style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginLeft: 'auto' }}>{sorted.length}</span>
       </div>
       <div
         ref={listRef}
@@ -64,17 +64,17 @@ function KanbanColumn({ stage, items, dragId, overStage, onDragStart, onDragOver
             draggable
             onDragStart={() => onDragStart(l.id)}
             onClick={() => onOpenLead(l)}
-            onPointerEnter={mouseOnly(e => { e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.borderColor = 'rgba(19,102,240,0.3)'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 24px -12px rgba(20,30,55,0.25)' })}
-            onPointerLeave={mouseOnly(e => { e.currentTarget.style.background = 'rgba(255,255,255,0.7)'; e.currentTarget.style.borderColor = 'rgba(14,23,38,0.08)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' })}
+            onPointerEnter={mouseOnly(e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'rgba(19,102,240,0.3)'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 24px -12px rgba(20,30,55,0.25)' })}
+            onPointerLeave={mouseOnly(e => { e.currentTarget.style.background = 'rgba(var(--paper-rgb), 0.7)'; e.currentTarget.style.borderColor = 'rgba(var(--ink-rgb), 0.08)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' })}
             style={{
-              padding: '11px 13px', borderRadius: 16, background: 'rgba(255,255,255,0.7)',
-              border: '1px solid rgba(14,23,38,0.08)', cursor: 'pointer',
+              padding: '11px 13px', borderRadius: 16, background: 'rgba(var(--paper-rgb), 0.7)',
+              border: '1px solid rgba(var(--ink-rgb), 0.08)', cursor: 'pointer',
               transition: 'background 0.15s var(--ease), border-color 0.15s var(--ease), transform 0.15s var(--ease), box-shadow 0.15s var(--ease)',
             }}
           >
-            <div style={{ fontSize: 13.5, fontWeight: 600, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
+            <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
             <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#1366F0', marginTop: 3 }}>{l.phone}</div>
-            {l.contact_person && <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 2 }}>{l.contact_person}</div>}
+            {l.contact_person && <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>{l.contact_person}</div>}
             {l.next_call && <div style={{ fontSize: 10.5, color: '#F47A1F', marginTop: 4 }}>→ {new Date(l.next_call).toLocaleDateString('ru-RU')}</div>}
             {!l.assigned_to && (
               <button
@@ -87,7 +87,7 @@ function KanbanColumn({ stage, items, dragId, overStage, onDragStart, onDragOver
           </div>
         ))}
         {visibleCount < sorted.length && (
-          <div style={{ textAlign: 'center', padding: 10, fontSize: 11, color: '#8A93A0' }}>
+          <div style={{ textAlign: 'center', padding: 10, fontSize: 11, color: 'var(--text-3)' }}>
             ещё {sorted.length - visibleCount}, докрутите вниз
           </div>
         )}
@@ -185,7 +185,7 @@ export default function KanbanView({ industry }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 8 }}>
         {activeStages.map(renderColumn)}
-        <div style={{ width: 1, background: 'rgba(14,23,38,0.1)', flexShrink: 0 }} />
+        <div style={{ width: 1, background: 'rgba(var(--ink-rgb), 0.1)', flexShrink: 0 }} />
         {closedStages.map(renderColumn)}
       </div>
 

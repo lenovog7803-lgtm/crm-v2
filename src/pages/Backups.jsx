@@ -17,10 +17,10 @@ function ImportPreviewModal({ preview, onClose, onConfirm, applying }) {
   const orders = preview.orders || {}
   const hasDeletes = (orders.would_delete || []).length > 0
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 640, padding: 26, maxHeight: '86vh', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#0E1726', marginBottom: 4 }}>Что изменится при импорте из Таблицы</div>
-        <div style={{ fontSize: 12, color: '#8A93A0', marginBottom: 16 }}>Ничего ещё не применено — только предпросмотр</div>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
+      <div style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 640, padding: 26, maxHeight: '86vh', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 4 }}>Что изменится при импорте из Таблицы</div>
+        <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 16 }}>Ничего ещё не применено — только предпросмотр</div>
 
         <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
           <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
@@ -30,16 +30,16 @@ function ImportPreviewModal({ preview, onClose, onConfirm, applying }) {
             <div style={{ padding: '6px 12px', borderRadius: 10, background: 'rgba(19,102,240,0.08)', color: '#1366F0', fontSize: 12, fontWeight: 600 }}>
               Изменится: {(orders.changed || []).length}
             </div>
-            <div style={{ padding: '6px 12px', borderRadius: 10, background: hasDeletes ? 'rgba(224,71,59,0.1)' : 'rgba(14,23,38,0.05)', color: hasDeletes ? '#E0473B' : '#8A93A0', fontSize: 12, fontWeight: 600 }}>
+            <div style={{ padding: '6px 12px', borderRadius: 10, background: hasDeletes ? 'rgba(224,71,59,0.1)' : 'rgba(var(--ink-rgb), 0.05)', color: hasDeletes ? '#E0473B' : 'var(--text-3)', fontSize: 12, fontWeight: 600 }}>
               Будет удалено: {(orders.would_delete || []).length}
             </div>
             {preview.clients && (
-              <div style={{ padding: '6px 12px', borderRadius: 10, background: 'rgba(14,23,38,0.05)', color: '#5A6573', fontSize: 12, fontWeight: 600 }}>
+              <div style={{ padding: '6px 12px', borderRadius: 10, background: 'rgba(var(--ink-rgb), 0.05)', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600 }}>
                 Новых клиентов: {preview.clients.new}
               </div>
             )}
             {preview.carriers && (
-              <div style={{ padding: '6px 12px', borderRadius: 10, background: 'rgba(14,23,38,0.05)', color: '#5A6573', fontSize: 12, fontWeight: 600 }}>
+              <div style={{ padding: '6px 12px', borderRadius: 10, background: 'rgba(var(--ink-rgb), 0.05)', color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600 }}>
                 Новых перевозчиков: {preview.carriers.new}
               </div>
             )}
@@ -50,7 +50,7 @@ function ImportPreviewModal({ preview, onClose, onConfirm, applying }) {
               <div style={{ fontSize: 11, fontWeight: 700, color: '#E0473B', letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 8 }}>
                 Будут помечены удалёнными (не найдены в Таблице)
               </div>
-              <div style={{ fontSize: 13, color: '#5A6573', lineHeight: 1.7, wordBreak: 'break-word' }}>
+              <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7, wordBreak: 'break-word' }}>
                 {orders.would_delete.join(', ')}
               </div>
             </div>
@@ -58,15 +58,15 @@ function ImportPreviewModal({ preview, onClose, onConfirm, applying }) {
 
           {(orders.changed || []).length > 0 && (
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 8 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 8 }}>
                 Изменённые заявки
               </div>
               {orders.changed.map(c => (
-                <div key={c.order_number} style={{ padding: '10px 12px', background: '#F7F8FA', borderRadius: 12, marginBottom: 6 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#0E1726', marginBottom: 4 }}>{c.order_number}</div>
+                <div key={c.order_number} style={{ padding: '10px 12px', background: 'var(--fill)', borderRadius: 12, marginBottom: 6 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', marginBottom: 4 }}>{c.order_number}</div>
                   {c.diffs.map((d, i) => (
-                    <div key={i} style={{ fontSize: 12, color: '#5A6573' }}>
-                      {d.label}: <span style={{ color: '#A6AEB8' }}>{fieldVal(d.old)}</span> → <span style={{ color: '#0E1726', fontWeight: 600 }}>{fieldVal(d.new)}</span>
+                    <div key={i} style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                      {d.label}: <span style={{ color: 'var(--text-tertiary)' }}>{fieldVal(d.old)}</span> → <span style={{ color: 'var(--ink)', fontWeight: 600 }}>{fieldVal(d.new)}</span>
                     </div>
                   ))}
                 </div>
@@ -76,22 +76,22 @@ function ImportPreviewModal({ preview, onClose, onConfirm, applying }) {
 
           {(orders.new || []).length > 0 && (
             <div style={{ marginTop: 16 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 8 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 8 }}>
                 Новые заявки
               </div>
-              <div style={{ fontSize: 13, color: '#5A6573', lineHeight: 1.7, wordBreak: 'break-word' }}>
+              <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7, wordBreak: 'break-word' }}>
                 {orders.new.join(', ')}
               </div>
             </div>
           )}
 
           {(orders.new || []).length === 0 && (orders.changed || []).length === 0 && !hasDeletes && (
-            <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>Изменений нет</div>
+            <div style={{ padding: 30, textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 13 }}>Изменений нет</div>
           )}
         </div>
 
         <div style={{ display: 'flex', gap: 10, marginTop: 18, flexShrink: 0 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', color: '#5A6573', cursor: 'pointer' }}>Отмена</button>
+          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
           <button
             onClick={onConfirm}
             disabled={applying}
@@ -194,15 +194,15 @@ export default function Backups() {
     <div>
       <div style={{ marginBottom: 16, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
         <div>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 20, color: '#0E1726' }}>Резервные копии</div>
-          <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>Автоматический снимок раз в сутки, хранятся последние 30</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 20, color: 'var(--ink)' }}>Резервные копии</div>
+          <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>Автоматический снимок раз в сутки, хранятся последние 30</div>
         </div>
         {!forbidden && (
           <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
             <button
               onClick={doPreview}
               disabled={previewing}
-              style={{ padding: '9px 16px', borderRadius: 12, border: '1px solid rgba(14,23,38,0.12)', background: '#FFFFFF', color: '#0E1726', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+              style={{ padding: '9px 16px', borderRadius: 12, border: '1px solid rgba(var(--ink-rgb), 0.12)', background: 'var(--surface)', color: 'var(--ink)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
             >
               {previewing ? 'Проверяю…' : 'Импорт из Таблицы'}
             </button>
@@ -230,7 +230,7 @@ export default function Backups() {
 
       {!loading && forbidden && (
         <div className="card" style={{ padding: 30, textAlign: 'center' }}>
-          <div style={{ fontSize: 13, color: '#5A6573' }}>Резервные копии доступны только администратору</div>
+          <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Резервные копии доступны только администратору</div>
         </div>
       )}
 
@@ -239,14 +239,14 @@ export default function Backups() {
       )}
 
       {!loading && !forbidden && backups.map(b => (
-        <div key={b.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: '#FFFFFF', borderRadius: 14, border: '1px solid rgba(14,23,38,0.06)', marginBottom: 8 }}>
+        <div key={b.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--surface)', borderRadius: 14, border: '1px solid rgba(var(--ink-rgb), 0.06)', marginBottom: 8 }}>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#0E1726' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>
               {new Date(b.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}
               {' в '}
               {new Date(b.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
             </div>
-            <div style={{ fontSize: 11, color: '#8A93A0', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {reasonLabel(b.reason)}
               {b.counts && ` · ${Object.entries(b.counts).map(([k, v]) => `${k}: ${v}`).join(' · ')}`}
             </div>
@@ -261,14 +261,14 @@ export default function Backups() {
       ))}
 
       {restoreTarget && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-          <div style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 440, padding: 26 }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
+          <div style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 440, padding: 26 }}>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#E0473B', marginBottom: 8 }}>Восстановить из бэкапа?</div>
-            <div style={{ fontSize: 13, color: '#5A6573', marginBottom: 18, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 18, lineHeight: 1.5 }}>
               Это заменит текущие данные снимком от{' '}
               {new Date(restoreTarget.created_at).toLocaleDateString('ru-RU')}. Текущее состояние тоже будет сохранено отдельным бэкапом на случай ошибки.
             </div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#8A93A0', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
               Введите слово ВОССТАНОВИТЬ
             </div>
             <input
@@ -276,14 +276,14 @@ export default function Backups() {
               onChange={e => setConfirmWord(e.target.value)}
               placeholder="ВОССТАНОВИТЬ"
               autoFocus
-              style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 14, boxSizing: 'border-box', marginBottom: 18 }}
+              style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--fill)', fontSize: 14, boxSizing: 'border-box', marginBottom: 18 }}
             />
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setRestoreTarget(null)} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', color: '#5A6573', cursor: 'pointer' }}>Отмена</button>
+              <button onClick={() => setRestoreTarget(null)} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
               <button
                 onClick={doRestore}
                 disabled={confirmWord.trim().toUpperCase() !== 'ВОССТАНОВИТЬ' || restoring}
-                style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: confirmWord.trim().toUpperCase() === 'ВОССТАНОВИТЬ' ? '#E0473B' : '#E8EAEE', color: confirmWord.trim().toUpperCase() === 'ВОССТАНОВИТЬ' ? '#FFFFFF' : '#8A93A0', fontWeight: 700, cursor: 'pointer' }}
+                style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: confirmWord.trim().toUpperCase() === 'ВОССТАНОВИТЬ' ? '#E0473B' : 'var(--line)', color: confirmWord.trim().toUpperCase() === 'ВОССТАНОВИТЬ' ? '#FFFFFF' : 'var(--text-3)', fontWeight: 700, cursor: 'pointer' }}
               >
                 {restoring ? 'Восстанавливаю…' : 'Подтвердить восстановление'}
               </button>

@@ -192,7 +192,7 @@ function MoreSheet({ page, counts, onNav, onClose }) {
     .filter(sec => sec.items.length)
   return (
     <ModalOverlay onClose={onClose}
-      panelStyle={{ background: '#F2F2F7', fontFamily: SYS_FONT, maxHeight: '92dvh', overflowY: 'auto' }}
+      panelStyle={{ background: 'var(--fill)', fontFamily: SYS_FONT, maxHeight: '92dvh', overflowY: 'auto' }}
       bodyStyle={{ padding: '18px 0 8px' }}>
       <div style={{ position: 'relative', textAlign: 'center', marginBottom: 18, minHeight: 26 }}>
         <span style={{ fontSize: 17, fontWeight: 600, color: '#000', letterSpacing: '-0.01em' }}>Разделы</span>
@@ -201,19 +201,19 @@ function MoreSheet({ page, counts, onNav, onClose }) {
       {sections.map(sec => (
         <div key={sec.title} style={{ marginBottom: 22 }}>
           <div style={{ fontSize: 13, color: '#6D6D72', textTransform: 'uppercase', letterSpacing: '0.02em', padding: '0 16px 7px' }}>{sec.title}</div>
-          <div style={{ borderRadius: 12, background: '#FFFFFF', overflow: 'hidden' }}>
+          <div style={{ borderRadius: 12, background: 'var(--surface)', overflow: 'hidden' }}>
             {sec.items.map((it, idx) => {
               const active = page === it.key
               const n = it.badge ? counts?.[it.badge] : 0
               return (
                 <button key={it.key} className="ios-row" onClick={() => { onNav(it.key); onClose() }}
                   style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 14, minHeight: 52, padding: '0 14px 0 14px',
-                    border: 'none', background: '#FFFFFF', fontFamily: SYS_FONT, textAlign: 'left', cursor: 'pointer' }}>
+                    border: 'none', background: 'var(--surface)', fontFamily: SYS_FONT, textAlign: 'left', cursor: 'pointer' }}>
                   <span style={{ width: 30, height: 30, borderRadius: 7, background: it.color, flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{ICONS[it.icon]}</span>
                   {/* разделитель начинается от текста, а не от края — как в iOS */}
                   <span style={{ flex: 1, alignSelf: 'stretch', display: 'flex', alignItems: 'center', gap: 8,
-                    borderTop: idx ? '0.5px solid rgba(60,60,67,0.29)' : 'none' }}>
+                    borderTop: idx ? '0.5px solid rgba(var(--sep-rgb), 0.29)' : 'none' }}>
                     <span style={{ flex: 1, fontSize: 17, color: '#000', fontWeight: active ? 600 : 400, letterSpacing: '-0.02em' }}>{it.label}</span>
                     {n > 0 && <span style={{ minWidth: 22, height: 22, borderRadius: 11, background: '#FF3B30', color: '#fff', fontSize: 13, fontWeight: 600,
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 7px' }}>{n > 99 ? '99+' : n}</span>}
@@ -307,7 +307,7 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
                   position: 'absolute', top: -4, right: -6,
                   minWidth: 15, height: 15, borderRadius: 99,
                   background: badgeColor,
-                  border: '1.5px solid rgba(255,255,255,0.9)',
+                  border: '1.5px solid rgba(255,255,255,calc(0.9 * var(--rim-k)))',
                   color: '#fff', fontSize: 8, fontWeight: 800,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   padding: '0 3px', lineHeight: 1,

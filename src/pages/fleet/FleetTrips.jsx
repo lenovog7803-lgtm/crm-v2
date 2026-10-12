@@ -7,7 +7,7 @@ import { Loader } from '../../components/Loader'
 import Select from '../../components/Select'
 import { EmptyState } from '../../components/EmptyState'
 
-const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid #E8EAEE', fontSize: 13, background: '#FFFFFF', boxSizing: 'border-box', width: '100%' }
+const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid var(--line)', fontSize: 13, background: 'var(--surface)', boxSizing: 'border-box', width: '100%' }
 
 function fmtDate(v) {
   if (!v) return '—'
@@ -61,9 +61,9 @@ function CreateTripModal({ onClose, onCreated }) {
   }
 
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 460, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#0E1726', marginBottom: 18 }}>Новый рейс</div>
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
+      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 460, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 18 }}>Новый рейс</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
           <input autoFocus value={form.name} onChange={e => set('name', e.target.value)} placeholder="Название рейса, напр. Минск–Москва" style={fieldStyle} />
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -80,11 +80,11 @@ function CreateTripModal({ onClose, onCreated }) {
               {drivers.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
             </Select>
           </div>
-          <div style={{ fontSize: 11, color: '#A6AEB8' }}>Машина и водитель подставятся в каждый заказ этого рейса — в самом заказе можно поменять.</div>
+          <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>Машина и водитель подставятся в каждый заказ этого рейса — в самом заказе можно поменять.</div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', color: '#5A6573', cursor: 'pointer' }}>Отмена</button>
-          <button onClick={save} disabled={saving || !form.name.trim()} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: form.name.trim() ? '#1366F0' : '#C4CAD4', color: '#fff', fontWeight: 700, cursor: saving ? 'default' : 'pointer' }}>
+          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
+          <button onClick={save} disabled={saving || !form.name.trim()} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: form.name.trim() ? '#1366F0' : 'var(--text-quaternary)', color: '#fff', fontWeight: 700, cursor: saving ? 'default' : 'pointer' }}>
             {saving ? 'Создаю…' : 'Создать рейс'}
           </button>
         </div>
@@ -110,8 +110,8 @@ export default function FleetTrips({ onOpenTrip }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, gap: 12, flexWrap: 'wrap' }}>
         <div>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 22, color: '#0E1726' }}>Рейсы</div>
-          <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>Свой автопарк</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 22, color: 'var(--ink)' }}>Рейсы</div>
+          <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>Свой автопарк</div>
         </div>
         <button onClick={() => setShowCreate(true)} className="btn-primary">
           + Новый рейс
@@ -126,7 +126,7 @@ export default function FleetTrips({ onOpenTrip }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
           {groupByMonth(trips).map(([mk, monthTrips]) => (
             <div key={mk}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: '#A6AEB8', textTransform: 'uppercase', marginBottom: 10 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: 10 }}>
                 {monthTitle(mk)} · {monthTrips.length}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
@@ -136,7 +136,7 @@ export default function FleetTrips({ onOpenTrip }) {
                     onPointerLeave={mouseOnly(e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '' })}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: '#0E1726', flex: 1, minWidth: 0 }}>
+                      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: 'var(--ink)', flex: 1, minWidth: 0 }}>
                         {t.trip_number ? <span style={{ fontFamily: 'var(--font-mono)', color: '#1366F0', fontSize: 13, marginRight: 6 }}>Р{t.trip_number}</span> : null}
                         {t.name || 'Без названия'}
                       </div>
@@ -144,10 +144,10 @@ export default function FleetTrips({ onOpenTrip }) {
                         <span style={{ fontSize: 10.5, fontWeight: 700, color: s.color, background: `${s.color}1a`, borderRadius: 99, padding: '2px 8px', flexShrink: 0 }}>{s.label}</span>
                       ) })()}
                     </div>
-                    <div style={{ fontSize: 12.5, color: '#5A6573', marginBottom: 4 }}>
+                    <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 4 }}>
                       {(t.route_from || '—')} → {(t.route_to || '—')}
                     </div>
-                    <div style={{ fontSize: 11.5, color: '#A6AEB8', marginBottom: 12 }}>
+                    <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginBottom: 12 }}>
                       {fmtDate(t.first_load_date)} – {fmtDate(t.last_unload_date)}
                     </div>
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 700, color: '#1366F0' }}>

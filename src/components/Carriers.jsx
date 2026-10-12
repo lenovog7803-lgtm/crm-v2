@@ -55,7 +55,7 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726' }}>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>
           {search ? `Найдено: ${visible.length}` : <>Всего перевозчиков: <span style={{ color: '#1366F0' }}>{carriers.length}</span></>}
         </div>
         <div style={{ flex: 1 }} />

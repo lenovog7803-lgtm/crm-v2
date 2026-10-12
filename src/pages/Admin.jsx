@@ -33,8 +33,8 @@ const PERMISSION_OPTIONS = [
 
 const inputStyle = {
   width: '100%', padding: '10px 12px', borderRadius: 10,
-  border: '1px solid rgba(14,23,38,0.12)', background: '#F7F8FA',
-  fontSize: 13, fontFamily: 'var(--font-sys)', color: '#0E1726', boxSizing: 'border-box',
+  border: '1px solid rgba(var(--ink-rgb), 0.12)', background: 'var(--fill)',
+  fontSize: 13, fontFamily: 'var(--font-sys)', color: 'var(--ink)', boxSizing: 'border-box',
 }
 
 function parseDeviceInfo(ua) {
@@ -94,29 +94,29 @@ function UserDetailModal({ user, onClose, onSaved }) {
             background: user.role === 'manager' ? 'rgba(19,102,240,0.1)' : 'rgba(124,58,237,0.1)',
             color: user.role === 'manager' ? '#1366F0' : '#7C3AED',
           }}>{ROLE_LABEL[user.role] || user.role}</span>
-          <span style={{ fontSize: 11.5, color: '#A6AEB8' }}>роль меняется отдельно, не через эту форму</span>
+          <span style={{ fontSize: 11.5, color: 'var(--text-tertiary)' }}>роль меняется отдельно, не через эту форму</span>
         </div>
 
         <div>
-          <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>Логин</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', paddingLeft: 4, marginBottom: 5 }}>Логин</div>
           <input style={inputStyle} value={login} onChange={e => setLogin(e.target.value)} />
         </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>Имя</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', paddingLeft: 4, marginBottom: 5 }}>Имя</div>
           <input style={inputStyle} value={name} onChange={e => setName(e.target.value)} />
         </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>Новый пароль</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', paddingLeft: 4, marginBottom: 5 }}>Новый пароль</div>
           <input type="password" style={inputStyle} value={password} onChange={e => setPassword(e.target.value)} placeholder="Оставьте пустым, чтобы не менять" autoComplete="new-password" />
-          <div style={{ fontSize: 11, color: '#A6AEB8', marginTop: 5, lineHeight: 1.4 }}>
+          <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 5, lineHeight: 1.4 }}>
             Текущий пароль хранится хешированным и нигде не может быть показан — можно только задать новый.
           </div>
         </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 8 }}>Права доступа</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', paddingLeft: 4, marginBottom: 8 }}>Права доступа</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {PERMISSION_OPTIONS.map(p => (
-              <label key={p.key} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 10, cursor: 'pointer', fontSize: 13, color: '#0E1726', background: perms[p.key] ? 'rgba(19,102,240,0.06)' : 'transparent' }}>
+              <label key={p.key} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 10, cursor: 'pointer', fontSize: 13, color: 'var(--ink)', background: perms[p.key] ? 'rgba(19,102,240,0.06)' : 'transparent' }}>
                 <Switch size="sm" checked={!!perms[p.key]} onChange={() => togglePerm(p.key)} style={{ width: 15, height: 15, accentColor: '#1366F0' }} />
                 {p.label}
               </label>
@@ -127,7 +127,7 @@ function UserDetailModal({ user, onClose, onSaved }) {
         {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center' }}>{error}</div>}
 
         <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-          <button onClick={onClose} style={{ flex: 1, height: 44, borderRadius: 13, border: '1px solid rgba(14,23,38,0.12)', background: 'transparent', cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 14, fontWeight: 600, color: '#5A6573' }}>Отмена</button>
+          <button onClick={onClose} style={{ flex: 1, height: 44, borderRadius: 13, border: '1px solid rgba(var(--ink-rgb), 0.12)', background: 'transparent', cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)' }}>Отмена</button>
           <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ flex: 2, justifyContent: 'center', opacity: saving ? 0.7 : 1 }}>
             <SwapText>{saving ? 'Сохранение…' : 'Сохранить'}</SwapText>
           </button>
@@ -204,19 +204,19 @@ function UsersTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <form onSubmit={handleCreate} className="card" style={{ padding: 18, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr) auto', gap: 10, alignItems: 'end' }}>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>Логин</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', paddingLeft: 4, marginBottom: 5 }}>Логин</div>
           <input style={inputStyle} value={form.login} onChange={e => set('login', e.target.value)} placeholder="ivan_m" required />
         </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>Временный пароль</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', paddingLeft: 4, marginBottom: 5 }}>Временный пароль</div>
           <input style={inputStyle} value={form.password} onChange={e => set('password', e.target.value)} placeholder="••••••••" required />
         </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>Имя</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', paddingLeft: 4, marginBottom: 5 }}>Имя</div>
           <input style={inputStyle} value={form.name} onChange={e => set('name', e.target.value)} placeholder="Иван Менеджеров" required />
         </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, marginBottom: 5 }}>План звонков/день</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', paddingLeft: 4, marginBottom: 5 }}>План звонков/день</div>
           <input type="number" style={inputStyle} value={form.daily_call_goal} onChange={e => set('daily_call_goal', e.target.value)} min={1} />
         </div>
         <button type="submit" disabled={creating} className="btn-primary" style={{ height: 40, whiteSpace: 'nowrap' }}>
@@ -228,13 +228,13 @@ function UsersTab() {
         {loading ? (
           <Loader padding={30} />
         ) : users.length === 0 ? (
-          <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Пользователей пока нет</div>
+          <div style={{ padding: 30, textAlign: 'center', color: 'var(--text-tertiary)' }}>Пользователей пока нет</div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
                 {['Логин', 'Имя', 'Роль', 'Статус', 'План звонков/день', ''].map(h => (
-                  <th key={h} style={{ textAlign: 'left', padding: '10px 14px', fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, textTransform: 'uppercase' }}>{h}</th>
+                  <th key={h} style={{ textAlign: 'left', padding: '10px 14px', fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', paddingLeft: 4, textTransform: 'uppercase' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -243,19 +243,19 @@ function UsersTab() {
                 const isManager = m.role === 'manager'
                 return (
                   <tr key={m.id} onClick={() => setEditUser(m)} style={{ cursor: 'pointer' }}
-                    onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(14,23,38,0.02)')}
+                    onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.02)')}
                     onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                   >
-                    <td style={{ padding: '11px 14px', fontSize: 13, fontFamily: 'var(--font-mono)', color: '#1366F0', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.login}</td>
-                    <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: '#0E1726', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.name}</td>
-                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)' }}>
+                    <td style={{ padding: '11px 14px', fontSize: 13, fontFamily: 'var(--font-mono)', color: '#1366F0', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.login}</td>
+                    <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: 'var(--ink)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.name}</td>
+                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
                       <span style={{
                         padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
                         background: isManager ? 'rgba(19,102,240,0.1)' : 'rgba(124,58,237,0.1)',
                         color: isManager ? '#1366F0' : '#7C3AED',
                       }}>{ROLE_LABEL[m.role] || m.role}</span>
                     </td>
-                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)' }} onClick={e => e.stopPropagation()}>
+                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }} onClick={e => e.stopPropagation()}>
                       <button onClick={() => toggleStatus(m)} style={{
                         padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
                         fontSize: 11.5, fontWeight: 700,
@@ -265,15 +265,15 @@ function UsersTab() {
                         {m.status === 'suspended' ? 'Заблокирован' : 'Активен'}
                       </button>
                     </td>
-                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)' }} onClick={e => e.stopPropagation()}>
+                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }} onClick={e => e.stopPropagation()}>
                       <input
                         type="number"
                         defaultValue={m.daily_call_goal || 45}
                         onBlur={e => changeGoal(m, e.target.value)}
-                        style={{ width: 70, padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(14,23,38,0.12)', fontSize: 12.5, fontFamily: 'var(--font-mono)' }}
+                        style={{ width: 70, padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(var(--ink-rgb), 0.12)', fontSize: 12.5, fontFamily: 'var(--font-mono)' }}
                       />
                     </td>
-                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(14,23,38,0.05)', textAlign: 'right' }} onClick={e => e.stopPropagation()}>
+                    <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)', textAlign: 'right' }} onClick={e => e.stopPropagation()}>
                       {isManager && (
                         <button onClick={() => remove(m)} style={{ padding: '6px 12px', borderRadius: 9, border: 'none', background: 'rgba(200,25,35,0.08)', color: '#C81923', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
                           Удалить
@@ -321,19 +321,19 @@ function SessionsTab() {
   }
 
   if (loading) return <Loader padding={30} />
-  if (sessions.length === 0) return <div className="card" style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Активных сессий нет</div>
+  if (sessions.length === 0) return <div className="card" style={{ padding: 30, textAlign: 'center', color: 'var(--text-tertiary)' }}>Активных сессий нет</div>
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {sessions.map(s => (
         <div key={s.id} className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13.5, fontWeight: 700, color: '#0E1726' }}>{s.user_login} · <span style={{ fontWeight: 500, color: '#5A6573' }}>{ROLE_LABEL[s.role] || s.role}</span></div>
-            <div style={{ fontSize: 12, color: '#8A93A0', marginTop: 2 }}>{parseDeviceInfo(s.device_info)} · {s.ip || '—'}</div>
+            <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--ink)' }}>{s.user_login} · <span style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>{ROLE_LABEL[s.role] || s.role}</span></div>
+            <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{parseDeviceInfo(s.device_info)} · {s.ip || '—'}</div>
           </div>
-          <div style={{ fontSize: 12, color: '#5A6573', textAlign: 'right', flexShrink: 0 }}>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)', textAlign: 'right', flexShrink: 0 }}>
             <div>{relativeTime(s.last_activity)}</div>
-            <div style={{ color: '#A6AEB8', marginTop: 2 }}>{s.activity_summary?.calls ?? 0} звонков · {s.activity_summary?.won ?? 0} в клиенты</div>
+            <div style={{ color: 'var(--text-tertiary)', marginTop: 2 }}>{s.activity_summary?.calls ?? 0} звонков · {s.activity_summary?.won ?? 0} в клиенты</div>
           </div>
           <button onClick={() => logout(s)} style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid rgba(224,71,59,0.3)', background: 'rgba(224,71,59,0.06)', color: '#E0473B', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
             Завершить сессию
@@ -361,13 +361,13 @@ function ManagerDetail({ manager, period }) {
   }, [manager.id, period])
 
   if (loading) return <Loader padding={24} />
-  if (!data) return <div style={{ padding: 24, textAlign: 'center', color: '#A6AEB8' }}>Нет данных</div>
+  if (!data) return <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-tertiary)' }}>Нет данных</div>
 
   return (
     <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
       <CallsHeatmap data={data.calls_by_day || []} onDayClick={() => {}} />
       <div>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: '#0E1726', marginBottom: 14 }}>Воронка конверсий</div>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 14 }}>Воронка конверсий</div>
         <FunnelChart funnel={data.funnel} />
       </div>
     </div>
@@ -395,8 +395,8 @@ function StatsTab() {
           <button key={p.id} onClick={() => setPeriod(p.id)} style={{
             padding: '7px 16px', borderRadius: 99, border: 'none', cursor: 'pointer',
             fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
-            background: period === p.id ? '#0E1726' : 'rgba(14,23,38,0.06)',
-            color: period === p.id ? '#fff' : '#5A6573',
+            background: period === p.id ? '#0E1726' : 'rgba(var(--ink-rgb), 0.06)',
+            color: period === p.id ? '#fff' : 'var(--text-secondary)',
           }}>{p.label}</button>
         ))}
       </div>
@@ -405,13 +405,13 @@ function StatsTab() {
         {loading ? (
           <Loader padding={30} />
         ) : sorted.length === 0 ? (
-          <div style={{ padding: 30, textAlign: 'center', color: '#A6AEB8' }}>Менеджеров пока нет</div>
+          <div style={{ padding: 30, textAlign: 'center', color: 'var(--text-tertiary)' }}>Менеджеров пока нет</div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
                 {['Менеджер', 'Звонков', ...(period === 'today' ? ['% плана'] : []), 'Лидов в работе', 'Конверсия', 'Просрочки'].map(h => (
-                  <th key={h} style={{ textAlign: 'left', padding: '10px 14px', fontSize: 13, fontWeight: 500, color: '#6B7480', paddingLeft: 4, textTransform: 'uppercase' }}>{h}</th>
+                  <th key={h} style={{ textAlign: 'left', padding: '10px 14px', fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', paddingLeft: 4, textTransform: 'uppercase' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -419,18 +419,18 @@ function StatsTab() {
               {sorted.map(m => (
                 <Fragment key={m.id}>
                   <tr onClick={() => setOpenId(openId === m.id ? null : m.id)} style={{ cursor: 'pointer', background: openId === m.id ? 'rgba(19,102,240,0.04)' : undefined }}>
-                    <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: '#0E1726', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.name}</td>
-                    <td style={{ padding: '11px 14px', fontSize: 13, borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.calls}</td>
+                    <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: 'var(--ink)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.name}</td>
+                    <td style={{ padding: '11px 14px', fontSize: 13, borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.calls}</td>
                     {period === 'today' && (
-                      <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: (m.goal_pct ?? 0) >= 100 ? '#1E9E5A' : '#0E1726', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.goal_pct ?? 0}%</td>
+                      <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: (m.goal_pct ?? 0) >= 100 ? '#1E9E5A' : 'var(--ink)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.goal_pct ?? 0}%</td>
                     )}
-                    <td style={{ padding: '11px 14px', fontSize: 13, borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.leads_in_work}</td>
-                    <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 700, color: '#1E9E5A', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.conversion}%</td>
-                    <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: m.overdue > 0 ? 700 : 400, color: m.overdue > 0 ? '#E0473B' : '#5A6573', borderTop: '1px solid rgba(14,23,38,0.05)' }}>{m.overdue}</td>
+                    <td style={{ padding: '11px 14px', fontSize: 13, borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.leads_in_work}</td>
+                    <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 700, color: '#1E9E5A', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.conversion}%</td>
+                    <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: m.overdue > 0 ? 700 : 400, color: m.overdue > 0 ? '#E0473B' : 'var(--text-secondary)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.overdue}</td>
                   </tr>
                   {openId === m.id && (
                     <tr>
-                      <td colSpan={period === 'today' ? 6 : 5} style={{ padding: 0, borderTop: '1px solid rgba(14,23,38,0.05)' }}>
+                      <td colSpan={period === 'today' ? 6 : 5} style={{ padding: 0, borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
                         <ManagerDetail manager={m} period={period} />
                       </td>
                     </tr>
@@ -455,8 +455,8 @@ export default function Admin() {
           <button key={t.id} onClick={() => setTab(t.id)} style={{
             padding: '7px 15px', borderRadius: 99, border: 'none', cursor: 'pointer',
             fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
-            background: tab === t.id ? '#0E1726' : 'rgba(14,23,38,0.06)',
-            color: tab === t.id ? '#fff' : '#5A6573',
+            background: tab === t.id ? '#0E1726' : 'rgba(var(--ink-rgb), 0.06)',
+            color: tab === t.id ? '#fff' : 'var(--text-secondary)',
           }}>{t.label}</button>
         ))}
       </div>

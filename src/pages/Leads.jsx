@@ -30,7 +30,7 @@ export default function Leads() {
       <div className="card" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
         <SlidingTabs options={VIEWS.map(v => ({ key: v.id, label: v.label }))} value={view} onChange={setView} />
 
-        <div style={{ width: 1, height: 24, background: 'rgba(14,23,38,0.1)' }} />
+        <div style={{ width: 1, height: 24, background: 'rgba(var(--ink-rgb), 0.1)' }} />
 
         {industries.length > 0 && (
           <Select value={industry} onChange={e => setIndustry(e.target.value)} className="form-input" style={{ minWidth: 180 }}>

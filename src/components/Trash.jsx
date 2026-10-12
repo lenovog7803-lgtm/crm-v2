@@ -81,8 +81,8 @@ export default function Trash() {
   const chipStyle = (k) => ({
     padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer',
     fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
-    background: filter === k ? '#0E1726' : 'rgba(14,23,38,0.06)',
-    color: filter === k ? '#fff' : '#5A6573',
+    background: filter === k ? '#0E1726' : 'rgba(var(--ink-rgb), 0.06)',
+    color: filter === k ? '#fff' : 'var(--text-secondary)',
   })
 
   return (
@@ -94,10 +94,10 @@ export default function Trash() {
           </svg>
         </div>
         <div>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: '#0E1726' }}>Корзина</div>
-          <div style={{ fontSize: 12, color: '#A6AEB8', marginTop: 2 }}>Удалённые элементы хранятся 30 дней, затем удаляются навсегда</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: 'var(--ink)' }}>Корзина</div>
+          <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>Удалённые элементы хранятся 30 дней, затем удаляются навсегда</div>
         </div>
-        <div style={{ marginLeft: 'auto', fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color: items.length > 0 ? '#C81923' : '#A6AEB8' }}>
+        <div style={{ marginLeft: 'auto', fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color: items.length > 0 ? '#C81923' : 'var(--text-tertiary)' }}>
           {items.length}
         </div>
         {items.length > 0 && (
@@ -117,13 +117,13 @@ export default function Trash() {
       {purgeOpen && (
         <div
           onClick={() => !purging && setPurgeOpen(false)}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(14,23,38,0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, display: 'grid', padding: 24 }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, display: 'grid', padding: 24 }}
         >
-          <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 420, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
+          <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 420, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#C81923', marginBottom: 6 }}>
               Необратимое действие
             </div>
-            <div style={{ fontSize: 14, color: '#5A6573', marginBottom: 18 }}>
+            <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 18 }}>
               Будут навсегда удалены все {items.length} элементов в корзине. Это нельзя отменить. Введите <b>УДАЛИТЬ</b>, чтобы подтвердить.
             </div>
             <input
@@ -131,10 +131,10 @@ export default function Trash() {
               onChange={e => setPurgeWord(e.target.value)}
               placeholder="УДАЛИТЬ"
               autoFocus
-              style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 14, color: '#0E1726', boxSizing: 'border-box', marginBottom: 22 }}
+              style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--fill)', fontSize: 14, color: 'var(--ink)', boxSizing: 'border-box', marginBottom: 22 }}
             />
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => { setPurgeOpen(false); setPurgeWord('') }} style={{ flex: 1, padding: 13, borderRadius: 12, background: '#F7F8FA', border: '1px solid #E8EAEE', fontSize: 14, color: '#5A6573', cursor: 'pointer' }}>
+              <button onClick={() => { setPurgeOpen(false); setPurgeWord('') }} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', fontSize: 14, color: 'var(--text-secondary)', cursor: 'pointer' }}>
                 Отмена
               </button>
               <button
@@ -142,7 +142,7 @@ export default function Trash() {
                 disabled={purging || purgeWord.trim().toUpperCase() !== 'УДАЛИТЬ'}
                 style={{
                   flex: 2, padding: 13, borderRadius: 12, border: 'none',
-                  background: purgeWord.trim().toUpperCase() === 'УДАЛИТЬ' ? '#C81923' : '#C4CAD4',
+                  background: purgeWord.trim().toUpperCase() === 'УДАЛИТЬ' ? '#C81923' : 'var(--text-quaternary)',
                   color: '#FFFFFF', fontSize: 14, fontWeight: 700,
                   cursor: purgeWord.trim().toUpperCase() === 'УДАЛИТЬ' && !purging ? 'pointer' : 'default',
                 }}
@@ -174,7 +174,7 @@ export default function Trash() {
           return (
             <div key={item.id} style={{
               display: 'flex', alignItems: 'center', gap: 14, padding: '14px 20px',
-              borderBottom: i < filtered.length - 1 ? '1px solid rgba(14,23,38,0.05)' : 'none',
+              borderBottom: i < filtered.length - 1 ? '1px solid rgba(var(--ink-rgb), 0.05)' : 'none',
             }}>
               <div style={{
                 width: 36, height: 36, borderRadius: 11, flexShrink: 0,
@@ -184,18 +184,18 @@ export default function Trash() {
                 {TYPE_ICONS[item.collection] || TYPE_ICONS.tasks}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13.5, fontWeight: 600, color: '#0E1726', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {item.label || item.id}
                 </div>
-                <div style={{ fontSize: 11.5, color: '#A6AEB8', marginTop: 2 }}>
+                <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginTop: 2 }}>
                   {TYPE_LABELS[item.collection] || item.collection}
                   {item.deleted_at && ` · Удалено ${new Date(item.deleted_at).toLocaleDateString('ru-RU')}`}
                 </div>
               </div>
               <div style={{
                 fontSize: 11.5, fontWeight: 600, padding: '4px 10px', borderRadius: 8,
-                background: urgent ? 'rgba(200,25,35,0.1)' : 'rgba(14,23,38,0.05)',
-                color: urgent ? '#C81923' : '#8A93A0', flexShrink: 0,
+                background: urgent ? 'rgba(200,25,35,0.1)' : 'rgba(var(--ink-rgb), 0.05)',
+                color: urgent ? '#C81923' : 'var(--text-3)', flexShrink: 0,
               }}>
                 {days === 0 ? 'Сегодня удалится' : `${days} дн.`}
               </div>

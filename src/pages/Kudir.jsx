@@ -13,7 +13,7 @@ const TABS = [
 
 const inputStyle = {
   padding: '6px 8px', borderRadius: 8, border: '1px solid #E0473B4D', fontSize: 12,
-  fontFamily: 'var(--font-sys)', color: '#0E1726',
+  fontFamily: 'var(--font-sys)', color: 'var(--ink)',
 }
 
 const MISSING_FIELD_META = {
@@ -61,9 +61,9 @@ function MissingPPRow({ order, onSaved }) {
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderBottom: '1px solid #F0F1F4', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderBottom: '1px solid var(--fill-2)', flexWrap: 'wrap' }}>
       <div style={{ width: 110, fontFamily: 'var(--font-mono)', fontSize: 12, color: '#1366F0' }}>{order.order_number}</div>
-      <div style={{ flex: 1, minWidth: 120, fontSize: 12, color: '#0E1726' }}>{order.client_name}</div>
+      <div style={{ flex: 1, minWidth: 120, fontSize: 12, color: 'var(--ink)' }}>{order.client_name}</div>
       {missing.map(key => {
         const meta = MISSING_FIELD_META[key]
         if (!meta) return null
@@ -114,13 +114,13 @@ function BackfillTab() {
 
   return (
     <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-      <div style={{ padding: '14px 18px', borderBottom: '1px solid #F0F1F4', fontSize: 13, fontWeight: 600, color: '#0E1726' }}>
+      <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--fill-2)', fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>
         Осталось дозаполнить: {orders.length}
       </div>
       {loading ? (
         <Loader padding={24} />
       ) : orders.length === 0 ? (
-        <div style={{ padding: 24, textAlign: 'center', color: '#A6AEB8', fontSize: 13 }}>Всё заполнено</div>
+        <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-tertiary)', fontSize: 13 }}>Всё заполнено</div>
       ) : (
         orders.map(order => <MissingPPRow key={order.id} order={order} onSaved={load} />)
       )}
@@ -252,7 +252,7 @@ function BookTab() {
           placeholder="Поиск по контрагенту или заявке…"
           style={{
             flex: '1 1 220px', minWidth: 180, padding: '9px 12px', borderRadius: 10,
-            border: '1px solid #E8EAEE', background: '#F7F8FA', fontSize: 13, color: '#0E1726',
+            border: '1px solid var(--line)', background: 'var(--fill)', fontSize: 13, color: 'var(--ink)',
             boxSizing: 'border-box',
           }}
         />
@@ -260,14 +260,14 @@ function BookTab() {
           onClick={resync}
           disabled={resyncing}
           title="Пересчитать книгу по всем заявкам (нал, «Акт б/н», группировка ПП). Ручные правки не трогает."
-          style={{ marginLeft: 'auto', padding: '9px 16px', borderRadius: 10, background: '#fff', color: '#0E1726', border: '1px solid #E8EAEE', fontSize: 13, fontWeight: 600, cursor: resyncing ? 'default' : 'pointer', opacity: resyncing ? 0.6 : 1, whiteSpace: 'nowrap' }}
+          style={{ marginLeft: 'auto', padding: '9px 16px', borderRadius: 10, background: 'var(--surface)', color: 'var(--ink)', border: '1px solid var(--line)', fontSize: 13, fontWeight: 600, cursor: resyncing ? 'default' : 'pointer', opacity: resyncing ? 0.6 : 1, whiteSpace: 'nowrap' }}
         >
           {resyncing ? (resyncMsg || 'Пересчёт…') : 'Пересчитать'}
         </button>
         {resyncing && (
           <button
             onClick={cancelResync}
-            style={{ padding: '9px 14px', borderRadius: 10, background: '#fff', color: '#E0473B', border: '1px solid rgba(224,71,59,0.4)', fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
+            style={{ padding: '9px 14px', borderRadius: 10, background: 'var(--surface)', color: '#E0473B', border: '1px solid rgba(224,71,59,0.4)', fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
           >
             Остановить
           </button>
@@ -281,7 +281,7 @@ function BookTab() {
       </div>
 
       <div className="card" style={{ padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ fontSize: 13, color: '#5A6573' }}>
+        <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
           {needle ? `Найдено: ${filteredEntries.length} из ${entries.length}` : `Записей: ${entries.length}`}
         </div>
         <div style={{ fontSize: 14, fontWeight: 700, color: '#1E9E5A' }}>
@@ -292,7 +292,7 @@ function BookTab() {
       <div className="card" style={{ padding: 0, overflow: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
           <thead>
-            <tr style={{ background: '#F7F8FA', textAlign: 'left' }}>
+            <tr style={{ background: 'var(--fill)', textAlign: 'left' }}>
               <th style={{ padding: '10px 12px' }}>Дата</th>
               <th style={{ padding: '10px 12px' }}>Документ</th>
               <th style={{ padding: '10px 12px' }}>Содержание</th>
@@ -304,7 +304,7 @@ function BookTab() {
             {loading ? (
               <tr><td colSpan={5}><Loader padding={24} /></td></tr>
             ) : filteredEntries.length === 0 ? (
-              <tr><td colSpan={5} style={{ padding: 24, textAlign: 'center', color: '#A6AEB8' }}>
+              <tr><td colSpan={5} style={{ padding: 24, textAlign: 'center', color: 'var(--text-tertiary)' }}>
                 {needle ? 'Ничего не найдено' : 'Нет записей за период'}
               </td></tr>
             ) : (
@@ -326,7 +326,7 @@ function BookTab() {
 // order automatically.
 const cellInputStyle = {
   width: '100%', border: '1px solid transparent', background: 'transparent',
-  padding: '6px 8px', borderRadius: 8, fontSize: 12, fontFamily: 'var(--font-sys)', color: '#0E1726',
+  padding: '6px 8px', borderRadius: 8, fontSize: 12, fontFamily: 'var(--font-sys)', color: 'var(--ink)',
   boxSizing: 'border-box',
 }
 const focusCell = e => { e.target.style.border = '1px solid #E0473B4D'; e.target.style.background = '#fff' }
@@ -370,7 +370,7 @@ function EntryRow({ entry, onChanged }) {
   const locked = !!entry.manually_edited
 
   return (
-    <tr style={{ borderTop: '1px solid #F0F1F4', background: locked ? 'rgba(19,102,240,0.03)' : 'transparent' }}>
+    <tr style={{ borderTop: '1px solid var(--fill-2)', background: locked ? 'rgba(19,102,240,0.03)' : 'transparent' }}>
       <td style={{ padding: '6px 12px', whiteSpace: 'nowrap' }}>
         <input
           type="date"
@@ -415,7 +415,7 @@ function EntryRow({ entry, onChanged }) {
           onFocus={focusCell}
           onBlur={e => { blurCell(e); save('income_amount', fields.income_amount) }}
           disabled={saving === 'income_amount'}
-          data-plain style={{ ...cellInputStyle, textAlign: 'right', fontWeight: 600, color: fields.income_amount != null && fields.income_amount !== '' ? '#1E9E5A' : '#A6AEB8' }}
+          data-plain style={{ ...cellInputStyle, textAlign: 'right', fontWeight: 600, color: fields.income_amount != null && fields.income_amount !== '' ? '#1E9E5A' : 'var(--text-tertiary)' }}
           placeholder="—"
         />
       </td>
@@ -433,7 +433,7 @@ function EntryRow({ entry, onChanged }) {
             <button
               onClick={revert}
               title="Снять ручную правку — строка снова будет пересчитываться автоматически"
-              style={{ flexShrink: 0, border: 'none', background: 'transparent', color: '#A6AEB8', fontSize: 10, cursor: 'pointer', padding: '2px 4px', whiteSpace: 'nowrap' }}
+              style={{ flexShrink: 0, border: 'none', background: 'transparent', color: 'var(--text-tertiary)', fontSize: 10, cursor: 'pointer', padding: '2px 4px', whiteSpace: 'nowrap' }}
             >
               снять
             </button>
@@ -450,7 +450,7 @@ export default function Kudir() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <h1 style={{ fontFamily: 'var(--font-sys)', fontSize: 20, fontWeight: 800, color: '#0E1726', margin: 0 }}>КУДиР</h1>
+        <h1 style={{ fontFamily: 'var(--font-sys)', fontSize: 20, fontWeight: 800, color: 'var(--ink)', margin: 0 }}>КУДиР</h1>
         <SlidingTabs options={TABS} value={tab} onChange={setTab} />
       </div>
       {tab === 'backfill' ? <BackfillTab /> : <BookTab />}
