@@ -86,7 +86,7 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
         {form.due_time && !form.due_date && (
           <div style={{ fontSize: 11.5, color: 'var(--text-3)' }}>Укажите дату — уведомление придёт в этот день в {form.due_time}.</div>
         )}
-        {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center' }}>{error}</div>}
+        {error && <div style={{ fontSize: 12, color: 'var(--fg-c81923)', textAlign: 'center' }}>{error}</div>}
         <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
           <button type="button" className="btn-ghost" onClick={onClose} style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button type="submit" className="btn-primary" disabled={loading} style={{ flex: 2, justifyContent: 'center' }}>

@@ -27,11 +27,11 @@ function ProfitChart({ rows }) {
       <BarChart data={data} xDataKey="month" stacked aspectRatio="auto" margin={{ left: 8, right: 8, top: 12, bottom: 28 }}>
         <Grid horizontal />
         <Bar dataKey="profit" fill="var(--chart-line-primary)" lineCap="round" />
-        {hasLoss && <Bar dataKey="loss" fill="#E0473B" lineCap="round" />}
+        {hasLoss && <Bar dataKey="loss" fill="var(--fg-e0473b)" lineCap="round" />}
         <BarXAxis />
-        <ChartTooltip dotColor={p => p.raw >= 0 ? 'var(--chart-line-primary)' : '#E0473B'} rows={p => [p.raw >= 0
+        <ChartTooltip dotColor={p => p.raw >= 0 ? 'var(--chart-line-primary)' : 'var(--fg-e0473b)'} rows={p => [p.raw >= 0
           ? { color: 'var(--chart-line-primary)', label: 'Прибыль', value: `${int(p.raw)} Br` }
-          : { color: '#E0473B', label: 'Убыток', value: `${int(p.raw)} Br` }]} />
+          : { color: 'var(--fg-e0473b)', label: 'Убыток', value: `${int(p.raw)} Br` }]} />
       </BarChart>
     </div>
   )
@@ -85,7 +85,7 @@ export default function FleetAnalytics({ onBack }) {
   if (!d) return <Loader padding={20} state="composing" />
 
   const inp = { height: 38, padding: '0 12px', borderRadius: 12, border: '1px solid rgba(var(--ink-rgb), 0.14)', background: 'rgba(var(--paper-rgb), 0.8)', fontFamily: 'var(--font-sys)', fontSize: 13, color: 'var(--ink)' }
-  const profitColor = v => (Number(v) >= 0 ? '#1E9E5A' : '#E0473B')
+  const profitColor = v => (Number(v) >= 0 ? 'var(--fg-1e9e5a)' : 'var(--fg-e0473b)')
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -103,10 +103,10 @@ export default function FleetAnalytics({ onBack }) {
       {/* KPI */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
         {[
-          { label: 'Порожний пробег', v: `${(d.empty_km_pct || 0).toFixed(1)}%`, c: '#D97706' },
-          { label: 'Гружёный пробег', v: `${int(d.laden_km)} км`, c: '#1E9E5A' },
-          { label: 'Всего пробег', v: `${int(d.total_km)} км`, c: '#1366F0' },
-          { label: 'Убыточных рейсов', v: (d.loss_trips || []).length, c: '#E0473B' },
+          { label: 'Порожний пробег', v: `${(d.empty_km_pct || 0).toFixed(1)}%`, c: 'var(--fg-d97706)' },
+          { label: 'Гружёный пробег', v: `${int(d.laden_km)} км`, c: 'var(--fg-1e9e5a)' },
+          { label: 'Всего пробег', v: `${int(d.total_km)} км`, c: 'var(--fg-1366f0)' },
+          { label: 'Убыточных рейсов', v: (d.loss_trips || []).length, c: 'var(--fg-e0473b)' },
         ].map(k => (
           <div key={k.label} className="card" style={{ padding: '16px 18px' }}>
             <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: 6 }}>{k.label}</div>
@@ -129,7 +129,7 @@ export default function FleetAnalytics({ onBack }) {
             { key: 'name', label: 'Машина' },
             { key: 'trips', label: 'Рейсы', right: true },
             { key: 'revenue', label: 'Выручка', right: true, mono: true, fmt: int },
-            { key: 'expenses', label: 'Расходы', right: true, mono: true, fmt: int, color: () => '#E0473B' },
+            { key: 'expenses', label: 'Расходы', right: true, mono: true, fmt: int, color: () => 'var(--fg-e0473b)' },
             { key: 'profit', label: 'Прибыль', right: true, mono: true, bold: true, fmt: int, color: profitColor },
           ]}
         />
@@ -139,7 +139,7 @@ export default function FleetAnalytics({ onBack }) {
           cols={[
             { key: 'name', label: 'Водитель' },
             { key: 'trips', label: 'Рейсы', right: true },
-            { key: 'salary', label: 'ЗП', right: true, mono: true, fmt: int, color: () => '#D97706' },
+            { key: 'salary', label: 'ЗП', right: true, mono: true, fmt: int, color: () => 'var(--fg-d97706)' },
             { key: 'revenue', label: 'Выручка', right: true, mono: true, fmt: int },
             { key: 'profit', label: 'Прибыль', right: true, mono: true, bold: true, fmt: int, color: profitColor },
           ]}
@@ -150,11 +150,11 @@ export default function FleetAnalytics({ onBack }) {
         title="Самые убыточные рейсы"
         rows={d.loss_trips || []}
         cols={[
-          { key: 'trip_number', label: 'Рейс', fmt: v => `Р${v}`, color: () => '#1366F0', mono: true },
+          { key: 'trip_number', label: 'Рейс', fmt: v => `Р${v}`, color: () => 'var(--fg-1366f0)', mono: true },
           { key: 'name', label: 'Название' },
           { key: 'route', label: 'Маршрут' },
           { key: 'revenue', label: 'Выручка', right: true, mono: true, fmt: int },
-          { key: 'expenses', label: 'Расходы', right: true, mono: true, fmt: int, color: () => '#E0473B' },
+          { key: 'expenses', label: 'Расходы', right: true, mono: true, fmt: int, color: () => 'var(--fg-e0473b)' },
           { key: 'profit', label: 'Убыток', right: true, mono: true, bold: true, fmt: int, color: profitColor },
         ]}
       />

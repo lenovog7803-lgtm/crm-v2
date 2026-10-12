@@ -100,7 +100,7 @@ function ComboSelect({ value, onTextChange, onSelect, items, placeholder, labelF
               key={item.id}
               onMouseDown={() => { onSelect(item); setShow(false) }}
               style={{ padding: '10px 14px', fontSize: 13, color: 'var(--ink)', cursor: 'pointer', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)', transition: 'background 0.1s' }}
-              onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.07)')}
+              onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.07)')}
               onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
             >
               {labelFn(item)}
@@ -148,7 +148,7 @@ function CityInput({ value, onChange, placeholder }) {
               key={city}
               onMouseDown={() => { onChange(city); setShow(false) }}
               style={{ padding: '10px 14px', fontSize: 13, color: 'var(--ink)', cursor: 'pointer', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)', transition: 'background 0.1s' }}
-              onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.07)')}
+              onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.07)')}
               onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
             >
               {city}
@@ -379,7 +379,7 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
             style={{ ...iStyle, height: 72, padding: '10px 12px', resize: 'vertical' }} />
         </div>
 
-        {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center' }}>{error}</div>}
+        {error && <div style={{ fontSize: 12, color: 'var(--fg-c81923)', textAlign: 'center' }}>{error}</div>}
 
         <div style={{ display: 'flex', gap: 10 }}>
           <button type="button" className="btn-ghost" onClick={handleClose} style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
@@ -398,7 +398,7 @@ const int = v => Math.round(Number(v) || 0).toLocaleString('ru-RU')
 // и как обычно идёт это направление
 function MarginHint({ margin, marginPct, client, carrier, route, from, to }) {
   const kind = margin === null ? null : margin < 0 ? 'bad' : (margin < MIN_MARGIN || (client > 0 && margin / client < MIN_PCT)) ? 'empty' : 'ok'
-  const tone = { ok: ['rgba(19,102,240,0.08)', '#1366F0'], empty: ['rgba(217,119,6,0.1)', '#B45309'], bad: ['rgba(200,25,35,0.08)', '#C81923'] }
+  const tone = { ok: ['rgba(var(--rgb-19-102-240), 0.08)', 'var(--fg-1366f0)'], empty: ['rgba(var(--rgb-217-119-6), 0.1)', 'var(--fg-b45309)'], bad: ['rgba(var(--rgb-200-25-35), 0.08)', 'var(--fg-c81923)'] }
   // до порога: клиенту не меньше …, или перевозчику не больше …
   const needClient = Math.ceil(Math.max(carrier + MIN_MARGIN, carrier / (1 - MIN_PCT)))
   const maxCarrier = Math.floor(Math.min(client - MIN_MARGIN, client * (1 - MIN_PCT)))

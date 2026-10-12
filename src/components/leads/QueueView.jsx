@@ -76,13 +76,13 @@ export default function QueueView({ industry, onCounts }) {
   }
 
   const pct = Math.min(100, Math.round((todayCalls / DAILY_GOAL) * 100))
-  const ringColor = pct >= 100 ? '#1E9E5A' : '#1366F0'
+  const ringColor = pct >= 100 ? 'var(--fg-1e9e5a)' : 'var(--fg-1366f0)'
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div className="ios-widget" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16 }}>
-        <div style={{ position: 'relative', flexShrink: 0, filter: `drop-shadow(0 4px 10px ${ringColor}40)` }}>
-          <CircularProgress pct={pct} color={ringColor} size={60} stroke={9} track={`${ringColor}22`} />
+        <div style={{ position: 'relative', flexShrink: 0, filter: `drop-shadow(0 4px 10px color-mix(in srgb, ${ringColor} 25%, transparent))` }}>
+          <CircularProgress pct={pct} color={ringColor} size={60} stroke={9} track={`color-mix(in srgb, ${ringColor} 13%, transparent)`} />
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: ringColor }}>{pct}%</div>
         </div>
         <div>
@@ -100,7 +100,7 @@ export default function QueueView({ industry, onCounts }) {
         <div className="ios-list" style={{ padding: 60, textAlign: 'center' }}>
           <div style={{
             width: 56, height: 56, borderRadius: 18, margin: '0 auto 16px',
-            background: 'rgba(30,158,90,0.1)', color: '#1E9E5A',
+            background: 'rgba(var(--rgb-30-158-90), 0.1)', color: 'var(--fg-1e9e5a)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">

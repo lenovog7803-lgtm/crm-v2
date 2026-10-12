@@ -50,8 +50,8 @@ export default function LeaderboardView() {
             return (
               <div key={r.id} className="card" style={{
                 padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 16,
-                border: isMe ? '1.5px solid rgba(19,102,240,0.4)' : undefined,
-                background: isMe ? 'rgba(19,102,240,0.04)' : undefined,
+                border: isMe ? '1.5px solid rgba(var(--rgb-19-102-240), 0.4)' : undefined,
+                background: isMe ? 'rgba(var(--rgb-19-102-240), 0.04)' : undefined,
               }}>
                 <div style={{ width: 32, textAlign: 'center', fontSize: i < 3 ? 22 : 15, fontWeight: 800, color: i < 3 ? undefined : 'var(--text-tertiary)', flexShrink: 0 }}>
                   {MEDAL[i] || i + 1}
@@ -59,10 +59,10 @@ export default function LeaderboardView() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink)' }}>{r.name}</span>
-                    {isMe && <span style={{ fontSize: 10.5, fontWeight: 700, color: '#1366F0', background: 'rgba(19,102,240,0.1)', padding: '2px 8px', borderRadius: 20 }}>ЭТО ВЫ</span>}
+                    {isMe && <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--fg-1366f0)', background: 'rgba(var(--rgb-19-102-240), 0.1)', padding: '2px 8px', borderRadius: 20 }}>ЭТО ВЫ</span>}
                   </div>
                   <div style={{ height: 6, borderRadius: 99, background: 'rgba(var(--ink-rgb), 0.06)', marginTop: 8, maxWidth: 300 }}>
-                    <div style={{ height: '100%', borderRadius: 99, width: `${barWidth}%`, background: i === 0 ? '#D97706' : '#1366F0', transition: 'width 0.4s' }} />
+                    <div style={{ height: '100%', borderRadius: 99, width: `${barWidth}%`, background: i === 0 ? 'var(--fg-d97706)' : 'var(--fg-1366f0)', transition: 'width 0.4s' }} />
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 22, flexShrink: 0, textAlign: 'right' }}>
@@ -71,7 +71,7 @@ export default function LeaderboardView() {
                     <div style={{ fontSize: 10.5, color: 'var(--text-tertiary)' }}>звонков</div>
                   </div>
                   <div>
-                    <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 18, color: '#1E9E5A' }}>{r.won}</div>
+                    <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 18, color: 'var(--fg-1e9e5a)' }}>{r.won}</div>
                     <div style={{ fontSize: 10.5, color: 'var(--text-tertiary)' }}>в клиенты</div>
                   </div>
                   <div>

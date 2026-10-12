@@ -190,13 +190,13 @@ export default function Finance({ refreshKey }) {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
             <div onClick={() => setShowInModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '14px 14px', color: 'var(--ink)' }}>
-              <div className="grad-kicker" style={{ color: '#1E9E5A' }}>Поступления</div>
+              <div className="grad-kicker" style={{ color: 'var(--fg-1e9e5a)' }}>Поступления</div>
               <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
               <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
               <div style={{ marginTop: 6, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{paidClientOrders.length} заявок оплачено</div>
             </div>
             <div onClick={() => setShowOutModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '14px 14px', color: 'var(--ink)' }}>
-              <div className="grad-kicker" style={{ color: '#7C3AED' }}>Списания</div>
+              <div className="grad-kicker" style={{ color: 'var(--fg-7c3aed)' }}>Списания</div>
               <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
               <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
               <div style={{ marginTop: 6, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{paidCarrierOrders.length} заявок оплачено</div>
@@ -222,13 +222,13 @@ export default function Finance({ refreshKey }) {
             </div>
           </div>
           <div onClick={() => setShowInModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '26px 24px', color: 'var(--ink)' }}>
-            <div className="grad-kicker" style={{ color: '#1E9E5A' }}>Поступления</div>
+            <div className="grad-kicker" style={{ color: 'var(--fg-1e9e5a)' }}>Поступления</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
             <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
             <div style={{ marginTop: 14, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{paidClientOrders.length} заявок оплачено</div>
           </div>
           <div onClick={() => setShowOutModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '26px 24px', color: 'var(--ink)' }}>
-            <div className="grad-kicker" style={{ color: '#7C3AED' }}>Списания</div>
+            <div className="grad-kicker" style={{ color: 'var(--fg-7c3aed)' }}>Списания</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
             <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
             <div style={{ marginTop: 14, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{paidCarrierOrders.length} заявок оплачено</div>
@@ -239,9 +239,9 @@ export default function Finance({ refreshKey }) {
       {/* KPI */}
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr 1fr' : 'repeat(3,1fr)', gap: isMobile ? 8 : 12 }}>
         {[
-          { label: 'Выручка', val: fmtMoney(totalIncome), color: '#1E9E5A' },
-          { label: 'Перевозчики', val: fmtMoney(totalExpense), color: '#1366F0' },
-          { label: 'Маржа', val: marginPct + '%', color: '#D97706' },
+          { label: 'Выручка', val: fmtMoney(totalIncome), color: 'var(--fg-1e9e5a)' },
+          { label: 'Перевозчики', val: fmtMoney(totalExpense), color: 'var(--fg-1366f0)' },
+          { label: 'Маржа', val: marginPct + '%', color: 'var(--fg-d97706)' },
         ].map(k => (
           <div key={k.label} className="card" style={{ padding: isMobile ? '10px 12px' : '16px 18px' }}>
             <div style={{ fontSize: isMobile ? 10 : 11, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: isMobile ? 4 : 6 }}>{k.label}</div>
@@ -262,8 +262,8 @@ export default function Finance({ refreshKey }) {
           <button onClick={() => setShowAdd(v => !v)} style={{
             width: 32, height: 32, borderRadius: 10, border: 'none', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: showAdd ? 'rgba(200,25,35,0.1)' : 'rgba(19,102,240,0.12)',
-            color: showAdd ? '#C81923' : '#1366F0',
+            background: showAdd ? 'rgba(var(--rgb-200-25-35), 0.1)' : 'rgba(var(--rgb-19-102-240), 0.12)',
+            color: showAdd ? 'var(--fg-c81923)' : 'var(--fg-1366f0)',
           }}>
             {showAdd
               ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -334,7 +334,7 @@ export default function Finance({ refreshKey }) {
             const [avA, avB] = getGradient(p.gradKey)
             return (
               <div key={`${p.kind}-${p.id}`}
-                onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.05)')}
+                onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.05)')}
                 onPointerLeave={mouseOnly(e => e.currentTarget.style.background = i % 2 === 0 ? 'rgba(var(--ink-rgb), 0.02)' : 'transparent')}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 12, padding: '10px 8px', borderRadius: 11,
@@ -352,16 +352,16 @@ export default function Finance({ refreshKey }) {
                   <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginTop: 1 }}>
                     {p.kind === 'income' ? 'Поступление' : 'Списание'}
                     {p.pp_number ? ` · ПП ${p.pp_number}` : ''}
-                    {p.order_number ? <span style={{ color: '#1366F0', fontFamily: 'var(--font-mono)' }}> · {p.order_number}</span> : ''}
+                    {p.order_number ? <span style={{ color: 'var(--fg-1366f0)', fontFamily: 'var(--font-mono)' }}> · {p.order_number}</span> : ''}
                   </div>
                 </div>
                 <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', flexShrink: 0 }}>{fmtDate(p.date) || '—'}</div>
-                <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: p.kind === 'income' ? '#1E9E5A' : '#1366F0', flexShrink: 0 }}>
+                <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: p.kind === 'income' ? 'var(--fg-1e9e5a)' : 'var(--fg-1366f0)', flexShrink: 0 }}>
                   {p.kind === 'income' ? '+' : '-'}{(p.amount || 0).toLocaleString('ru-RU')} BYN
                 </div>
                 <button onClick={() => handleDeletePayment(p)} style={{
                   width: 28, height: 28, borderRadius: 8, border: 'none', cursor: 'pointer',
-                  background: 'rgba(200,25,35,0.07)', color: '#C81923',
+                  background: 'rgba(var(--rgb-200-25-35), 0.07)', color: 'var(--fg-c81923)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                 }}>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -378,8 +378,8 @@ export default function Finance({ refreshKey }) {
         {filtered.length > PREVIEW && (
           <button onClick={() => setShowAll(v => !v)} style={{
             width: '100%', marginTop: 10, padding: '9px', borderRadius: 11,
-            border: '1px solid rgba(19,102,240,0.2)', background: 'rgba(19,102,240,0.04)',
-            cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600, color: '#1366F0',
+            border: '1px solid rgba(var(--rgb-19-102-240), 0.2)', background: 'rgba(var(--rgb-19-102-240), 0.04)',
+            cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600, color: 'var(--fg-1366f0)',
           }}>{showAll ? 'Свернуть' : `Показать все (${filtered.length})`}</button>
         )}
       </div>
@@ -411,10 +411,10 @@ export default function Finance({ refreshKey }) {
               {actRows.map(row => (
                 <tr key={row.id} style={{ borderBottom: '1px solid rgba(var(--ink-rgb), 0.04)' }}>
                   <td style={{ padding: '10px 12px', color: 'var(--text-tertiary)' }}>{row.n}</td>
-                  <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)', fontSize: 12, color: '#1366F0' }}>{row.order_number || '—'}</td>
+                  <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-1366f0)' }}>{row.order_number || '—'}</td>
                   <td style={{ padding: '10px 12px', color: 'var(--text-secondary)' }}>{fmtDate(row.unload_date) || '—'}</td>
-                  <td style={{ padding: '10px 12px', color: '#1E9E5A', fontWeight: 700 }}>{(row.amt || 0).toLocaleString('ru-RU')} BYN</td>
-                  <td style={{ padding: '10px 12px', fontWeight: 700, color: row.balance >= 0 ? '#1E9E5A' : '#C81923' }}>{row.balance.toLocaleString('ru-RU')} BYN</td>
+                  <td style={{ padding: '10px 12px', color: 'var(--fg-1e9e5a)', fontWeight: 700 }}>{(row.amt || 0).toLocaleString('ru-RU')} BYN</td>
+                  <td style={{ padding: '10px 12px', fontWeight: 700, color: row.balance >= 0 ? 'var(--fg-1e9e5a)' : 'var(--fg-c81923)' }}>{row.balance.toLocaleString('ru-RU')} BYN</td>
                 </tr>
               ))}
             </tbody>
@@ -449,8 +449,8 @@ export default function Finance({ refreshKey }) {
               />
               {recPartyId && (
                 <button onClick={() => setShowLedger(true)} style={{
-                  width: 26, height: 26, borderRadius: 8, border: '1px solid #1366F0',
-                  background: 'transparent', color: '#1366F0', fontSize: 15, fontWeight: 700,
+                  width: 26, height: 26, borderRadius: 8, border: '1px solid var(--fg-1366f0)',
+                  background: 'transparent', color: 'var(--fg-1366f0)', fontSize: 15, fontWeight: 700,
                   cursor: 'pointer', marginLeft: 8, lineHeight: 1,
                 }} title={`Список платежей ${recType === 'client' ? 'клиента' : 'перевозчику'} для акта сверки`}>
                   +
@@ -471,7 +471,7 @@ export default function Finance({ refreshKey }) {
           <button onClick={handleGenerateReconciliation} disabled={recLoading || !recPartyId} style={{
             height: 36, padding: '0 20px', borderRadius: 11, border: 'none',
             cursor: recPartyId ? 'pointer' : 'not-allowed',
-            background: recPartyId ? '#1366F0' : 'rgba(var(--ink-rgb), 0.08)',
+            background: recPartyId ? 'var(--fg-1366f0)' : 'rgba(var(--ink-rgb), 0.08)',
             color: recPartyId ? '#fff' : 'var(--text-tertiary)',
             fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600, opacity: recLoading ? 0.7 : 1,
           }}>{recLoading ? 'Генерация...' : 'Сформировать акт'}</button>
@@ -484,7 +484,7 @@ export default function Finance({ refreshKey }) {
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12.5 }}>
                   <span style={{ color: 'var(--text-secondary)' }}>{fmtDate(r.date || r.created_at)}</span>
                   <span style={{ fontWeight: 600, color: 'var(--ink)', flex: 1 }}>{r.counterparty_name || r.counterparty_id}</span>
-                  {r.url && <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: '#1366F0', fontWeight: 600, textDecoration: 'none' }}>Открыть</a>}
+                  {r.url && <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--fg-1366f0)', fontWeight: 600, textDecoration: 'none' }}>Открыть</a>}
                 </div>
               ))}
             </div>
@@ -530,7 +530,7 @@ export default function Finance({ refreshKey }) {
                         {o.client_paid_date ? ` · ${new Date(o.client_paid_date).toLocaleDateString('ru-RU')}` : ''}
                       </div>
                     </div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: '#1E9E5A', flexShrink: 0 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: 'var(--fg-1e9e5a)', flexShrink: 0 }}>
                       +{parseFloat(o.client_rate || 0).toLocaleString('ru-RU')} BYN
                     </div>
                   </div>
@@ -557,7 +557,7 @@ export default function Finance({ refreshKey }) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
                   <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Оплачено перевозчикам</div>
-                  <div style={{ fontSize: 12, color: '#E0473B', fontWeight: 600, marginTop: 2 }}>Итого: -{totalExpense.toLocaleString('ru-RU')} BYN · {paidCarrierOrders.length} заявок</div>
+                  <div style={{ fontSize: 12, color: 'var(--fg-e0473b)', fontWeight: 600, marginTop: 2 }}>Итого: -{totalExpense.toLocaleString('ru-RU')} BYN · {paidCarrierOrders.length} заявок</div>
                 </div>
                 <button onClick={() => setShowOutModal(false)} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.1)', background: 'transparent', cursor: 'pointer', fontSize: 18, color: 'var(--text-tertiary)' }}>×</button>
               </div>
@@ -566,7 +566,7 @@ export default function Finance({ refreshKey }) {
               ) : paidCarrierOrders.map((o, i) => {
                 const [avA, avB] = getGradient(o.carrier_name || '')
                 return (
-                  <div key={o.id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 8px', borderBottom: '1px solid rgba(var(--ink-rgb), 0.06)', borderLeft: '3px solid rgba(224,71,59,0.35)', background: 'rgba(224,71,59,0.03)' }}>
+                  <div key={o.id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 8px', borderBottom: '1px solid rgba(var(--ink-rgb), 0.06)', borderLeft: '3px solid rgba(var(--rgb-224-71-59), 0.35)', background: 'rgba(var(--rgb-224-71-59), 0.03)' }}>
                     <div style={{
                       width: 36, height: 36, borderRadius: 10, flexShrink: 0,
                       background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
@@ -579,7 +579,7 @@ export default function Finance({ refreshKey }) {
                         {o.carrier_paid_date ? ` · ${new Date(o.carrier_paid_date).toLocaleDateString('ru-RU')}` : ''}
                       </div>
                     </div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 700, color: '#E0473B', flexShrink: 0 }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 700, color: 'var(--fg-e0473b)', flexShrink: 0 }}>
                       -{parseFloat(o.carrier_rate || 0).toLocaleString('ru-RU')} BYN
                     </div>
                   </div>
@@ -653,7 +653,7 @@ function PPLedgerModal({ type, entityId, entityName, onClose }) {
   const getLedger = type === 'client' ? getClientPPLedger : getCarrierPPLedger
   const addEntry = type === 'client' ? addClientPPEntry : addCarrierPPEntry
   const deleteEntry = type === 'client' ? deleteClientPPEntry : deleteCarrierPPEntry
-  const accentColor = type === 'client' ? '#1E9E5A' : '#E0473B'
+  const accentColor = type === 'client' ? 'var(--fg-1e9e5a)' : 'var(--fg-e0473b)'
 
   const load = () => getLedger(entityId).then(r => setEntries(r.entries || []))
   useEffect(() => { load() }, [entityId, type])
@@ -692,7 +692,7 @@ function PPLedgerModal({ type, entityId, entityName, onClose }) {
           <input value={ppNumber} onChange={e => setPpNumber(e.target.value)} placeholder="№ ПП" style={{ width: 90, padding: '9px 10px', borderRadius: 10, border: '1px solid var(--line)', fontSize: 12 }} />
           <DateInput type="date" value={ppDate} onChange={e => setPpDate(e.target.value)} style={{ width: 130, padding: '9px 10px', borderRadius: 10, border: '1px solid var(--line)', fontSize: 12 }} />
           <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Сумма" style={{ flex: 1, padding: '9px 10px', borderRadius: 10, border: '1px solid var(--line)', fontSize: 12 }} />
-          <button onClick={add} style={{ width: 34, height: 34, borderRadius: 10, background: '#1366F0', color: '#fff', border: 'none', fontSize: 16, cursor: 'pointer' }}>+</button>
+          <button onClick={add} style={{ width: 34, height: 34, borderRadius: 10, background: 'var(--bg-1366f0)', color: '#fff', border: 'none', fontSize: 16, cursor: 'pointer' }}>+</button>
         </div>
 
         <div style={{ maxHeight: '45vh', overflowY: 'auto' }}>
@@ -707,7 +707,7 @@ function PPLedgerModal({ type, entityId, entityName, onClose }) {
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: accentColor }}>
                 {Number(e.amount).toLocaleString('ru-RU')} Br
               </div>
-              <button onClick={() => remove(e.id)} style={{ border: 'none', background: 'transparent', color: '#E0473B', fontSize: 15, cursor: 'pointer' }}>×</button>
+              <button onClick={() => remove(e.id)} style={{ border: 'none', background: 'transparent', color: 'var(--fg-e0473b)', fontSize: 15, cursor: 'pointer' }}>×</button>
             </div>
           ))}
         </div>

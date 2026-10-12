@@ -26,7 +26,7 @@ const NAV = [
     key: 'orders',
     label: 'Заявки',
     badge: 'newOrders',
-    badgeColor: '#7C3AED',
+    badgeColor: 'var(--fg-7c3aed)',
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <line x1="8" y1="6" x2="21" y2="6"/>
@@ -63,7 +63,7 @@ const NAV = [
     key: 'tasks',
     label: 'Задачи',
     badge: 'pendingTasks',
-    badgeColor: '#D97706',
+    badgeColor: 'var(--fg-d97706)',
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="9 11 12 14 22 4"/>
@@ -99,7 +99,7 @@ const NAV = [
     key: 'leads',
     label: 'База обзвона',
     badge: 'newLeads',
-    badgeColor: '#1366F0',
+    badgeColor: 'var(--fg-1366f0)',
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 9.7 19.79 19.79 0 0 1 1.63 1.06 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.08 6.08l.96-.96a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -109,7 +109,7 @@ const NAV = [
     key: 'mailing',
     label: 'Рассылка',
     badge: 'newReplies',
-    badgeColor: '#0E9F6E',
+    badgeColor: 'var(--fg-0e9f6e)',
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="4" width="20" height="16" rx="2"/>
@@ -467,7 +467,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
         {pillRect && (
           <div ref={pillRef} style={{
             position: 'absolute', left: 0, right: 0, top: 0,  // место и высоту ставит пружина (useSpringPill)
-            borderRadius: 12, background: 'rgba(19,102,240,0.1)',  // тонированная заливка без тени — как выделение в боковой панели iPad/Mac
+            borderRadius: 12, background: 'rgba(var(--rgb-19-102-240), 0.1)',  // тонированная заливка без тени — как выделение в боковой панели iPad/Mac
             opacity: drag ? 0 : 1,  // во время перетаскивания подсветка не мешает
             transition: 'opacity 0.15s',
             pointerEvents: 'none', zIndex: 0,
@@ -476,7 +476,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
         {navItems.map((item, index) => {
           const active = item.key === activeKey
           const badgeVal = item.badge ? counts[item.badge] : null
-          const badgeColor = item.badgeColor || '#1366F0'
+          const badgeColor = item.badgeColor || 'var(--fg-1366f0)'
           return (
             <button
               key={item.key}
@@ -493,7 +493,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
                 height: 44, borderRadius: 12, border: 'none', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', gap: 10, padding: '0 10px',
                 justifyContent: expanded ? 'flex-start' : 'center',
-                color: active ? '#1366F0' : 'var(--text-secondary)',
+                color: active ? 'var(--fg-1366f0)' : 'var(--text-secondary)',
                 fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13.5,
                 whiteSpace: 'nowrap',
                 position: 'relative', zIndex: 1, textAlign: 'left',
@@ -542,8 +542,8 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
           style={{
             marginBottom: 10, height: 40, borderRadius: 12, border: 'none', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: mode === 'fleet' ? 'rgba(19,102,240,0.1)' : 'rgba(var(--ink-rgb), 0.05)',
-            color: mode === 'fleet' ? '#1366F0' : 'var(--text-secondary)',
+            background: mode === 'fleet' ? 'rgba(var(--rgb-19-102-240), 0.1)' : 'rgba(var(--ink-rgb), 0.05)',
+            color: mode === 'fleet' ? 'var(--fg-1366f0)' : 'var(--text-secondary)',
           }}
         >
           {truckIcon}
@@ -565,7 +565,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
           onTouchEnd={cancelLongPress}
           style={{
             width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-            background: 'linear-gradient(135deg, #A5D8FF 0%, #1366F0 100%)',
+            background: 'linear-gradient(135deg, #A5D8FF 0%, var(--fg-1366f0) 100%)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: '#fff', fontWeight: 700, fontSize: 13,
             cursor: 'pointer', userSelect: 'none', WebkitTapHighlightColor: 'transparent',
@@ -617,8 +617,8 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
                 style={{
                   width: '100%', height: 38, borderRadius: 10, border: 'none', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', gap: 10, padding: '0 10px',
-                  background: page === item.key ? 'rgba(19,102,240,0.1)' : 'transparent',
-                  color: page === item.key ? '#1366F0' : 'var(--text-secondary)',
+                  background: page === item.key ? 'rgba(var(--rgb-19-102-240), 0.1)' : 'transparent',
+                  color: page === item.key ? 'var(--fg-1366f0)' : 'var(--text-secondary)',
                   fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13,
                 }}
                 onPointerEnter={mouseOnly(e => { if (page !== item.key) e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.05)' })}

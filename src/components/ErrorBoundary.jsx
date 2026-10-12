@@ -14,8 +14,8 @@ export default class ErrorBoundary extends Component {
   render() {
     if (this.state.error) {
       return (
-        <div style={{ background: 'var(--surface)', borderRadius: 20, padding: 24, border: '1px solid rgba(224,71,59,0.25)' }}>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: '#E0473B', marginBottom: 8 }}>
+        <div style={{ background: 'var(--surface)', borderRadius: 20, padding: 24, border: '1px solid rgba(var(--rgb-224-71-59), 0.25)' }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: 'var(--fg-e0473b)', marginBottom: 8 }}>
             Ошибка в разделе
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 14, fontFamily: 'var(--font-mono)' }}>
@@ -23,7 +23,7 @@ export default class ErrorBoundary extends Component {
           </div>
           <button
             onClick={() => this.setState({ error: null })}
-            style={{ padding: '10px 18px', borderRadius: 12, background: '#1366F0', border: 'none', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+            style={{ padding: '10px 18px', borderRadius: 12, background: 'var(--bg-1366f0)', border: 'none', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
           >
             Попробовать снова
           </button>

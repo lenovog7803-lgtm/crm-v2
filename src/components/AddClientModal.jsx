@@ -136,7 +136,7 @@ export default function AddClientModal({ onClose, onSuccess }) {
           </div>
         </div>
 
-        {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center' }}>{error}</div>}
+        {error && <div style={{ fontSize: 12, color: 'var(--fg-c81923)', textAlign: 'center' }}>{error}</div>}
         <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
           <button type="button" className="btn-ghost" onClick={handleClose} style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button type="submit" className="btn-primary" disabled={loading} style={{ flex: 2, justifyContent: 'center' }}>

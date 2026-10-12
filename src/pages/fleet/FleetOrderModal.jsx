@@ -107,7 +107,7 @@ export function FleetOrderModal({ tripId, direction, order, trip, onClose, onSav
         title={editing ? 'Редактировать заявку' : 'Новая заявка'}
         onClose={onClose}
       />
-      <div style={{ marginTop: -14, marginBottom: 20, fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: '#1366F0' }}>
+      <div style={{ marginTop: -14, marginBottom: 20, fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: 'var(--fg-1366f0)' }}>
         {editing ? (order.order_number || '№ —') : '№ присвоится после создания'}
         {dir ? <span style={{ color: 'var(--text-tertiary)', fontFamily: 'var(--font-sys)', fontWeight: 500, marginLeft: 10 }}>{dir === 'forward' ? 'прямой' : 'обратка'}</span> : null}
       </div>

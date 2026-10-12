@@ -29,27 +29,27 @@ const ICONS = {
 }
 const MORE_SECTIONS = [
   { title: 'Работа', items: [
-    { key: 'tasks', label: 'Задачи', icon: 'tasks', color: '#FF9500', badge: 'pendingTasks' },
-    { key: 'finance', label: 'Финансы', icon: 'money', color: '#34C759' },
-    { key: 'leads', label: 'База обзвона', icon: 'leads', color: '#007AFF', badge: 'newLeads' },
-    { key: 'mailing', label: 'Рассылка', icon: 'mailing', color: '#5856D6', badge: 'newReplies', director: true },
+    { key: 'tasks', label: 'Задачи', icon: 'tasks', color: 'var(--fg-ff9500)', badge: 'pendingTasks' },
+    { key: 'finance', label: 'Финансы', icon: 'money', color: 'var(--fg-34c759)' },
+    { key: 'leads', label: 'База обзвона', icon: 'leads', color: 'var(--fg-007aff)', badge: 'newLeads' },
+    { key: 'mailing', label: 'Рассылка', icon: 'mailing', color: 'var(--fg-5856d6)', badge: 'newReplies', director: true },
   ] },
   { title: 'Свой автопарк', fleet: true, items: [
-    { key: 'fleet-dashboard', label: 'Дашборд автопарка', icon: 'dashboard', color: '#30B0C7' },
-    { key: 'fleet-trips', label: 'Рейсы', icon: 'route', color: '#30B0C7' },
-    { key: 'fleet-plan', label: 'План автопарка', icon: 'target', color: '#30B0C7' },
-    { key: 'fleet-clients', label: 'Клиенты автопарка', icon: 'clients', color: '#30B0C7' },
-    { key: 'fleet-vehicles', label: 'Машины и водители', icon: 'fleet', color: '#30B0C7' },
+    { key: 'fleet-dashboard', label: 'Дашборд автопарка', icon: 'dashboard', color: 'var(--fg-30b0c7)' },
+    { key: 'fleet-trips', label: 'Рейсы', icon: 'route', color: 'var(--fg-30b0c7)' },
+    { key: 'fleet-plan', label: 'План автопарка', icon: 'target', color: 'var(--fg-30b0c7)' },
+    { key: 'fleet-clients', label: 'Клиенты автопарка', icon: 'clients', color: 'var(--fg-30b0c7)' },
+    { key: 'fleet-vehicles', label: 'Машины и водители', icon: 'fleet', color: 'var(--fg-30b0c7)' },
   ] },
   { title: 'Отчёты и учёт', director: true, items: [
-    { key: 'plan', label: 'План', icon: 'target', color: '#1366F0' },
+    { key: 'plan', label: 'План', icon: 'target', color: 'var(--fg-1366f0)' },
     { key: 'reports', label: 'Отчёты', icon: 'reports', color: '#AF52DE' },
     { key: 'kudir', label: 'КУДиР', icon: 'book', color: '#A2845E' },
   ] },
   { title: 'Служебное', items: [
     { key: 'trash', label: 'Корзина', icon: 'trash', color: '#8E8E93' },
     { key: 'backups', label: 'Резервные копии', icon: 'backup', color: '#636366', egor: true },
-    { key: 'admin', label: 'Администрирование', icon: 'shield', color: '#FF3B30', egor: true },
+    { key: 'admin', label: 'Администрирование', icon: 'shield', color: 'var(--fg-ff3b30)', egor: true },
   ] },
 ]
 
@@ -70,7 +70,7 @@ const NAV = [
     key: 'orders',
     label: 'Заявки',
     badge: 'newOrders',
-    badgeColor: '#7C3AED',
+    badgeColor: 'var(--fg-7c3aed)',
     icon: (a) => (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={a ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">
         <line x1="8" y1="6" x2="21" y2="6"/>
@@ -110,7 +110,7 @@ const NAV = [
     key: 'more',
     label: 'Ещё',
     badge: 'moreBadge',
-    badgeColor: '#0E9F6E',
+    badgeColor: 'var(--fg-0e9f6e)',
     icon: (a) => (
       <svg width="24" height="24" viewBox="0 0 24 24" fill={a ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={a ? 0 : 1.8}>
         <circle cx="5" cy="12" r={a ? 2.4 : 1.8}/><circle cx="12" cy="12" r={a ? 2.4 : 1.8}/><circle cx="19" cy="12" r={a ? 2.4 : 1.8}/>
@@ -138,7 +138,7 @@ const MANAGER_NAV = [
     key: 'tasks',
     label: 'Задачи',
     badge: 'pendingTasks',
-    badgeColor: '#D97706',
+    badgeColor: 'var(--fg-d97706)',
     icon: (a) => (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={a ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">
         <polyline points="9 11 12 14 22 4"/>
@@ -150,7 +150,7 @@ const MANAGER_NAV = [
     key: 'leads',
     label: 'Обзвон',
     badge: 'newLeads',
-    badgeColor: '#1366F0',
+    badgeColor: 'var(--fg-1366f0)',
     icon: (a) => (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={a ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">
         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 9.7 19.79 19.79 0 0 1 1.63 1.06 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.08 6.08l.96-.96a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -174,7 +174,7 @@ function SheetDone({ onClose }) {
   return (
     <button onClick={() => (sheet ? sheet.requestClose() : onClose())}
       style={{ position: 'absolute', right: 0, top: 0, border: 'none', background: 'none', padding: '4px 4px 4px 12px',
-        color: '#007AFF', fontFamily: SYS_FONT, fontSize: 17, fontWeight: 600, cursor: 'pointer' }}>
+        color: 'var(--fg-007aff)', fontFamily: SYS_FONT, fontSize: 17, fontWeight: 600, cursor: 'pointer' }}>
       Готово
     </button>
   )
@@ -215,9 +215,9 @@ function MoreSheet({ page, counts, onNav, onClose }) {
                   <span style={{ flex: 1, alignSelf: 'stretch', display: 'flex', alignItems: 'center', gap: 8,
                     borderTop: idx ? '0.5px solid rgba(var(--sep-rgb), 0.29)' : 'none' }}>
                     <span style={{ flex: 1, fontSize: 17, color: '#000', fontWeight: active ? 600 : 400, letterSpacing: '-0.02em' }}>{it.label}</span>
-                    {n > 0 && <span style={{ minWidth: 22, height: 22, borderRadius: 11, background: '#FF3B30', color: '#fff', fontSize: 13, fontWeight: 600,
+                    {n > 0 && <span style={{ minWidth: 22, height: 22, borderRadius: 11, background: 'var(--bg-ff3b30)', color: '#fff', fontSize: 13, fontWeight: 600,
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 7px' }}>{n > 99 ? '99+' : n}</span>}
-                    {active && <span style={{ color: '#007AFF', fontSize: 15, fontWeight: 600 }}>✓</span>}
+                    {active && <span style={{ color: 'var(--fg-007aff)', fontSize: 15, fontWeight: 600 }}>✓</span>}
                     <svg width="8" height="14" viewBox="0 0 8 14" fill="none" stroke="#C4C4C7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 1l6 6-6 6"/></svg>
                   </span>
                 </button>
@@ -273,7 +273,7 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
       {navList.map(item => {
         const active = activeKey === item.key
         const badgeVal = item.badge ? allCounts[item.badge] : 0
-        const badgeColor = item.badgeColor || '#1366F0'
+        const badgeColor = item.badgeColor || 'var(--fg-1366f0)'
         return (
           <button
             key={item.key}
@@ -288,7 +288,7 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
               alignItems: 'center',
               justifyContent: 'center',
               position: 'relative',
-              color: active ? '#1366F0' : '#8E8E93',
+              color: active ? 'var(--fg-1366f0)' : '#8E8E93',
               WebkitTapHighlightColor: 'transparent',
               transition: 'color 0.1s',
               padding: 0,

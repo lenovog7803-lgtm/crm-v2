@@ -2,7 +2,7 @@ import { haptic } from '../motion'
 
 // Тумблер как в iOS. Заменяет <input type="checkbox"> один в один: onChange получает
 // событие с e.target.checked, поэтому старые обработчики работают без изменений.
-export default function Switch({ checked, onChange, disabled, color = '#34C759', size = 'md', title, 'aria-label': ariaLabel }) {
+export default function Switch({ checked, onChange, disabled, color = 'var(--fg-34c759)', size = 'md', title, 'aria-label': ariaLabel }) {
   const toggle = (e) => {
     e.preventDefault()  // внутри <label> — не даём второму клику вернуть состояние
     if (disabled) return

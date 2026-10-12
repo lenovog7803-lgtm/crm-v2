@@ -133,7 +133,7 @@ export default function ClientDetail({ clientId, onMeta, onBack, onDelete, onOpe
             <button onClick={cancelEdit} style={{ padding: '9px 16px', borderRadius: 12, border: '1px solid rgba(var(--ink-rgb), 0.12)', cursor: 'pointer', background: 'transparent', color: 'var(--text-secondary)', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13 }}>
               Отмена
             </button>
-            <button onClick={saveEdit} disabled={saving} style={{ padding: '9px 18px', borderRadius: 12, border: 'none', cursor: 'pointer', background: '#1366F0', color: '#fff', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13 }}>
+            <button onClick={saveEdit} disabled={saving} style={{ padding: '9px 18px', borderRadius: 12, border: 'none', cursor: 'pointer', background: 'var(--bg-1366f0)', color: '#fff', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13 }}>
               {saving ? 'Сохранение...' : 'Сохранить'}
             </button>
           </>
@@ -141,7 +141,7 @@ export default function ClientDetail({ clientId, onMeta, onBack, onDelete, onOpe
           <>
             <button onClick={startEdit} style={{
               padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
-              background: 'rgba(19,102,240,0.1)', color: '#1366F0',
+              background: 'rgba(var(--rgb-19-102-240), 0.1)', color: 'var(--fg-1366f0)',
               fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13,
               display: 'flex', alignItems: 'center', gap: 6,
             }}>
@@ -153,7 +153,7 @@ export default function ClientDetail({ clientId, onMeta, onBack, onDelete, onOpe
             </button>
             <button onClick={handleDelete} style={{
               padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
-              background: 'rgba(200,25,35,0.1)', color: '#C81923',
+              background: 'rgba(var(--rgb-200-25-35), 0.1)', color: 'var(--fg-c81923)',
               fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13,
               display: 'flex', alignItems: 'center', gap: 6,
             }}>
@@ -172,7 +172,7 @@ export default function ClientDetail({ clientId, onMeta, onBack, onDelete, onOpe
           background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: '#fff', fontWeight: 800, fontSize: 24,
-          boxShadow: `0 12px 30px -12px ${avB}80`,
+          boxShadow: `0 12px 30px -12px color-mix(in srgb, ${avB} 50%, transparent)`,
         }}>{initials(editing ? form.name : client.name)}</div>
         {editing ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 360, margin: '0 auto' }}>
@@ -185,7 +185,7 @@ export default function ClientDetail({ clientId, onMeta, onBack, onDelete, onOpe
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.02em' }}>{client.name}</div>
             {client.contact_person && <div style={{ fontSize: 14, color: 'var(--text-tertiary)', marginTop: 4 }}>{client.contact_person}</div>}
             {client.phone && (
-              <a href={`tel:${client.phone}`} style={{ display: 'block', marginTop: 8, fontSize: 15, fontWeight: 600, color: '#1366F0', textDecoration: 'none' }}>{client.phone}</a>
+              <a href={`tel:${client.phone}`} style={{ display: 'block', marginTop: 8, fontSize: 15, fontWeight: 600, color: 'var(--fg-1366f0)', textDecoration: 'none' }}>{client.phone}</a>
             )}
           </>
         )}
@@ -263,11 +263,11 @@ export default function ClientDetail({ clientId, onMeta, onBack, onDelete, onOpe
                     cursor: onOpenOrder ? 'pointer' : 'default',
                     transition: 'background 0.12s',
                   }}
-                  onPointerEnter={mouseOnly(e => { if (onOpenOrder) e.currentTarget.style.background = 'rgba(19,102,240,0.05)' })}
+                  onPointerEnter={mouseOnly(e => { if (onOpenOrder) e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.05)' })}
                   onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                 >
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: '#1366F0', fontWeight: 600 }}>{o.order_number || o.id}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-1366f0)', fontWeight: 600 }}>{o.order_number || o.id}</div>
                     <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {o.route_from && o.route_to ? `${o.route_from} → ${o.route_to}` : '—'}
                     </div>

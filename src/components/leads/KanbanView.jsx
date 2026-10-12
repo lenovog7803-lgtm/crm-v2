@@ -54,8 +54,8 @@ function KanbanColumn({ stage, items, dragId, overStage, onDragStart, onDragOver
         className="card"
         style={{
           padding: 8, minHeight: 100, maxHeight: 560, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8,
-          background: overStage === stage.id ? 'rgba(19,102,240,0.06)' : undefined,
-          border: overStage === stage.id ? '1.5px dashed rgba(19,102,240,0.4)' : undefined,
+          background: overStage === stage.id ? 'rgba(var(--rgb-19-102-240), 0.06)' : undefined,
+          border: overStage === stage.id ? '1.5px dashed rgba(var(--rgb-19-102-240), 0.4)' : undefined,
         }}
       >
         {visible.map(l => (
@@ -64,7 +64,7 @@ function KanbanColumn({ stage, items, dragId, overStage, onDragStart, onDragOver
             draggable
             onDragStart={() => onDragStart(l.id)}
             onClick={() => onOpenLead(l)}
-            onPointerEnter={mouseOnly(e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'rgba(19,102,240,0.3)'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 24px -12px rgba(20,30,55,0.25)' })}
+            onPointerEnter={mouseOnly(e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'rgba(var(--rgb-19-102-240), 0.3)'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 24px -12px rgba(20,30,55,0.25)' })}
             onPointerLeave={mouseOnly(e => { e.currentTarget.style.background = 'rgba(var(--paper-rgb), 0.7)'; e.currentTarget.style.borderColor = 'rgba(var(--ink-rgb), 0.08)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' })}
             style={{
               padding: '11px 13px', borderRadius: 16, background: 'rgba(var(--paper-rgb), 0.7)',
@@ -73,13 +73,13 @@ function KanbanColumn({ stage, items, dragId, overStage, onDragStart, onDragOver
             }}
           >
             <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: '#1366F0', marginTop: 3 }}>{l.phone}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-1366f0)', marginTop: 3 }}>{l.phone}</div>
             {l.contact_person && <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>{l.contact_person}</div>}
-            {l.next_call && <div style={{ fontSize: 10.5, color: '#F47A1F', marginTop: 4 }}>→ {new Date(l.next_call).toLocaleDateString('ru-RU')}</div>}
+            {l.next_call && <div style={{ fontSize: 10.5, color: 'var(--fg-f47a1f)', marginTop: 4 }}>→ {new Date(l.next_call).toLocaleDateString('ru-RU')}</div>}
             {!l.assigned_to && (
               <button
                 onClick={e => { e.stopPropagation(); onClaim(l.id) }}
-                style={{ marginTop: 8, width: '100%', padding: '6px 0', borderRadius: 99, border: 'none', cursor: 'pointer', background: 'rgba(19,102,240,0.1)', color: '#1366F0', fontSize: 12, fontWeight: 600 }}
+                style={{ marginTop: 8, width: '100%', padding: '6px 0', borderRadius: 99, border: 'none', cursor: 'pointer', background: 'rgba(var(--rgb-19-102-240), 0.1)', color: 'var(--fg-1366f0)', fontSize: 12, fontWeight: 600 }}
               >
                 Взять в работу
               </button>

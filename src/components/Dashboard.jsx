@@ -276,16 +276,16 @@ function DebtModal({ title, orders, onClose, onOpenOrder }) {
               <div key={i}
                 onClick={() => { onOpenOrder && onOpenOrder(o.id); onClose() }}
                 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', borderRadius: 12, borderBottom: '1px solid rgba(var(--ink-rgb), 0.06)', cursor: onOpenOrder ? 'pointer' : 'default', transition: 'background 0.1s' }}
-                onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.05)')}
+                onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.05)')}
                 onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
               >
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: '#1366F0', fontWeight: 600 }}>{o.order_number || `#${o.id}`}</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-1366f0)', fontWeight: 600 }}>{o.order_number || `#${o.id}`}</div>
                   <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {o.client_name || o.carrier_name || '—'}{(o.route_from && o.route_to) ? ` · ${o.route_from} → ${o.route_to}` : ''}
                   </div>
                 </div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: '#D97706', flexShrink: 0, marginLeft: 12 }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: 'var(--fg-d97706)', flexShrink: 0, marginLeft: 12 }}>
                   {(o.client_rate || o.carrier_rate || 0).toLocaleString('ru-RU')} Br
                 </div>
               </div>
@@ -539,8 +539,8 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         </div>
 
         {[
-          { icon: 'in', label: 'Ожидается от клиентов', color: '#D97706', value: clientDebt, count: debtorOrders.length, onClick: () => setShowDebtors(true) },
-          { icon: 'out', label: 'К оплате перевозчикам', color: '#7C3AED', value: carrierDebt, count: carrierDebtOrders.length, onClick: () => setShowCarrierDebt(true) },
+          { icon: 'in', label: 'Ожидается от клиентов', color: 'var(--fg-d97706)', value: clientDebt, count: debtorOrders.length, onClick: () => setShowDebtors(true) },
+          { icon: 'out', label: 'К оплате перевозчикам', color: 'var(--fg-7c3aed)', value: carrierDebt, count: carrierDebtOrders.length, onClick: () => setShowCarrierDebt(true) },
         ].map(w => (
           <div key={w.icon} className="ios-widget" onClick={w.onClick}
             {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.9), 0 14px 40px -22px rgba(20,30,55,0.22)', 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 46px -18px rgba(20,30,55,0.3)')}
@@ -562,12 +562,12 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       {/* KPI */}
       <div className="dashboard-stat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
         {[
-          { label: 'Активных заявок', value: active, color: '#1366F0',
+          { label: 'Активных заявок', value: active, color: 'var(--fg-1366f0)',
             onClick: () => { localStorage.setItem('orders_statusFilter', 'active'); onNav('orders') } },
-          { label: 'Доставлено', value: done, color: '#1E9E5A',
+          { label: 'Доставлено', value: done, color: 'var(--fg-1e9e5a)',
             onClick: () => { localStorage.setItem('orders_statusFilter', 'done'); onNav('orders') } },
-          { label: 'Клиентов', value: clientsCount, color: '#D97706', onClick: () => onNav('clients') },
-          { label: 'Перевозчиков', value: carriersCount, color: '#7C3AED', onClick: () => onNav('carriers') },
+          { label: 'Клиентов', value: clientsCount, color: 'var(--fg-d97706)', onClick: () => onNav('clients') },
+          { label: 'Перевозчиков', value: carriersCount, color: 'var(--fg-7c3aed)', onClick: () => onNav('carriers') },
         ].map(kpi => (
           <div key={kpi.label} className="ios-widget"
             onClick={kpi.onClick}
@@ -592,10 +592,10 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: isMobile ? 14 : 20 }}>
             {[
-              { key: 'profit', label: 'Прибыль', fact: goals.profit_fact, goal: goals.profit_goal, color: '#1366F0', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
-              { key: 'trips', label: 'Рейсы', fact: goals.trips_fact, goal: goals.trips_goal, color: '#1E9E5A', fmt: v => Math.round(v) },
-              { key: 'margin', label: 'Маржа/рейс', fact: goals.margin_fact, goal: goals.margin_goal, color: '#D97706', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
-              { key: 'new_clients', label: 'Новые клиенты', fact: goals.new_clients_fact, goal: goals.new_clients_goal, color: '#7C3AED', fmt: v => Math.round(v) },
+              { key: 'profit', label: 'Прибыль', fact: goals.profit_fact, goal: goals.profit_goal, color: 'var(--fg-1366f0)', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
+              { key: 'trips', label: 'Рейсы', fact: goals.trips_fact, goal: goals.trips_goal, color: 'var(--fg-1e9e5a)', fmt: v => Math.round(v) },
+              { key: 'margin', label: 'Маржа/рейс', fact: goals.margin_fact, goal: goals.margin_goal, color: 'var(--fg-d97706)', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
+              { key: 'new_clients', label: 'Новые клиенты', fact: goals.new_clients_fact, goal: goals.new_clients_goal, color: 'var(--fg-7c3aed)', fmt: v => Math.round(v) },
             ].map(g => {
               const pct = g.goal > 0 ? (g.fact / g.goal) * 100 : 0
               return (
@@ -607,8 +607,8 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
                   onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                 >
                   <div style={{ position: 'relative', flexShrink: 0 }}>
-                    <div style={{ filter: `drop-shadow(0 4px 10px ${g.color}40)` }}>
-                      <CircularProgress pct={pct} color={g.color} size={isMobile ? 54 : 64} stroke={isMobile ? 8 : 10} track={`${g.color}22`} />
+                    <div style={{ filter: `drop-shadow(0 4px 10px color-mix(in srgb, ${g.color} 25%, transparent))` }}>
+                      <CircularProgress pct={pct} color={g.color} size={isMobile ? 54 : 64} stroke={isMobile ? 8 : 10} track={`color-mix(in srgb, ${g.color} 13%, transparent)`} />
                     </div>
                     <div style={{
                       position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -661,7 +661,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           </div>
           {chart.prev && chart.prev.length > 0 && chart.prev.some(v => v > 0) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <div style={{ width: 10, height: 10, background: '#1366F0', borderRadius: 3 }} />
+              <div style={{ width: 10, height: 10, background: 'var(--bg-1366f0)', borderRadius: 3 }} />
               <span style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, marginRight: 8 }}>этот период</span>
               <div style={{ width: 10, height: 10, background: '#9AAFD0', borderRadius: 3 }} />
               <span style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600 }}>прошлый период</span>
@@ -684,7 +684,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
               {topClients.slice(0, 6).map((c, i) => (
                 <TopRow key={i} rank={i + 1} name={c.name || c.client_name}
                   value={`${Math.round(c.rev || c.revenue || c.total_revenue || 0).toLocaleString('ru-RU')} Br`}
-                  color="#1366F0" bg="rgba(19,102,240,0.1)" />
+                  color="var(--fg-1366f0)" bg="rgba(var(--rgb-19-102-240), 0.1)" />
               ))}
             </div>
           ) : <div style={{ color: 'var(--text-tertiary)', fontSize: 13 }}>Нет данных за период</div>}
@@ -701,7 +701,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
               {topByMargin.slice(0, 6).map((c, i) => (
                 <TopRow key={i} rank={i + 1} name={c.name || c.client_name}
                   value={`${(c.pct || c.margin_pct || c.margin_percent || 0).toFixed(1)}%`}
-                  color="#1E9E5A" bg="rgba(30,158,90,0.1)" />
+                  color="var(--fg-1e9e5a)" bg="rgba(var(--rgb-30-158-90), 0.1)" />
               ))}
             </div>
           ) : <div style={{ color: 'var(--text-tertiary)', fontSize: 13 }}>Нет данных за период</div>}
@@ -718,7 +718,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
               {topDebtors.slice(0, 6).map((c, i) => (
                 <TopRow key={i} rank={i + 1} name={c.name}
                   value={`${Math.round(c.amt || 0).toLocaleString('ru-RU')} Br`}
-                  color="#D97706" bg="rgba(217,119,6,0.12)" />
+                  color="var(--fg-d97706)" bg="rgba(var(--rgb-217-119-6), 0.12)" />
               ))}
             </div>
           ) : <div style={{ color: 'var(--text-tertiary)', fontSize: 13 }}>Нет должников</div>}
@@ -748,17 +748,17 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             clients: {
               title: 'Все клиенты', subtitle: 'по выручке за период', items: topClients,
               valueOf: c => `${Math.round(c.rev || c.revenue || c.total_revenue || 0).toLocaleString('ru-RU')} Br`,
-              color: '#1366F0', bg: 'rgba(19,102,240,0.1)',
+              color: 'var(--fg-1366f0)', bg: 'rgba(var(--rgb-19-102-240), 0.1)',
             },
             margin: {
               title: 'Топ по марже', subtitle: '% маржинальности', items: topByMargin,
               valueOf: c => `${(c.pct || c.margin_pct || c.margin_percent || 0).toFixed(1)}%`,
-              color: '#1E9E5A', bg: 'rgba(30,158,90,0.1)',
+              color: 'var(--fg-1e9e5a)', bg: 'rgba(var(--rgb-30-158-90), 0.1)',
             },
             debtors: {
               title: 'Все должники', subtitle: 'неоплаченные доставки', items: topDebtors,
               valueOf: c => `${Math.round(c.amt || 0).toLocaleString('ru-RU')} Br`,
-              color: '#D97706', bg: 'rgba(217,119,6,0.12)',
+              color: 'var(--fg-d97706)', bg: 'rgba(var(--rgb-217-119-6), 0.12)',
             },
           }[openModal]}
           onClose={() => setOpenModal(null)}

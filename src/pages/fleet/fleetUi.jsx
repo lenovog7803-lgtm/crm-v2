@@ -1,9 +1,9 @@
 // Кнопки-действия в стиле карточки заявки экспедирования (OrderDetail).
 const VARIANTS = {
-  edit: { bg: 'rgba(19,102,240,0.08)', color: '#1366F0' },
+  edit: { bg: 'rgba(var(--rgb-19-102-240), 0.08)', color: 'var(--fg-1366f0)' },
   neutral: { bg: 'rgba(14,23,38,0.06)', color: 'var(--text-secondary)' },
-  delete: { bg: 'rgba(200,25,35,0.1)', color: '#C81923' },
-  green: { bg: 'rgba(30,158,90,0.1)', color: '#1E9E5A' },
+  delete: { bg: 'rgba(var(--rgb-200-25-35), 0.1)', color: 'var(--fg-c81923)' },
+  green: { bg: 'rgba(var(--rgb-30-158-90), 0.1)', color: 'var(--fg-1e9e5a)' },
 }
 
 const I = (p) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">{p}</svg>

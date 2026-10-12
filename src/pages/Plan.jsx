@@ -85,7 +85,7 @@ const statusOf = (fact, plan, started) => {
   return { label: 'отстаёт', cls: 'r' }
 }
 
-function Bar100({ pct, color = '#1366F0' }) {
+function Bar100({ pct, color = 'var(--fg-1366f0)' }) {
   return (
     <div className="plan-bar"><div style={{ width: `${Math.max(0, Math.min(100, pct))}%`, background: color }} /></div>
   )
@@ -194,10 +194,10 @@ export default function Plan() {
       {/* Показатели года */}
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: isMobile ? 10 : 16 }}>
         {[
-          { label: 'Рейсы', color: '#1366F0', fact: months.reduce((s, m) => s + m.trips, 0), plan: months.reduce((s, m) => s + m.tripsPlan, 0) },
-          { label: 'Маржа на заявку', color: '#7C3AED', fact: Math.round(yearSum.perOrder), plan: 220, unit: ' Br', note: 'цель ≥ 220' },
-          { label: 'Новые клиенты', color: '#1E9E5A', fact: months.reduce((s, m) => s + m.newCl, 0), plan: months.reduce((s, m) => s + m.newClPlan, 0) },
-          { label: 'Доля топ-5 клиентов', color: '#D97706', fact: yearSum.top5, plan: 60, unit: '%', note: 'цель ≤ 60%', inverse: true },
+          { label: 'Рейсы', color: 'var(--fg-1366f0)', fact: months.reduce((s, m) => s + m.trips, 0), plan: months.reduce((s, m) => s + m.tripsPlan, 0) },
+          { label: 'Маржа на заявку', color: 'var(--fg-7c3aed)', fact: Math.round(yearSum.perOrder), plan: 220, unit: ' Br', note: 'цель ≥ 220' },
+          { label: 'Новые клиенты', color: 'var(--fg-1e9e5a)', fact: months.reduce((s, m) => s + m.newCl, 0), plan: months.reduce((s, m) => s + m.newClPlan, 0) },
+          { label: 'Доля топ-5 клиентов', color: 'var(--fg-d97706)', fact: yearSum.top5, plan: 60, unit: '%', note: 'цель ≤ 60%', inverse: true },
         ].map(t => (
           <div key={t.label} className="ios-widget" style={{ padding: isMobile ? '14px 16px' : '18px 20px' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: t.color, marginBottom: 6 }}>{t.label}</div>
@@ -213,7 +213,7 @@ export default function Plan() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
           <div style={{ flex: 1, fontWeight: 700, fontSize: 15, color: 'var(--ink)' }}>Прибыль по месяцам</div>
           <span className="plan-legend"><i style={{ background: '#C9D8F5' }} />план</span>
-          <span className="plan-legend"><i style={{ background: '#1366F0' }} />факт</span>
+          <span className="plan-legend"><i style={{ background: 'var(--bg-1366f0)' }} />факт</span>
         </div>
         <div className="bklit" style={{ height: isMobile ? 180 : 220 }}>
           <BarChart data={chartData} xDataKey="month" aspectRatio="auto" margin={{ left: 4, right: 4, top: 10, bottom: 26 }}>
@@ -247,11 +247,11 @@ export default function Plan() {
               </div>
               <div className="plan-metric">
                 <span>Рейсы</span><b>{q.trips} / {q.tripsPlan}</b>
-                <Bar100 pct={q.tripsPlan ? q.trips / q.tripsPlan * 100 : 0} color="#7C3AED" />
+                <Bar100 pct={q.tripsPlan ? q.trips / q.tripsPlan * 100 : 0} color="var(--fg-7c3aed)" />
               </div>
               <div className="plan-metric">
                 <span>Новые клиенты</span><b>{q.newCl} / {q.newClPlan}</b>
-                <Bar100 pct={q.newClPlan ? q.newCl / q.newClPlan * 100 : 0} color="#1E9E5A" />
+                <Bar100 pct={q.newClPlan ? q.newCl / q.newClPlan * 100 : 0} color="var(--fg-1e9e5a)" />
               </div>
               <div className="plan-krs">
                 {okr.krs.map(kr => {

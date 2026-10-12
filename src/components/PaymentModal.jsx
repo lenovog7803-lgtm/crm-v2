@@ -91,7 +91,7 @@ export default function PaymentModal({ defaultKind, onClose, onSuccess }) {
           <label className="form-label">Номер ПП</label>
           <input className="form-input" placeholder="ПП №1234" value={form.pp_number} onChange={e => set('pp_number', e.target.value)} />
         </div>
-        {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center' }}>{error}</div>}
+        {error && <div style={{ fontSize: 12, color: 'var(--fg-c81923)', textAlign: 'center' }}>{error}</div>}
         <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
           <button type="button" className="btn-ghost" onClick={onClose} style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button type="submit" className="btn-primary" disabled={loading} style={{ flex: 2, justifyContent: 'center' }}>

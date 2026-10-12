@@ -31,7 +31,7 @@ const statusOf = (fact, plan, started) => {
   return { label: 'отстаёт', cls: 'r' }
 }
 
-const Bar100 = ({ pct, color = '#30B0C7' }) => (
+const Bar100 = ({ pct, color = 'var(--fg-30b0c7)' }) => (
   <div className="plan-bar"><div style={{ width: `${Math.max(0, Math.min(100, pct))}%`, background: color }} /></div>
 )
 
@@ -113,10 +113,10 @@ export default function FleetPlan() {
 
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: isMobile ? 10 : 16 }}>
         {[
-          { label: 'Рейсы', color: '#30B0C7', v: int(tripsYear), sub: tripsPlanYear ? `из ${int(tripsPlanYear)}` : 'цель не задана', pct: tripsPlanYear ? tripsYear / tripsPlanYear * 100 : 0 },
-          { label: 'Выручка', color: '#1366F0', v: `${int(revenueYear)} Br`, sub: revenuePlanYear ? `из ${int(revenuePlanYear)}` : 'цель не задана', pct: revenuePlanYear ? revenueYear / revenuePlanYear * 100 : 0 },
-          { label: 'Прибыль с рейса', color: '#7C3AED', v: anyTrips ? `${int(perTrip)} Br` : '—', sub: 'в среднем за год', pct: null },
-          { label: 'Порожний пробег', color: '#D97706', v: anyTrips ? `${emptyKm}%` : '—', sub: 'чем меньше, тем лучше', pct: null },
+          { label: 'Рейсы', color: 'var(--fg-30b0c7)', v: int(tripsYear), sub: tripsPlanYear ? `из ${int(tripsPlanYear)}` : 'цель не задана', pct: tripsPlanYear ? tripsYear / tripsPlanYear * 100 : 0 },
+          { label: 'Выручка', color: 'var(--fg-1366f0)', v: `${int(revenueYear)} Br`, sub: revenuePlanYear ? `из ${int(revenuePlanYear)}` : 'цель не задана', pct: revenuePlanYear ? revenueYear / revenuePlanYear * 100 : 0 },
+          { label: 'Прибыль с рейса', color: 'var(--fg-7c3aed)', v: anyTrips ? `${int(perTrip)} Br` : '—', sub: 'в среднем за год', pct: null },
+          { label: 'Порожний пробег', color: 'var(--fg-d97706)', v: anyTrips ? `${emptyKm}%` : '—', sub: 'чем меньше, тем лучше', pct: null },
         ].map(t => (
           <div key={t.label} className="ios-widget" style={{ padding: isMobile ? '14px 16px' : '18px 20px' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: t.color, marginBottom: 6 }}>{t.label}</div>
@@ -131,18 +131,18 @@ export default function FleetPlan() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
           <div style={{ flex: 1, fontWeight: 700, fontSize: 15, color: 'var(--ink)' }}>Прибыль по месяцам</div>
           <span className="plan-legend"><i style={{ background: '#C9E7EE' }} />план</span>
-          <span className="plan-legend"><i style={{ background: '#30B0C7' }} />факт</span>
+          <span className="plan-legend"><i style={{ background: 'var(--bg-30b0c7)' }} />факт</span>
         </div>
         <div className="bklit" style={{ height: isMobile ? 180 : 220 }}>
           <BarChart data={months.map(m => ({ month: m.label, plan: m.plan, fact: m.started ? Math.max(0, m.fact) : 0, raw: m.fact }))}
             xDataKey="month" aspectRatio="auto" margin={{ left: 4, right: 4, top: 10, bottom: 26 }}>
             <Grid horizontal />
             <Bar dataKey="plan" fill="#C9E7EE" lineCap="round" />
-            <Bar dataKey="fact" fill="#30B0C7" lineCap="round" />
+            <Bar dataKey="fact" fill="var(--fg-30b0c7)" lineCap="round" />
             <BarXAxis />
             <ChartTooltip rows={p => [
               { color: '#C9E7EE', label: 'План', value: `${int(p.plan)} Br` },
-              { color: p.raw < 0 ? '#E0473B' : '#30B0C7', label: p.raw < 0 ? 'Убыток' : 'Факт', value: `${int(p.raw)} Br` },
+              { color: p.raw < 0 ? 'var(--fg-e0473b)' : 'var(--fg-30b0c7)', label: p.raw < 0 ? 'Убыток' : 'Факт', value: `${int(p.raw)} Br` },
             ]} />
           </BarChart>
         </div>
@@ -158,8 +158,8 @@ export default function FleetPlan() {
                 <span className={`plan-pill ${st.cls}`}>{st.label}</span>
               </div>
               <div className="plan-metric"><span>Прибыль</span><b>{int(q.fact)} / {int(q.plan)}</b><Bar100 pct={q.plan ? q.fact / q.plan * 100 : 0} /></div>
-              <div className="plan-metric"><span>Рейсы</span><b>{q.trips} / {q.tripsPlan}</b><Bar100 pct={q.tripsPlan ? q.trips / q.tripsPlan * 100 : 0} color="#7C3AED" /></div>
-              <div className="plan-metric"><span>Выручка</span><b>{int(q.revenue)} / {int(q.revenuePlan)}</b><Bar100 pct={q.revenuePlan ? q.revenue / q.revenuePlan * 100 : 0} color="#1366F0" /></div>
+              <div className="plan-metric"><span>Рейсы</span><b>{q.trips} / {q.tripsPlan}</b><Bar100 pct={q.tripsPlan ? q.trips / q.tripsPlan * 100 : 0} color="var(--fg-7c3aed)" /></div>
+              <div className="plan-metric"><span>Выручка</span><b>{int(q.revenue)} / {int(q.revenuePlan)}</b><Bar100 pct={q.revenuePlan ? q.revenue / q.revenuePlan * 100 : 0} color="var(--fg-1366f0)" /></div>
             </div>
           )
         })}
@@ -188,7 +188,7 @@ export default function FleetPlan() {
               <div key={t.id || i} className="plan-kr">
                 <span className="plan-kr-dot fail" />
                 <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{[t.trip_number ? `Рейс №${t.trip_number}` : 'Рейс', t.name, t.route].filter(Boolean).join(' · ')}</span>
-                <span className="plan-kr-val" style={{ color: '#D63B30' }}>{int(t.profit)} Br</span>
+                <span className="plan-kr-val" style={{ color: 'var(--fg-d63b30)' }}>{int(t.profit)} Br</span>
               </div>
             ))}
           </div>

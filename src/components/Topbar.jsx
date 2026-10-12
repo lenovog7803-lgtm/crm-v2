@@ -227,7 +227,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
         onClick={() => onNav && onNav('trash')}
         title="Корзина"
         style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 6, borderRadius: 10 }}
-        onPointerEnter={mouseOnly(e => e.currentTarget.style.color = '#C81923')}
+        onPointerEnter={mouseOnly(e => e.currentTarget.style.color = 'var(--fg-c81923)')}
         onPointerLeave={mouseOnly(e => e.currentTarget.style.color = 'var(--text-secondary)')}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -240,8 +240,8 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
         <button
           onClick={() => setBellOpen(v => !v)}
           style={{
-            position: 'relative', background: bellOpen ? 'rgba(200,25,35,0.08)' : 'none', border: 'none', cursor: 'pointer',
-            color: badgeCount > 0 ? '#C81923' : 'var(--text-secondary)', padding: 6, borderRadius: 10,
+            position: 'relative', background: bellOpen ? 'rgba(var(--rgb-200-25-35), 0.08)' : 'none', border: 'none', cursor: 'pointer',
+            color: badgeCount > 0 ? 'var(--fg-c81923)' : 'var(--text-secondary)', padding: 6, borderRadius: 10,
             animation: bellPulse ? 'bellPulse 0.6s ease' : 'none',
           }}
         >
@@ -252,7 +252,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
           {badgeCount > 0 && (
             <span className="t-badge-pop" style={{
               position: 'absolute', top: 3, right: 3,
-              minWidth: 16, height: 16, borderRadius: 8, background: '#C81923',
+              minWidth: 16, height: 16, borderRadius: 8, background: 'var(--bg-c81923)',
               border: '2px solid #fff', color: '#fff',
               fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center',
               padding: '0 3px',
@@ -277,8 +277,8 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
                 </div>
                 <div style={{ maxHeight: 300, overflowY: 'auto' }}>
                   {notifications.map(n => {
-                    const accent = n.type === 'error' ? '#E0473B' : n.type === 'success' ? '#1E9E5A' : '#1366F0'
-                    const tint = n.type === 'error' ? 'rgba(224,71,59,0.1)' : n.type === 'success' ? 'rgba(30,158,90,0.1)' : 'rgba(19,102,240,0.1)'
+                    const accent = n.type === 'error' ? 'var(--fg-e0473b)' : n.type === 'success' ? 'var(--fg-1e9e5a)' : 'var(--fg-1366f0)'
+                    const tint = n.type === 'error' ? 'rgba(var(--rgb-224-71-59), 0.1)' : n.type === 'success' ? 'rgba(var(--rgb-30-158-90), 0.1)' : 'rgba(var(--rgb-19-102-240), 0.1)'
                     return (
                       <div
                         key={n.id}
@@ -320,7 +320,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
                             {n.actionLabel && (
                               <button
                                 onClick={e => { e.stopPropagation(); n.onAction?.(); dismiss(n.id) }}
-                                style={{ fontSize: 11.5, fontWeight: 700, color: accent, background: `${accent}1A`, border: 'none', borderRadius: 8, padding: '3px 9px', cursor: 'pointer' }}
+                                style={{ fontSize: 11.5, fontWeight: 700, color: accent, background: `color-mix(in srgb, ${accent} 10%, transparent)`, border: 'none', borderRadius: 8, padding: '3px 9px', cursor: 'pointer' }}
                               >
                                 {n.actionLabel}
                               </button>
@@ -352,14 +352,14 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
                       padding: '11px 16px', cursor: item.type === 'order' ? 'pointer' : 'default',
                       borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)', transition: 'background 0.12s',
                     }}
-                    onPointerEnter={mouseOnly(e => { if (item.type === 'order') e.currentTarget.style.background = 'rgba(200,25,35,0.05)' })}
+                    onPointerEnter={mouseOnly(e => { if (item.type === 'order') e.currentTarget.style.background = 'rgba(var(--rgb-200-25-35), 0.05)' })}
                     onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                   >
                     <div style={{
                       width: 32, height: 32, borderRadius: 10, flexShrink: 0,
-                      background: item.type === 'order' ? 'rgba(200,25,35,0.1)' : 'rgba(217,119,6,0.1)',
+                      background: item.type === 'order' ? 'rgba(var(--rgb-200-25-35), 0.1)' : 'rgba(var(--rgb-217-119-6), 0.1)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: item.type === 'order' ? '#C81923' : '#D97706',
+                      color: item.type === 'order' ? 'var(--fg-c81923)' : 'var(--fg-d97706)',
                     }}>
                       {item.type === 'order' ? (
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -373,7 +373,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</div>
-                      <div style={{ fontSize: 11, color: '#C81923', marginTop: 2 }}>Просрочено · {fmtDate(item.date)}</div>
+                      <div style={{ fontSize: 11, color: 'var(--fg-c81923)', marginTop: 2 }}>Просрочено · {fmtDate(item.date)}</div>
                     </div>
                   </div>
                 ))}

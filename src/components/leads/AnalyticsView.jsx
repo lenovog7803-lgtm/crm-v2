@@ -32,7 +32,7 @@ export function CallsHeatmap({ data, onDayClick }) {
     if (t < 0.25) return '#CFE0FF'
     if (t < 0.5) return '#8FB6FF'
     if (t < 0.75) return '#4C8CFF'
-    return '#1366F0'
+    return 'var(--fg-1366f0)'
   }
 
   return (
@@ -54,7 +54,7 @@ export function CallsHeatmap({ data, onDayClick }) {
       )}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12, fontSize: 11, color: 'var(--text-3)' }}>
         меньше
-        {['#F0F1F4', '#CFE0FF', '#8FB6FF', '#4C8CFF', '#1366F0'].map(c => (
+        {['#F0F1F4', '#CFE0FF', '#8FB6FF', '#4C8CFF', 'var(--fg-1366f0)'].map(c => (
           <div key={c} style={{ width: 12, height: 12, borderRadius: 3, background: c }} />
         ))}
         больше
@@ -74,12 +74,12 @@ export function FunnelChart({ funnel }) {
       <BklitFunnel
         // ширина — по корню: «Новых» в сотни раз больше остальных, по прямой шкале воронка сжималась бы в нитку;
         // подписи — настоящие числа, проценты (они считались бы от корня) не показываем
-        data={stages.map((f, i) => ({ label: f.label, value: Math.sqrt(f.cumulative), displayValue: `${f.cumulative}`, color: troubled(f, i) ? '#D97706' : f.color }))}
-        color="#1366F0" showLabels showValues showPercentage={false}
+        data={stages.map((f, i) => ({ label: f.label, value: Math.sqrt(f.cumulative), displayValue: `${f.cumulative}`, color: troubled(f, i) ? 'var(--fg-d97706)' : f.color }))}
+        color="var(--fg-1366f0)" showLabels showValues showPercentage={false}
         style={{ aspectRatio: 'auto', height: 190 }} />
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 14px', marginTop: 10 }}>
         {stages.map((f, i) => (
-          <span key={f.stage} style={{ fontSize: 12, color: troubled(f, i) ? '#D97706' : 'var(--text-secondary)' }}>
+          <span key={f.stage} style={{ fontSize: 12, color: troubled(f, i) ? 'var(--fg-d97706)' : 'var(--text-secondary)' }}>
             <b style={{ fontWeight: 600 }}>{f.label}</b>: {f.count}{i > 0 && ` · ${f.conversion}% из прошлого`}
           </span>
         ))}
@@ -160,20 +160,20 @@ export default function AnalyticsView() {
         <div style={{ display: 'flex', gap: 20, marginBottom: 16, flexWrap: 'wrap' }}>
           <div style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Всего звонков: <b style={{ color: 'var(--ink)' }}>{data.total_calls}</b></div>
           <div style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Среднее в день: <b style={{ color: 'var(--ink)' }}>{avgPerDay}</b></div>
-          <div style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Дней с выполненным планом: <b style={{ color: '#1E9E5A' }}>{daysGoalMet}</b> из {days.length}</div>
+          <div style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Дней с выполненным планом: <b style={{ color: 'var(--fg-1e9e5a)' }}>{daysGoalMet}</b> из {days.length}</div>
         </div>
         <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', gap: 6, height: 140, paddingTop: 10 }}>
           <div style={{
             position: 'absolute', left: 0, right: 0,
             bottom: `${(data.daily_goal / maxCalls) * 140}px`,
-            borderTop: '1.5px dashed rgba(217,119,6,0.6)',
+            borderTop: '1.5px dashed rgba(var(--rgb-217-119-6), 0.6)',
           }} />
           {days.map(d => {
             const h = Math.max(2, (d.calls / maxCalls) * 140)
             const met = d.calls >= data.daily_goal
             return (
               <div key={d.date} title={`${d.date}: ${d.calls}`} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                <div style={{ width: '100%', maxWidth: 26, height: h, borderRadius: 6, background: met ? '#1E9E5A' : '#1366F0' }} />
+                <div style={{ width: '100%', maxWidth: 26, height: h, borderRadius: 6, background: met ? 'var(--fg-1e9e5a)' : 'var(--fg-1366f0)' }} />
                 <span style={{ fontSize: 9, color: 'var(--text-tertiary)' }}>{d.date.slice(5)}</span>
               </div>
             )
@@ -202,7 +202,7 @@ export default function AnalyticsView() {
                   <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>{r.count} · {totalLost ? Math.round(r.count / totalLost * 100) : 0}%</span>
                 </div>
                 <div style={{ height: 10, borderRadius: 6, background: 'rgba(var(--ink-rgb), 0.06)' }}>
-                  <div style={{ height: '100%', borderRadius: 6, width: `${(r.count / maxLostCount) * 100}%`, background: '#E0473B' }} />
+                  <div style={{ height: '100%', borderRadius: 6, width: `${(r.count / maxLostCount) * 100}%`, background: 'var(--bg-e0473b)' }} />
                 </div>
               </div>
             ))}
@@ -212,10 +212,10 @@ export default function AnalyticsView() {
 
         {/* 5. Отдача от холодных лидов */}
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12, alignContent: 'start' }}>
-          <StatCard label="Лидов → клиентов" value={fmt(data.cold_leads?.converted_count)} color="#1E9E5A" />
-          <StatCard label="Заявок от них" value={fmt(data.cold_leads?.orders_count)} color="#1366F0" />
+          <StatCard label="Лидов → клиентов" value={fmt(data.cold_leads?.converted_count)} color="var(--fg-1e9e5a)" />
+          <StatCard label="Заявок от них" value={fmt(data.cold_leads?.orders_count)} color="var(--fg-1366f0)" />
           <StatCard label="Выручка, BYN" value={fmt(data.cold_leads?.revenue)} />
-          <StatCard label="Маржа, BYN" value={fmt(data.cold_leads?.margin)} color="#7C3AED" />
+          <StatCard label="Маржа, BYN" value={fmt(data.cold_leads?.margin)} color="var(--fg-7c3aed)" />
         </div>
       </div>
 
@@ -232,13 +232,13 @@ export default function AnalyticsView() {
           </thead>
           <tbody>
             {(data.by_industry || []).map((row, i) => (
-              <tr key={row.industry} style={{ background: i < 3 ? 'rgba(30,158,90,0.06)' : undefined }}>
+              <tr key={row.industry} style={{ background: i < 3 ? 'rgba(var(--rgb-30-158-90), 0.06)' : undefined }}>
                 <td style={{ padding: '10px 12px', fontSize: 13, fontWeight: 600, color: 'var(--ink)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{row.industry}</td>
                 <td style={{ padding: '10px 12px', fontSize: 13, borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{row.total}</td>
                 <td style={{ padding: '10px 12px', fontSize: 13, borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{row.called}</td>
                 <td style={{ padding: '10px 12px', fontSize: 13, borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{row.won}</td>
                 <td style={{ padding: '10px 12px', fontSize: 13, borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{row.lost}</td>
-                <td style={{ padding: '10px 12px', fontSize: 13, fontWeight: 700, color: i < 3 ? '#1E9E5A' : 'var(--ink)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{row.conversion}%</td>
+                <td style={{ padding: '10px 12px', fontSize: 13, fontWeight: 700, color: i < 3 ? 'var(--fg-1e9e5a)' : 'var(--ink)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{row.conversion}%</td>
               </tr>
             ))}
           </tbody>

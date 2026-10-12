@@ -77,7 +77,7 @@ export function FleetClientModal({ initial, onClose, onSaved }) {
 
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
-          <button onClick={save} disabled={saving || !form.name.trim()} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: form.name.trim() ? '#1366F0' : 'var(--text-quaternary)', color: '#fff', fontWeight: 700, cursor: saving ? 'default' : 'pointer' }}>
+          <button onClick={save} disabled={saving || !form.name.trim()} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: form.name.trim() ? 'var(--fg-1366f0)' : 'var(--text-quaternary)', color: '#fff', fontWeight: 700, cursor: saving ? 'default' : 'pointer' }}>
             <SwapText>{saving ? 'Сохраняю…' : editing ? 'Сохранить' : 'Добавить'}</SwapText>
           </button>
         </div>

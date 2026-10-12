@@ -19,14 +19,14 @@ const ICON_PATHS = {
   mailing: <><rect x="2" y="4" width="20" height="16" rx="3" /><polyline points="22 6 12 13 2 6" /></>,
 }
 const GRADIENT = {
-  order: ['#4F8BFF', '#1366F0'], client: ['#34C77B', '#1E9E5A'], carrier: ['#A673FF', '#7C3AED'],
-  lead: ['#FFB547', '#E08600'], task: ['#FF8A5B', '#F2542D'], dashboard: ['#5AC8FA', '#0A84FF'], mailing: ['#7D7AFF', '#5856D6'],
+  order: ['#4F8BFF', 'var(--fg-1366f0)'], client: ['#34C77B', 'var(--fg-1e9e5a)'], carrier: ['#A673FF', 'var(--fg-7c3aed)'],
+  lead: ['#FFB547', 'var(--fg-e08600)'], task: ['#FF8A5B', '#F2542D'], dashboard: ['#5AC8FA', 'var(--fg-0a84ff)'], mailing: ['#7D7AFF', 'var(--fg-5856d6)'],
 }
 function AppIcon({ kind, size = 36 }) {
   const [a, b] = GRADIENT[kind] || GRADIENT.order
   return (
     <span style={{ width: size, height: size, borderRadius: size * 0.26, flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-      background: `linear-gradient(160deg, ${a}, ${b})`, boxShadow: `0 2px 6px -1px ${b}66, inset 0 1px 0 rgba(255,255,255,0.35)` }}>
+      background: `linear-gradient(160deg, ${a}, ${b})`, boxShadow: `0 2px 6px -1px color-mix(in srgb, ${b} 40%, transparent), inset 0 1px 0 rgba(255,255,255,0.35)` }}>
       <svg width={size * 0.52} height={size * 0.52} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         {ICON_PATHS[kind] || ICON_PATHS.order}
       </svg>
@@ -125,7 +125,7 @@ export default function CommandPalette({ open, onClose, onOpenOrder, onOpenClien
     return (
       <div key={(item.type || item.key) + (item.id || '')} data-active={active} onClick={() => select(item)} onMouseMove={() => setActiveIdx(i)}
         style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '9px 12px', borderRadius: 12, cursor: 'default',
-          background: active ? 'rgba(10,132,255,0.14)' : 'transparent', transition: 'background 80ms' }}>
+          background: active ? 'rgba(var(--rgb-10-132-255), 0.14)' : 'transparent', transition: 'background 80ms' }}>
         <AppIcon kind={kind} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.01em' }}>{title}</div>

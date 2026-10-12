@@ -93,7 +93,7 @@ function EntityModal({ title, sections, initial, onClose, onSave }) {
 
         <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
           <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
-          <button onClick={submit} disabled={saving} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: '#1366F0', color: '#fff', fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
+          <button onClick={submit} disabled={saving} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: 'var(--bg-1366f0)', color: '#fff', fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
             <SwapText>{saving ? 'Сохраняю…' : initial ? 'Сохранить' : 'Добавить'}</SwapText>
           </button>
         </div>

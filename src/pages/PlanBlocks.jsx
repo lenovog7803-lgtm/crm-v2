@@ -69,10 +69,10 @@ export function Forecasts({ orders, months, planYear, factYear, pace, year }) {
     const futurePlan = months.filter(m => !m.started).reduce((s, m) => s + m.plan, 0)
     const perOrder = last3Orders.length ? last3Mg * PROFIT / last3Orders.length : 0
     const scenarios = [
-      { key: 'bad', label: 'Плохой', note: topName ? `уходит «${topName.replace(/^(ООО|ЧТУП|ИП)\s*/, '').replace(/[«»"“”]/g, '')}» (${Math.round(topShare * 100)}% маржи)` : 'уходит крупнейший клиент', value: factYear + pace * (1 - topShare) * remaining, color: '#D63B30' },
+      { key: 'bad', label: 'Плохой', note: topName ? `уходит «${topName.replace(/^(ООО|ЧТУП|ИП)\s*/, '').replace(/[«»"“”]/g, '')}» (${Math.round(topShare * 100)}% маржи)` : 'уходит крупнейший клиент', value: factYear + pace * (1 - topShare) * remaining, color: 'var(--fg-d63b30)' },
       { key: 'now', label: 'Как сейчас', note: `темп ${int(pace)} Br в месяц`, value: factYear + pace * remaining, color: 'var(--text-3)' },
-      { key: 'plan', label: 'По плану', note: 'оставшиеся месяцы — точно по цели', value: factYear + futurePlan + (cur ? Math.max(0, cur.plan - cur.fact) : 0), color: '#1366F0' },
-      { key: 'best', label: 'Лучший темп', note: `как в лучший квартал: ${int(best)} Br в месяц`, value: factYear + best * remaining, color: '#1E9E5A' },
+      { key: 'plan', label: 'По плану', note: 'оставшиеся месяцы — точно по цели', value: factYear + futurePlan + (cur ? Math.max(0, cur.plan - cur.fact) : 0), color: 'var(--fg-1366f0)' },
+      { key: 'best', label: 'Лучший темп', note: `как в лучший квартал: ${int(best)} Br в месяц`, value: factYear + best * remaining, color: 'var(--fg-1e9e5a)' },
     ]
     const need = Math.max(0, planYear - factYear)
     const needPerMonth = remaining ? need / remaining : 0
@@ -91,7 +91,7 @@ export function Forecasts({ orders, months, planYear, factYear, pace, year }) {
               <b style={{ color: s.color, fontWeight: 600, width: 96, flexShrink: 0 }}>{s.label}</b>
               <span style={{ flex: 1, color: 'var(--text-3)', fontSize: 12, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.note}</span>
               <b style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--ink)' }}>{int(s.value)} Br</b>
-              <span style={{ width: 44, textAlign: 'right', fontSize: 12, color: s.value >= planYear ? '#1E9E5A' : 'var(--text-3)' }}>{planYear ? Math.round(s.value / planYear * 100) : 0}%</span>
+              <span style={{ width: 44, textAlign: 'right', fontSize: 12, color: s.value >= planYear ? 'var(--fg-1e9e5a)' : 'var(--text-3)' }}>{planYear ? Math.round(s.value / planYear * 100) : 0}%</span>
             </div>
             <div className="plan-scn">
               <div style={{ width: `${s.value / max * 100}%`, background: s.color }} />
@@ -128,9 +128,9 @@ export function TrafficLight({ orders }) {
   bad.forEach(o => { const c = byCl[o.client_name] || (byCl[o.client_name] = { n: 0, mg: 0 }); c.n++; c.mg += margin(o) })
   const worst = Object.entries(byCl).sort((a, b) => b[1].n - a[1].n).slice(0, 5)
   const segs = [
-    { key: 'green', label: 'Нормальные', hint: `≥ ${MIN_MARGIN} Br и ≥ 15%`, color: '#1E9E5A' },
-    { key: 'yellow', label: 'Пустые', hint: 'ниже порога', color: '#D97706' },
-    { key: 'red', label: 'В минус', hint: 'маржа меньше нуля', color: '#D63B30' },
+    { key: 'green', label: 'Нормальные', hint: `≥ ${MIN_MARGIN} Br и ≥ 15%`, color: 'var(--fg-1e9e5a)' },
+    { key: 'yellow', label: 'Пустые', hint: 'ниже порога', color: 'var(--fg-d97706)' },
+    { key: 'red', label: 'В минус', hint: 'маржа меньше нуля', color: 'var(--fg-d63b30)' },
   ]
   return (
     <Disclosure id="traffic" title="Светофор заявок"
@@ -205,10 +205,10 @@ export function SalesWeek({ orders }) {
       {calls === null ? <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>Загружаю…</div> : <>
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 10, marginBottom: 14 }}>
           {[
-            { label: 'Звонки', v: totCalls, goal: GOAL_CALLS, color: '#1366F0' },
-            { label: 'Письма', v: letters === null ? '…' : totLetters, goal: GOAL_LETTERS, color: '#5856D6', note: letters === null ? 'журнал рассылки грузится ~10 с' : null },
-            { label: 'Дни продаж', v: salesDone, goal: 3, color: '#D97706', note: `вт, ср, чт · прошло ${salesPassed}` },
-            { label: 'Новые клиенты', v: newClients.length, goal: null, color: '#1E9E5A', note: newClients.map(c => c.name).join(', ') || 'пока нет' },
+            { label: 'Звонки', v: totCalls, goal: GOAL_CALLS, color: 'var(--fg-1366f0)' },
+            { label: 'Письма', v: letters === null ? '…' : totLetters, goal: GOAL_LETTERS, color: 'var(--fg-5856d6)', note: letters === null ? 'журнал рассылки грузится ~10 с' : null },
+            { label: 'Дни продаж', v: salesDone, goal: 3, color: 'var(--fg-d97706)', note: `вт, ср, чт · прошло ${salesPassed}` },
+            { label: 'Новые клиенты', v: newClients.length, goal: null, color: 'var(--fg-1e9e5a)', note: newClients.map(c => c.name).join(', ') || 'пока нет' },
           ].map(t => (
             <div key={t.label} className="plan-week-stat">
               <div style={{ fontSize: 12.5, fontWeight: 600, color: t.color }}>{t.label}</div>
@@ -225,8 +225,8 @@ export function SalesWeek({ orders }) {
             return (
               <div key={d.date} className={`plan-day${sales ? ' is-sales' : ''}${d.future ? ' is-future' : ''}`}>
                 <div className="plan-day-bars">
-                  <div style={{ height: `${l / maxDay * 100}%`, background: '#5856D6' }} />
-                  <div style={{ height: `${c / maxDay * 100}%`, background: '#1366F0' }} />
+                  <div style={{ height: `${l / maxDay * 100}%`, background: 'var(--bg-5856d6)' }} />
+                  <div style={{ height: `${c / maxDay * 100}%`, background: 'var(--bg-1366f0)' }} />
                 </div>
                 <div className="plan-day-n">{c + l || ''}</div>
                 <div className="plan-day-label">{d.label} <span>{d.num}</span></div>
@@ -235,9 +235,9 @@ export function SalesWeek({ orders }) {
           })}
         </div>
         <div style={{ display: 'flex', gap: 14, marginTop: 8, fontSize: 11.5, color: 'var(--text-3)', flexWrap: 'wrap' }}>
-          <span className="plan-legend"><i style={{ background: '#1366F0' }} />звонки</span>
-          <span className="plan-legend"><i style={{ background: '#5856D6' }} />письма</span>
-          <span className="plan-legend"><i style={{ background: 'rgba(217,119,6,0.18)' }} />дни продаж по расписанию</span>
+          <span className="plan-legend"><i style={{ background: 'var(--bg-1366f0)' }} />звонки</span>
+          <span className="plan-legend"><i style={{ background: 'var(--bg-5856d6)' }} />письма</span>
+          <span className="plan-legend"><i style={{ background: 'rgba(var(--rgb-217-119-6), 0.18)' }} />дни продаж по расписанию</span>
         </div>
       </>}
     </Disclosure>

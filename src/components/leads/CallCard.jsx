@@ -50,7 +50,7 @@ export default function CallCard({ lead, onEdit, part }) {
             background: `linear-gradient(160deg, ${avA} 0%, ${avB} 100%)`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: '#fff', fontWeight: 700, fontSize: 19, letterSpacing: '-0.02em',
-            boxShadow: `0 6px 16px -6px ${avB}90, inset 0 1px 0 rgba(255,255,255,0.35)`,
+            boxShadow: `0 6px 16px -6px color-mix(in srgb, ${avB} 56%, transparent), inset 0 1px 0 rgba(255,255,255,0.35)`,
           }}>{initials(lead.name)}</div>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 21, letterSpacing: '-0.02em', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.name}</div>
@@ -71,14 +71,14 @@ export default function CallCard({ lead, onEdit, part }) {
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <span style={chip(stage.bg, stage.color)}>{stage.label}</span>
         {cadenceStep > 0 && <span style={chip('rgba(14,23,38,0.06)', '#5A6573')}>шаг каденции {cadenceStep} из 5</span>}
-        {lead.industry && <span style={chip('rgba(244,122,31,0.1)', '#F47A1F')}>{lead.industry}</span>}
+        {lead.industry && <span style={chip('rgba(var(--rgb-244-122-31), 0.1)', 'var(--fg-f47a1f)')}>{lead.industry}</span>}
         {lead.city && <span style={chip('rgba(14,23,38,0.06)', '#5A6573')}>{lead.city}</span>}
         {lead.region && <span style={chip('rgba(14,23,38,0.06)', '#5A6573')}>{lead.region}</span>}
-        {attempts > 0 && <span style={chip('rgba(217,119,6,0.12)', '#D97706')}>попыток дозвона: {attempts}</span>}
+        {attempts > 0 && <span style={chip('rgba(var(--rgb-217-119-6), 0.12)', 'var(--fg-d97706)')}>попыток дозвона: {attempts}</span>}
       </div>
 
       {attempts >= 3 && (
-        <div style={{ background: 'rgba(224,71,59,0.08)', border: '1px solid rgba(224,71,59,0.2)', borderRadius: 12, padding: '10px 14px', fontSize: 12, color: '#E0473B' }}>
+        <div style={{ background: 'rgba(var(--rgb-224-71-59), 0.08)', border: '1px solid rgba(var(--rgb-224-71-59), 0.2)', borderRadius: 12, padding: '10px 14px', fontSize: 12, color: 'var(--fg-e0473b)' }}>
           {attempts} неудачных дозвона подряд. После 5-й лид уйдёт в «Нет контакта».
         </div>
       )}
@@ -91,12 +91,12 @@ export default function CallCard({ lead, onEdit, part }) {
 
       <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', fontSize: 12.5 }}>
         {lead.website && (
-          <a href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`} target="_blank" rel="noreferrer" style={{ color: '#1366F0', fontWeight: 600 }}>
+          <a href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`} target="_blank" rel="noreferrer" style={{ color: 'var(--fg-1366f0)', fontWeight: 600 }}>
             {lead.website}
           </a>
         )}
         {lead.email && (
-          <a href={`mailto:${lead.email}`} style={{ color: '#1366F0', fontWeight: 600 }}>{lead.email}</a>
+          <a href={`mailto:${lead.email}`} style={{ color: 'var(--fg-1366f0)', fontWeight: 600 }}>{lead.email}</a>
         )}
       </div>
 
@@ -139,14 +139,14 @@ export default function CallCard({ lead, onEdit, part }) {
                 <div style={{
                   width: 28, height: 28, borderRadius: 9, flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: (o?.color || '#8A93A0') + '1A', color: o?.color || 'var(--text-3)',
+                  background: `color-mix(in srgb, ${(o?.color || '#8A93A0')} 10%, transparent)`, color: o?.color || 'var(--text-3)',
                 }}><OutcomeIcon id={o?.id || 'reached'} size={12} /></div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 11, color: o?.color || 'var(--text-3)', fontWeight: 700 }}>
                     {o?.label || h.outcome} · {new Date(h.created_at).toLocaleString('ru-RU')}
                   </div>
                   {h.comment && <div style={{ fontSize: 13.5, color: 'var(--text-strong)', marginTop: 2 }}>{h.comment}</div>}
-                  {h.lost_reason && <div style={{ fontSize: 12, color: '#E0473B', marginTop: 2 }}>Причина: {h.lost_reason}</div>}
+                  {h.lost_reason && <div style={{ fontSize: 12, color: 'var(--fg-e0473b)', marginTop: 2 }}>Причина: {h.lost_reason}</div>}
                 </div>
               </div>
             )

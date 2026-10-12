@@ -91,7 +91,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
 
         {/* Оранжевая: дебиторка */}
         <div className="ios-widget" style={{ padding: '24px 24px' }}>
-          <div className="grad-kicker" style={{ color: '#D97706' }}>Ожидается от клиентов</div>
+          <div className="grad-kicker" style={{ color: 'var(--fg-d97706)' }}>Ожидается от клиентов</div>
           <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
             <CountUp value={d.debt_sum} />
           </div>
@@ -101,7 +101,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
 
         {/* Фиолетовая: расходы по рейсам */}
         <div className="ios-widget" style={{ padding: '24px 24px' }}>
-          <div className="grad-kicker" style={{ color: '#7C3AED' }}>Расходы по рейсам</div>
+          <div className="grad-kicker" style={{ color: 'var(--fg-7c3aed)' }}>Расходы по рейсам</div>
           <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
             <CountUp value={d.expenses} />
           </div>
@@ -110,7 +110,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
             топливо {money(d.fuel_cost)} · прочее {money(d.other_expenses)} · ЗП {money(d.driver_salary_total)}
           </div>
           {d.expenses_unpaid > 0.5 && (
-            <div style={{ marginTop: 4, fontSize: 11.5, color: '#E0473B', fontWeight: 700 }}>не оплачено {money(d.expenses_unpaid)}</div>
+            <div style={{ marginTop: 4, fontSize: 11.5, color: 'var(--fg-e0473b)', fontWeight: 700 }}>не оплачено {money(d.expenses_unpaid)}</div>
           )}
         </div>
       </div>
@@ -118,11 +118,11 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
       {/* KPI strip */}
       <div className="dashboard-stat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
         {[
-          { label: 'Рейсов', value: d.trips_total, color: '#1366F0', bg: 'rgba(19,102,240,0.08)',
+          { label: 'Рейсов', value: d.trips_total, color: 'var(--fg-1366f0)', bg: 'rgba(var(--rgb-19-102-240), 0.08)',
             sub: `в пути ${st.in_transit || 0} · доставлено ${st.delivered || 0}`, onClick: () => onNav?.('fleet-trips') },
-          { label: 'Заказов', value: d.orders_total, color: '#1E9E5A', bg: 'rgba(30,158,90,0.08)', sub: `доставлено ${int(d.delivered)}` },
-          { label: 'Пробег, км', value: d.km, color: '#D97706', bg: 'rgba(217,119,6,0.08)', sub: `${(d.fuel_per_100 || 0).toFixed(1)} л/100км` },
-          { label: 'Себестоимость', value: null, raw: `${(d.cost_per_km || 0).toFixed(2)}`, color: '#7C3AED', bg: 'rgba(124,58,237,0.08)', sub: `доход ${(d.revenue_per_km || 0).toFixed(2)} Br/км` },
+          { label: 'Заказов', value: d.orders_total, color: 'var(--fg-1e9e5a)', bg: 'rgba(var(--rgb-30-158-90), 0.08)', sub: `доставлено ${int(d.delivered)}` },
+          { label: 'Пробег, км', value: d.km, color: 'var(--fg-d97706)', bg: 'rgba(var(--rgb-217-119-6), 0.08)', sub: `${(d.fuel_per_100 || 0).toFixed(1)} л/100км` },
+          { label: 'Себестоимость', value: null, raw: `${(d.cost_per_km || 0).toFixed(2)}`, color: 'var(--fg-7c3aed)', bg: 'rgba(var(--rgb-124-58-237), 0.08)', sub: `доход ${(d.revenue_per_km || 0).toFixed(2)} Br/км` },
         ].map(kpi => (
           <div key={kpi.label} className="card" onClick={kpi.onClick} style={{ padding: '18px 20px', cursor: kpi.onClick ? 'pointer' : 'default' }}>
             <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: 6 }}>{kpi.label}</div>
@@ -155,15 +155,15 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
               {trips.map(t => (
                 <tr key={t.id} onClick={() => onOpenTrip?.(t.id)} style={{ borderTop: '1px solid var(--fill-2)', cursor: onOpenTrip ? 'pointer' : 'default' }}>
                   <td style={{ padding: '9px 10px', color: 'var(--ink)' }}>
-                    <span style={{ fontFamily: 'var(--font-mono)', color: '#1366F0', marginRight: 6 }}>Р{t.trip_number || 0}</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--fg-1366f0)', marginRight: 6 }}>Р{t.trip_number || 0}</span>
                     {t.name || t.route || '—'}
                   </td>
                   <td style={{ padding: '9px 10px' }}>
-                    <span style={{ fontSize: 10.5, fontWeight: 700, color: stColor(t.status), background: `${stColor(t.status)}1a`, borderRadius: 99, padding: '2px 8px' }}>{stLabel(t.status)}</span>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, color: stColor(t.status), background: `color-mix(in srgb, ${stColor(t.status)} 10%, transparent)`, borderRadius: 99, padding: '2px 8px' }}>{stLabel(t.status)}</span>
                   </td>
                   <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'var(--font-mono)', color: 'var(--ink)' }}>{int(t.revenue)}</td>
-                  <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'var(--font-mono)', color: '#E0473B' }}>{int(t.expenses)}</td>
-                  <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'var(--font-mono)', fontWeight: 700, color: t.profit >= 0 ? '#1E9E5A' : '#E0473B' }}>{int(t.profit)}</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'var(--font-mono)', color: 'var(--fg-e0473b)' }}>{int(t.expenses)}</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'var(--font-mono)', fontWeight: 700, color: t.profit >= 0 ? 'var(--fg-1e9e5a)' : 'var(--fg-e0473b)' }}>{int(t.profit)}</td>
                   <td style={{ padding: '9px 10px', textAlign: 'right', color: 'var(--text-3)' }}>{t.margin_pct}%</td>
                 </tr>
               ))}
@@ -176,19 +176,19 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
       {((d.overdue && d.overdue.length > 0) || (d.driver_debts && d.driver_debts.length > 0)) && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
           {d.overdue && d.overdue.length > 0 && (
-            <div className="card" style={{ padding: '18px 20px', border: '1px solid rgba(200,25,35,0.25)' }}>
+            <div className="card" style={{ padding: '18px 20px', border: '1px solid rgba(var(--rgb-200-25-35), 0.25)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
-                <div style={{ fontSize: 11, color: '#C81923', fontWeight: 700, letterSpacing: '0.1em' }}>ПРОСРОЧКА ОПЛАТЫ</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#C81923' }}>{int(d.overdue_total)} Br</div>
+                <div style={{ fontSize: 11, color: 'var(--fg-c81923)', fontWeight: 700, letterSpacing: '0.1em' }}>ПРОСРОЧКА ОПЛАТЫ</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--fg-c81923)' }}>{int(d.overdue_total)} Br</div>
               </div>
               {d.overdue.map((o, i) => (
                 <div key={o.order_id || i}
                   onClick={() => o.client_id && onOpenClient?.(o.client_id)}
                   style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '8px 0', borderBottom: i < d.overdue.length - 1 ? '1px solid var(--fill-2)' : 'none', fontSize: 12.5, cursor: o.client_id ? 'pointer' : 'default' }}>
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    <span style={{ fontFamily: 'var(--font-mono)', color: '#1366F0', marginRight: 6 }}>{o.order_number}</span>{o.client_name}
+                    <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--fg-1366f0)', marginRight: 6 }}>{o.order_number}</span>{o.client_name}
                   </span>
-                  <span style={{ flexShrink: 0, color: '#C81923', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+                  <span style={{ flexShrink: 0, color: 'var(--fg-c81923)', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
                     {int(o.amount)} · +{o.days}д
                   </span>
                 </div>
@@ -199,12 +199,12 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
             <div className="card" style={{ padding: '18px 20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
                 <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 700, letterSpacing: '0.1em' }}>ДОЛГ ВОДИТЕЛЯМ</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#D97706' }}>{int(d.driver_debt_total)} Br</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--fg-d97706)' }}>{int(d.driver_debt_total)} Br</div>
               </div>
               {d.driver_debts.map((dr, i) => (
                 <div key={dr.id || i} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '8px 0', borderBottom: i < d.driver_debts.length - 1 ? '1px solid var(--fill-2)' : 'none', fontSize: 13 }}>
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{dr.name}</span>
-                  <span style={{ flexShrink: 0, color: '#D97706', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{int(dr.sum)}</span>
+                  <span style={{ flexShrink: 0, color: 'var(--fg-d97706)', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{int(dr.sum)}</span>
                 </div>
               ))}
             </div>
@@ -214,7 +214,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
 
       {/* Должники + Топ клиентов */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
-        {[['ДОЛЖНИКИ', d.debtors, '#D97706'], ['ТОП КЛИЕНТОВ', d.top_clients, '#1E9E5A']].map(([title, items, accent]) => (
+        {[['ДОЛЖНИКИ', d.debtors, 'var(--fg-d97706)'], ['ТОП КЛИЕНТОВ', d.top_clients, 'var(--fg-1e9e5a)']].map(([title, items, accent]) => (
           <div key={title} className="card" style={{ padding: '18px 20px' }}>
             <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.1em', marginBottom: 10 }}>{title}</div>
             {(!items || items.length === 0) ? (
@@ -227,7 +227,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
                   borderBottom: i < items.length - 1 ? '1px solid var(--fill-2)' : 'none', fontSize: 13, color: 'var(--ink)',
                   cursor: it.id ? 'pointer' : 'default',
                 }}
-                onPointerEnter={mouseOnly(e => { if (it.id) e.currentTarget.style.background = 'rgba(19,102,240,0.05)' })}
+                onPointerEnter={mouseOnly(e => { if (it.id) e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.05)' })}
                 onPointerLeave={mouseOnly(e => { e.currentTarget.style.background = 'transparent' })}
               >
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{it.name || '—'}</span>

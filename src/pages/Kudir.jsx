@@ -62,7 +62,7 @@ function MissingPPRow({ order, onSaved }) {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderBottom: '1px solid var(--fill-2)', flexWrap: 'wrap' }}>
-      <div style={{ width: 110, fontFamily: 'var(--font-mono)', fontSize: 12, color: '#1366F0' }}>{order.order_number}</div>
+      <div style={{ width: 110, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-1366f0)' }}>{order.order_number}</div>
       <div style={{ flex: 1, minWidth: 120, fontSize: 12, color: 'var(--ink)' }}>{order.client_name}</div>
       {missing.map(key => {
         const meta = MISSING_FIELD_META[key]
@@ -89,7 +89,7 @@ function MissingPPRow({ order, onSaved }) {
       <button
         onClick={save}
         disabled={saving}
-        style={{ padding: '6px 12px', borderRadius: 8, background: '#1366F0', color: '#fff', border: 'none', fontSize: 12, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}
+        style={{ padding: '6px 12px', borderRadius: 8, background: 'var(--bg-1366f0)', color: '#fff', border: 'none', fontSize: 12, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}
       >
         {saving ? '...' : 'Сохранить'}
       </button>
@@ -267,14 +267,14 @@ function BookTab() {
         {resyncing && (
           <button
             onClick={cancelResync}
-            style={{ padding: '9px 14px', borderRadius: 10, background: 'var(--surface)', color: '#E0473B', border: '1px solid rgba(224,71,59,0.4)', fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
+            style={{ padding: '9px 14px', borderRadius: 10, background: 'var(--surface)', color: 'var(--fg-e0473b)', border: '1px solid rgba(var(--rgb-224-71-59), 0.4)', fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
           >
             Остановить
           </button>
         )}
         <button
           onClick={download}
-          style={{ padding: '9px 16px', borderRadius: 10, background: '#1366F0', color: '#fff', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+          style={{ padding: '9px 16px', borderRadius: 10, background: 'var(--bg-1366f0)', color: '#fff', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
         >
           Скачать
         </button>
@@ -284,7 +284,7 @@ function BookTab() {
         <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
           {needle ? `Найдено: ${filteredEntries.length} из ${entries.length}` : `Записей: ${entries.length}`}
         </div>
-        <div style={{ fontSize: 14, fontWeight: 700, color: '#1E9E5A' }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--fg-1e9e5a)' }}>
           {needle ? `Доход по найденному: ${fmtMoney(filteredIncome)}` : `Доход за период: ${fmtMoney(totalIncome)}`}
         </div>
       </div>
@@ -370,7 +370,7 @@ function EntryRow({ entry, onChanged }) {
   const locked = !!entry.manually_edited
 
   return (
-    <tr style={{ borderTop: '1px solid var(--fill-2)', background: locked ? 'rgba(19,102,240,0.03)' : 'transparent' }}>
+    <tr style={{ borderTop: '1px solid var(--fill-2)', background: locked ? 'rgba(var(--rgb-19-102-240), 0.03)' : 'transparent' }}>
       <td style={{ padding: '6px 12px', whiteSpace: 'nowrap' }}>
         <input
           type="date"
@@ -415,7 +415,7 @@ function EntryRow({ entry, onChanged }) {
           onFocus={focusCell}
           onBlur={e => { blurCell(e); save('income_amount', fields.income_amount) }}
           disabled={saving === 'income_amount'}
-          data-plain style={{ ...cellInputStyle, textAlign: 'right', fontWeight: 600, color: fields.income_amount != null && fields.income_amount !== '' ? '#1E9E5A' : 'var(--text-tertiary)' }}
+          data-plain style={{ ...cellInputStyle, textAlign: 'right', fontWeight: 600, color: fields.income_amount != null && fields.income_amount !== '' ? 'var(--fg-1e9e5a)' : 'var(--text-tertiary)' }}
           placeholder="—"
         />
       </td>

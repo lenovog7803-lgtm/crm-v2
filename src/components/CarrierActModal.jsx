@@ -29,7 +29,7 @@ export default function CarrierActModal({ initialValue, initialDate, onClose, on
       }}>
         <div style={{
           fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
-          color: '#1E9E5A', marginBottom: 6,
+          color: 'var(--fg-1e9e5a)', marginBottom: 6,
         }}>
           Документы от перевозчика получены
         </div>
@@ -54,8 +54,8 @@ export default function CarrierActModal({ initialValue, initialDate, onClose, on
             onClick={() => setValue('Б/Н')}
             style={{
               padding: '11px 14px', borderRadius: 12, border: '1px solid var(--line)', whiteSpace: 'nowrap',
-              background: value.trim().toUpperCase() === 'Б/Н' ? 'rgba(19,102,240,0.1)' : 'var(--fill)',
-              color: value.trim().toUpperCase() === 'Б/Н' ? '#1366F0' : 'var(--text-secondary)',
+              background: value.trim().toUpperCase() === 'Б/Н' ? 'rgba(var(--rgb-19-102-240), 0.1)' : 'var(--fill)',
+              color: value.trim().toUpperCase() === 'Б/Н' ? 'var(--fg-1366f0)' : 'var(--text-secondary)',
               fontSize: 12, fontWeight: 700, cursor: 'pointer',
             }}
           >
@@ -82,7 +82,7 @@ export default function CarrierActModal({ initialValue, initialDate, onClose, on
             disabled={saving || !value.trim()}
             style={{
               flex: 2, padding: 13, borderRadius: 12, border: 'none',
-              background: value.trim() ? '#1E9E5A' : 'var(--text-quaternary)', color: '#FFFFFF', fontSize: 14, fontWeight: 700,
+              background: value.trim() ? 'var(--fg-1e9e5a)' : 'var(--text-quaternary)', color: '#FFFFFF', fontSize: 14, fontWeight: 700,
               cursor: value.trim() && !saving ? 'pointer' : 'default',
             }}
           >

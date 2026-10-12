@@ -18,7 +18,7 @@ function Row({ label, value, mono }) {
 
 function StarIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="#D97706" stroke="none">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--fg-d97706)" stroke="none">
       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
     </svg>
   )
@@ -149,7 +149,7 @@ export default function CarrierDetail({ carrierId, onMeta, onBack, onDelete, onO
             <button onClick={cancelEdit} style={{ padding: '9px 16px', borderRadius: 12, border: '1px solid rgba(var(--ink-rgb), 0.12)', cursor: 'pointer', background: 'transparent', color: 'var(--text-secondary)', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13 }}>
               Отмена
             </button>
-            <button onClick={saveEdit} disabled={saving} style={{ padding: '9px 18px', borderRadius: 12, border: 'none', cursor: 'pointer', background: '#1366F0', color: '#fff', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13 }}>
+            <button onClick={saveEdit} disabled={saving} style={{ padding: '9px 18px', borderRadius: 12, border: 'none', cursor: 'pointer', background: 'var(--bg-1366f0)', color: '#fff', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13 }}>
               {saving ? 'Сохранение...' : 'Сохранить'}
             </button>
           </>
@@ -157,7 +157,7 @@ export default function CarrierDetail({ carrierId, onMeta, onBack, onDelete, onO
           <>
             <button onClick={startEdit} style={{
               padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
-              background: 'rgba(19,102,240,0.1)', color: '#1366F0',
+              background: 'rgba(var(--rgb-19-102-240), 0.1)', color: 'var(--fg-1366f0)',
               fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13,
               display: 'flex', alignItems: 'center', gap: 6,
             }}>
@@ -169,7 +169,7 @@ export default function CarrierDetail({ carrierId, onMeta, onBack, onDelete, onO
             </button>
             <button onClick={handleDelete} style={{
               padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
-              background: 'rgba(200,25,35,0.1)', color: '#C81923',
+              background: 'rgba(var(--rgb-200-25-35), 0.1)', color: 'var(--fg-c81923)',
               fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13,
               display: 'flex', alignItems: 'center', gap: 6,
             }}>
@@ -187,7 +187,7 @@ export default function CarrierDetail({ carrierId, onMeta, onBack, onDelete, onO
           width: 72, height: 72, borderRadius: 22, margin: '0 auto 16px',
           background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: `0 12px 30px -12px ${avB}80`,
+          boxShadow: `0 12px 30px -12px color-mix(in srgb, ${avB} 50%, transparent)`,
         }}>
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="1" y="3" width="15" height="13" rx="1"/>
@@ -207,10 +207,10 @@ export default function CarrierDetail({ carrierId, onMeta, onBack, onDelete, onO
             <div style={{ fontSize: 14, color: 'var(--text-tertiary)', marginTop: 4 }}>{driver}</div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 10 }}>
               <StarIcon />
-              <span style={{ fontSize: 16, fontWeight: 700, color: '#D97706' }}>{carrier.rating || '5.0'}</span>
+              <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--fg-d97706)' }}>{carrier.rating || '5.0'}</span>
             </div>
             {carrier.phone && (
-              <a href={`tel:${carrier.phone}`} style={{ display: 'block', marginTop: 8, fontSize: 15, fontWeight: 600, color: '#1366F0', textDecoration: 'none' }}>{carrier.phone}</a>
+              <a href={`tel:${carrier.phone}`} style={{ display: 'block', marginTop: 8, fontSize: 15, fontWeight: 600, color: 'var(--fg-1366f0)', textDecoration: 'none' }}>{carrier.phone}</a>
             )}
           </>
         )}
@@ -285,11 +285,11 @@ export default function CarrierDetail({ carrierId, onMeta, onBack, onDelete, onO
                     cursor: onOpenOrder ? 'pointer' : 'default',
                     transition: 'background 0.12s',
                   }}
-                  onPointerEnter={mouseOnly(e => { if (onOpenOrder) e.currentTarget.style.background = 'rgba(19,102,240,0.05)' })}
+                  onPointerEnter={mouseOnly(e => { if (onOpenOrder) e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.05)' })}
                   onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                 >
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: '#1366F0', fontWeight: 600 }}>{o.order_number || o.id}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-1366f0)', fontWeight: 600 }}>{o.order_number || o.id}</div>
                     <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {o.route_from && o.route_to ? `${o.route_from} → ${o.route_to}` : '—'}
                     </div>

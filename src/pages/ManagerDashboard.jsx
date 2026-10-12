@@ -38,7 +38,7 @@ export default function ManagerDashboard() {
   if (loading) return <Loader padding={40} state="composing" />
   if (error) return (
     <div className="card" style={{ padding: 40, textAlign: 'center' }}>
-      <div style={{ fontSize: 13, color: '#C81923', marginBottom: 12 }}>Не удалось загрузить дашборд: {error}</div>
+      <div style={{ fontSize: 13, color: 'var(--fg-c81923)', marginBottom: 12 }}>Не удалось загрузить дашборд: {error}</div>
       <button onClick={load} className="btn-primary" style={{ margin: '0 auto' }}>Попробовать снова</button>
     </div>
   )
@@ -51,20 +51,20 @@ export default function ManagerDashboard() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 14 }}>
-        <StatCard label="ЗВОНКОВ ЗА ВСЁ ВРЕМЯ" value={data.total_calls} color="#1366F0" />
+        <StatCard label="ЗВОНКОВ ЗА ВСЁ ВРЕМЯ" value={data.total_calls} color="var(--fg-1366f0)" />
         <StatCard
           label="ЛУЧШИЙ МЕСЯЦ"
           value={data.best_month?.calls || 0}
-          color="#D97706"
+          color="var(--fg-d97706)"
           format={v => data.best_month ? `${fmtMonth(data.best_month.month)} · ${Math.round(v)} звонков` : '—'}
         />
-        <StatCard label="СТАЛО КЛИЕНТАМИ ЗА ВСЁ ВРЕМЯ" value={data.total_won} color="#1E9E5A" />
+        <StatCard label="СТАЛО КЛИЕНТАМИ ЗА ВСЁ ВРЕМЯ" value={data.total_won} color="var(--fg-1e9e5a)" />
       </div>
 
       <div className="card" style={{ padding: 20 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 4 }}>Звонки по месяцам</div>
         <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 16 }}>
-          В этом месяце: <b style={{ color: 'var(--ink)' }}>{currentMonth?.calls || 0}</b> звонков, <b style={{ color: '#1E9E5A' }}>{currentMonth?.won || 0}</b> в клиенты
+          В этом месяце: <b style={{ color: 'var(--ink)' }}>{currentMonth?.calls || 0}</b> звонков, <b style={{ color: 'var(--fg-1e9e5a)' }}>{currentMonth?.won || 0}</b> в клиенты
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, height: 150 }}>
           {monthly.map(m => {
@@ -73,7 +73,7 @@ export default function ManagerDashboard() {
             return (
               <div key={m.month} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
                 <div style={{ fontSize: 10.5, color: 'var(--text-secondary)', fontWeight: 600 }}>{m.calls}</div>
-                <div style={{ width: '100%', maxWidth: 36, height: h, borderRadius: 8, background: isBest ? '#D97706' : '#1366F0', transition: 'height 0.4s' }} />
+                <div style={{ width: '100%', maxWidth: 36, height: h, borderRadius: 8, background: isBest ? 'var(--fg-d97706)' : 'var(--fg-1366f0)', transition: 'height 0.4s' }} />
                 <span style={{ fontSize: 10.5, color: 'var(--text-tertiary)' }}>{fmtMonth(m.month)}</span>
               </div>
             )

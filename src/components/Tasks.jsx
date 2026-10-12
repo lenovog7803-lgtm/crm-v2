@@ -11,8 +11,8 @@ import { EmptyState } from './EmptyState'
 import { useChangeFlash } from '../hooks/useChangeFlash'
 import DateInput from './DateInput'
 
-const TYPE_COLORS = { call: '#1366F0', reminder: '#D97706', payment: '#1E9E5A', other: '#8A93A0' }
-const TYPE_BG = { call: 'rgba(19,102,240,0.1)', reminder: 'rgba(217,119,6,0.1)', payment: 'rgba(30,158,90,0.1)', other: 'rgba(138,147,160,0.1)' }
+const TYPE_COLORS = { call: 'var(--fg-1366f0)', reminder: 'var(--fg-d97706)', payment: 'var(--fg-1e9e5a)', other: '#8A93A0' }
+const TYPE_BG = { call: 'rgba(var(--rgb-19-102-240), 0.1)', reminder: 'rgba(var(--rgb-217-119-6), 0.1)', payment: 'rgba(var(--rgb-30-158-90), 0.1)', other: 'rgba(138,147,160,0.1)' }
 const TYPE_LABELS = { call: 'Звонок', reminder: 'Напоминание', payment: 'Оплата', other: 'Прочее' }
 
 const inputStyle = {
@@ -130,7 +130,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
             return (
               <div key={task.id} className={`ios-row${liveFlash.has(task.id) ? ' row-flash' : ''}`} onClick={() => openEdit(task)}>
                 <span onClick={e => e.stopPropagation()} style={{ display: 'flex' }}>
-                  <CheckCircle checked={done} onChange={() => handleToggle(task)} color="#1E9E5A" size={24} />
+                  <CheckCircle checked={done} onChange={() => handleToggle(task)} color="var(--fg-1e9e5a)" size={24} />
                 </span>
                 <div className="ios-row-text">
                   <div className="ios-row-title" style={{ fontWeight: 500, color: done ? 'var(--text-tertiary)' : 'var(--ink)', textDecoration: done ? 'line-through' : 'none' }}>
@@ -138,7 +138,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
                   </div>
                   <div className="ios-row-sub">
                     <span style={{ color: TYPE_COLORS[typeKey] || TYPE_COLORS.other, fontWeight: 600 }}>{TYPE_LABELS[typeKey] || typeKey}</span>
-                    {task.due_date && <span style={{ color: overdue ? '#FF3B30' : undefined, fontWeight: overdue ? 600 : undefined }}> · {fmtDate(task.due_date)}{task.due_time ? ` ${task.due_time}` : ''}</span>}
+                    {task.due_date && <span style={{ color: overdue ? 'var(--fg-ff3b30)' : undefined, fontWeight: overdue ? 600 : undefined }}> · {fmtDate(task.due_date)}{task.due_time ? ` ${task.due_time}` : ''}</span>}
                     {task.description && task.title && <> · {task.description}</>}
                   </div>
                 </div>

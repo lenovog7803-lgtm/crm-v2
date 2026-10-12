@@ -141,7 +141,7 @@ export default function ListView({ industry }) {
                   <div className="ios-row-hide-sm" style={{ width: 86, textAlign: 'right', flexShrink: 0 }}>
                     {l.next_call ? (
                       <>
-                        <div style={{ fontSize: 13, color: overdue ? '#FF3B30' : 'var(--ink)', fontWeight: overdue ? 600 : 500, fontVariantNumeric: 'tabular-nums' }}>
+                        <div style={{ fontSize: 13, color: overdue ? 'var(--fg-ff3b30)' : 'var(--ink)', fontWeight: overdue ? 600 : 500, fontVariantNumeric: 'tabular-nums' }}>
                           {new Date(l.next_call).toLocaleDateString('ru-RU')}
                         </div>
                         {(l.call_attempts || 0) > 0 && <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginTop: 1 }}>{l.call_attempts} попыт.</div>}
@@ -149,7 +149,7 @@ export default function ListView({ industry }) {
                     ) : <span style={{ fontSize: 13, color: 'var(--text-quaternary)' }}>—</span>}
                   </div>
                   {!l.assigned_to ? (
-                    <button onClick={e => handleClaim(l.id, e)} style={{ padding: '6px 16px', borderRadius: 99, border: 'none', cursor: 'pointer', background: 'rgba(118,118,128,0.12)', color: '#1366F0', fontSize: 13, fontWeight: 700, fontFamily: 'var(--font-sys)', flexShrink: 0 }}>Взять</button>
+                    <button onClick={e => handleClaim(l.id, e)} style={{ padding: '6px 16px', borderRadius: 99, border: 'none', cursor: 'pointer', background: 'rgba(118,118,128,0.12)', color: 'var(--fg-1366f0)', fontSize: 13, fontWeight: 700, fontFamily: 'var(--font-sys)', flexShrink: 0 }}>Взять</button>
                   ) : (
                     <svg className="ios-row-chevron" width="8" height="13" viewBox="0 0 8 13" fill="none">
                       <path d="M1 1.5L6.5 7L1 12.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

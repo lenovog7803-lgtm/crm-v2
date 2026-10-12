@@ -71,7 +71,7 @@ function LegList({ title, items }) {
               padding: '7px 0', borderBottom: i < items.length - 1 ? '1px solid var(--fill-2)' : 'none',
               fontSize: 13, color: 'var(--ink)',
             }}>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: '#1366F0', marginRight: 8 }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-1366f0)', marginRight: 8 }}>
                 {x.order_number || '—'}
               </span>
               {[x.route_from, x.route_to].filter(Boolean).join(' → ')}
@@ -136,25 +136,25 @@ function ReportBody({ r }) {
       <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>Сформирован: {fmtStamp(r.generated_at)}</div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 18 }}>
-        <Stat label="Выручка" value={money(r.revenue)} color="#1366F0" bg="rgba(19,102,240,0.08)"
+        <Stat label="Выручка" value={money(r.revenue)} color="var(--fg-1366f0)" bg="rgba(var(--rgb-19-102-240), 0.08)"
           sub={r.basis === 'unload' ? 'по дате выгрузки' : 'по дате создания заявок'} />
-        <Stat label="Маржа" value={money(r.margin)} color="#1E9E5A" bg="rgba(30,158,90,0.08)"
+        <Stat label="Маржа" value={money(r.margin)} color="var(--fg-1e9e5a)" bg="rgba(var(--rgb-30-158-90), 0.08)"
           sub={r.avg_margin != null ? `в среднем ${money(r.avg_margin)}/заявка` : null} />
-        <Stat label="Прибыль" value={money(r.net_profit)} color="#1E9E5A" bg="rgba(30,158,90,0.08)"
+        <Stat label="Прибыль" value={money(r.net_profit)} color="var(--fg-1e9e5a)" bg="rgba(var(--rgb-30-158-90), 0.08)"
           sub="маржа − налог 20%" />
         <Stat label={r.basis === 'unload' ? 'Заявок (по выгрузке)' : 'Создано заявок'}
-          value={total} color="#1366F0" bg="rgba(19,102,240,0.08)" />
-        <Stat label="Доставлено" value={int(r.delivered)} color="#1E9E5A" bg="rgba(30,158,90,0.08)"
+          value={total} color="var(--fg-1366f0)" bg="rgba(var(--rgb-19-102-240), 0.08)" />
+        <Stat label="Доставлено" value={int(r.delivered)} color="var(--fg-1e9e5a)" bg="rgba(var(--rgb-30-158-90), 0.08)"
           sub="по дате выгрузки" />
         <Stat label="Оплачено клиентами" value={`${int(r.client_paid_count)} из ${total}`}
-          color="#1E9E5A" bg="rgba(30,158,90,0.08)" sub={money(r.client_paid_sum)} />
+          color="var(--fg-1e9e5a)" bg="rgba(var(--rgb-30-158-90), 0.08)" sub={money(r.client_paid_sum)} />
         <Stat label="Оплачено перевозчикам" value={`${int(r.carrier_paid_count)} из ${total}`}
-          color="#1366F0" bg="rgba(19,102,240,0.08)" sub={money(r.carrier_paid_sum)} />
-        <Stat label="Просрочка перевозчикам" value={int(r.overdue_carrier_count)} color="#E0473B" bg="rgba(224,71,59,0.08)"
+          color="var(--fg-1366f0)" bg="rgba(var(--rgb-19-102-240), 0.08)" sub={money(r.carrier_paid_sum)} />
+        <Stat label="Просрочка перевозчикам" value={int(r.overdue_carrier_count)} color="var(--fg-e0473b)" bg="rgba(var(--rgb-224-71-59), 0.08)"
           sub={money(r.overdue_carrier_sum)} />
-        <Stat label="Должники (клиенты)" value={int(r.debtors_count)} color="#D97706" bg="rgba(217,119,6,0.08)"
+        <Stat label="Должники (клиенты)" value={int(r.debtors_count)} color="var(--fg-d97706)" bg="rgba(var(--rgb-217-119-6), 0.08)"
           sub={money(r.debtors_sum)} />
-        <Stat label="Звонки" value={int(r.calls_total)} color="#7C3AED" bg="rgba(124,58,237,0.08)"
+        <Stat label="Звонки" value={int(r.calls_total)} color="var(--fg-7c3aed)" bg="rgba(var(--rgb-124-58-237), 0.08)"
           sub={`стали клиентами: ${int(r.calls_won)}`} />
       </div>
 
@@ -164,9 +164,9 @@ function ReportBody({ r }) {
             Налог по КУДиР <span style={{ color: 'var(--text-3)', fontWeight: 400 }}>(по фактическим датам оплат в книге)</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 18 }}>
-            <Stat label="Строк дохода в книге" value={int(r.kudir_rows_count)} color="#1366F0" bg="rgba(19,102,240,0.08)" sub="за период" />
+            <Stat label="Строк дохода в книге" value={int(r.kudir_rows_count)} color="var(--fg-1366f0)" bg="rgba(var(--rgb-19-102-240), 0.08)" sub="за период" />
             <Stat label="Доход по книге (графа 4)" value={money(r.kudir_income)} color="#0E1726" />
-            <Stat label={`Налог к уплате (${Math.round((r.tax_rate ?? 0.2) * 100)}%)`} value={money(r.kudir_tax)} color="#E0473B" bg="rgba(224,71,59,0.08)" />
+            <Stat label={`Налог к уплате (${Math.round((r.tax_rate ?? 0.2) * 100)}%)`} value={money(r.kudir_tax)} color="var(--fg-e0473b)" bg="rgba(var(--rgb-224-71-59), 0.08)" />
           </div>
         </div>
       )}
@@ -176,8 +176,8 @@ function ReportBody({ r }) {
           display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 24,
           borderTop: '1px solid var(--fill-2)', paddingTop: 14,
         }}>
-          <MoneyList title="Пришло от клиентов" items={incomeBreakdown} accent="#1E9E5A" />
-          <MoneyList title="Ушло перевозчикам" items={expenseBreakdown} accent="#1366F0" />
+          <MoneyList title="Пришло от клиентов" items={incomeBreakdown} accent="var(--fg-1e9e5a)" />
+          <MoneyList title="Ушло перевозчикам" items={expenseBreakdown} accent="var(--fg-1366f0)" />
         </div>
       )}
 
@@ -231,7 +231,7 @@ function ReportRow({ r }) {
             выручка {money(r.revenue)} · маржа {money(r.margin)}
           </span>
         </div>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, color: '#1366F0', fontSize: 12.5, fontWeight: 600 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, color: 'var(--fg-1366f0)', fontSize: 12.5, fontWeight: 600 }}>
           {open ? 'Свернуть' : 'Открыть'}
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
             style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>

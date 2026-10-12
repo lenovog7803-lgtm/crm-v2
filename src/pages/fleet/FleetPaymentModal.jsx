@@ -43,7 +43,7 @@ export default function FleetPaymentModal({ order, onClose, onSaved }) {
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
       <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 400, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#1E9E5A', marginBottom: 6 }}>Оплата от клиента</div>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--fg-1e9e5a)', marginBottom: 6 }}>Оплата от клиента</div>
         <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 20 }}>{order.client_name || '—'} · {(order.rate || 0).toLocaleString('ru-RU')} Br</div>
 
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, cursor: 'pointer', fontSize: 13, color: 'var(--ink)' }}>
@@ -63,7 +63,7 @@ export default function FleetPaymentModal({ order, onClose, onSaved }) {
 
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', fontSize: 14, color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
-          <button onClick={confirm} disabled={saving} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: '#1E9E5A', color: '#FFFFFF', fontSize: 14, fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
+          <button onClick={confirm} disabled={saving} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: 'var(--bg-1e9e5a)', color: '#FFFFFF', fontSize: 14, fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
             <SwapText>{saving ? 'Сохраняю…' : 'Подтвердить оплату'}</SwapText>
           </button>
         </div>

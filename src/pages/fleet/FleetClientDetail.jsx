@@ -103,7 +103,7 @@ function OrderRow({ order, onOpen, onReload }) {
     <div onClick={() => onOpen(order.id)} title="Открыть карточку загрузки" style={{ padding: '12px 0', borderBottom: '1px solid var(--fill-2)', cursor: 'pointer' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>
-          {order.order_number && <span style={{ fontFamily: 'var(--font-mono)', color: '#1366F0', fontSize: 12, marginRight: 6 }}>{order.order_number}</span>}
+          {order.order_number && <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--fg-1366f0)', fontSize: 12, marginRight: 6 }}>{order.order_number}</span>}
           {order.trip_name || 'Рейс'}
           <span style={{ color: 'var(--text-tertiary)', fontWeight: 400 }}> · {order.direction === 'backward' ? 'обратка' : 'прямой'}</span>
         </div>
@@ -114,7 +114,7 @@ function OrderRow({ order, onOpen, onReload }) {
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
         <span style={{ fontSize: 11, color: 'var(--text-3)' }}>{fmtDate(order.load_date)} → {fmtDate(order.unload_date)}</span>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: '#1366F0' }}>{(order.rate || 0).toLocaleString('ru-RU')} Br</span>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: 'var(--fg-1366f0)' }}>{(order.rate || 0).toLocaleString('ru-RU')} Br</span>
       </div>
     </div>
   )
@@ -165,7 +165,7 @@ export default function FleetClientDetail({ clientId, onBack, onOpenOrder }) {
       <div className="card" style={{ padding: 18 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>Заказы клиента · {orders.length}</div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: '#1366F0' }}>{total.toLocaleString('ru-RU')} Br</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: 'var(--fg-1366f0)' }}>{total.toLocaleString('ru-RU')} Br</div>
         </div>
         {orders.length === 0
           ? <div style={{ fontSize: 12, color: 'var(--text-tertiary)', textAlign: 'center', padding: 20 }}>Заказов пока нет</div>

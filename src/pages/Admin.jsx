@@ -91,8 +91,8 @@ function UserDetailModal({ user, onClose, onSaved }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{
             padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
-            background: user.role === 'manager' ? 'rgba(19,102,240,0.1)' : 'rgba(124,58,237,0.1)',
-            color: user.role === 'manager' ? '#1366F0' : '#7C3AED',
+            background: user.role === 'manager' ? 'rgba(var(--rgb-19-102-240), 0.1)' : 'rgba(var(--rgb-124-58-237), 0.1)',
+            color: user.role === 'manager' ? 'var(--fg-1366f0)' : 'var(--fg-7c3aed)',
           }}>{ROLE_LABEL[user.role] || user.role}</span>
           <span style={{ fontSize: 11.5, color: 'var(--text-tertiary)' }}>роль меняется отдельно, не через эту форму</span>
         </div>
@@ -116,15 +116,15 @@ function UserDetailModal({ user, onClose, onSaved }) {
           <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', paddingLeft: 4, marginBottom: 8 }}>Права доступа</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {PERMISSION_OPTIONS.map(p => (
-              <label key={p.key} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 10, cursor: 'pointer', fontSize: 13, color: 'var(--ink)', background: perms[p.key] ? 'rgba(19,102,240,0.06)' : 'transparent' }}>
-                <Switch size="sm" checked={!!perms[p.key]} onChange={() => togglePerm(p.key)} style={{ width: 15, height: 15, accentColor: '#1366F0' }} />
+              <label key={p.key} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 10, cursor: 'pointer', fontSize: 13, color: 'var(--ink)', background: perms[p.key] ? 'rgba(var(--rgb-19-102-240), 0.06)' : 'transparent' }}>
+                <Switch size="sm" checked={!!perms[p.key]} onChange={() => togglePerm(p.key)} style={{ width: 15, height: 15, accentColor: 'var(--fg-1366f0)' }} />
                 {p.label}
               </label>
             ))}
           </div>
         </div>
 
-        {error && <div style={{ fontSize: 12, color: '#C81923', textAlign: 'center' }}>{error}</div>}
+        {error && <div style={{ fontSize: 12, color: 'var(--fg-c81923)', textAlign: 'center' }}>{error}</div>}
 
         <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
           <button onClick={onClose} style={{ flex: 1, height: 44, borderRadius: 13, border: '1px solid rgba(var(--ink-rgb), 0.12)', background: 'transparent', cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)' }}>Отмена</button>
@@ -246,21 +246,21 @@ function UsersTab() {
                     onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.02)')}
                     onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
                   >
-                    <td style={{ padding: '11px 14px', fontSize: 13, fontFamily: 'var(--font-mono)', color: '#1366F0', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.login}</td>
+                    <td style={{ padding: '11px 14px', fontSize: 13, fontFamily: 'var(--font-mono)', color: 'var(--fg-1366f0)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.login}</td>
                     <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: 'var(--ink)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.name}</td>
                     <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
                       <span style={{
                         padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
-                        background: isManager ? 'rgba(19,102,240,0.1)' : 'rgba(124,58,237,0.1)',
-                        color: isManager ? '#1366F0' : '#7C3AED',
+                        background: isManager ? 'rgba(var(--rgb-19-102-240), 0.1)' : 'rgba(var(--rgb-124-58-237), 0.1)',
+                        color: isManager ? 'var(--fg-1366f0)' : 'var(--fg-7c3aed)',
                       }}>{ROLE_LABEL[m.role] || m.role}</span>
                     </td>
                     <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }} onClick={e => e.stopPropagation()}>
                       <button onClick={() => toggleStatus(m)} style={{
                         padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
                         fontSize: 11.5, fontWeight: 700,
-                        background: m.status === 'suspended' ? 'rgba(224,71,59,0.1)' : 'rgba(30,158,90,0.1)',
-                        color: m.status === 'suspended' ? '#E0473B' : '#1E9E5A',
+                        background: m.status === 'suspended' ? 'rgba(var(--rgb-224-71-59), 0.1)' : 'rgba(var(--rgb-30-158-90), 0.1)',
+                        color: m.status === 'suspended' ? 'var(--fg-e0473b)' : 'var(--fg-1e9e5a)',
                       }}>
                         {m.status === 'suspended' ? 'Заблокирован' : 'Активен'}
                       </button>
@@ -275,7 +275,7 @@ function UsersTab() {
                     </td>
                     <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)', textAlign: 'right' }} onClick={e => e.stopPropagation()}>
                       {isManager && (
-                        <button onClick={() => remove(m)} style={{ padding: '6px 12px', borderRadius: 9, border: 'none', background: 'rgba(200,25,35,0.08)', color: '#C81923', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                        <button onClick={() => remove(m)} style={{ padding: '6px 12px', borderRadius: 9, border: 'none', background: 'rgba(var(--rgb-200-25-35), 0.08)', color: 'var(--fg-c81923)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
                           Удалить
                         </button>
                       )}
@@ -335,7 +335,7 @@ function SessionsTab() {
             <div>{relativeTime(s.last_activity)}</div>
             <div style={{ color: 'var(--text-tertiary)', marginTop: 2 }}>{s.activity_summary?.calls ?? 0} звонков · {s.activity_summary?.won ?? 0} в клиенты</div>
           </div>
-          <button onClick={() => logout(s)} style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid rgba(224,71,59,0.3)', background: 'rgba(224,71,59,0.06)', color: '#E0473B', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
+          <button onClick={() => logout(s)} style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid rgba(var(--rgb-224-71-59), 0.3)', background: 'rgba(var(--rgb-224-71-59), 0.06)', color: 'var(--fg-e0473b)', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
             Завершить сессию
           </button>
         </div>
@@ -418,15 +418,15 @@ function StatsTab() {
             <tbody>
               {sorted.map(m => (
                 <Fragment key={m.id}>
-                  <tr onClick={() => setOpenId(openId === m.id ? null : m.id)} style={{ cursor: 'pointer', background: openId === m.id ? 'rgba(19,102,240,0.04)' : undefined }}>
+                  <tr onClick={() => setOpenId(openId === m.id ? null : m.id)} style={{ cursor: 'pointer', background: openId === m.id ? 'rgba(var(--rgb-19-102-240), 0.04)' : undefined }}>
                     <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: 'var(--ink)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.name}</td>
                     <td style={{ padding: '11px 14px', fontSize: 13, borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.calls}</td>
                     {period === 'today' && (
-                      <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: (m.goal_pct ?? 0) >= 100 ? '#1E9E5A' : 'var(--ink)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.goal_pct ?? 0}%</td>
+                      <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 600, color: (m.goal_pct ?? 0) >= 100 ? 'var(--fg-1e9e5a)' : 'var(--ink)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.goal_pct ?? 0}%</td>
                     )}
                     <td style={{ padding: '11px 14px', fontSize: 13, borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.leads_in_work}</td>
-                    <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 700, color: '#1E9E5A', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.conversion}%</td>
-                    <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: m.overdue > 0 ? 700 : 400, color: m.overdue > 0 ? '#E0473B' : 'var(--text-secondary)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.overdue}</td>
+                    <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: 700, color: 'var(--fg-1e9e5a)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.conversion}%</td>
+                    <td style={{ padding: '11px 14px', fontSize: 13, fontWeight: m.overdue > 0 ? 700 : 400, color: m.overdue > 0 ? 'var(--fg-e0473b)' : 'var(--text-secondary)', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }}>{m.overdue}</td>
                   </tr>
                   {openId === m.id && (
                     <tr>

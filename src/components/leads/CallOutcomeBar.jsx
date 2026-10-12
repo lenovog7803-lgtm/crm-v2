@@ -58,15 +58,15 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 4 }) {
             aria-pressed={outcome === o.id}
             style={{
               display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 14,
-              background: outcome === o.id ? o.color + '1F' : 'rgba(var(--paper-rgb), 0.75)',
-              boxShadow: outcome === o.id ? `inset 0 0 0 1.5px ${o.color}66` : 'inset 0 0 0 1px rgba(14,23,38,0.07), 0 1px 2px rgba(14,23,38,0.04)',
+              background: outcome === o.id ? `color-mix(in srgb, ${o.color} 12%, transparent)` : 'rgba(var(--paper-rgb), 0.75)',
+              boxShadow: outcome === o.id ? `inset 0 0 0 1.5px color-mix(in srgb, ${o.color} 40%, transparent)` : 'inset 0 0 0 1px rgba(14,23,38,0.07), 0 1px 2px rgba(14,23,38,0.04)',
               border: 'none', cursor: 'pointer', textAlign: 'left',
             }}
           >
             <span style={{
               width: 30, height: 30, borderRadius: 9, flexShrink: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: outcome === o.id ? o.color : o.color + '1A',
+              background: outcome === o.id ? o.color : `color-mix(in srgb, ${o.color} 10%, transparent)`,
               color: outcome === o.id ? '#fff' : o.color,
               transition: 'all 0.15s var(--ease)',
             }}><OutcomeIcon id={o.id} size={14} /></span>
@@ -125,7 +125,7 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 4 }) {
         </div>
       )}
 
-      {error && <div style={{ fontSize: 12, color: '#E0473B', marginBottom: 12 }}>{error}</div>}
+      {error && <div style={{ fontSize: 12, color: 'var(--fg-e0473b)', marginBottom: 12 }}>{error}</div>}
 
       <button onClick={handleSave} disabled={saving || !outcome} className={`call-save${outcome ? ' is-ready' : ''}`}>
         <SwapText>{saving ? 'Сохраняю…' : outcome ? 'Сохранить и следующий' : 'Выберите результат звонка'}</SwapText>

@@ -24,13 +24,13 @@ function ImportPreviewModal({ preview, onClose, onConfirm, applying }) {
 
         <div style={{ overflowY: 'auto', flex: 1, minHeight: 0 }}>
           <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-            <div style={{ padding: '6px 12px', borderRadius: 10, background: 'rgba(19,102,240,0.08)', color: '#1366F0', fontSize: 12, fontWeight: 600 }}>
+            <div style={{ padding: '6px 12px', borderRadius: 10, background: 'rgba(var(--rgb-19-102-240), 0.08)', color: 'var(--fg-1366f0)', fontSize: 12, fontWeight: 600 }}>
               Новых заявок: {(orders.new || []).length}
             </div>
-            <div style={{ padding: '6px 12px', borderRadius: 10, background: 'rgba(19,102,240,0.08)', color: '#1366F0', fontSize: 12, fontWeight: 600 }}>
+            <div style={{ padding: '6px 12px', borderRadius: 10, background: 'rgba(var(--rgb-19-102-240), 0.08)', color: 'var(--fg-1366f0)', fontSize: 12, fontWeight: 600 }}>
               Изменится: {(orders.changed || []).length}
             </div>
-            <div style={{ padding: '6px 12px', borderRadius: 10, background: hasDeletes ? 'rgba(224,71,59,0.1)' : 'rgba(var(--ink-rgb), 0.05)', color: hasDeletes ? '#E0473B' : 'var(--text-3)', fontSize: 12, fontWeight: 600 }}>
+            <div style={{ padding: '6px 12px', borderRadius: 10, background: hasDeletes ? 'rgba(var(--rgb-224-71-59), 0.1)' : 'rgba(var(--ink-rgb), 0.05)', color: hasDeletes ? 'var(--fg-e0473b)' : 'var(--text-3)', fontSize: 12, fontWeight: 600 }}>
               Будет удалено: {(orders.would_delete || []).length}
             </div>
             {preview.clients && (
@@ -47,7 +47,7 @@ function ImportPreviewModal({ preview, onClose, onConfirm, applying }) {
 
           {hasDeletes && (
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#E0473B', letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 8 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-e0473b)', letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 8 }}>
                 Будут помечены удалёнными (не найдены в Таблице)
               </div>
               <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7, wordBreak: 'break-word' }}>
@@ -95,7 +95,7 @@ function ImportPreviewModal({ preview, onClose, onConfirm, applying }) {
           <button
             onClick={onConfirm}
             disabled={applying}
-            style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: '#1366F0', color: '#FFFFFF', fontWeight: 700, cursor: 'pointer' }}
+            style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: 'var(--bg-1366f0)', color: '#FFFFFF', fontWeight: 700, cursor: 'pointer' }}
           >
             {applying ? 'Применяю…' : 'Применить изменения'}
           </button>
@@ -209,7 +209,7 @@ export default function Backups() {
             <button
               onClick={doCreate}
               disabled={creating}
-              style={{ padding: '9px 16px', borderRadius: 12, border: '1px solid rgba(19,102,240,0.25)', background: 'rgba(19,102,240,0.08)', color: '#1366F0', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+              style={{ padding: '9px 16px', borderRadius: 12, border: '1px solid rgba(var(--rgb-19-102-240), 0.25)', background: 'rgba(var(--rgb-19-102-240), 0.08)', color: 'var(--fg-1366f0)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
             >
               {creating ? 'Создаю…' : 'Создать сейчас'}
             </button>
@@ -253,7 +253,7 @@ export default function Backups() {
           </div>
           <button
             onClick={() => setRestoreTarget(b)}
-            style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid rgba(224,71,59,0.3)', background: 'rgba(224,71,59,0.06)', color: '#E0473B', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0, marginLeft: 12 }}
+            style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid rgba(var(--rgb-224-71-59), 0.3)', background: 'rgba(var(--rgb-224-71-59), 0.06)', color: 'var(--fg-e0473b)', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0, marginLeft: 12 }}
           >
             Восстановить
           </button>
@@ -263,7 +263,7 @@ export default function Backups() {
       {restoreTarget && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
           <div style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 440, padding: 26 }}>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: '#E0473B', marginBottom: 8 }}>Восстановить из бэкапа?</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--fg-e0473b)', marginBottom: 8 }}>Восстановить из бэкапа?</div>
             <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 18, lineHeight: 1.5 }}>
               Это заменит текущие данные снимком от{' '}
               {new Date(restoreTarget.created_at).toLocaleDateString('ru-RU')}. Текущее состояние тоже будет сохранено отдельным бэкапом на случай ошибки.
@@ -283,7 +283,7 @@ export default function Backups() {
               <button
                 onClick={doRestore}
                 disabled={confirmWord.trim().toUpperCase() !== 'ВОССТАНОВИТЬ' || restoring}
-                style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: confirmWord.trim().toUpperCase() === 'ВОССТАНОВИТЬ' ? '#E0473B' : 'var(--line)', color: confirmWord.trim().toUpperCase() === 'ВОССТАНОВИТЬ' ? '#FFFFFF' : 'var(--text-3)', fontWeight: 700, cursor: 'pointer' }}
+                style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: confirmWord.trim().toUpperCase() === 'ВОССТАНОВИТЬ' ? 'var(--fg-e0473b)' : 'var(--line)', color: confirmWord.trim().toUpperCase() === 'ВОССТАНОВИТЬ' ? '#FFFFFF' : 'var(--text-3)', fontWeight: 700, cursor: 'pointer' }}
               >
                 {restoring ? 'Восстанавливаю…' : 'Подтвердить восстановление'}
               </button>

@@ -88,7 +88,7 @@ export default function Trash() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div className="card" style={{ padding: '20px 22px', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 14, background: 'rgba(200,25,35,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C81923', flexShrink: 0 }}>
+        <div style={{ width: 40, height: 40, borderRadius: 14, background: 'rgba(var(--rgb-200-25-35), 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fg-c81923)', flexShrink: 0 }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
           </svg>
@@ -97,15 +97,15 @@ export default function Trash() {
           <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: 'var(--ink)' }}>Корзина</div>
           <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>Удалённые элементы хранятся 30 дней, затем удаляются навсегда</div>
         </div>
-        <div style={{ marginLeft: 'auto', fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color: items.length > 0 ? '#C81923' : 'var(--text-tertiary)' }}>
+        <div style={{ marginLeft: 'auto', fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 22, color: items.length > 0 ? 'var(--fg-c81923)' : 'var(--text-tertiary)' }}>
           {items.length}
         </div>
         {items.length > 0 && (
           <button
             onClick={() => setPurgeOpen(true)}
             style={{
-              padding: '9px 16px', borderRadius: 10, border: '1px solid rgba(200,25,35,0.25)',
-              background: 'rgba(200,25,35,0.06)', color: '#C81923',
+              padding: '9px 16px', borderRadius: 10, border: '1px solid rgba(var(--rgb-200-25-35), 0.25)',
+              background: 'rgba(var(--rgb-200-25-35), 0.06)', color: 'var(--fg-c81923)',
               fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer',
             }}
           >
@@ -120,7 +120,7 @@ export default function Trash() {
           style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, display: 'grid', padding: 24 }}
         >
           <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 420, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#C81923', marginBottom: 6 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--fg-c81923)', marginBottom: 6 }}>
               Необратимое действие
             </div>
             <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 18 }}>
@@ -142,7 +142,7 @@ export default function Trash() {
                 disabled={purging || purgeWord.trim().toUpperCase() !== 'УДАЛИТЬ'}
                 style={{
                   flex: 2, padding: 13, borderRadius: 12, border: 'none',
-                  background: purgeWord.trim().toUpperCase() === 'УДАЛИТЬ' ? '#C81923' : 'var(--text-quaternary)',
+                  background: purgeWord.trim().toUpperCase() === 'УДАЛИТЬ' ? 'var(--fg-c81923)' : 'var(--text-quaternary)',
                   color: '#FFFFFF', fontSize: 14, fontWeight: 700,
                   cursor: purgeWord.trim().toUpperCase() === 'УДАЛИТЬ' && !purging ? 'pointer' : 'default',
                 }}
@@ -178,7 +178,7 @@ export default function Trash() {
             }}>
               <div style={{
                 width: 36, height: 36, borderRadius: 11, flexShrink: 0,
-                background: 'rgba(200,25,35,0.08)', color: '#C81923',
+                background: 'rgba(var(--rgb-200-25-35), 0.08)', color: 'var(--fg-c81923)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 {TYPE_ICONS[item.collection] || TYPE_ICONS.tasks}
@@ -194,8 +194,8 @@ export default function Trash() {
               </div>
               <div style={{
                 fontSize: 11.5, fontWeight: 600, padding: '4px 10px', borderRadius: 8,
-                background: urgent ? 'rgba(200,25,35,0.1)' : 'rgba(var(--ink-rgb), 0.05)',
-                color: urgent ? '#C81923' : 'var(--text-3)', flexShrink: 0,
+                background: urgent ? 'rgba(var(--rgb-200-25-35), 0.1)' : 'rgba(var(--ink-rgb), 0.05)',
+                color: urgent ? 'var(--fg-c81923)' : 'var(--text-3)', flexShrink: 0,
               }}>
                 {days === 0 ? 'Сегодня удалится' : `${days} дн.`}
               </div>
@@ -203,13 +203,13 @@ export default function Trash() {
                 onClick={() => handleRestore(item)}
                 disabled={restoring === item.id}
                 style={{
-                  padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(19,102,240,0.25)',
-                  background: 'rgba(19,102,240,0.06)', color: '#1366F0',
+                  padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(var(--rgb-19-102-240), 0.25)',
+                  background: 'rgba(var(--rgb-19-102-240), 0.06)', color: 'var(--fg-1366f0)',
                   fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
                   flexShrink: 0, transition: 'all 0.15s',
                 }}
-                onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.12)')}
-                onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.06)')}
+                onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.12)')}
+                onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.06)')}
               >
                 {restoring === item.id ? '...' : 'Восстановить'}
               </button>

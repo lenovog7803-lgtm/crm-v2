@@ -27,7 +27,7 @@ export default function Login() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
       // тот же спокойный голубой фон, что и в CRM (aurora-bg)
-      background: 'radial-gradient(ellipse 80% 60% at 10% 10%, rgba(90,150,255,0.14) 0%, transparent 60%), radial-gradient(ellipse 70% 60% at 90% 5%, rgba(19,102,240,0.12) 0%, transparent 60%), radial-gradient(ellipse 60% 60% at 85% 90%, rgba(120,180,255,0.12) 0%, transparent 60%), radial-gradient(ellipse 70% 60% at 5% 85%, rgba(70,120,230,0.1) 0%, transparent 60%), var(--bg)' }}>
+      background: 'radial-gradient(ellipse 80% 60% at 10% 10%, rgba(90,150,255,0.14) 0%, transparent 60%), radial-gradient(ellipse 70% 60% at 90% 5%, rgba(var(--rgb-19-102-240), 0.12) 0%, transparent 60%), radial-gradient(ellipse 60% 60% at 85% 90%, rgba(120,180,255,0.12) 0%, transparent 60%), radial-gradient(ellipse 70% 60% at 5% 85%, rgba(70,120,230,0.1) 0%, transparent 60%), var(--bg)' }}>
       {/* живой фон — только на экране входа; внутри CRM фон неподвижный */}
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}><GradientLayer /></div>
       <div ref={cardRef} className="ios-widget login-card">
@@ -46,7 +46,7 @@ export default function Login() {
             <span>Пароль</span>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" />
           </label>
-          {error && <div style={{ fontSize: 13, color: '#FF3B30', textAlign: 'center' }}>{error}</div>}
+          {error && <div style={{ fontSize: 13, color: 'var(--fg-ff3b30)', textAlign: 'center' }}>{error}</div>}
           <button type="submit" disabled={loading} className="btn-primary" style={{ height: 54, justifyContent: 'center', fontSize: 17, fontWeight: 600, marginTop: 4, opacity: loading ? 0.7 : 1 }}>
             {loading ? 'Вход…' : 'Войти'}
           </button>

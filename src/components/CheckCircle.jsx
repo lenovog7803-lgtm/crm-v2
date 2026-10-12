@@ -3,7 +3,7 @@ import { haptic } from '../motion'
 
 // Круглая отметка как в «Напоминаниях» iOS 26. Заменяет <input type="checkbox">:
 // onChange получает e.target.checked, как раньше.
-export default function CheckCircle({ checked, onChange, color = '#0A84FF', size = 18 }) {
+export default function CheckCircle({ checked, onChange, color = 'var(--fg-0a84ff)', size = 18 }) {
   return (
     <button type="button" role="checkbox" aria-checked={!!checked}
       onClick={e => { e.preventDefault(); haptic(8); onChange?.({ target: { checked: !checked } }) }}

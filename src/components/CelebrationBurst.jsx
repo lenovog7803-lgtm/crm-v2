@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 const PARTICLE_COUNT = 14
-const COLORS = ['#1366F0', '#1E9E5A', '#7C3AED', '#D97706']
+const COLORS = ['var(--fg-1366f0)', 'var(--fg-1e9e5a)', 'var(--fg-7c3aed)', 'var(--fg-d97706)']
 
 export function CelebrationBurst({ trigger, onDone }) {
   const [particles, setParticles] = useState([])
@@ -55,7 +55,7 @@ export function CelebrationBurst({ trigger, onDone }) {
         <div style={{
           position: 'absolute', left: -28, top: -28,
           width: 56, height: 56, borderRadius: '50%',
-          background: 'rgba(19,102,240,0.15)',
+          background: 'rgba(var(--rgb-19-102-240), 0.15)',
           animation: 'burstRing 0.6s ease-out forwards',
         }} />
       </div>

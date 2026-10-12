@@ -32,21 +32,21 @@ function Step({ done, label, sub, onToggle }) {
     <div onClick={onToggle} style={{
       display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12,
       cursor: onToggle ? 'pointer' : 'default', userSelect: 'none',
-      background: done ? 'rgba(30,158,90,0.06)' : 'rgba(var(--ink-rgb), 0.03)',
-      border: `1px solid ${done ? 'rgba(30,158,90,0.2)' : 'rgba(var(--ink-rgb), 0.07)'}`,
+      background: done ? 'rgba(var(--rgb-30-158-90), 0.06)' : 'rgba(var(--ink-rgb), 0.03)',
+      border: `1px solid ${done ? 'rgba(var(--rgb-30-158-90), 0.2)' : 'rgba(var(--ink-rgb), 0.07)'}`,
     }}>
       <div style={{
         width: 20, height: 20, borderRadius: 6, flexShrink: 0,
-        background: done ? '#1E9E5A' : 'transparent', border: `2px solid ${done ? '#1E9E5A' : 'var(--text-quaternary)'}`,
+        background: done ? 'var(--fg-1e9e5a)' : 'transparent', border: `2px solid ${done ? 'var(--fg-1e9e5a)' : 'var(--text-quaternary)'}`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
         {done && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>}
       </div>
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 13, fontWeight: 500, color: done ? '#1E9E5A' : 'var(--ink)' }}>{label}</div>
-        {sub && <div style={{ fontSize: 11, color: '#1E9E5A', marginTop: 2 }}>{sub}</div>}
+        <div style={{ fontSize: 13, fontWeight: 500, color: done ? 'var(--fg-1e9e5a)' : 'var(--ink)' }}>{label}</div>
+        {sub && <div style={{ fontSize: 11, color: 'var(--fg-1e9e5a)', marginTop: 2 }}>{sub}</div>}
       </div>
-      <div style={{ fontSize: 11, fontWeight: 600, color: done ? '#1E9E5A' : 'var(--text-tertiary)', flexShrink: 0 }}>{done ? 'готово' : 'отметить'}</div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: done ? 'var(--fg-1e9e5a)' : 'var(--text-tertiary)', flexShrink: 0 }}>{done ? 'готово' : 'отметить'}</div>
     </div>
   )
 }
@@ -70,7 +70,7 @@ function StepModal({ title, fields, onClose, onConfirm }) {
         ))}
         <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
           <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', fontSize: 14, color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
-          <button onClick={go} disabled={saving} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: '#1E9E5A', color: '#FFFFFF', fontSize: 14, fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
+          <button onClick={go} disabled={saving} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: 'var(--bg-1e9e5a)', color: '#FFFFFF', fontSize: 14, fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
             <SwapText>{saving ? 'Сохраняю…' : 'Подтвердить'}</SwapText>
           </button>
         </div>
@@ -145,21 +145,21 @@ function PaymentsCard({ order, cur, onReload, onFull }) {
         <SLabel>ОПЛАТА ОТ КЛИЕНТА</SLabel>
         <span style={{
           fontSize: 11, fontWeight: 700, borderRadius: 6, padding: '3px 8px',
-          color: order.paid ? '#1E9E5A' : overdue ? '#C81923' : '#D97706',
-          background: order.paid ? 'rgba(30,158,90,0.1)' : overdue ? 'rgba(200,25,35,0.1)' : 'rgba(217,119,6,0.1)',
+          color: order.paid ? 'var(--fg-1e9e5a)' : overdue ? 'var(--fg-c81923)' : 'var(--fg-d97706)',
+          background: order.paid ? 'rgba(var(--rgb-30-158-90), 0.1)' : overdue ? 'rgba(var(--rgb-200-25-35), 0.1)' : 'rgba(var(--rgb-217-119-6), 0.1)',
         }}>
           {order.paid ? 'оплачен' : overdue ? 'просрочен' : 'ожидается'}
         </span>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-mono)', fontSize: 15, fontWeight: 700, marginBottom: 6 }}>
-        <span style={{ color: '#1E9E5A' }}>{money(paidAmt, cur === 'BYN' ? 'Br' : cur)}</span>
+        <span style={{ color: 'var(--fg-1e9e5a)' }}>{money(paidAmt, cur === 'BYN' ? 'Br' : cur)}</span>
         <span style={{ color: 'var(--text-tertiary)' }}>из {money(rate, cur === 'BYN' ? 'Br' : cur)}</span>
       </div>
       <div style={{ height: 6, borderRadius: 4, background: 'rgba(var(--ink-rgb), 0.06)', overflow: 'hidden', marginBottom: 6 }}>
-        <div style={{ width: `${pct}%`, height: '100%', background: order.paid ? '#1E9E5A' : '#1366F0', transition: 'width 0.3s' }} />
+        <div style={{ width: `${pct}%`, height: '100%', background: order.paid ? 'var(--fg-1e9e5a)' : 'var(--fg-1366f0)', transition: 'width 0.3s' }} />
       </div>
-      <div style={{ fontSize: 11, color: overdue ? '#C81923' : 'var(--text-tertiary)', marginBottom: 12 }}>
+      <div style={{ fontSize: 11, color: overdue ? 'var(--fg-c81923)' : 'var(--text-tertiary)', marginBottom: 12 }}>
         {remaining > 0 ? `Осталось ${money(remaining, cur === 'BYN' ? 'Br' : cur)}` : 'Полностью оплачен'}
         {order.due_date && `  ·  срок ${fmtDate(order.due_date)}`}
       </div>
@@ -195,9 +195,9 @@ function PaymentsCard({ order, cur, onReload, onFull }) {
         </div>
       ) : (
         <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-          <button onClick={() => setAdding(true)} style={{ flex: 1, padding: '9px 12px', borderRadius: 10, border: '1px solid #1366F0', background: 'rgba(19,102,240,0.06)', color: '#1366F0', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>+ платёж</button>
+          <button onClick={() => setAdding(true)} style={{ flex: 1, padding: '9px 12px', borderRadius: 10, border: '1px solid var(--fg-1366f0)', background: 'rgba(var(--rgb-19-102-240), 0.06)', color: 'var(--fg-1366f0)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>+ платёж</button>
           {!order.paid && (
-            <button onClick={onFull} style={{ flex: 1, padding: '9px 12px', borderRadius: 10, border: '1px solid #1E9E5A', background: 'rgba(30,158,90,0.06)', color: '#1E9E5A', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>Оплачен полностью</button>
+            <button onClick={onFull} style={{ flex: 1, padding: '9px 12px', borderRadius: 10, border: '1px solid var(--fg-1e9e5a)', background: 'rgba(var(--rgb-30-158-90), 0.06)', color: 'var(--fg-1e9e5a)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>Оплачен полностью</button>
           )}
         </div>
       )}
@@ -411,7 +411,7 @@ export default function FleetOrderDetail({ orderId, onBack }) {
             </div>
             {ourContract ? (
               <DocRow label={order.doc_url_order ? 'Договор' : 'Заявка-договор'} url={order.doc_url_order}
-                color="#1366F0" bg="rgba(19,102,240,0.08)" busy={genBusy === 'order'}
+                color="var(--fg-1366f0)" bg="rgba(var(--rgb-19-102-240), 0.08)" busy={genBusy === 'order'}
                 onClick={() => (order.doc_url_order ? window.open(order.doc_url_order, '_blank') : generate('order'))} />
             ) : (
               <div style={{ marginBottom: 8 }}>
@@ -422,7 +422,7 @@ export default function FleetOrderDetail({ orderId, onBack }) {
               </div>
             )}
             <DocRow label="Акт выполненных работ" url={order.doc_url_act}
-              color="#1E9E5A" bg="rgba(30,158,90,0.08)" busy={genBusy === 'act'}
+              color="var(--fg-1e9e5a)" bg="rgba(var(--rgb-30-158-90), 0.08)" busy={genBusy === 'act'}
               onClick={() => (order.doc_url_act ? window.open(order.doc_url_act, '_blank') : generate('act'))} />
             <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 6 }}>Генерация подключится с реквизитами юрлица и шаблонами.</div>
           </div>

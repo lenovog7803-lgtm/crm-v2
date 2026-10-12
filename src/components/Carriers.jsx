@@ -15,7 +15,7 @@ function primaryPhone(raw) {
 
 function StarIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="#D97706" stroke="none">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--fg-d97706)" stroke="none">
       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
     </svg>
   )
@@ -56,7 +56,7 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>
-          {search ? `Найдено: ${visible.length}` : <>Всего перевозчиков: <span style={{ color: '#1366F0' }}>{carriers.length}</span></>}
+          {search ? `Найдено: ${visible.length}` : <>Всего перевозчиков: <span style={{ color: 'var(--fg-1366f0)' }}>{carriers.length}</span></>}
         </div>
         <div style={{ flex: 1 }} />
         <button className="btn-primary" onClick={onAdd}>

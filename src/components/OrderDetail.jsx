@@ -14,9 +14,9 @@ import { iosConfirm } from './IOSAlert'
 import CardGradient from './CardGradient'
 
 const STATUSES = [
-  { id: 'new', label: 'Новая', color: '#7C3AED', bg: 'rgba(124,58,237,0.1)' },
-  { id: 'in_progress', label: 'В работе', color: '#1366F0', bg: 'rgba(19,102,240,0.1)' },
-  { id: 'done', label: 'Доставлено', color: '#1E9E5A', bg: 'rgba(30,158,90,0.1)' },
+  { id: 'new', label: 'Новая', color: 'var(--fg-7c3aed)', bg: 'rgba(var(--rgb-124-58-237), 0.1)' },
+  { id: 'in_progress', label: 'В работе', color: 'var(--fg-1366f0)', bg: 'rgba(var(--rgb-19-102-240), 0.1)' },
+  { id: 'done', label: 'Доставлено', color: 'var(--fg-1e9e5a)', bg: 'rgba(var(--rgb-30-158-90), 0.1)' },
   { id: 'cancelled', label: 'Отменено', color: 'var(--text-3)', bg: 'rgba(138,147,160,0.1)' },
 ]
 
@@ -81,7 +81,7 @@ function OrderHistorySection({ orderId }) {
           ) : (
             history.map((h, i) => (
               <div key={h.id || i} style={{ display: 'flex', gap: 10, padding: '9px 0', borderBottom: i < history.length - 1 ? '1px solid rgba(var(--ink-rgb), 0.05)' : 'none' }}>
-                <div style={{ width: 6, height: 6, borderRadius: 3, background: '#1366F0', marginTop: 6, flexShrink: 0 }} />
+                <div style={{ width: 6, height: 6, borderRadius: 3, background: 'var(--bg-1366f0)', marginTop: 6, flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 12.5, color: 'var(--ink)' }}>
                     <b>{HISTORY_FIELD_LABEL[h.field] || h.field}</b>: {h.old_value || '—'} → {h.new_value || '—'}
@@ -129,10 +129,10 @@ function ClickableName({ name, onClick }) {
       onClick={handleClick}
       style={{
         cursor: 'pointer', display: 'inline-block', padding: '2px 6px', margin: '-2px -6px',
-        borderRadius: 8, background: pressed ? 'rgba(19,102,240,0.12)' : 'transparent',
+        borderRadius: 8, background: pressed ? 'rgba(var(--rgb-19-102-240), 0.12)' : 'transparent',
         transition: 'background 0.12s ease',
-        fontWeight: 700, fontSize: 14, color: '#1366F0',
-        textDecoration: 'underline', textDecorationColor: 'rgba(19,102,240,0.4)',
+        fontWeight: 700, fontSize: 14, color: 'var(--fg-1366f0)',
+        textDecoration: 'underline', textDecorationColor: 'rgba(var(--rgb-19-102-240), 0.4)',
         fontFamily: 'var(--font-sys)',
       }}
     >{name}</span>
@@ -170,7 +170,7 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
   // untouched order, hiding a real payment and inviting a duplicate transfer.
   const enteredTotal = payments.reduce((s, p) => s + (Number(p.amount) || 0), 0)
   const hasUnmatchedPayment = hasUnreconciledPayment(order, type)
-  const accent = isPaid ? '#1E9E5A' : hasUnmatchedPayment ? '#D97706' : (isCarrier ? '#E0473B' : '#0E1726')
+  const accent = isPaid ? 'var(--fg-1e9e5a)' : hasUnmatchedPayment ? 'var(--fg-d97706)' : (isCarrier ? 'var(--fg-e0473b)' : '#0E1726')
 
   // Long press (2s) opens the PP editor regardless of paid state; a plain
   // tap keeps its existing meaning (mark / unmark). longPressFired guards
@@ -214,36 +214,36 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
       }
       style={{
         flex: 1, padding: '14px 18px', borderRadius: 14, cursor: 'pointer',
-        background: isPaid ? 'rgba(30,158,90,0.08)' : hasUnmatchedPayment ? 'rgba(217,119,6,0.08)' : (isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(var(--ink-rgb), 0.04)'),
+        background: isPaid ? 'rgba(var(--rgb-30-158-90), 0.08)' : hasUnmatchedPayment ? 'rgba(var(--rgb-217-119-6), 0.08)' : (isCarrier ? 'rgba(var(--rgb-224-71-59), 0.05)' : 'rgba(var(--ink-rgb), 0.04)'),
         border: isPaid
-          ? (isCarrier ? '2px solid rgba(30,158,90,0.28)' : '1px solid rgba(30,158,90,0.25)')
+          ? (isCarrier ? '2px solid rgba(var(--rgb-30-158-90), 0.28)' : '1px solid rgba(var(--rgb-30-158-90), 0.25)')
           : hasUnmatchedPayment
-            ? '2px solid rgba(217,119,6,0.4)'
-            : (isCarrier ? '2px solid rgba(224,71,59,0.35)' : '1px solid rgba(14,23,38,0.08)'),
+            ? '2px solid rgba(var(--rgb-217-119-6), 0.4)'
+            : (isCarrier ? '2px solid rgba(var(--rgb-224-71-59), 0.35)' : '1px solid rgba(14,23,38,0.08)'),
         transition: 'all 0.2s',
         userSelect: 'none', WebkitUserSelect: 'none',
       }}
-      onPointerEnter={mouseOnly(e => { if (!isPaid && !hasUnmatchedPayment) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.09)' : 'rgba(var(--ink-rgb), 0.07)' })}
-      onPointerLeave={mouseOnly(e => { cancelPress(); if (!isPaid && !hasUnmatchedPayment) e.currentTarget.style.background = isCarrier ? 'rgba(224,71,59,0.05)' : 'rgba(var(--ink-rgb), 0.04)' })}
+      onPointerEnter={mouseOnly(e => { if (!isPaid && !hasUnmatchedPayment) e.currentTarget.style.background = isCarrier ? 'rgba(var(--rgb-224-71-59), 0.09)' : 'rgba(var(--ink-rgb), 0.07)' })}
+      onPointerLeave={mouseOnly(e => { cancelPress(); if (!isPaid && !hasUnmatchedPayment) e.currentTarget.style.background = isCarrier ? 'rgba(var(--rgb-224-71-59), 0.05)' : 'rgba(var(--ink-rgb), 0.04)' })}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{
           width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
-          background: isPaid ? '#1E9E5A' : 'transparent',
-          border: `2px solid ${isPaid ? '#1E9E5A' : hasUnmatchedPayment ? '#D97706' : 'var(--text-quaternary)'}`,
+          background: isPaid ? 'var(--fg-1e9e5a)' : 'transparent',
+          border: `2px solid ${isPaid ? 'var(--fg-1e9e5a)' : hasUnmatchedPayment ? 'var(--fg-d97706)' : 'var(--text-quaternary)'}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transition: 'all 0.2s',
         }}>
           <SuccessCheck show={isPaid} size={11} strokeWidth={3.5} />
-          {hasUnmatchedPayment && <span style={{ color: '#D97706', fontSize: 13, fontWeight: 700, lineHeight: 1 }}>!</span>}
+          {hasUnmatchedPayment && <span style={{ color: 'var(--fg-d97706)', fontSize: 13, fontWeight: 700, lineHeight: 1 }}>!</span>}
         </div>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ fontSize: 13, color: accent }}>{isCarrier ? '↑' : '↓'}</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: isPaid ? '#1E9E5A' : accent }}>{label}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: isPaid ? 'var(--fg-1e9e5a)' : accent }}>{label}</span>
           </div>
           {isPaid ? (
-            <div style={{ fontSize: 11, color: '#1E9E5A', marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: 'var(--fg-1e9e5a)', marginTop: 2 }}>
               {date ? new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : 'дата не указана'}
               {isCash
                 ? ' · наличными'
@@ -252,7 +252,7 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
                   : (ppNumber || payments[0]?.pp_number) ? ` · ПП №${ppNumber || payments[0].pp_number}` : ' · номер ПП не указан'}
             </div>
           ) : hasUnmatchedPayment ? (
-            <div style={{ fontSize: 11, color: '#D97706', marginTop: 2, fontWeight: 600 }}>
+            <div style={{ fontSize: 11, color: 'var(--fg-d97706)', marginTop: 2, fontWeight: 600 }}>
               Внесено {enteredTotal.toLocaleString('ru-RU')} из {amount.toLocaleString('ru-RU')} Br
               {payments.length > 1
                 ? ` · ${payments.length} ПП`
@@ -272,15 +272,15 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
               title="Вернуть оплату, снятую по ошибке — восстановит номер ПП, даты и отметку"
               style={{
                 marginTop: 5, padding: '4px 9px', borderRadius: 8, cursor: 'pointer',
-                border: '1px solid rgba(19,102,240,0.35)', background: 'rgba(19,102,240,0.08)',
-                color: '#1366F0', fontSize: 11, fontWeight: 700, fontFamily: 'inherit',
+                border: '1px solid rgba(var(--rgb-19-102-240), 0.35)', background: 'rgba(var(--rgb-19-102-240), 0.08)',
+                color: 'var(--fg-1366f0)', fontSize: 11, fontWeight: 700, fontFamily: 'inherit',
               }}
             >
               ↩ Вернуть{undoPP ? ` ПП №${undoPP}` : ' оплату'}{undoDate ? ` от ${new Date(undoDate).toLocaleDateString('ru-RU')}` : ''}
             </button>
           )}
         </div>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: isCarrier ? 18 : 16, fontWeight: 700, color: isPaid ? '#1E9E5A' : accent, flexShrink: 0 }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: isCarrier ? 18 : 16, fontWeight: 700, color: isPaid ? 'var(--fg-1e9e5a)' : accent, flexShrink: 0 }}>
           {isCarrier ? '' : '+'}{amount.toLocaleString('ru-RU')} Br
         </div>
       </div>
@@ -724,12 +724,12 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
               background: curStatus.bg, color: curStatus.color,
             }}>{curStatus.label}</span>
             <div style={{ flex: 1 }} />
-            {saveErr && <span style={{ fontSize: 11, color: '#C81923', fontWeight: 700 }}>Ошибка</span>}
+            {saveErr && <span style={{ fontSize: 11, color: 'var(--fg-c81923)', fontWeight: 700 }}>Ошибка</span>}
             <button onClick={handleSave} disabled={!isDirty || saving} style={{
               minWidth: 36, height: 36, borderRadius: 11, cursor: isDirty ? 'pointer' : 'default',
-              border: `1px solid ${savedOk ? 'rgba(30,158,90,0.4)' : isDirty ? 'rgba(19,102,240,0.4)' : 'rgba(var(--ink-rgb), 0.1)'}`,
-              background: savedOk ? 'rgba(30,158,90,0.12)' : isDirty ? 'rgba(19,102,240,0.12)' : 'rgba(var(--paper-rgb), 0.5)',
-              color: savedOk ? '#1E9E5A' : isDirty ? '#1366F0' : 'var(--text-quaternary)',
+              border: `1px solid ${savedOk ? 'rgba(var(--rgb-30-158-90), 0.4)' : isDirty ? 'rgba(var(--rgb-19-102-240), 0.4)' : 'rgba(var(--ink-rgb), 0.1)'}`,
+              background: savedOk ? 'rgba(var(--rgb-30-158-90), 0.12)' : isDirty ? 'rgba(var(--rgb-19-102-240), 0.12)' : 'rgba(var(--paper-rgb), 0.5)',
+              color: savedOk ? 'var(--fg-1e9e5a)' : isDirty ? 'var(--fg-1366f0)' : 'var(--text-quaternary)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 13, flexShrink: 0,
               padding: isDirty ? '0 14px' : '0 10px',
@@ -744,12 +744,12 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
           </div>
           {/* Row 2: secondary actions */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {isDirty && <span style={{ fontSize: 11.5, color: '#D97706', fontWeight: 600 }}>Есть изменения</span>}
+            {isDirty && <span style={{ fontSize: 11.5, color: 'var(--fg-d97706)', fontWeight: 600 }}>Есть изменения</span>}
             <div style={{ flex: 1 }} />
             {onEdit && (
               <button onClick={() => onEdit(order)} style={{
                 height: 34, padding: '0 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                background: 'rgba(19,102,240,0.08)', color: '#1366F0',
+                background: 'rgba(var(--rgb-19-102-240), 0.08)', color: 'var(--fg-1366f0)',
                 fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 12.5,
                 display: 'flex', alignItems: 'center', gap: 5,
               }}>
@@ -770,7 +770,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
             </button>
             <button onClick={handleDelete} style={{
               width: 34, height: 34, borderRadius: 10, border: 'none', cursor: 'pointer',
-              background: 'rgba(200,25,35,0.08)', color: '#C81923',
+              background: 'rgba(var(--rgb-200-25-35), 0.08)', color: 'var(--fg-c81923)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -788,15 +788,15 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
             Назад
           </button>
           <span style={{ padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, flexShrink: 0, background: curStatus.bg, color: curStatus.color }}>{curStatus.label}</span>
-          {isDirty && <span style={{ fontSize: 11.5, fontWeight: 600, color: '#D97706', padding: '3px 10px', borderRadius: 8, background: 'rgba(217,119,6,0.1)' }}>Есть изменения</span>}
+          {isDirty && <span style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--fg-d97706)', padding: '3px 10px', borderRadius: 8, background: 'rgba(var(--rgb-217-119-6), 0.1)' }}>Есть изменения</span>}
           <div style={{ flex: 1 }} />
-          {saveErr && <span style={{ fontSize: 12, color: '#C81923', fontWeight: 600, flexShrink: 0 }}>Ошибка</span>}
+          {saveErr && <span style={{ fontSize: 12, color: 'var(--fg-c81923)', fontWeight: 600, flexShrink: 0 }}>Ошибка</span>}
           <button onClick={handleSave} disabled={!isDirty || saving} style={{
             padding: '11px 26px', borderRadius: 12, cursor: isDirty ? 'pointer' : 'default',
-            border: `1px solid ${savedOk ? 'rgba(30,158,90,0.35)' : isDirty ? 'rgba(19,102,240,0.35)' : 'rgba(255,255,255,calc(0.2 * var(--rim-k)))'}`,
-            background: savedOk ? 'rgba(30,158,90,0.15)' : isDirty ? 'rgba(19,102,240,0.15)' : 'rgba(var(--paper-rgb), 0.07)',
+            border: `1px solid ${savedOk ? 'rgba(var(--rgb-30-158-90), 0.35)' : isDirty ? 'rgba(var(--rgb-19-102-240), 0.35)' : 'rgba(255,255,255,calc(0.2 * var(--rim-k)))'}`,
+            background: savedOk ? 'rgba(var(--rgb-30-158-90), 0.15)' : isDirty ? 'rgba(var(--rgb-19-102-240), 0.15)' : 'rgba(var(--paper-rgb), 0.07)',
             backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-            color: savedOk ? '#1E9E5A' : isDirty ? '#1366F0' : 'var(--text-tertiary)',
+            color: savedOk ? 'var(--fg-1e9e5a)' : isDirty ? 'var(--fg-1366f0)' : 'var(--text-tertiary)',
             fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14,
             display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0, transition: 'all 0.25s',
           }}>
@@ -807,7 +807,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
             {saving ? 'Сохранение...' : savedOk ? 'Сохранено' : 'Сохранить'}
           </button>
           {onEdit && (
-            <button onClick={() => onEdit(order)} style={{ padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0, background: 'rgba(19,102,240,0.08)', color: '#1366F0', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <button onClick={() => onEdit(order)} style={{ padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0, background: 'rgba(var(--rgb-19-102-240), 0.08)', color: 'var(--fg-1366f0)', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
               Редактировать
             </button>
@@ -816,7 +816,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             {duplicating ? '...' : 'Дублировать'}
           </button>
-          <button onClick={handleDelete} style={{ padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0, background: 'rgba(200,25,35,0.1)', color: '#C81923', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button onClick={handleDelete} style={{ padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer', flexShrink: 0, background: 'rgba(var(--rgb-200-25-35), 0.1)', color: 'var(--fg-c81923)', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /></svg>
             Удалить
           </button>
@@ -881,7 +881,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
                     fontSize: 13, fontWeight: 600,
                     background: view.status === s.id ? s.bg : 'rgba(var(--ink-rgb), 0.04)',
                     color: view.status === s.id ? s.color : 'var(--text-3)',
-                    border: `1.5px solid ${view.status === s.id ? s.color + '50' : 'rgba(var(--ink-rgb), 0.08)'}`,
+                    border: `1.5px solid ${view.status === s.id ? `color-mix(in srgb, ${s.color} 31%, transparent)` : 'rgba(var(--ink-rgb), 0.08)'}`,
                     transition: 'all 0.2s',
                   }}
                   onPointerEnter={mouseOnly(e => { if (view.status !== s.id) { e.currentTarget.style.background = s.bg; e.currentTarget.style.color = s.color } })}
@@ -924,8 +924,8 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '12px 14px', borderRadius: 12, cursor: 'pointer',
-                      background: isDone ? 'rgba(30,158,90,0.06)' : 'rgba(var(--ink-rgb), 0.03)',
-                      border: `1px solid ${isDone ? 'rgba(30,158,90,0.2)' : 'rgba(var(--ink-rgb), 0.07)'}`,
+                      background: isDone ? 'rgba(var(--rgb-30-158-90), 0.06)' : 'rgba(var(--ink-rgb), 0.03)',
+                      border: `1px solid ${isDone ? 'rgba(var(--rgb-30-158-90), 0.2)' : 'rgba(var(--ink-rgb), 0.07)'}`,
                       transition: 'all 0.2s', userSelect: 'none', WebkitUserSelect: 'none',
                     }}
                     onPointerEnter={mouseOnly(e => { if (!isDone) e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.06)' })}
@@ -933,23 +933,23 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
                   >
                     <div style={{
                       width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
-                      background: isDone ? '#1E9E5A' : 'transparent',
-                      border: `2px solid ${isDone ? '#1E9E5A' : 'var(--text-quaternary)'}`,
+                      background: isDone ? 'var(--fg-1e9e5a)' : 'transparent',
+                      border: `2px solid ${isDone ? 'var(--fg-1e9e5a)' : 'var(--text-quaternary)'}`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       transition: 'all 0.2s',
                     }}>
                       <SuccessCheck show={isDone} size={10} strokeWidth={3.5} />
                     </div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: 500, color: isDone ? '#1E9E5A' : 'var(--ink)' }}>{step.label}</div>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: isDone ? 'var(--fg-1e9e5a)' : 'var(--ink)' }}>{step.label}</div>
                       {isDone && date && (
-                        <div style={{ fontSize: 11, color: '#1E9E5A', marginTop: 2 }}>
+                        <div style={{ fontSize: 11, color: 'var(--fg-1e9e5a)', marginTop: 2 }}>
                           {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })} в{' '}
                           {new Date(date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       )}
                       {isCarrierDocs && view.carrier_act_number && (
-                        <div style={{ fontSize: 11.5, color: '#1E9E5A', fontWeight: 700, marginTop: 2 }}>
+                        <div style={{ fontSize: 11.5, color: 'var(--fg-1e9e5a)', fontWeight: 700, marginTop: 2 }}>
                           {String(view.carrier_act_number).trim().toUpperCase() === 'Б/Н'
                             ? 'Акт б/н'
                             : `Акт № ${view.carrier_act_number}`}
@@ -962,7 +962,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
                         </div>
                       )}
                     </div>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: isDone ? '#1E9E5A' : 'var(--text-tertiary)', flexShrink: 0 }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: isDone ? 'var(--fg-1e9e5a)' : 'var(--text-tertiary)', flexShrink: 0 }}>
                       {isDone ? 'готово' : 'ожидание'}
                     </div>
                   </div>
@@ -1055,12 +1055,12 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
                 title="Обновить токен Google (переавторизация) — если генерация документов выдаёт ошибку токена"
                 style={{
                   width: 30, height: 30, borderRadius: 9, border: 'none', cursor: gAuthBusy ? 'default' : 'pointer',
-                  background: 'rgba(217,119,6,0.1)', color: '#D97706',
+                  background: 'rgba(var(--rgb-217-119-6), 0.1)', color: 'var(--fg-d97706)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 6,
                   transition: 'background 0.15s', opacity: gAuthBusy ? 0.6 : 1,
                 }}
-                onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(217,119,6,0.18)')}
-                onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'rgba(217,119,6,0.1)')}
+                onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--rgb-217-119-6), 0.18)')}
+                onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--rgb-217-119-6), 0.1)')}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3" />
@@ -1071,12 +1071,12 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
                 title="Обновить ссылки на документы"
                 style={{
                   width: 30, height: 30, borderRadius: 9, border: 'none', cursor: 'pointer',
-                  background: 'rgba(19,102,240,0.08)', color: '#1366F0',
+                  background: 'rgba(var(--rgb-19-102-240), 0.08)', color: 'var(--fg-1366f0)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'background 0.15s',
                 }}
-                onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.16)')}
-                onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'rgba(19,102,240,0.08)')}
+                onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.16)')}
+                onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.08)')}
               >
                 <svg
                   width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
@@ -1090,9 +1090,9 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
-                { type: 'client',  label: `Заявка-договор ${order.order_number || ''}`, color: '#1366F0', bg: 'rgba(19,102,240,0.1)', url: order.doc_url_client },
-                { type: 'act',     label: 'Акт выполненных работ',  color: '#1E9E5A', bg: 'rgba(30,158,90,0.1)',  url: order.doc_url_act },
-                { type: 'carrier', label: 'Заявка перевозчику',     color: '#D97706', bg: 'rgba(217,119,6,0.1)', url: order.doc_url_carrier },
+                { type: 'client',  label: `Заявка-договор ${order.order_number || ''}`, color: 'var(--fg-1366f0)', bg: 'rgba(var(--rgb-19-102-240), 0.1)', url: order.doc_url_client },
+                { type: 'act',     label: 'Акт выполненных работ',  color: 'var(--fg-1e9e5a)', bg: 'rgba(var(--rgb-30-158-90), 0.1)',  url: order.doc_url_act },
+                { type: 'carrier', label: 'Заявка перевозчику',     color: 'var(--fg-d97706)', bg: 'rgba(var(--rgb-217-119-6), 0.1)', url: order.doc_url_carrier },
               ].map(doc => (
                 <div key={doc.type} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <a href={doc.url || '#'} target={doc.url ? '_blank' : undefined} rel="noopener noreferrer"
