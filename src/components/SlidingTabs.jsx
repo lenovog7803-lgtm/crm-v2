@@ -3,7 +3,7 @@ import { useSpringPill } from '../hooks/useSpringPill'
 
 // Переключатель-сегменты в стиле iOS 26: стеклянная дорожка и «капля» liquid glass,
 // которая перетекает к выбранной вкладке на пружине и растягивается по скорости.
-export function SlidingTabs({ options, value, onChange, pillColor, activeColor = 'var(--fg-1366f0)', inactiveColor = '#5A6573', fontSize = 12.5 }) {
+export function SlidingTabs({ options, value, onChange, pillColor, activeColor = 'var(--fg-1366f0)', inactiveColor = 'var(--text-secondary)', fontSize = 12.5 }) {
   const btnRefs = useRef({})
   const thumbRef = useRef(null)
   const [rect, setRect] = useState(null)

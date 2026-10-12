@@ -313,7 +313,7 @@ export default function Finance({ refreshKey }) {
             <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
               <button type="submit" disabled={addLoading} style={{
                 padding: '8px 20px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                background: '#0E1726', color: '#fff',
+                background: 'var(--chip-strong)', color: '#fff',
                 fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600,
               }}>{addLoading ? 'Сохранение...' : 'Добавить платёж'}</button>
               <button type="button" onClick={() => setShowAdd(false)} style={{

@@ -39,7 +39,7 @@ export default function ScriptPanel({ stage }) {
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
       }}>
         <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13, color: 'var(--text-secondary)' }}>Показать скрипт</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A93A0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="9 18 15 12 9 6" />
         </svg>
       </button>

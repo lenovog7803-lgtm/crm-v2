@@ -32,7 +32,7 @@ export default function LeaderboardView() {
           <button key={p.id} onClick={() => setPeriod(p.id)} style={{
             padding: '7px 16px', borderRadius: 99, border: 'none', cursor: 'pointer',
             fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
-            background: period === p.id ? '#0E1726' : 'rgba(var(--ink-rgb), 0.06)',
+            background: period === p.id ? 'var(--chip-strong)' : 'rgba(var(--ink-rgb), 0.06)',
             color: period === p.id ? '#fff' : 'var(--text-secondary)',
           }}>{p.label}</button>
         ))}

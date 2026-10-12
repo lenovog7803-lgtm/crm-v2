@@ -281,7 +281,7 @@ export default function ClientDetail({ clientId, onMeta, onBack, onDelete, onOpe
                     fontSize: 11, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4,
                   }}><StatusOrb status={o.status} scale={0.7} />{statusLabel(o.status)}</span>
                   {onOpenOrder && (
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A6AEB8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                       <polyline points="9 18 15 12 9 6"/>
                     </svg>
                   )}

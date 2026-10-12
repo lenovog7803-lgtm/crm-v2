@@ -45,7 +45,7 @@ function rowTitle(r) {
 
 // Same stat-tile pattern as the dashboard KPI grid — label + big number on a
 // tinted background.
-function Stat({ label, value, color = '#0E1726', bg = 'rgba(14,23,38,0.06)', sub }) {
+function Stat({ label, value, color = 'var(--ink)', bg = 'rgba(var(--ink-rgb), 0.06)', sub }) {
   return (
     <div style={{ minWidth: 0 }}>
       <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: 6 }}>{label}</div>
@@ -93,7 +93,7 @@ function LegList({ title, items }) {
 
 // «Пришло от клиентов» / «Ушло перевозчикам» — живые деньги за период из
 // журналов ПП. В Telegram список режется до 15, в интерфейсе — целиком.
-function MoneyList({ title, items, accent = '#0E1726' }) {
+function MoneyList({ title, items, accent = 'var(--ink)' }) {
   const total = items.reduce((s, row) => s + (Number(row[1]) || 0), 0)
   return (
     <div>
@@ -165,7 +165,7 @@ function ReportBody({ r }) {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 18 }}>
             <Stat label="Строк дохода в книге" value={int(r.kudir_rows_count)} color="var(--fg-1366f0)" bg="rgba(var(--rgb-19-102-240), 0.08)" sub="за период" />
-            <Stat label="Доход по книге (графа 4)" value={money(r.kudir_income)} color="#0E1726" />
+            <Stat label="Доход по книге (графа 4)" value={money(r.kudir_income)} color="var(--ink)" />
             <Stat label={`Налог к уплате (${Math.round((r.tax_rate ?? 0.2) * 100)}%)`} value={money(r.kudir_tax)} color="var(--fg-e0473b)" bg="rgba(var(--rgb-224-71-59), 0.08)" />
           </div>
         </div>
@@ -335,7 +335,7 @@ export default function Reports() {
           <button
             onClick={runNow}
             disabled={running}
-            style={{ padding: '7px 15px', borderRadius: 99, border: 'none', cursor: running ? 'default' : 'pointer', fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600, background: '#0E1726', color: '#fff', opacity: running ? 0.6 : 1, whiteSpace: 'nowrap' }}
+            style={{ padding: '7px 15px', borderRadius: 99, border: 'none', cursor: running ? 'default' : 'pointer', fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600, background: 'var(--chip-strong)', color: '#fff', opacity: running ? 0.6 : 1, whiteSpace: 'nowrap' }}
           >
             {running ? '…' : 'Сформировать сейчас'}
           </button>

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { prefersReducedMotion } from '../motion'
 
-export function CircularProgress({ pct, color, size = 56, stroke = 6, duration = 800, track = 'rgba(14,23,38,0.07)' }) {
+export function CircularProgress({ pct, color, size = 56, stroke = 6, duration = 800, track = 'rgba(var(--ink-rgb), 0.07)' }) {
   const [display, setDisplay] = useState(0)
   const startRef = useRef(null)
   const fromRef = useRef(0)

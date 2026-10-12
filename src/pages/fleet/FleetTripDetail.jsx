@@ -39,7 +39,7 @@ function niceInput(props) {
   return <input {...props} style={{ ...fieldStyle, width: '100%', ...(props.style || {}) }} />
 }
 
-const stat = (label, value, color = '#0E1726') => (
+const stat = (label, value, color = 'var(--ink)') => (
   <div style={{ background: 'rgba(var(--ink-rgb), 0.03)', borderRadius: 12, padding: '10px 14px', minWidth: 0 }}>
     <div style={{ fontSize: 10.5, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: 4 }}>{label}</div>
     <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 15, color }}>{value}</div>
@@ -144,7 +144,7 @@ function TripInfoCard({ trip, revenue, finance, onSave, onReload }) {
         onClick={() => setOpen(o => !o)}
         style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 18px', cursor: 'pointer', background: open ? 'rgba(var(--ink-rgb), 0.03)' : 'transparent' }}
       >
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8A93A0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
           style={{ transform: open ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}>
           <polyline points="9 18 15 12 9 6" />
         </svg>
@@ -403,7 +403,7 @@ function FleetOrderCard({ order, onReload, onOpen }) {
   const paidAmt = order.paid_amount ?? (order.paid ? rate : 0)
   const payState = order.paid ? { t: 'оплачен', c: 'var(--fg-1e9e5a)', bg: 'rgba(var(--rgb-30-158-90), 0.1)' }
     : paidAmt > 0 ? { t: `${paidAmt.toLocaleString('ru-RU')} из ${rate.toLocaleString('ru-RU')}`, c: 'var(--fg-d97706)', bg: 'rgba(var(--rgb-217-119-6), 0.1)' }
-    : { t: 'не оплачен', c: '#8A93A0', bg: 'rgba(14,23,38,0.05)' }
+    : { t: 'не оплачен', c: 'var(--text-3)', bg: 'rgba(var(--ink-rgb), 0.05)' }
   return (
     <div
       onClick={() => onOpen?.(order.id)}

@@ -29,16 +29,16 @@ import SearchField from '../components/SearchField'
 // контакты; почтовые ящики — подключение, подпись, лимиты и разгон.
 
 const STATUS = {
-  new: { label: 'Новый', color: 'var(--text-secondary)', bg: 'rgba(14,23,38,0.06)' },
+  new: { label: 'Новый', color: 'var(--text-secondary)', bg: 'rgba(var(--ink-rgb), 0.06)' },
   sent: { label: 'Отправлено', color: 'var(--fg-1366f0)', bg: 'rgba(var(--rgb-19-102-240), 0.08)' },
   followup: { label: 'Напоминание', color: 'var(--fg-7c3aed)', bg: 'rgba(var(--rgb-124-58-237), 0.08)' },
   replied: { label: 'Ответил', color: 'var(--fg-0e9f6e)', bg: 'rgba(14,159,110,0.1)' },
   interested: { label: 'Интерес', color: 'var(--fg-0e9f6e)', bg: 'rgba(14,159,110,0.16)' },
-  refused: { label: 'Отказ', color: 'var(--text-3)', bg: 'rgba(14,23,38,0.05)' },
+  refused: { label: 'Отказ', color: 'var(--text-3)', bg: 'rgba(var(--ink-rgb), 0.05)' },
   deal: { label: 'Сделка', color: 'var(--fg-047857)', bg: 'rgba(4,120,87,0.16)' },
   bounce: { label: 'Возврат', color: 'var(--fg-e0473b)', bg: 'rgba(var(--rgb-224-71-59), 0.1)' },
   error: { label: 'Ошибка', color: 'var(--fg-e0473b)', bg: 'rgba(var(--rgb-224-71-59), 0.1)' },
-  skip: { label: 'Пропуск', color: 'var(--text-tertiary)', bg: 'rgba(14,23,38,0.04)' },
+  skip: { label: 'Пропуск', color: 'var(--text-tertiary)', bg: 'rgba(var(--ink-rgb), 0.04)' },
 }
 
 const tabsWith = (newReplies, withSuppliers) => [
@@ -157,7 +157,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
   const kpis = [
     { label: 'В очереди', value: state.queue_new || 0, hint: state.queue_follow ? `+${state.queue_follow} напоминаний` : 'новых адресов', color: 'var(--fg-1366f0)', bg: 'rgba(var(--rgb-19-102-240), 0.08)', group: '' },
     { label: 'Ждём ответа', value: groups.waiting || 0, hint: 'письмо дошло', color: 'var(--fg-7c3aed)', bg: 'rgba(var(--rgb-124-58-237), 0.08)', group: 'waiting' },
-    { label: 'Молчат', value: groups.silent || 0, hint: 'после напоминания', color: 'var(--text-3)', bg: 'rgba(14,23,38,0.05)', group: 'silent' },
+    { label: 'Молчат', value: groups.silent || 0, hint: 'после напоминания', color: 'var(--text-3)', bg: 'rgba(var(--ink-rgb), 0.05)', group: 'silent' },
     { label: 'Не дошло', value: groups.failed || 0, hint: 'возвраты и ошибки', color: 'var(--fg-e0473b)', bg: 'rgba(var(--rgb-224-71-59), 0.08)', group: 'failed' },
   ]
   const log = state.log || []
@@ -227,7 +227,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
         {/* Ответили */}
         <div onClick={onGoReplies} className="ios-widget" style={{ ...heroBase, cursor: 'pointer', padding: isMobile ? '16px 18px' : '26px 24px' }}>
           <div className="grad-kicker" style={{ color: 'var(--fg-1e9e5a)' }}>Ответили</div>
-          <div style={bigNum('#0E1726', isMobile ? 28 : 34)}><PopNumber value={answered} /></div>
+          <div style={bigNum('var(--ink)', isMobile ? 28 : 34)}><PopNumber value={answered} /></div>
           <div style={{ fontSize: 12, color: 'var(--fg-1e9e5a)', marginTop: 6 }}>{replyPct}% от отправленных</div>
           <div style={{ marginTop: 14, fontSize: 12.5, color: 'var(--ink)', fontWeight: 700 }}>
             {state.replies_new ? `🔔 ${state.replies_new} новых — разобрать →` : 'Все ответы →'}
@@ -238,7 +238,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
         <div className="ios-widget" style={{ ...heroBase, padding: isMobile ? '16px 18px' : '26px 24px' }}>
           <div className="grad-kicker" style={{ color: healthColor }}>{multi ? `Здоровье почт · ${boxes.length}` : `Здоровье ящика${boxes[0]?.login ? ` · ${boxes[0].login}` : ''}`}</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={bigNum('#0E1726', isMobile ? 28 : 34)}>{bounceRate}%</span>
+            <span style={bigNum('var(--ink)', isMobile ? 28 : 34)}>{bounceRate}%</span>
             <span style={{ fontSize: 12, color: 'var(--text-2b)', fontWeight: 600 }}>возвратов</span>
           </div>
           <div style={{ fontSize: 12, color: 'var(--text-2b)', marginTop: 6 }}>{bounced7} из {sent7} за 7 дней · норма до 4%</div>
@@ -1265,7 +1265,7 @@ const SUP_STAGES = {
   interested: { label: 'Интерес', color: 'var(--fg-0e9f6e)', bg: 'rgba(14,159,110,0.12)' },
   negotiation: { label: 'Переговоры', color: 'var(--fg-7c3aed)', bg: 'rgba(var(--rgb-124-58-237), 0.1)' },
   deal: { label: 'Работаем', color: 'var(--fg-047857)', bg: 'rgba(4,120,87,0.16)' },
-  refused: { label: 'Отказ', color: 'var(--text-3)', bg: 'rgba(14,23,38,0.05)' },
+  refused: { label: 'Отказ', color: 'var(--text-3)', bg: 'rgba(var(--ink-rgb), 0.05)' },
 }
 
 function SupplierCard({ s, onChange, onRemove }) {

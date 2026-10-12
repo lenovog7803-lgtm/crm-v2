@@ -468,7 +468,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                       borderBottom: i < filtered.length - 1 ? '0.5px solid rgba(var(--ink-rgb), 0.1)' : 'none',
                       background: isFlash ? 'rgba(var(--rgb-19-102-240), 0.14)' : (isSelected ? 'rgba(var(--rgb-19-102-240), 0.12)' : (flagged ? 'rgba(var(--rgb-200-25-35), 0.03)' : 'transparent')),
                       cursor: 'pointer',
-                      WebkitTapHighlightColor: 'rgba(14,23,38,0.06)',
+                      WebkitTapHighlightColor: 'rgba(var(--ink-rgb), 0.06)',
                       touchAction: 'pan-y',
                       opacity: isRemoving ? 0 : 1,
                       transform: isRemoving ? `translateX(${dx}px) scale(0.95)` : `translateX(${dx}px)`,
@@ -529,7 +529,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                         </div>
                       </div>
                       <svg width="8" height="13" viewBox="0 0 8 13" fill="none">
-                        <path d="M1 1.5L6.5 7L1 12.5" stroke="#C4CAD4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M1 1.5L6.5 7L1 12.5" stroke="var(--text-quaternary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </div>
                   </div>

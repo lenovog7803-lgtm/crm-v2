@@ -15,7 +15,7 @@ const PERIODS = [
 
 const fmt = (n) => new Intl.NumberFormat('ru-RU').format(Math.round(n || 0))
 
-function StatCard({ label, value, color = '#0E1726' }) {
+function StatCard({ label, value, color = 'var(--ink)' }) {
   return (
     <div className="card" style={{ padding: 18 }}>
       <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: 6 }}>{label}</div>

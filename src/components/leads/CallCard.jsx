@@ -70,10 +70,10 @@ export default function CallCard({ lead, onEdit, part }) {
 
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <span style={chip(stage.bg, stage.color)}>{stage.label}</span>
-        {cadenceStep > 0 && <span style={chip('rgba(14,23,38,0.06)', '#5A6573')}>шаг каденции {cadenceStep} из 5</span>}
+        {cadenceStep > 0 && <span style={chip('rgba(var(--ink-rgb), 0.06)', 'var(--text-secondary)')}>шаг каденции {cadenceStep} из 5</span>}
         {lead.industry && <span style={chip('rgba(var(--rgb-244-122-31), 0.1)', 'var(--fg-f47a1f)')}>{lead.industry}</span>}
-        {lead.city && <span style={chip('rgba(14,23,38,0.06)', '#5A6573')}>{lead.city}</span>}
-        {lead.region && <span style={chip('rgba(14,23,38,0.06)', '#5A6573')}>{lead.region}</span>}
+        {lead.city && <span style={chip('rgba(var(--ink-rgb), 0.06)', 'var(--text-secondary)')}>{lead.city}</span>}
+        {lead.region && <span style={chip('rgba(var(--ink-rgb), 0.06)', 'var(--text-secondary)')}>{lead.region}</span>}
         {attempts > 0 && <span style={chip('rgba(var(--rgb-217-119-6), 0.12)', 'var(--fg-d97706)')}>попыток дозвона: {attempts}</span>}
       </div>
 
@@ -139,7 +139,7 @@ export default function CallCard({ lead, onEdit, part }) {
                 <div style={{
                   width: 28, height: 28, borderRadius: 9, flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: `color-mix(in srgb, ${(o?.color || '#8A93A0')} 10%, transparent)`, color: o?.color || 'var(--text-3)',
+                  background: `color-mix(in srgb, ${(o?.color || 'var(--text-3)')} 10%, transparent)`, color: o?.color || 'var(--text-3)',
                 }}><OutcomeIcon id={o?.id || 'reached'} size={12} /></div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 11, color: o?.color || 'var(--text-3)', fontWeight: 700 }}>

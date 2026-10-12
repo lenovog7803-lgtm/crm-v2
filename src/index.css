@@ -28,6 +28,7 @@
   --line: #E8EAEE; --fill-2: #F0F1F4; --fill: #F7F8FA; --bg: #EDEFF3; --surface: #FFFFFF;
   --paper-rgb: 255,255,255; --sep-rgb: 60,60,67;
   --rim-k: 1;  /* сила белых бликов стекла */
+  --chip-strong: #0E1726;  /* выбранная тёмная плашка с белым текстом */
   color-scheme: light;
 }
 /* аватарки */
@@ -43,6 +44,7 @@
   --line: #2B2D32; --fill-2: #26282C; --fill: #1F2124; --bg: #111214; --surface: #1A1B1E;
   --paper-rgb: 30,31,34; --sep-rgb: 235,235,245;
   --rim-k: 0.07;
+  --chip-strong: #3A3D44;
   color-scheme: dark;
 }
 /* тёмная тема: стекло — ровная заливка и одна тонкая граница вместо бликов */

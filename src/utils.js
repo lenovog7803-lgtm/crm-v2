@@ -42,14 +42,14 @@ export const statusLabel = s => ({
 }[s] || s)
 
 export const statusColor = s => ({
-  new: '#8A93A0', in_progress: 'var(--fg-d97706)', active: 'var(--fg-1366f0)',
+  new: 'var(--text-3)', in_progress: 'var(--fg-d97706)', active: 'var(--fg-1366f0)',
   delivered: 'var(--fg-1e9e5a)', done: 'var(--fg-1e9e5a)', cancelled: 'var(--fg-c81923)',
-}[s] || '#8A93A0')
+}[s] || 'var(--text-3)')
 
 export const statusBg = s => ({
   new: 'rgba(138,147,160,0.1)', in_progress: 'rgba(var(--rgb-217-119-6), 0.1)', active: 'rgba(var(--rgb-19-102-240), 0.1)',
   delivered: 'rgba(var(--rgb-30-158-90), 0.1)', done: 'rgba(var(--rgb-30-158-90), 0.1)', cancelled: 'rgba(var(--rgb-200-25-35), 0.1)',
-}[s] || 'rgba(14,23,38,0.05)')
+}[s] || 'rgba(var(--ink-rgb), 0.05)')
 
 // Deterministic avatar gradient from any string (name, id, etc.)
 // цвета — в index.css (--av-N-a/b): в тёмной теме приглушённые пастельные

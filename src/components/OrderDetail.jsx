@@ -170,7 +170,7 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
   // untouched order, hiding a real payment and inviting a duplicate transfer.
   const enteredTotal = payments.reduce((s, p) => s + (Number(p.amount) || 0), 0)
   const hasUnmatchedPayment = hasUnreconciledPayment(order, type)
-  const accent = isPaid ? 'var(--fg-1e9e5a)' : hasUnmatchedPayment ? 'var(--fg-d97706)' : (isCarrier ? 'var(--fg-e0473b)' : '#0E1726')
+  const accent = isPaid ? 'var(--fg-1e9e5a)' : hasUnmatchedPayment ? 'var(--fg-d97706)' : (isCarrier ? 'var(--fg-e0473b)' : 'var(--ink)')
 
   // Long press (2s) opens the PP editor regardless of paid state; a plain
   // tap keeps its existing meaning (mark / unmark). longPressFired guards
@@ -219,7 +219,7 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
           ? (isCarrier ? '2px solid rgba(var(--rgb-30-158-90), 0.28)' : '1px solid rgba(var(--rgb-30-158-90), 0.25)')
           : hasUnmatchedPayment
             ? '2px solid rgba(var(--rgb-217-119-6), 0.4)'
-            : (isCarrier ? '2px solid rgba(var(--rgb-224-71-59), 0.35)' : '1px solid rgba(14,23,38,0.08)'),
+            : (isCarrier ? '2px solid rgba(var(--rgb-224-71-59), 0.35)' : '1px solid rgba(var(--ink-rgb), 0.08)'),
         transition: 'all 0.2s',
         userSelect: 'none', WebkitUserSelect: 'none',
       }}

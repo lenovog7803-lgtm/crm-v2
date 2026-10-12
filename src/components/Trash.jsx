@@ -81,7 +81,7 @@ export default function Trash() {
   const chipStyle = (k) => ({
     padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer',
     fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
-    background: filter === k ? '#0E1726' : 'rgba(var(--ink-rgb), 0.06)',
+    background: filter === k ? 'var(--chip-strong)' : 'rgba(var(--ink-rgb), 0.06)',
     color: filter === k ? '#fff' : 'var(--text-secondary)',
   })
 

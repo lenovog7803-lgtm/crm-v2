@@ -11,7 +11,7 @@ import { EmptyState } from './EmptyState'
 import { useChangeFlash } from '../hooks/useChangeFlash'
 import DateInput from './DateInput'
 
-const TYPE_COLORS = { call: 'var(--fg-1366f0)', reminder: 'var(--fg-d97706)', payment: 'var(--fg-1e9e5a)', other: '#8A93A0' }
+const TYPE_COLORS = { call: 'var(--fg-1366f0)', reminder: 'var(--fg-d97706)', payment: 'var(--fg-1e9e5a)', other: 'var(--text-3)' }
 const TYPE_BG = { call: 'rgba(var(--rgb-19-102-240), 0.1)', reminder: 'rgba(var(--rgb-217-119-6), 0.1)', payment: 'rgba(var(--rgb-30-158-90), 0.1)', other: 'rgba(138,147,160,0.1)' }
 const TYPE_LABELS = { call: 'Звонок', reminder: 'Напоминание', payment: 'Оплата', other: 'Прочее' }
 

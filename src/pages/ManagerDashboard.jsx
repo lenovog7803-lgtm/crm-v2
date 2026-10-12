@@ -11,7 +11,7 @@ const fmtMonth = m => {
   return `${MONTH_RU_SHORT[parseInt(mo) - 1]} ${y}`
 }
 
-function StatCard({ label, value, color = '#0E1726', format }) {
+function StatCard({ label, value, color = 'var(--ink)', format }) {
   return (
     <div className="card" style={{ padding: 18 }}>
       <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: 6 }}>{label}</div>
