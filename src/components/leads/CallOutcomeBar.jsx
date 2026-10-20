@@ -7,7 +7,7 @@ import DateInput from '../DateInput'
 
 const labelStyle = { fontSize: 13, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.01em', marginBottom: 10, display: 'block' }
 
-export default function CallOutcomeBar({ lead, onSave, saving, columns = 4 }) {
+export default function CallOutcomeBar({ lead, onSave, saving, columns = 3 }) {
   const [outcome, setOutcome] = useState(null)
   const [comment, setComment] = useState('')
   const [lostReason, setLostReason] = useState('')
@@ -89,11 +89,11 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 4 }) {
 
       {outcome && outcome !== 'no_answer' && (
         <div style={{ marginBottom: 16 }}>
-          <span style={labelStyle}>Комментарий после звонка *</span>
+          <span style={labelStyle}>Комментарий после звонка{cfg?.needsComment ? ' *' : ''}</span>
           <textarea
             value={comment}
             onChange={e => { setComment(e.target.value); setError('') }}
-            placeholder="О чём говорили, что решили…"
+            placeholder={cfg?.needsComment ? 'О чём говорили, что решили…' : 'Необязательно: когда удобно, что сказали…'}
             autoFocus
             style={{ width: '100%', minHeight: 70, padding: '11px 13px', borderRadius: 12, border: '1px solid rgba(var(--ink-rgb), 0.12)', background: 'var(--fill)', fontSize: 13, fontFamily: 'var(--font-sys)', color: 'var(--ink)', resize: 'vertical', boxSizing: 'border-box' }}
           />

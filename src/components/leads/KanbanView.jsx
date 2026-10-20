@@ -1,96 +1,101 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { getLeads, updateLead, logCall, claimLead } from '../../api'
+import { getLeads, updateLead, logCall, claimLead, getAllUsers } from '../../api'
 import { useRealtime } from '../../hooks/useRealtime'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
-import { STAGES } from '../../constants/leads'
+import { STAGES, stageOf } from '../../constants/leads'
 import LeadEditModal from './LeadEditModal'
 import { useCelebration } from '../Celebration'
 import { useAuth } from '../../AuthContext'
-import { mouseOnly } from '../../motion'
 import { Loader } from '../Loader'
+import { initials, getGradient } from '../../utils'
 import CallWindow from './CallWindow'
 
 const PAGE_SIZE = 10
+const CARD_W = 248
 
-function KanbanColumn({ stage, items, dragId, overStage, onDragStart, onDragOver, onDragLeave, onDrop, onOpenLead, onClaim }) {
+const dayLabel = (iso) => new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }).replace('.', '')
+
+// Карточка лида. Сама не двигается: при перетаскивании её копия едет за курсором (Board), а здесь — бледный след
+function LeadCard({ lead, users, ghost, lifted, onPointerDown, onClaim }) {
+  const manager = users[lead.assigned_to]
+  const [a, b] = getGradient(manager || lead.assigned_to || '')
+  const overdue = lead.next_call && new Date(lead.next_call) < new Date()
+  return (
+    <div
+      onPointerDown={onPointerDown}
+      className="kanban-card"
+      style={{
+        padding: '12px 13px', borderRadius: 16, background: 'var(--surface)', cursor: lifted ? 'grabbing' : 'grab',
+        border: '1px solid rgba(var(--ink-rgb), 0.07)', userSelect: 'none', WebkitUserSelect: 'none', touchAction: 'manipulation',
+        opacity: ghost ? 0.35 : 1,
+        boxShadow: lifted ? '0 24px 48px -16px rgba(20,30,55,0.45), 0 0 0 1px rgba(var(--rgb-19-102-240), 0.25)' : '0 1px 2px rgba(20,30,55,0.06)',
+        transition: lifted ? 'none' : 'opacity .15s var(--ease), box-shadow .15s var(--ease)',
+      }}
+    >
+      {lead.industry && (
+        <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 7, marginBottom: 7, fontSize: 10.5, fontWeight: 600, color: 'var(--fg-1366f0)', background: 'rgba(var(--rgb-19-102-240), 0.09)' }}>{lead.industry}</span>
+      )}
+      <div style={{ fontSize: 13.5, fontWeight: 650, color: 'var(--ink)', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.name}</div>
+      {lead.phone && <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-tertiary)', marginTop: 3 }}>{lead.phone}</div>}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
+        {lead.assigned_to ? (
+          <span title={manager || 'Менеджер'} style={{ width: 22, height: 22, borderRadius: 11, flexShrink: 0, display: 'grid', placeItems: 'center', fontSize: 9.5, fontWeight: 700, color: '#fff', background: `linear-gradient(135deg, ${a}, ${b})` }}>
+            {initials(manager || '?')}
+          </span>
+        ) : (
+          <button
+            onPointerDown={e => e.stopPropagation()}
+            onClick={e => { e.stopPropagation(); onClaim(lead.id) }}
+            style={{ padding: '4px 10px', borderRadius: 99, border: 'none', cursor: 'pointer', background: 'rgba(var(--rgb-19-102-240), 0.1)', color: 'var(--fg-1366f0)', fontSize: 11.5, fontWeight: 600 }}
+          >Взять</button>
+        )}
+        {lead.next_call && (
+          <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 500, color: overdue ? 'var(--fg-e0473b)' : 'var(--text-tertiary)' }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><rect x="3" y="5" width="18" height="16" rx="3" /><path d="M16 3v4M8 3v4M3 10h18" /></svg>
+            {dayLabel(lead.next_call)}
+          </span>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function Column({ stage, items, users, drag, over, onCardDown, onClaim }) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const listRef = useRef(null)
-
-  const sorted = useMemo(() => {
-    return [...items].sort((a, b) => {
-      const da = new Date(a.stage_changed_at || a.updated_at || a.created_at || 0).getTime()
-      const db = new Date(b.stage_changed_at || b.updated_at || b.created_at || 0).getTime()
-      return db - da
-    })
-  }, [items])
-
-  useEffect(() => { setVisibleCount(PAGE_SIZE) }, [stage.id])
-
+  const sorted = useMemo(() => [...items].sort((x, y) =>
+    new Date(y.stage_changed_at || y.updated_at || y.created_at || 0) - new Date(x.stage_changed_at || x.updated_at || x.created_at || 0)), [items])
   const visible = sorted.slice(0, visibleCount)
+  const isOver = over === stage.id && drag && drag.from !== stage.id
 
-  const handleScroll = () => {
+  const onScroll = () => {
     const el = listRef.current
-    if (!el) return
-    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 40) {
-      setVisibleCount(prev => Math.min(prev + PAGE_SIZE, sorted.length))
-    }
+    if (el && el.scrollTop + el.clientHeight >= el.scrollHeight - 40) setVisibleCount(c => Math.min(c + PAGE_SIZE, sorted.length))
   }
 
   return (
-    <div
-      onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
-      onDrop={onDrop}
-      style={{ minWidth: 240, width: 240, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 10 }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 4px' }}>
+    <div data-stage={stage.id} style={{
+      width: CARD_W + 20, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 10, padding: 10, borderRadius: 20,
+      background: isOver ? 'rgba(var(--rgb-19-102-240), 0.07)' : 'rgba(var(--ink-rgb), 0.035)',
+      boxShadow: isOver ? 'inset 0 0 0 1.5px rgba(var(--rgb-19-102-240), 0.35)' : 'none',
+      transition: 'background .15s var(--ease), box-shadow .15s var(--ease)',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '2px 4px' }}>
         <span style={{ width: 8, height: 8, borderRadius: 4, background: stage.color, flexShrink: 0 }} />
-        <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 12.5, color: 'var(--ink)' }}>{stage.label}</span>
-        <span style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginLeft: 'auto' }}>{sorted.length}</span>
+        <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 13, color: 'var(--ink)' }}>{stage.label}</span>
+        <span style={{ marginLeft: 2, minWidth: 20, padding: '1px 7px', borderRadius: 99, textAlign: 'center', fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)', background: 'rgba(var(--ink-rgb), 0.06)' }}>{sorted.length}</span>
       </div>
-      <div
-        ref={listRef}
-        onScroll={handleScroll}
-        className="card"
-        style={{
-          padding: 8, minHeight: 100, maxHeight: 560, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8,
-          background: overStage === stage.id ? 'rgba(var(--rgb-19-102-240), 0.06)' : undefined,
-          border: overStage === stage.id ? '1.5px dashed rgba(var(--rgb-19-102-240), 0.4)' : undefined,
-        }}
-      >
+      <div ref={listRef} onScroll={onScroll} style={{ display: 'flex', flexDirection: 'column', gap: 8, minHeight: 90, maxHeight: 580, overflowY: 'auto', padding: 2 }}>
+        {isOver && (   // куда ляжет карточка
+          <div style={{ height: drag.h, flexShrink: 0, borderRadius: 16, border: '1.5px dashed rgba(var(--rgb-19-102-240), 0.45)', background: 'rgba(var(--rgb-19-102-240), 0.05)' }} />
+        )}
         {visible.map(l => (
-          <div
-            key={l.id}
-            draggable
-            onDragStart={() => onDragStart(l.id)}
-            onClick={() => onOpenLead(l)}
-            onPointerEnter={mouseOnly(e => { e.currentTarget.style.background = 'var(--surface)'; e.currentTarget.style.borderColor = 'rgba(var(--rgb-19-102-240), 0.3)'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 24px -12px rgba(20,30,55,0.25)' })}
-            onPointerLeave={mouseOnly(e => { e.currentTarget.style.background = 'rgba(var(--paper-rgb), 0.7)'; e.currentTarget.style.borderColor = 'rgba(var(--ink-rgb), 0.08)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' })}
-            style={{
-              padding: '11px 13px', borderRadius: 16, background: 'rgba(var(--paper-rgb), 0.7)',
-              border: '1px solid rgba(var(--ink-rgb), 0.08)', cursor: 'pointer',
-              transition: 'background 0.15s var(--ease), border-color 0.15s var(--ease), transform 0.15s var(--ease), box-shadow 0.15s var(--ease)',
-            }}
-          >
-            <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-1366f0)', marginTop: 3 }}>{l.phone}</div>
-            {l.contact_person && <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>{l.contact_person}</div>}
-            {l.next_call && <div style={{ fontSize: 10.5, color: 'var(--fg-f47a1f)', marginTop: 4 }}>→ {new Date(l.next_call).toLocaleDateString('ru-RU')}</div>}
-            {!l.assigned_to && (
-              <button
-                onClick={e => { e.stopPropagation(); onClaim(l.id) }}
-                style={{ marginTop: 8, width: '100%', padding: '6px 0', borderRadius: 99, border: 'none', cursor: 'pointer', background: 'rgba(var(--rgb-19-102-240), 0.1)', color: 'var(--fg-1366f0)', fontSize: 12, fontWeight: 600 }}
-              >
-                Взять в работу
-              </button>
-            )}
-          </div>
+          <LeadCard key={l.id} lead={l} users={users} ghost={drag?.id === l.id} onPointerDown={e => onCardDown(e, l)} onClaim={onClaim} />
         ))}
         {visibleCount < sorted.length && (
-          <div style={{ textAlign: 'center', padding: 10, fontSize: 11, color: 'var(--text-3)' }}>
-            ещё {sorted.length - visibleCount}, докрутите вниз
-          </div>
+          <div style={{ textAlign: 'center', padding: 8, fontSize: 11, color: 'var(--text-3)' }}>ещё {sorted.length - visibleCount}, докрутите вниз</div>
         )}
+        {!sorted.length && !isOver && <div style={{ textAlign: 'center', padding: '22px 0', fontSize: 11.5, color: 'var(--text-3)' }}>Пусто</div>}
       </div>
     </div>
   )
@@ -100,12 +105,14 @@ export default function KanbanView({ industry }) {
   const { user } = useAuth()
   const myId = user?.user?.id
   const [leads, setLeads] = useState([])
+  const [users, setUsers] = useState({})
   const [loading, setLoading] = useState(true)
-  const [dragId, setDragId] = useState(null)
-  const [overStage, setOverStage] = useState(null)
+  const [drag, setDrag] = useState(null)      // { id, from, x, y, ox, oy, w, h } — карточка, которую несут
+  const [over, setOver] = useState(null)
   const [activeLead, setActiveLead] = useState(null)
   const [editLead, setEditLead] = useState(null)
   const [saving, setSaving] = useState(false)
+  const press = useRef(null)
   const { celebrate } = useCelebration()
   useEscapeKey(() => setActiveLead(null), !!activeLead)
 
@@ -113,27 +120,76 @@ export default function KanbanView({ industry }) {
     if (showLoading) setLoading(true)
     return getLeads({ limit: 3000 }).then(r => setLeads(Array.isArray(r) ? r : (r?.items || []))).catch(console.error).finally(() => setLoading(false))
   }
-
   useEffect(() => { loadLeads() }, [])
-
-  useRealtime((event) => {
-    if (event.type === 'lead_updated') loadLeads(false)
-  })
+  useEffect(() => {   // имена менеджеров для кружков; нет прав на список — будут «?»
+    getAllUsers().then(r => setUsers(Object.fromEntries((r.users || r || []).map(u => [u.id, u.name || u.full_name || u.username])))).catch(() => {})
+  }, [])
+  useRealtime((event) => { if (event.type === 'lead_updated' && !press.current) loadLeads(false) })
 
   const filtered = industry ? leads.filter(l => l.industry === industry) : leads
-  const activeStages = STAGES.filter(s => s.active)
-  const closedStages = STAGES.filter(s => !s.active)
+  const byStage = useMemo(() => {
+    const m = Object.fromEntries(STAGES.map(s => [s.id, []]))
+    for (const l of filtered) (m[stageOf(l)] || m.new).push(l)
+    return m
+  }, [filtered])
 
   const moveTo = async (leadId, stageId) => {
-    setLeads(prev => prev.map(l => l.id === leadId ? { ...l, stage: stageId } : l))
-    try { await updateLead(leadId, { stage: stageId }) } catch (e) { console.error(e) }
+    const now = new Date().toISOString()
+    setLeads(prev => prev.map(l => l.id === leadId ? { ...l, stage: stageId, stage_changed_at: now } : l))
+    try { await updateLead(leadId, { stage: stageId }) } catch (e) { console.error(e); loadLeads(false) }
   }
 
-  const handleDrop = (stageId) => (e) => {
-    e.preventDefault()
-    setOverStage(null)
-    if (dragId) moveTo(dragId, stageId)
-    setDragId(null)
+  // Перетаскивание на указателе (мышь, тачпад, палец): HTML5 drag-and-drop не работает на телефонах
+  // и не даёт «поднятую» карточку. Мышью — после сдвига на 6 px; пальцем — после удержания 0,3 с, иначе это прокрутка.
+  const onCardDown = (e, lead) => {
+    if (e.button !== undefined && e.button !== 0) return
+    const r = e.currentTarget.getBoundingClientRect()
+    const p = { lead, from: stageOf(lead), x0: e.clientX, y0: e.clientY, ox: e.clientX - r.left, oy: e.clientY - r.top, w: r.width, h: r.height, started: false, touch: e.pointerType === 'touch' }
+    press.current = p
+    if (p.touch) p.timer = setTimeout(() => start(p, p.x0, p.y0), 300)
+
+    function start(p, x, y) {
+      p.started = true
+      navigator.vibrate?.(10)
+      setDrag({ id: p.lead.id, from: p.from, x, y, ox: p.ox, oy: p.oy, w: p.w, h: p.h })
+    }
+    const stageAt = (x, y) => document.elementFromPoint(x, y)?.closest('[data-stage]')?.dataset.stage || null
+    const move = (ev) => {
+      const p = press.current
+      if (!p) return
+      const far = Math.hypot(ev.clientX - p.x0, ev.clientY - p.y0) > (p.touch ? 8 : 6)
+      if (!p.started) {
+        if (p.touch) { if (far) cleanup(); return }   // повёл пальцем раньше 0,3 с — это прокрутка
+        if (!far) return
+        start(p, ev.clientX, ev.clientY)
+      }
+      setDrag(d => d && { ...d, x: ev.clientX, y: ev.clientY })
+      setOver(stageAt(ev.clientX, ev.clientY))
+    }
+    const block = (ev) => { if (press.current?.started) ev.preventDefault() }   // пока несём пальцем — страница не едет
+    const up = (ev) => {
+      const p = press.current
+      if (p?.started) {
+        const to = stageAt(ev.clientX, ev.clientY)
+        if (to && to !== p.from) moveTo(p.lead.id, to)
+      } else if (p && ev.type === 'pointerup') {
+        setActiveLead(p.lead)   // просто нажали — открыть звонок
+      }
+      cleanup()
+    }
+    function cleanup() {
+      clearTimeout(press.current?.timer)
+      press.current = null
+      setDrag(null); setOver(null)
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+      window.removeEventListener('pointercancel', up)
+      document.removeEventListener('touchmove', block)
+    }
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
+    window.addEventListener('pointercancel', up)
+    document.addEventListener('touchmove', block, { passive: false })
   }
 
   const handleClaim = async (leadId) => {
@@ -141,8 +197,7 @@ export default function KanbanView({ industry }) {
       await claimLead(leadId)
       setLeads(prev => {
         const next = prev.map(l => l.id === leadId ? { ...l, assigned_to: myId } : l)
-        // Claiming acts like opening the card — jump straight into the call window.
-        setActiveLead(next.find(l => l.id === leadId) || null)
+        setActiveLead(next.find(l => l.id === leadId) || null)   // взял — сразу окно звонка
         return next
       })
     } catch (e) { console.error(e) }
@@ -160,40 +215,30 @@ export default function KanbanView({ industry }) {
     setSaving(false)
   }
 
-  const renderColumn = (stage) => {
-    const items = filtered.filter(l => (l.stage || 'new') === stage.id)
-    return (
-      <KanbanColumn
-        key={stage.id}
-        stage={stage}
-        items={items}
-        dragId={dragId}
-        overStage={overStage}
-        onDragStart={setDragId}
-        onDragOver={e => { e.preventDefault(); setOverStage(stage.id) }}
-        onDragLeave={() => setOverStage(null)}
-        onDrop={handleDrop(stage.id)}
-        onOpenLead={setActiveLead}
-        onClaim={handleClaim}
-      />
-    )
-  }
-
   if (loading) return <Loader padding={40} />
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 8 }}>
-        {activeStages.map(renderColumn)}
-        <div style={{ width: 1, background: 'rgba(var(--ink-rgb), 0.1)', flexShrink: 0 }} />
-        {closedStages.map(renderColumn)}
-      </div>
+  const draggedLead = drag && leads.find(l => l.id === drag.id)
+  const col = (s) => <Column key={s.id} stage={s} items={byStage[s.id]} users={users} drag={drag} over={over} onCardDown={onCardDown} onClaim={handleClaim} />
 
-      {activeLead && (
-        <CallWindow lead={activeLead} onClose={() => setActiveLead(null)} onClaim={(id, e) => handleClaim(id)}
-          onEdit={setEditLead} onSave={handleSave} saving={saving} />
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8, alignItems: 'flex-start' }}>
+        {STAGES.filter(s => s.active).map(col)}
+        <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(var(--ink-rgb), 0.1)', flexShrink: 0 }} />
+        {STAGES.filter(s => !s.active).map(col)}
+      </div>
+      <div style={{ fontSize: 11.5, color: 'var(--text-3)', textAlign: 'center' }}>Перетаскивайте карточки между колонками · на телефоне — подержите карточку</div>
+
+      {drag && draggedLead && (   // поднятая карточка: чуть повёрнута и с тенью, едет за курсором
+        <div style={{ position: 'fixed', left: drag.x - drag.ox, top: drag.y - drag.oy, width: drag.w, zIndex: 1000, pointerEvents: 'none', transform: 'rotate(3deg) scale(1.03)', transformOrigin: `${drag.ox}px ${drag.oy}px` }}>
+          <LeadCard lead={draggedLead} users={users} lifted onPointerDown={() => {}} onClaim={() => {}} />
+        </div>
       )}
 
+      {activeLead && (
+        <CallWindow lead={activeLead} onClose={() => setActiveLead(null)} onClaim={(id) => handleClaim(id)}
+          onEdit={setEditLead} onSave={handleSave} saving={saving} />
+      )}
       {editLead && (
         <LeadEditModal
           lead={editLead}
