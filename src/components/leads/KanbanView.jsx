@@ -25,10 +25,9 @@ function LeadCard({ lead, users, ghost, lifted, onPointerDown, onClaim }) {
       onPointerDown={onPointerDown}
       className="kanban-card"
       style={{
-        padding: '12px 13px', borderRadius: 16, background: 'var(--surface)', cursor: lifted ? 'grabbing' : 'grab',
-        border: '1px solid rgba(var(--ink-rgb), 0.07)', userSelect: 'none', WebkitUserSelect: 'none', touchAction: 'manipulation',
+        padding: '12px 13px', borderRadius: 16, cursor: lifted ? 'grabbing' : 'grab', userSelect: 'none', WebkitUserSelect: 'none', touchAction: 'manipulation',
         opacity: ghost ? 0.35 : 1,
-        boxShadow: lifted ? '0 24px 48px -16px rgba(20,30,55,0.45), 0 0 0 1px rgba(var(--rgb-19-102-240), 0.25)' : '0 1px 2px rgba(20,30,55,0.06)',
+        boxShadow: lifted ? '0 24px 48px -16px rgba(20,30,55,0.45), 0 0 0 1px rgba(var(--rgb-19-102-240), 0.25)' : undefined,
         transition: lifted ? 'none' : 'opacity .15s var(--ease), box-shadow .15s var(--ease)',
       }}
     >
@@ -74,10 +73,10 @@ function Column({ stage, items, users, drag, over, onCardDown, onClaim }) {
   }
 
   return (
-    <div data-stage={stage.id} style={{
+    <div data-stage={stage.id} className="kanban-col" style={{
       width: CARD_W + 20, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 10, padding: 10, borderRadius: 20,
-      background: isOver ? 'rgba(var(--rgb-19-102-240), 0.07)' : 'rgba(var(--ink-rgb), 0.035)',
-      boxShadow: isOver ? 'inset 0 0 0 1.5px rgba(var(--rgb-19-102-240), 0.35)' : 'none',
+      background: isOver ? 'rgba(var(--rgb-19-102-240), 0.08)' : undefined,
+      boxShadow: isOver ? 'inset 0 0 0 1.5px rgba(var(--rgb-19-102-240), 0.35)' : undefined,
       transition: 'background .15s var(--ease), box-shadow .15s var(--ease)',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '2px 4px' }}>

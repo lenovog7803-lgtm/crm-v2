@@ -189,10 +189,10 @@ input[type="number"] {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 10% 10%, rgba(90,150,255,0.14) 0%, transparent 60%),
-    radial-gradient(ellipse 70% 60% at 90% 5%, rgba(var(--rgb-19-102-240), 0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 60% at 85% 90%, rgba(120,180,255,0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 70% 60% at 5% 85%, rgba(70,120,230,0.1) 0%, transparent 60%);
+    radial-gradient(ellipse 80% 60% at 10% 10%, rgba(90,150,255,0.24) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 60% at 90% 5%, rgba(var(--rgb-19-102-240), 0.2) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 60% at 85% 90%, rgba(150,120,255,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 60% at 5% 85%, rgba(70,180,230,0.16) 0%, transparent 60%);
 }
 
 .aurora-orb-a {
@@ -200,7 +200,7 @@ input[type="number"] {
   width: 520px;
   height: 520px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(var(--rgb-19-102-240), 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(var(--rgb-19-102-240), 0.28) 0%, transparent 70%);
   top: -100px;
   right: 20%;
   animation: floatA 14s ease-in-out infinite;
@@ -211,7 +211,7 @@ input[type="number"] {
   width: 480px;
   height: 480px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(110,165,255,0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(140,110,255,0.24) 0%, transparent 70%);
   bottom: -80px;
   left: 15%;
   animation: floatB 18s ease-in-out infinite;
@@ -1105,3 +1105,29 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   background: rgba(var(--rgb-19-102-240), 0.1); color: var(--fg-1366f0); white-space: nowrap; transition: transform 0.1s; }
 .island-btn:hover { background: rgba(var(--rgb-19-102-240), 0.16); }
 .island-btn:active { transform: scale(0.96); }
+
+/* ===== Стекло по всей CRM: карточки и канбан в духе .liquid-glass — блик сверху, светлый край, размытие фона.
+   Без ::before/::after и isolation: внутри .card бывают выпадающие меню, их нельзя запирать в карточке ===== */
+.card, .kanban-card {
+  background:
+    radial-gradient(140% 70% at 20% -20%, rgba(255,255,255,calc(0.55 * var(--rim-k))) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(var(--paper-rgb), 0.55) 0%, rgba(var(--paper-rgb), 0.34) 100%);
+  backdrop-filter: blur(26px) saturate(200%);
+  -webkit-backdrop-filter: blur(26px) saturate(200%);
+  border: 1px solid rgba(255,255,255,calc(0.7 * var(--rim-k)));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,calc(1 * var(--rim-k))),
+    inset 0 -1px 0 rgba(255,255,255,calc(0.35 * var(--rim-k))),
+    0 14px 40px -22px rgba(20,30,55,0.22);
+}
+.kanban-card { backdrop-filter: blur(14px) saturate(190%); -webkit-backdrop-filter: blur(14px) saturate(190%); }   /* мелкие и их много — размытие легче */
+.kanban-col {
+  background: linear-gradient(180deg, rgba(var(--paper-rgb), 0.4) 0%, rgba(var(--paper-rgb), 0.22) 100%);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.7 * var(--rim-k))), inset 0 0 0 1px rgba(255,255,255,calc(0.3 * var(--rim-k)));
+}
+@media (prefers-reduced-transparency: reduce) {
+  .card, .kanban-card { background: var(--surface) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .kanban-col { background: var(--fill) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+}
