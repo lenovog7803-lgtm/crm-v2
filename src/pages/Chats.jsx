@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { getMailboxes, getChats, getChat, replyChat, newChat, downloadChatAttachment, startMailboxGoogle } from '../api'
+import { getMailboxes, getChats, getChat, replyChat, newChat, draftChat, downloadChatAttachment, startMailboxGoogle } from '../api'
 import { useToast } from '../components/Toast'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { Loader } from '../components/Loader'
@@ -46,10 +46,17 @@ const chip = (on) => ({
   background: on ? 'var(--bg-1366f0)' : 'rgba(118,118,128,0.12)', color: on ? '#fff' : 'var(--ink)', whiteSpace: 'nowrap',
 })
 
-function Composer({ onSend, placeholder = 'Сообщение…', autoFocus }) {
+function Composer({ onSend, placeholder = 'Сообщение…', autoFocus, draft = '', extra }) {
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const ref = useRef(null)
+  // черновик от ИИ подставляем в пустое поле — свой набранный текст не затираем
+  useEffect(() => {
+    if (!draft) return
+    setText(t => t || draft)
+    requestAnimationFrame(() => { const el = ref.current; if (el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 260) + 'px' } })
+  }, [draft])
+  const isDraft = !!draft && text === draft
   const send = async () => {
     if (!text.trim() || sending) return
     setSending(true)
@@ -61,15 +68,24 @@ function Composer({ onSend, placeholder = 'Сообщение…', autoFocus }) 
     setSending(false)
   }
   return (
+    <>
+    {(isDraft || extra) && (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 14px 0', fontSize: 12, color: 'var(--fg-5856d6)', fontWeight: 600 }}>
+        {isDraft && <span>✍️ Черновик от ИИ — проверь и отправь</span>}
+        <span style={{ flex: 1 }} />
+        {extra}
+      </div>
+    )}
     <div className="composer">
       <textarea ref={ref} data-plain value={text} onChange={e => setText(e.target.value)} rows={1} placeholder={placeholder} autoFocus={autoFocus}
-        onInput={e => { e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 180) + 'px' }}
+        onInput={e => { e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 260) + 'px' }}
         // как в мессенджере: Enter — отправить, Shift + Enter — новая строка
         onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); send() } }} />
       <button className="composer-send" disabled={sending || !text.trim()} onClick={send} aria-label="Отправить" title="Отправить (Enter)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="19" x2="12" y2="5" /><polyline points="5 12 12 5 19 12" /></svg>
       </button>
     </div>
+    </>
   )
 }
 
@@ -99,6 +115,7 @@ function ChatView({ mailboxId, chat, onBack, onSent }) {
       const iso = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
       setData(d => d && { ...d, messages: [...d.messages, { id: 'local-' + now.getTime(), from_me: true, text, date: iso, attachments: [] }] })
       onSent?.(text)
+      setDraft('')
       setTimeout(() => load(true), 2500)
     } catch (e) {
       show('Не отправилось: ' + e.message, { type: 'error' })
@@ -106,6 +123,19 @@ function ChatView({ mailboxId, chat, onBack, onSent }) {
     }
   }
   const download = (m, a) => downloadChatAttachment(mailboxId, m.id, a.index, a.name).catch(e => show('Ошибка: ' + e.message, { type: 'error' }))
+  const [drafting, setDrafting] = useState(false)
+  const [draft, setDraft] = useState('')
+  useEffect(() => { if (data?.draft) setDraft(data.draft) }, [data?.draft])
+  const makeDraft = async () => {
+    setDrafting(true)
+    try { setDraft((await draftChat(mailboxId, chat.id)).draft) } catch (e) { show(e.message, { type: 'error' }) }
+    setDrafting(false)
+  }
+  const lastTheirs = data?.messages?.length && !data.messages[data.messages.length - 1].from_me
+  const draftBtn = data?.can_draft && lastTheirs && !draft && (
+    <button onClick={makeDraft} disabled={drafting} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0,
+      fontFamily: 'inherit', fontSize: 12, fontWeight: 700, color: 'var(--fg-5856d6)' }}>{drafting ? 'Пишу черновик…' : '✍️ Черновик ответа'}</button>
+  )
 
   const name = data?.peer_name || chat.peer_name
   const addr = data?.peer_email || chat.peer_email
@@ -155,7 +185,7 @@ function ChatView({ mailboxId, chat, onBack, onSent }) {
         })}
         <div ref={endRef} />
       </div>
-      <Composer onSend={send} />
+      <Composer onSend={send} draft={draft} extra={draftBtn} />
     </div>
   )
 }

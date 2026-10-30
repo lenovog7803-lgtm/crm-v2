@@ -346,6 +346,7 @@ export async function downloadMailAttachment(id, msg, index, name) {
 export const getChats = (mailboxId, q = '', page = '', folder = 'all') => req('/mailing/chats?' + new URLSearchParams({ mailbox_id: mailboxId, q, page, folder }), {}, 0);
 export const getChat = (mailboxId, id) => req(`/mailing/chats/${id}?` + new URLSearchParams({ mailbox_id: mailboxId }), {}, 0);
 export const replyChat = (mailboxId, id, text) => req(`/mailing/chats/${id}/reply`, { method: 'POST', body: JSON.stringify({ mailbox_id: mailboxId, text }) }, 0);
+export const draftChat = (mailboxId, id) => req(`/mailing/chats/${id}/draft`, { method: 'POST', body: JSON.stringify({ mailbox_id: mailboxId }) }, 0);
 export const newChat = (data) => req('/mailing/chats/new', { method: 'POST', body: JSON.stringify(data) }, 0);
 export async function downloadChatAttachment(mailboxId, msg, index, name) {
   const res = await fetch(BASE + '/mailing/chats/attachment?' + new URLSearchParams({ mailbox_id: mailboxId, msg, index }), {
