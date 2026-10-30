@@ -339,6 +339,22 @@ export async function downloadMailAttachment(id, msg, index, name) {
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+// «Чаты» — вся переписка выбранного ящика Gmail, как в мессенджере
+export const getChats = (mailboxId, q = '', page = '', folder = 'all') => req('/mailing/chats?' + new URLSearchParams({ mailbox_id: mailboxId, q, page, folder }), {}, 0);
+export const getChat = (mailboxId, id) => req(`/mailing/chats/${id}?` + new URLSearchParams({ mailbox_id: mailboxId }), {}, 0);
+export const replyChat = (mailboxId, id, text) => req(`/mailing/chats/${id}/reply`, { method: 'POST', body: JSON.stringify({ mailbox_id: mailboxId, text }) }, 0);
+export const newChat = (data) => req('/mailing/chats/new', { method: 'POST', body: JSON.stringify(data) }, 0);
+export async function downloadChatAttachment(mailboxId, msg, index, name) {
+  const res = await fetch(BASE + '/mailing/chats/attachment?' + new URLSearchParams({ mailbox_id: mailboxId, msg, index }), {
+    headers: { 'Authorization': token ? `Bearer ${token}` : '' },
+  });
+  if (res.status === 401) { onUnauthorized?.(); throw new Error('Сессия истекла — войдите заново'); }
+  if (!res.ok) throw new Error(await res.text());
+  const url = URL.createObjectURL(await res.blob());
+  const link = Object.assign(document.createElement('a'), { href: url, download: name });
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 // направления
 export const getMailingCampaigns = () => req('/mailing/campaigns');
 export const createMailingCampaign = (data) => req('/mailing/campaigns', { method: 'POST', body: JSON.stringify(data) });

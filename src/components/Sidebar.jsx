@@ -117,6 +117,15 @@ const NAV = [
       </svg>
     )
   },
+  {
+    key: 'chats',
+    label: 'Чаты',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.8-.8L3 21l1.9-5.2A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5z"/>
+      </svg>
+    )
+  },
 ]
 
 // «Свой автопарк» — параллельный набор пунктов, тот же сайдбар. Показывается

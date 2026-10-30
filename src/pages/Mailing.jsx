@@ -1245,8 +1245,9 @@ function SettingsPage({ campaign, mailboxes, onSaved, onCampaignDeleted }) {
         <>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
             {mailboxes.map(m => (
-              <button key={m.id} onClick={() => setMid(m.id)} style={chip(m.id === mailbox?.id)}>
-                <span style={{ width: 7, height: 7, borderRadius: 99, background: m.configured ? 'var(--fg-0e9f6e)' : 'var(--text-quaternary)' }} />
+              <button key={m.id} onClick={() => setMid(m.id)} title={m.login_expired ? 'Gmail вышел из аккаунта — войдите заново' : undefined}
+                style={{ ...chip(m.id === mailbox?.id), ...(m.login_expired ? { boxShadow: 'inset 0 0 0 2px var(--fg-e0473b)', color: m.id === mailbox?.id ? undefined : 'var(--fg-e0473b)' } : {}) }}>
+                <span style={{ width: 7, height: 7, borderRadius: 99, background: m.login_expired ? 'var(--fg-e0473b)' : m.configured ? 'var(--fg-0e9f6e)' : 'var(--text-quaternary)' }} />
                 {m.login || m.name}
               </button>
             ))}
@@ -1445,6 +1446,38 @@ function CampaignBar({ campaigns, value, onChange, onAdd }) {
 // ---------------- Страница ----------------
 const CAMPAIGN_KEY = 'mailing_campaign'
 
+// Google в тестовом режиме выкидывает из Gmail раз в 7 дней — такие ящики горят красным,
+// нажатие открывает вход Google; по возвращении во вкладку CRM ящики перепроверяются.
+export function ExpiredMailboxes({ mailboxes }) {
+  const { show } = useToast()
+  const expired = (mailboxes || []).filter(m => m.login_expired)
+  if (!expired.length) return null
+  const relogin = async (m) => {
+    try {
+      const r = await startMailboxGoogle(m.id)
+      window.open(r.auth_url, '_blank')
+    } catch (e) {
+      show('Ошибка: ' + e.message, { type: 'error' })
+    }
+  }
+  return (
+    <div style={{ marginBottom: 14, padding: '12px 14px', borderRadius: 16, background: 'rgba(224,71,59,0.1)', border: '1px solid rgba(224,71,59,0.35)',
+      display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--fg-e0473b)' }}>
+        Gmail вышел из аккаунта — письма с {expired.length > 1 ? 'этих почт' : 'этой почты'} не уходят и ответы не проверяются
+      </div>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        {expired.map(m => (
+          <button key={m.id} onClick={() => relogin(m)} style={{ border: 'none', cursor: 'pointer', borderRadius: 99, padding: '7px 14px',
+            fontSize: 13, fontWeight: 700, fontFamily: 'inherit', background: 'var(--fg-e0473b)', color: '#fff' }}>
+            Войти в {m.login || m.name} →
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function Mailing() {
   const { show } = useToast()
   const [tab, setTab] = useState('overview')
@@ -1477,6 +1510,10 @@ export default function Mailing() {
   useEffect(() => {
     loadCampaigns()
     loadMailboxes()
+    // вернулись из вкладки входа Google — перепроверяем ящики
+    const onFocus = () => loadMailboxes()
+    window.addEventListener('focus', onFocus)
+    return () => window.removeEventListener('focus', onFocus)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -1506,6 +1543,8 @@ export default function Mailing() {
         </div>
         <SlidingTabs options={tabsWith(state?.replies_new, hasPurchase)} value={tab} onChange={t => { setContactsGroup(''); setTab(t) }} />
       </div>
+
+      <ExpiredMailboxes mailboxes={mailboxes} />
 
       {campaigns && (
         <CampaignBar campaigns={campaigns} value={campaignId} onChange={id => { setCampaignId(id); setAdding(false) }} onAdd={() => setAdding(a => !a)} />
