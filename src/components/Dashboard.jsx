@@ -5,6 +5,7 @@ import { useEscapeKey } from '../hooks/useEscapeKey'
 import { CountUp } from './CountUp'
 import MarginChart from './MarginChart'
 import GoalsRings from './GoalsRings'
+import { Gauge } from '../bklit/charts/gauge'
 import { SkeletonCard } from './Skeleton'
 import { mouseOnly } from '../motion'
 import { inPeriod, initials, getGradient } from '../utils'
@@ -43,6 +44,14 @@ function calcStats(orders, period, apiData) {
   const allDone = orders.filter(o => o.status === 'done' || o.status === 'delivered' || o.status === 'completed')
   const clientDebt = allDone.filter(o => !o.client_paid).reduce((s, o) => s + (o.client_rate || 0), 0)
   const carrierDebt = allDone.filter(o => !o.carrier_paid).reduce((s, o) => s + (o.carrier_rate || 0), 0)
+  // доля оплаченного среди доставленных за выбранный период — для спидометров в карточках долгов
+  const periodDone = filtered.filter(o => ['done', 'delivered', 'completed'].includes(o.status))
+  const share = (paid, rate) => {
+    const all = periodDone.reduce((s, o) => s + (o[rate] || 0), 0)
+    return all > 0 ? Math.round(periodDone.filter(o => o[paid]).reduce((s, o) => s + (o[rate] || 0), 0) / all * 100) : 0
+  }
+  const clientPaidPct = share('client_paid', 'client_rate')
+  const carrierPaidPct = share('carrier_paid', 'carrier_rate')
 
   const active = orders.filter(o => ['new', 'in_progress', 'loading', 'in_transit'].includes(o.status)).length
   const done = orders.filter(o => ['done', 'delivered', 'completed'].includes(o.status)).length
@@ -84,7 +93,7 @@ function calcStats(orders, period, apiData) {
 
   return {
     revenue, cost, margin,
-    clientDebt, carrierDebt,
+    clientDebt, carrierDebt, clientPaidPct, carrierPaidPct,
     active: activeOrders, done: deliveredOrders,
     clientsCount, carriersCount,
     topClients: apiData?.top_clients?.length ? apiData.top_clients : topClients,
@@ -458,7 +467,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
   const stats = calcStats(allOrders, period, apiData)
   const chart = buildChartData(allOrders, period)
 
-  const { revenue, cost, margin, clientDebt, carrierDebt, active, done, clientsCount, carriersCount,
+  const { revenue, cost, margin, clientDebt, carrierDebt, clientPaidPct, carrierPaidPct, active, done, clientsCount, carriersCount,
     topClients, topByMargin, topDebtors, debtorOrders, carrierDebtOrders } = stats
 
   const prevPeriodKey = getPrevPeriod(period)
@@ -583,12 +592,13 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           {/* два долга стопкой — по высоте как «Цели месяца» */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {[
-          { icon: 'in', label: 'Ожидается от клиентов', color: 'var(--text-3)', value: clientDebt, count: debtorOrders.length, onClick: () => setShowDebtors(true) },
-          { icon: 'out', label: 'К оплате перевозчикам', color: 'var(--text-3)', value: carrierDebt, count: carrierDebtOrders.length, onClick: () => setShowCarrierDebt(true) },
+          { icon: 'in', label: 'Ожидается от клиентов', color: 'var(--text-3)', pct: clientPaidPct, pctLabel: 'оплачено', value: clientDebt, count: debtorOrders.length, onClick: () => setShowDebtors(true) },
+          { icon: 'out', label: 'К оплате перевозчикам', color: 'var(--text-3)', pct: carrierPaidPct, pctLabel: 'оплачено', value: carrierDebt, count: carrierDebtOrders.length, onClick: () => setShowCarrierDebt(true) },
         ].map(w => (
           <div key={w.icon} className="ios-widget" onClick={w.onClick}
             {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.9), 0 14px 40px -22px rgba(20,30,55,0.22)', 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 46px -18px rgba(20,30,55,0.3)')}
-            style={{ padding: isMobile ? '14px 16px' : '16px 20px', cursor: 'pointer' }}>
+            style={{ padding: isMobile ? '14px 16px' : '16px 20px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
             <WidgetHead label={w.label} color={w.color} right={<Chevron color={w.color} />} />
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
               <span style={{ fontWeight: 700, fontSize: isMobile ? 26 : 28, letterSpacing: '-0.03em', color: 'var(--ink)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
@@ -599,6 +609,13 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             <div style={{ marginTop: 8, fontSize: 13, color: 'var(--text-3)' }}>
               <span style={{ fontWeight: 600, color: 'var(--fg-1366f0)' }}>{w.count}</span> заявок
             </div>
+            </div>
+            {/* спидометр Bklit (Gauge): какая доля денег за период уже оплачена */}
+            {!isMobile && (
+              <div className="bklit debt-gauge" title={`${w.pctLabel} ${w.pct}% за период`}>
+                <Gauge value={w.pct} centerValue={w.pct} width={168} height={128} minWidth={168} suffix="%" defaultLabel={w.pctLabel} activeFill="var(--bg-1366f0)" inactiveFill="rgba(var(--ink-rgb), 0.08)" />
+              </div>
+            )}
           </div>
         ))}
           </div>

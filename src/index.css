@@ -1212,3 +1212,5 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .debt-orders { padding: 0 12px 8px 66px; }
 .debt-order { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; cursor: pointer; transition: background 0.12s; }
 @media (hover: hover) { .debt-order:hover { background: rgba(118,118,128,0.08); } }
+/* спидометр в карточках долгов: подпись и цифра — цветами CRM */
+.debt-gauge { flex-shrink: 0; width: 168px; margin: -8px 0; --chart-foreground: var(--ink); --chart-foreground-muted: var(--text-3); --chart-label: var(--text-3); }
