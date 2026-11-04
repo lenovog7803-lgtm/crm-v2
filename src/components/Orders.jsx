@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { deleteOrder as apiDelete, updateOrder, restoreOrder } from '../api'
 import { getOrdersFromCache, getCachedOrdersSnapshot, invalidateOrdersCache, subscribeOrders } from '../store/ordersStore'
-import { initials, statusLabel, statusColor, statusBg, getGradient, fmtDate, hasUnreconciledPayment } from '../utils'
+import { initials, statusLabel, statusColor, getGradient, fmtDate, hasUnreconciledPayment } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
 import { useToast } from './Toast'
@@ -189,18 +189,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
     setTimeout(resolve, 200)
   })
 
-  const handleDelete = async (e, id) => {
-    e.stopPropagation()
-    await apiDelete(id).catch(console.error)
-    // Without this the shared orders cache still holds the pre-delete list,
-    // so the very next cache read (navigating away and back, a live update
-    // elsewhere) resurrects the row — the delete looks like it "undoes
-    // itself" even though the server-side soft-delete stuck.
-    invalidateOrdersCache()
-    await animateRemoval([id])
-    setOrders(prev => prev.filter(o => o.id !== id))
-    setRemovingIds(prev => { const next = new Set(prev); next.delete(id); return next })
-  }
+
 
   const toggleSelect = (id) => {
     setSelected(prev => {
@@ -467,12 +456,12 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
 
       <div className="card" style={{ overflow: 'hidden' }}>
         <div style={{
-          display: 'grid', gridTemplateColumns: '140px minmax(0, 1fr) minmax(0, 1fr) 110px 90px 70px',
+          display: 'grid', gridTemplateColumns: '140px minmax(0, 1fr) minmax(0, 1fr) 110px 90px',
           padding: '12px 20px',
           borderBottom: '1px solid rgba(var(--ink-rgb), 0.06)',
           background: 'rgba(var(--ink-rgb), 0.02)',
         }}>
-          {['ЗАЯВКА', 'МАРШРУТ', 'КЛИЕНТ', 'МАРЖА', 'ОПЛАТЫ', ''].map(h => (
+          {['ЗАЯВКА', 'МАРШРУТ', 'КЛИЕНТ', 'МАРЖА', 'ОПЛАТЫ'].map(h => (
             <div key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)' }}>{h}</div>
           ))}
         </div>
@@ -532,7 +521,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                   {isSelected && <span style={{ color: '#fff', fontSize: 11 }}>✓</span>}
                 </div>
               )}
-              <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '140px minmax(0, 1fr) minmax(0, 1fr) 110px 90px 70px', alignItems: 'center' }}>
+              <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '140px minmax(0, 1fr) minmax(0, 1fr) 110px 90px', alignItems: 'center' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, fontSize: 13.5, color: 'var(--fg-1366f0)' }}>
@@ -544,13 +533,10 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                   {missingCarrierDate && <span style={{ fontSize: 9.5, color: 'var(--fg-d97706)', fontWeight: 700 }}>НЕТ ДАТЫ ПЕРЕВОЗЧИКА</span>}
                   {unreconciled && <span style={{ fontSize: 9.5, color: 'var(--fg-d97706)', fontWeight: 700 }}>ПРОВЕРЬТЕ ОПЛАТУ</span>}
                 </div>
-                <div style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 4, padding: '2px 8px', borderRadius: 6,
-                  background: statusBg(order.status), color: statusColor(order.status),
-                  fontSize: 11, fontWeight: 600,
-                }}>
-                  <StatusOrb status={order.status} overdue={overdue} scale={0.7} />
-                  {statusLabel(order.status)}
+                {/* статус — цветная точка и слово (просроченная — красная) */}
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 4, fontSize: 12, fontWeight: 600, color: overdue ? 'var(--fg-c81923)' : statusColor(order.status) }}>
+                  <span style={{ width: 7, height: 7, borderRadius: 99, background: 'currentColor', flexShrink: 0 }} />
+                  {overdue ? 'Просрочена' : statusLabel(order.status)}
                 </div>
               </div>
               <div>
@@ -600,26 +586,6 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                   background: order.carrier_paid ? 'rgba(var(--rgb-124-58-237), 0.15)' : (hasUnreconciledPayment(order, 'carrier') ? 'rgba(var(--rgb-217-119-6), 0.18)' : 'rgba(var(--ink-rgb), 0.07)'),
                   color: order.carrier_paid ? 'var(--fg-7c3aed)' : (hasUnreconciledPayment(order, 'carrier') ? 'var(--fg-d97706)' : 'var(--text-tertiary)'),
                 }} title={hasUnreconciledPayment(order, 'carrier') ? 'Есть введённый ПП перевозчику, но сумма не сошлась со ставкой' : undefined}>П</span>
-              </div>
-              <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }} onClick={e => e.stopPropagation()}>
-                <button onClick={e => handleDelete(e, order.id)} style={{
-                  width: 30, height: 30, borderRadius: 8, border: 'none', cursor: 'pointer',
-                  background: 'rgba(var(--rgb-200-25-35), 0.1)', color: 'var(--fg-c81923)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4h6v2" />
-                  </svg>
-                </button>
-                <button onClick={e => { e.stopPropagation(); onOpenOrder(order.id) }} style={{
-                  width: 30, height: 30, borderRadius: 8, border: 'none', cursor: 'pointer',
-                  background: 'rgba(var(--rgb-19-102-240), 0.1)', color: 'var(--fg-1366f0)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="9 18 15 12 9 6" />
-                  </svg>
-                </button>
               </div>
               </div>
             </div>
