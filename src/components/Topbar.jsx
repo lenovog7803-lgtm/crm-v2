@@ -64,6 +64,15 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
   // карточки (заявка, клиент, перевозчик) подставляют свой заголовок: номер, имя и т.п.
   const meta = metaOverride || PAGE_META[page] || { title: page, subtitle: '' }
   const [bellOpen, setBellOpen] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
+  const moreRef = useRef(null)
+  useEffect(() => {
+    if (!moreOpen) return
+    const close = e => { if (moreRef.current && !moreRef.current.contains(e.target)) setMoreOpen(false) }
+    const esc = e => { if (e.key === 'Escape') setMoreOpen(false) }
+    document.addEventListener('mousedown', close); document.addEventListener('keydown', esc)
+    return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', esc) }
+  }, [moreOpen])
   // анимированный поиск: открыт, пока на нём мышь, в нём курсор или есть текст
   const [searchHover, setSearchHover] = useState(false)
   const [searchFocus, setSearchFocus] = useState(false)
@@ -154,7 +163,27 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
       <div style={{ flex: 1, minWidth: 0 }}>
         {/* большой заголовок iOS: крупный вверху страницы, сжимается при прокрутке */}
         <div className="ios-title" style={{ fontSize: compact ? (isMobile ? 17 : 18) : (isMobile ? 24 : 26) }}>{meta.title}</div>
-        {!isMobile && <div className="ios-subtitle" style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>{meta.subtitle}</div>}
+        {!isMobile && (
+          <div className="ios-subtitle" style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 4 }}>
+            {meta.subtitle}
+            {/* период меняет содержимое страницы — поэтому он у заголовка, а не среди общих кнопок */}
+            {page === 'dashboard' && <>
+              <span aria-hidden="true">·</span>
+              <Select
+          className="topbar-period"
+          value={period}
+          onChange={e => onPeriodChange && onPeriodChange(e.target.value)}
+          style={{ height: 24, padding: '0 6px', borderRadius: 8, border: 'none', background: 'transparent', fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600, color: 'var(--fg-1366f0)', outline: 'none', cursor: 'pointer' }}
+        >
+          {PERIOD_OPTIONS.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+          {extraQuarters.length > 0 && <option disabled>──────────</option>}
+          {extraQuarters.map(q => <option key={q} value={q}>{fmtQuarter(q)}</option>)}
+          {extraMonths.length > 0 && <option disabled>──────────</option>}
+          {extraMonths.map(m => <option key={m} value={m}>{fmtMonth(m)}</option>)}
+        </Select>
+            </>}
+          </div>
+        )}
       </div>
       {/* шапка-остров: «ручка» раскрытия снизу */}
       {canExpand && <span className="topbar-grabber" aria-hidden="true" />}
@@ -200,51 +229,12 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
         )}
       </div>
 
-      {/* Period — only on dashboard */}
-      {page === 'dashboard' && (
-        <Select
-          className="topbar-period"
-          value={period}
-          onChange={e => onPeriodChange && onPeriodChange(e.target.value)}
-          style={{
-            height: 38, padding: '0 12px', borderRadius: 11,
-            border: '1px solid rgba(var(--ink-rgb), 0.12)',
-            background: 'rgba(var(--paper-rgb), 0.7)',
-            fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600, color: 'var(--ink)',
-            outline: 'none', cursor: 'pointer',
-          }}
-        >
-          {PERIOD_OPTIONS.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
-          {extraQuarters.length > 0 && <option disabled>──────────</option>}
-          {extraQuarters.map(q => <option key={q} value={q}>{fmtQuarter(q)}</option>)}
-          {extraMonths.length > 0 && <option disabled>──────────</option>}
-          {extraMonths.map(m => <option key={m} value={m}>{fmtMonth(m)}</option>)}
-        </Select>
-      )}
-
-      {/* Trash */}
-      <button
-        className="topbar-trash"
-        onClick={() => onNav && onNav('trash')}
-        title="Корзина"
-        style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 6, borderRadius: 10 }}
-        onPointerEnter={mouseOnly(e => e.currentTarget.style.color = 'var(--fg-c81923)')}
-        onPointerLeave={mouseOnly(e => e.currentTarget.style.color = 'var(--text-secondary)')}
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-        </svg>
-      </button>
-
       {/* Bell */}
       <div ref={bellRef} style={{ position: 'relative' }}>
         <button
           onClick={() => setBellOpen(v => !v)}
-          style={{
-            position: 'relative', background: bellOpen ? 'rgba(var(--rgb-200-25-35), 0.08)' : 'none', border: 'none', cursor: 'pointer',
-            color: badgeCount > 0 ? 'var(--fg-c81923)' : 'var(--text-secondary)', padding: 6, borderRadius: 10,
-            animation: bellPulse ? 'bellPulse 0.6s ease' : 'none',
-          }}
+          className="topbar-btn" title="Уведомления" aria-label="Уведомления"
+          style={{ color: badgeCount > 0 ? 'var(--fg-c81923)' : undefined, animation: bellPulse ? 'bellPulse 0.6s ease' : 'none' }}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -400,31 +390,33 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
         }
       `}</style>
 
-      {/* Тёмная / светлая тема */}
-      <button onClick={toggleTheme} title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'} aria-label={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'} style={{
-        background: 'rgba(var(--ink-rgb), 0.06)', border: 'none', cursor: 'pointer',
-        color: 'var(--text-3)', padding: 8, borderRadius: 10,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
-        {theme === 'dark'
-          ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-          : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>}
-      </button>
-
-      {/* Sign out */}
-      {onSignOut && (
-        <button className="topbar-signout" onClick={onSignOut} title="Выйти" style={{
-          background: 'rgba(var(--ink-rgb), 0.06)', border: 'none', cursor: 'pointer',
-          color: 'var(--text-3)', padding: 8, borderRadius: 10,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
+      {/* «⋯» — редкие действия: корзина, тема, выход */}
+      <div ref={moreRef} style={{ position: 'relative' }}>
+        <button className="topbar-btn" onClick={() => setMoreOpen(v => !v)} title="Ещё" aria-label="Ещё" aria-expanded={moreOpen}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
         </button>
-      )}
+        {moreOpen && (
+          <div className="topbar-menu t-dropdown-in" role="menu">
+            <button role="menuitem" onClick={() => { setMoreOpen(false); onNav && onNav('trash') }}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              Корзина
+            </button>
+            <button role="menuitem" onClick={() => { setMoreOpen(false); toggleTheme() }}>
+              {theme === 'dark'
+                ? <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+                : <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>}
+              {theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+            </button>
+            {onSignOut && <>
+              <div className="topbar-menu-sep" />
+              <button role="menuitem" className="is-danger" onClick={() => { setMoreOpen(false); onSignOut() }}>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Выйти
+              </button>
+            </>}
+          </div>
+        )}
+      </div>
       </>
       )}
     </div>
