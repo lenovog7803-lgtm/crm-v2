@@ -275,12 +275,12 @@ function DebtModal({ title, orders, onClose, onOpenOrder }) {
   )
 }
 
-function TopRow({ rank, name, value, color, bg }) {
+function TopRow({ rank, name, value }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
-      <span style={{ width: 24, height: 24, borderRadius: 8, flexShrink: 0, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>{rank}</span>
+      <span style={{ width: 24, height: 24, borderRadius: 8, flexShrink: 0, background: 'rgba(var(--ink-rgb), 0.05)', color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>{rank}</span>
       <span style={{ flex: 1, fontSize: 13, fontWeight: 500, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 700, color, flexShrink: 0 }}>{value}</span>
+      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 700, color: 'var(--ink)', flexShrink: 0 }}>{value}</span>
     </div>
   )
 }
@@ -527,8 +527,8 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           {/* два долга стопкой — по высоте как «Цели месяца» */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {[
-          { icon: 'in', label: 'Ожидается от клиентов', color: 'var(--fg-d97706)', value: clientDebt, count: debtorOrders.length, onClick: () => setShowDebtors(true) },
-          { icon: 'out', label: 'К оплате перевозчикам', color: 'var(--fg-7c3aed)', value: carrierDebt, count: carrierDebtOrders.length, onClick: () => setShowCarrierDebt(true) },
+          { icon: 'in', label: 'Ожидается от клиентов', color: 'var(--text-3)', value: clientDebt, count: debtorOrders.length, onClick: () => setShowDebtors(true) },
+          { icon: 'out', label: 'К оплате перевозчикам', color: 'var(--text-3)', value: carrierDebt, count: carrierDebtOrders.length, onClick: () => setShowCarrierDebt(true) },
         ].map(w => (
           <div key={w.icon} className="ios-widget" onClick={w.onClick}
             {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.9), 0 14px 40px -22px rgba(20,30,55,0.22)', 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 46px -18px rgba(20,30,55,0.3)')}
@@ -541,7 +541,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
               <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-tertiary)' }}>BYN</span>
             </div>
             <div style={{ marginTop: 8, fontSize: 13, color: 'var(--text-3)' }}>
-              <span style={{ fontWeight: 600, color: w.color }}>{w.count}</span> заявок
+              <span style={{ fontWeight: 600, color: 'var(--fg-1366f0)' }}>{w.count}</span> заявок
             </div>
           </div>
         ))}
@@ -555,10 +555,10 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             </div>
             <GoalsRings onEdit={key => { setEditingGoal(key); setGoalInput(String(goals[`${key}_goal`] ?? '')) }}
               items={[
-                { key: 'profit', label: 'Прибыль', fact: goals.profit_fact, goal: goals.profit_goal, color: 'var(--fg-1366f0)', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
-                { key: 'trips', label: 'Рейсы', fact: goals.trips_fact, goal: goals.trips_goal, color: 'var(--fg-1e9e5a)', fmt: v => Math.round(v) },
-                { key: 'margin', label: 'Маржа/рейс', fact: goals.margin_fact, goal: goals.margin_goal, color: 'var(--fg-d97706)', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
-                { key: 'new_clients', label: 'Новые клиенты', fact: goals.new_clients_fact, goal: goals.new_clients_goal, color: 'var(--fg-7c3aed)', fmt: v => Math.round(v) },
+                { key: 'profit', label: 'Прибыль', fact: goals.profit_fact, goal: goals.profit_goal, color: '#3A62C0', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
+                { key: 'trips', label: 'Рейсы', fact: goals.trips_fact, goal: goals.trips_goal, color: '#5585DC', fmt: v => Math.round(v) },
+                { key: 'margin', label: 'Маржа/рейс', fact: goals.margin_fact, goal: goals.margin_goal, color: '#7FA3EA', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
+                { key: 'new_clients', label: 'Новые клиенты', fact: goals.new_clients_fact, goal: goals.new_clients_goal, color: '#AFC6F3', fmt: v => Math.round(v) },
               ]} />
           </div>
         )}
@@ -569,12 +569,12 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       {/* KPI — одна полоса из четырёх цифр */}
       <div className="dashboard-stat-grid card ios-widget kpi-strip" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', padding: 4 }}>
         {[
-          { label: 'активных заявок', value: active, color: 'var(--fg-1366f0)',
+          { label: 'активных заявок', value: active, color: 'var(--ink)',
             onClick: () => { localStorage.setItem('orders_statusFilter', 'active'); onNav('orders') } },
-          { label: 'доставлено', value: done, color: 'var(--fg-1e9e5a)',
+          { label: 'доставлено', value: done, color: 'var(--ink)',
             onClick: () => { localStorage.setItem('orders_statusFilter', 'done'); onNav('orders') } },
-          { label: 'клиентов', value: clientsCount, color: 'var(--fg-d97706)', onClick: () => onNav('clients') },
-          { label: 'перевозчиков', value: carriersCount, color: 'var(--fg-7c3aed)', onClick: () => onNav('carriers') },
+          { label: 'клиентов', value: clientsCount, color: 'var(--ink)', onClick: () => onNav('clients') },
+          { label: 'перевозчиков', value: carriersCount, color: 'var(--ink)', onClick: () => onNav('carriers') },
         ].map(kpi => (
           <div key={kpi.label} className="kpi-cell" onClick={kpi.onClick}
             style={{ padding: isMobile ? '8px 10px' : '10px 16px', cursor: 'pointer', borderRadius: 14 }}>

@@ -33,7 +33,7 @@ export default function GoalsRings({ items, onEdit, size = 112 }) {
                 {g.fmt(g.fact)} <span style={{ fontWeight: 500, color: 'var(--text-tertiary)' }}>/ {g.fmt(g.goal)}</span>
               </span>
             </span>
-            <span style={{ fontSize: 12, fontWeight: 700, color: g.color, fontVariantNumeric: 'tabular-nums' }}>{pct(g)}%</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{pct(g)}%</span>
           </button>
         ))}
       </div>
