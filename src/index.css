@@ -1259,16 +1259,10 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .topbar-menu, .apple-select-menu {
   isolation: isolate; color: var(--ink); padding: 6px;
   background: linear-gradient(180deg, rgba(var(--paper-rgb), 0.58) 0%, rgba(var(--paper-rgb), 0.42) 100%) !important;
-  backdrop-filter: blur(24px) saturate(200%) brightness(1.06) !important; -webkit-backdrop-filter: blur(24px) saturate(200%) brightness(1.06) !important;
+  backdrop-filter: blur(16px) saturate(160%) !important; -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
   border-radius: 22px !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.95 * var(--rim-k))), inset 0 -1px 0 rgba(255,255,255,calc(0.35 * var(--rim-k))),
-    0 0 0 0.5px rgba(var(--ink-rgb), 0.08), 0 20px 50px -18px rgba(20,30,55,0.35) !important;
-}
-/* светящаяся кромка: свет сверху-слева, отражение снизу-справа */
-.topbar-menu::before, .apple-select-menu::before {
-  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 1px; pointer-events: none;
-  background: linear-gradient(140deg, rgba(255,255,255,calc(0.95 * var(--rim-k))) 0%, rgba(255,255,255,calc(0.15 * var(--rim-k))) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,calc(0.6 * var(--rim-k))) 100%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.95 * var(--rim-k))), inset 0 0 0 1px rgba(255,255,255,calc(0.45 * var(--rim-k))),
+    0 0 0 0.5px rgba(var(--ink-rgb), 0.08), 0 16px 40px -16px rgba(20,30,55,0.3) !important;
 }
 .apple-select-item, .topbar-menu button { color: var(--ink); border-radius: 14px; transition: background 0.12s var(--ease), box-shadow 0.12s var(--ease); }
 .apple-select-item[data-active="true"]:not(.is-disabled), .topbar-menu button:hover {
@@ -1281,4 +1275,8 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .topbar-menu button svg { color: var(--text-3); }
 .topbar-menu button.is-danger, .topbar-menu button.is-danger svg { color: var(--fg-c81923); }
 :root[data-theme="dark"] .topbar-menu, :root[data-theme="dark"] .apple-select-menu { background: rgba(40,42,48,0.62) !important; }
-:root[data-theme="dark"] .topbar-menu::before, :root[data-theme="dark"] .apple-select-menu::before { opacity: 0.25; }
+
+/* меню со стеклом открываются сдвигом и прозрачностью — увеличение заставляло пересчитывать размытие каждый кадр */
+@keyframes glassMenuIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.apple-select-menu, .topbar-menu.t-dropdown-in { animation: glassMenuIn 0.16s ease-out both !important; }
+.apple-select-menu.is-closing { animation: fadeOut 0.12s ease-in both !important; }
