@@ -36,10 +36,10 @@ function buildIsland(page, meta, goals, orders, now, extra = {}) {
     return {
       title: `${MON} — план месяца`, sub: goals ? `${pct(g.profit_fact, g.profit_goal)}% выполнено` : 'Загружаю…',
       stats: [
-        { label: 'Прибыль', value: `${int(g.profit_fact)} Br`, sub: `из ${int(g.profit_goal)}`, bar: pct(g.profit_fact, g.profit_goal), color: 'var(--fg-1366f0)' },
+        { label: 'Прибыль', value: `${int(g.profit_fact)} BYN`, sub: `из ${int(g.profit_goal)}`, bar: pct(g.profit_fact, g.profit_goal), color: 'var(--fg-1366f0)' },
         { label: 'Рейсы', value: int(g.trips_fact), sub: `из ${int(g.trips_goal)}`, bar: pct(g.trips_fact, g.trips_goal), color: 'var(--fg-7c3aed)' },
-        { label: 'Маржа на рейс', value: `${int(g.margin_fact)} Br`, sub: `цель ${int(g.margin_goal)}`, bar: pct(g.margin_fact, g.margin_goal), color: 'var(--fg-d97706)' },
-        { label: 'Прогноз на месяц', value: `${int(g.profit_fact ? g.profit_fact / day * days : 0)} Br`, sub: 'по текущему темпу' },
+        { label: 'Маржа на рейс', value: `${int(g.margin_fact)} BYN`, sub: `цель ${int(g.margin_goal)}`, bar: pct(g.margin_fact, g.margin_goal), color: 'var(--fg-d97706)' },
+        { label: 'Прогноз на месяц', value: `${int(g.profit_fact ? g.profit_fact / day * days : 0)} BYN`, sub: 'по текущему темпу' },
       ],
     }
   }
@@ -59,9 +59,9 @@ function buildIsland(page, meta, goals, orders, now, extra = {}) {
     if (!f) return { title: `Свой автопарк — ${MON.toLowerCase()}`, sub: 'загружаю…', stats: [] }
     const mm = (f.a.by_month || []).find(x => x.month === month) || {}, fg = f.goal || {}
     return { title: `Свой автопарк — ${MON.toLowerCase()}`, sub: f.a.trips_total ? `${f.a.trips_total} рейсов в месяце` : 'рейсов в этом месяце пока нет', stats: [
-      { label: 'Прибыль', value: `${int(mm.profit)} Br`, sub: fg.profit_goal ? `из ${int(fg.profit_goal)}` : 'цель не задана', bar: fg.profit_goal ? pct(Math.max(0, mm.profit || 0), fg.profit_goal) : null, color: (mm.profit || 0) < 0 ? 'var(--fg-d63b30)' : 'var(--fg-30b0c7)' },
+      { label: 'Прибыль', value: `${int(mm.profit)} BYN`, sub: fg.profit_goal ? `из ${int(fg.profit_goal)}` : 'цель не задана', bar: fg.profit_goal ? pct(Math.max(0, mm.profit || 0), fg.profit_goal) : null, color: (mm.profit || 0) < 0 ? 'var(--fg-d63b30)' : 'var(--fg-30b0c7)' },
       { label: 'Рейсы', value: int(f.a.trips_total), sub: fg.trips_goal ? `из ${int(fg.trips_goal)}` : 'цель не задана', bar: fg.trips_goal ? pct(f.a.trips_total, fg.trips_goal) : null, color: 'var(--fg-7c3aed)' },
-      { label: 'Выручка', value: `${int(mm.revenue)} Br`, sub: fg.revenue_goal ? `цель ${int(fg.revenue_goal)}` : '' },
+      { label: 'Выручка', value: `${int(mm.revenue)} BYN`, sub: fg.revenue_goal ? `цель ${int(fg.revenue_goal)}` : '' },
       { label: 'Порожний пробег', value: f.a.trips_total ? `${f.a.empty_km_pct}%` : '—', sub: 'чем меньше, тем лучше', color: (f.a.empty_km_pct || 0) > 30 ? 'var(--fg-d97706)' : undefined },
     ] }
   }
@@ -100,9 +100,9 @@ function buildIsland(page, meta, goals, orders, now, extra = {}) {
     const q = Math.floor(now.getMonth() / 3) + 1
     if (!k) return { title: `КУДиР — ${q} квартал`, sub: 'загружаю…', stats: [] }
     return { title: `КУДиР — ${q} квартал ${now.getFullYear()}`, sub: 'по датам оплат в книге', stats: [
-      { label: 'Доход за квартал', value: `${int(k.income)} Br`, sub: `${k.rows} строк в книге` },
-      { label: 'Налог к уплате', value: `${int(k.income * 0.2)} Br`, sub: '20% от дохода', color: 'var(--fg-d97706)' },
-      { label: 'Доход за месяц', value: `${int(k.monthIncome)} Br`, sub: MON.toLowerCase() },
+      { label: 'Доход за квартал', value: `${int(k.income)} BYN`, sub: `${k.rows} строк в книге` },
+      { label: 'Налог к уплате', value: `${int(k.income * 0.2)} BYN`, sub: '20% от дохода', color: 'var(--fg-d97706)' },
+      { label: 'Доход за месяц', value: `${int(k.monthIncome)} BYN`, sub: MON.toLowerCase() },
       { label: 'Нет ПП', value: k.missing ?? 0, sub: k.missing ? 'оплат без номера ПП' : 'все ПП на месте', color: k.missing ? 'var(--fg-d63b30)' : 'var(--fg-1e9e5a)' },
     ] }
   }
@@ -113,18 +113,18 @@ function buildIsland(page, meta, goals, orders, now, extra = {}) {
     const empty = inMonth.filter(isEmpty), owed = live.filter(owedByClient)
     return { title: `Заявки — ${MON.toLowerCase()}`, sub: `${inMonth.length} за месяц`, stats: [
       { label: 'Заявок', value: inMonth.length, sub: 'в этом месяце' },
-      { label: 'Маржа', value: `${int(m)} Br`, sub: rev ? `${Math.round(m / rev * 100)}% от выручки` : '' },
+      { label: 'Маржа', value: `${int(m)} BYN`, sub: rev ? `${Math.round(m / rev * 100)}% от выручки` : '' },
       { label: 'Пустых и в минус', value: `${empty.length} из ${inMonth.length}`, sub: 'ниже 150 Br или 15%', color: empty.length / (inMonth.length || 1) > 0.3 ? 'var(--fg-d97706)' : undefined },
-      { label: 'Ждём оплату', value: `${int(sum(owed, o => +o.client_rate || 0))} Br`, sub: `${owed.length} заявок` },
+      { label: 'Ждём оплату', value: `${int(sum(owed, o => +o.client_rate || 0))} BYN`, sub: `${owed.length} заявок` },
     ] }
   }
   if (page === 'finance') {
     const owed = live.filter(owedByClient), late = owed.filter(o => dayOf(o) && dayOf(o) < ago45), toCar = live.filter(owedToCarrier)
     return { title: 'Деньги', sub: 'на сегодня', stats: [
-      { label: 'Клиенты должны', value: `${int(sum(owed, o => +o.client_rate || 0))} Br`, sub: `${owed.length} заявок` },
-      { label: 'Дольше 45 дней', value: `${int(sum(late, o => +o.client_rate || 0))} Br`, sub: `${late.length} заявок`, color: late.length ? 'var(--fg-d63b30)' : undefined },
-      { label: 'Мы должны перевозчикам', value: `${int(sum(toCar, o => +o.carrier_rate || 0))} Br`, sub: `${toCar.length} заявок` },
-      { label: `Маржа за ${MON.toLowerCase()}`, value: `${int(sum(inMonth, mg))} Br`, sub: `${inMonth.length} заявок` },
+      { label: 'Клиенты должны', value: `${int(sum(owed, o => +o.client_rate || 0))} BYN`, sub: `${owed.length} заявок` },
+      { label: 'Дольше 45 дней', value: `${int(sum(late, o => +o.client_rate || 0))} BYN`, sub: `${late.length} заявок`, color: late.length ? 'var(--fg-d63b30)' : undefined },
+      { label: 'Мы должны перевозчикам', value: `${int(sum(toCar, o => +o.carrier_rate || 0))} BYN`, sub: `${toCar.length} заявок` },
+      { label: `Маржа за ${MON.toLowerCase()}`, value: `${int(sum(inMonth, mg))} BYN`, sub: `${inMonth.length} заявок` },
     ] }
   }
   if (page === 'clients') {
@@ -141,7 +141,7 @@ function buildIsland(page, meta, goals, orders, now, extra = {}) {
       { label: 'Активные', value: `${ids.filter(id => last[id] >= ago90).length} из ${ids.length}`, sub: 'грузились за 90 дней' },
       { label: 'Новые', value: ids.filter(id => first[id].startsWith(month)).length, sub: 'первая заявка в этом месяце' },
       { label: 'Топ-5 клиентов', value: `${totalY ? Math.round(top5 / totalY * 100) : 0}%`, sub: 'маржи за год', color: totalY && top5 / totalY > 0.65 ? 'var(--fg-d97706)' : undefined },
-      { label: 'Должны', value: `${int(sum(owed, o => +o.client_rate || 0))} Br`, sub: `${owed.length} заявок` },
+      { label: 'Должны', value: `${int(sum(owed, o => +o.client_rate || 0))} BYN`, sub: `${owed.length} заявок` },
     ] }
   }
   if (page === 'carriers') {
@@ -153,7 +153,7 @@ function buildIsland(page, meta, goals, orders, now, extra = {}) {
     return { title: 'Перевозчики', sub: `${ids.size} в работе за всё время`, stats: [
       { label: 'Возили в этом месяце', value: month_.size, sub: `${inMonth.length} рейсов` },
       { label: 'Чаще всех', value: topName, sub: topN ? `${topN} рейсов за месяц` : '' },
-      { label: 'Мы должны', value: `${int(sum(toCar, o => +o.carrier_rate || 0))} Br`, sub: `${toCar.length} заявок` },
+      { label: 'Мы должны', value: `${int(sum(toCar, o => +o.carrier_rate || 0))} BYN`, sub: `${toCar.length} заявок` },
     ] }
   }
   if (page === 'order-detail' && meta?.title) {
@@ -161,9 +161,9 @@ function buildIsland(page, meta, goals, orders, now, extra = {}) {
     if (o) {
       const m = mg(o), r = +o.client_rate || 0
       return { title: 'Сводка заявки', sub: '', stats: [
-        { label: 'Маржа', value: `${int(m)} Br`, sub: r ? `${Math.round(m / r * 100)}% · ${m < 0 ? 'в минус' : isEmpty(o) ? 'пустая' : 'нормальная'}` : '', color: m < 0 ? 'var(--fg-d63b30)' : isEmpty(o) ? 'var(--fg-d97706)' : 'var(--fg-1e9e5a)' },
-        { label: 'Клиент платит', value: `${int(r)} Br`, sub: o.client_paid || o.client_cash ? 'оплачено' : 'ждём оплату', color: o.client_paid || o.client_cash ? 'var(--fg-1e9e5a)' : undefined },
-        { label: 'Перевозчику', value: `${int(o.carrier_rate)} Br`, sub: o.carrier_paid || o.carrier_cash ? 'оплачено' : 'не оплачено', color: o.carrier_paid || o.carrier_cash ? 'var(--fg-1e9e5a)' : undefined },
+        { label: 'Маржа', value: `${int(m)} BYN`, sub: r ? `${Math.round(m / r * 100)}% · ${m < 0 ? 'в минус' : isEmpty(o) ? 'пустая' : 'нормальная'}` : '', color: m < 0 ? 'var(--fg-d63b30)' : isEmpty(o) ? 'var(--fg-d97706)' : 'var(--fg-1e9e5a)' },
+        { label: 'Клиент платит', value: `${int(r)} BYN`, sub: o.client_paid || o.client_cash ? 'оплачено' : 'ждём оплату', color: o.client_paid || o.client_cash ? 'var(--fg-1e9e5a)' : undefined },
+        { label: 'Перевозчику', value: `${int(o.carrier_rate)} BYN`, sub: o.carrier_paid || o.carrier_cash ? 'оплачено' : 'не оплачено', color: o.carrier_paid || o.carrier_cash ? 'var(--fg-1e9e5a)' : undefined },
         { label: 'Выгрузка', value: fmtDay(nd(o.unload_date)), sub: o.load_date ? `загрузка ${fmtDay(nd(o.load_date))}` : '' },
       ] }
     }
@@ -174,9 +174,9 @@ function buildIsland(page, meta, goals, orders, now, extra = {}) {
       const yearMine = mine.filter(o => dayOf(o).startsWith(year)), allYear = sum(inYear, mg)
       const owed = mine.filter(owedByClient), last = mine.map(dayOf).filter(Boolean).sort().pop()
       return { title: 'Сводка клиента', sub: `${mine.length} заявок за всё время`, stats: [
-        { label: `Маржа за ${year}`, value: `${int(sum(yearMine, mg))} Br`, sub: allYear ? `${Math.round(sum(yearMine, mg) / allYear * 100)}% всей маржи` : '' },
-        { label: 'Заявок за год', value: yearMine.length, sub: yearMine.length ? `в среднем ${int(sum(yearMine, mg) / yearMine.length)} Br` : '' },
-        { label: 'Должен', value: `${int(sum(owed, o => +o.client_rate || 0))} Br`, sub: `${owed.length} заявок`, color: owed.some(o => dayOf(o) < ago45) ? 'var(--fg-d63b30)' : undefined },
+        { label: `Маржа за ${year}`, value: `${int(sum(yearMine, mg))} BYN`, sub: allYear ? `${Math.round(sum(yearMine, mg) / allYear * 100)}% всей маржи` : '' },
+        { label: 'Заявок за год', value: yearMine.length, sub: yearMine.length ? `в среднем ${int(sum(yearMine, mg) / yearMine.length)} BYN` : '' },
+        { label: 'Должен', value: `${int(sum(owed, o => +o.client_rate || 0))} BYN`, sub: `${owed.length} заявок`, color: owed.some(o => dayOf(o) < ago45) ? 'var(--fg-d63b30)' : undefined },
         { label: 'Последняя заявка', value: fmtDay(last), sub: '' },
       ] }
     }
@@ -187,8 +187,8 @@ function buildIsland(page, meta, goals, orders, now, extra = {}) {
       const owed = mine.filter(owedToCarrier), last = mine.map(dayOf).filter(Boolean).sort().pop()
       return { title: 'Сводка перевозчика', sub: `${mine.length} рейсов за всё время`, stats: [
         { label: 'Рейсов за год', value: mine.filter(o => dayOf(o).startsWith(year)).length, sub: `${mine.filter(o => dayOf(o).startsWith(month)).length} в этом месяце` },
-        { label: 'Мы должны', value: `${int(sum(owed, o => +o.carrier_rate || 0))} Br`, sub: `${owed.length} заявок` },
-        { label: 'Маржа на его рейсах', value: `${int(sum(mine, mg))} Br`, sub: `в среднем ${int(sum(mine, mg) / mine.length)} Br` },
+        { label: 'Мы должны', value: `${int(sum(owed, o => +o.carrier_rate || 0))} BYN`, sub: `${owed.length} заявок` },
+        { label: 'Маржа на его рейсах', value: `${int(sum(mine, mg))} BYN`, sub: `в среднем ${int(sum(mine, mg) / mine.length)} BYN` },
         { label: 'Последний рейс', value: fmtDay(last), sub: '' },
       ] }
     }
@@ -381,7 +381,8 @@ export function TopbarExpand({ barRef, page, meta }) {
                 <div className="island-stat-v" style={st.color && st.bar == null ? { color: st.color } : undefined}>
                   {st.value}{st.bar != null && st.sub && <span className="island-stat-of"> {st.sub}</span>}
                 </div>
-                {st.bar != null ? <div className="island-bar"><div style={{ width: `${st.bar}%`, background: st.color }} /></div>
+                {/* полоска прогресса — одним цветом для всех, процент рядом */}
+                {st.bar != null ? <div className="island-bar-row"><div className="island-bar"><div style={{ width: `${st.bar}%` }} /></div><span>{Math.round(st.bar)}%</span></div>
                   : st.sub ? <div className="island-stat-sub">{st.sub}</div> : null}
               </motion.div>
             ))}
