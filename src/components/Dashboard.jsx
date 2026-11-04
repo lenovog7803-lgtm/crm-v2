@@ -238,37 +238,46 @@ const Chevron = ({ color }) => (
   <svg width="8" height="13" viewBox="0 0 8 13" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5 }}><polyline points="1.5 1.5 6.5 6.5 1.5 11.5" /></svg>
 )
 
-function DebtModal({ title, orders, onClose, onOpenOrder }) {
+function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
   useEscapeKey(onClose)
+  const total = orders.reduce((sum, o) => sum + (o.client_rate || 0), 0)
   return (
     <div className="dash-modal-scrim" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div className="dash-modal" style={{ maxWidth: 560 }}>
-        <div style={{ padding: 28 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>{title}</div>
+        <div style={{ padding: '24px 24px 20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+            <div>
+              <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>{title}</div>
+              {orders.length > 0 && (
+                <div style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 3, fontVariantNumeric: 'tabular-nums' }}>
+                  {orders.length} заявок · <b style={{ color: 'var(--ink)', fontWeight: 600 }}>{total.toLocaleString('ru-RU')} BYN</b>
+                </div>
+              )}
+            </div>
             <button onClick={onClose} className="ios-sheet-close" aria-label="Закрыть"><svg width="12" height="12" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
           </div>
           {orders.length === 0 && <div style={{ color: 'var(--text-tertiary)', fontSize: 13, textAlign: 'center', padding: '20px 0' }}>Нет неоплаченных заявок</div>}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {orders.map((o, i) => (
-              <div key={i}
-                onClick={() => { onOpenOrder && onOpenOrder(o.id); onClose() }}
-                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', borderRadius: 12, borderBottom: '1px solid rgba(var(--ink-rgb), 0.06)', cursor: onOpenOrder ? 'pointer' : 'default', transition: 'background 0.1s' }}
-                onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.05)')}
-                onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
-              >
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-1366f0)', fontWeight: 600 }}>{o.order_number || `#${o.id}`}</div>
-                  <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {o.client_name || o.carrier_name || '—'}{(o.route_from && o.route_to) ? ` · ${o.route_from} → ${o.route_to}` : ''}
+          {/* список как в iOS: одна группа, строки через тонкие линии */}
+          {orders.length > 0 && (
+            <div className="ios-list" style={{ maxHeight: '62vh', overflowY: 'auto' }}>
+              {orders.map((o, i) => (
+                <div key={i} className="ios-row debt-row" onClick={() => { onOpenOrder && onOpenOrder(o.id); onClose() }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {(o.route_from && o.route_to) ? `${o.route_from} → ${o.route_to}` : '—'}
+                    </div>
+                    <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {o.order_number || `#${o.id}`} · {(party === 'carrier' ? o.carrier_name : o.client_name) || '—'}
+                    </div>
                   </div>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                    {(o.client_rate || 0).toLocaleString('ru-RU')} <span style={{ fontSize: 12, color: 'var(--text-tertiary)', fontWeight: 500 }}>BYN</span>
+                  </div>
+                  <svg width="8" height="13" viewBox="0 0 8 13" fill="none" stroke="var(--text-quaternary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M1.5 1.5l5 5-5 5"/></svg>
                 </div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: 'var(--fg-d97706)', flexShrink: 0, marginLeft: 12 }}>
-                  {(o.client_rate || o.carrier_rate || 0).toLocaleString('ru-RU')} Br
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -680,6 +689,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
         <DebtModal
           title="К оплате перевозчикам"
           orders={carrierDebtOrders.map(o => ({ ...o, client_rate: o.carrier_rate }))}
+          party="carrier"
           onClose={() => setShowCarrierDebt(false)}
           onOpenOrder={onOpenOrder}
         />
