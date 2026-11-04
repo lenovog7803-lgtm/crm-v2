@@ -182,13 +182,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
       {/* Период — только на дашборде */}
       {page === 'dashboard' && (
         <Select className="topbar-period" value={period} onChange={e => onPeriodChange && onPeriodChange(e.target.value)}
-          style={{
-            height: 38, padding: '0 12px', borderRadius: 11,
-            border: '1px solid rgba(var(--ink-rgb), 0.12)',
-            background: 'rgba(var(--paper-rgb), 0.7)',
-            fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600, color: 'var(--ink)',
-            outline: 'none', cursor: 'pointer',
-          }}>
+>
           {PERIOD_OPTIONS.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
           {extraQuarters.length > 0 && <option disabled>──────────</option>}
           {extraQuarters.map(q => <option key={q} value={q}>{fmtQuarter(q)}</option>)}
