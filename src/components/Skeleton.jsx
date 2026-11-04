@@ -8,7 +8,8 @@ export function Skeleton({ width = '100%', height = 16, radius = 8, style = {} }
 
 export function SkeletonCard({ lines = 3 }) {
   return (
-    <div className="ios-widget" style={{ padding: 20 }}>
+    <div className="ios-widget loading-glass" style={{ padding: 20 }}>
+      <span className="sheen" />
       <Skeleton width="60%" height={14} style={{ marginBottom: 12 }} />
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton key={i} width={i === lines - 1 ? '40%' : '90%'} height={12} style={{ marginBottom: 8 }} />
@@ -34,7 +35,8 @@ export function SkeletonRow() {
 // check — вместо аватара круглая отметка, как в задачах.
 export function SkeletonList({ rows = 8, check = false }) {
   return (
-    <div className={`ios-list${check ? ' ios-list--check' : ''}`} aria-busy="true">
+    <div className={`ios-list loading-glass${check ? ' ios-list--check' : ''}`} aria-busy="true">
+      <span className="sheen" />
       {Array.from({ length: rows }).map((_, i) => (
         <div key={i} className="ios-row ios-row-skel">
           <Skeleton width={check ? 24 : 42} height={check ? 24 : 42} radius={999} style={{ flexShrink: 0 }} />

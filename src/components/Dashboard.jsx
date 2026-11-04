@@ -511,15 +511,15 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
   if (loading) return (
     // заготовки той же формы, что и дашборд: «Маржа» во всю ширину, под ней долги и цели, полоса цифр
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div className="ios-widget" style={{ height: isMobile ? 300 : 450 }} />
+      <div className="ios-widget loading-glass" style={{ height: isMobile ? 300 : 450 }}><span className="sheen" /></div>
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div className="ios-widget" style={{ height: 130 }} />
-          <div className="ios-widget" style={{ height: 130 }} />
+          <div className="ios-widget loading-glass" style={{ height: 130 }}><span className="sheen" /></div>
+          <div className="ios-widget loading-glass" style={{ height: 130 }}><span className="sheen" /></div>
         </div>
-        <div className="ios-widget" style={{ height: 276 }} />
+        <div className="ios-widget loading-glass" style={{ height: 276 }}><span className="sheen" /></div>
       </div>
-      <div className="ios-widget" style={{ height: 52 }} />
+      <div className="ios-widget loading-glass" style={{ height: 52 }}><span className="sheen" /></div>
     </div>
   )
 
