@@ -982,7 +982,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: 14, flexShrink: 0,
-                  background: `linear-gradient(135deg, ${avAc} 0%, ${avBc} 100%)`,
+                  '--av-hue': avBc, background: `linear-gradient(135deg, ${avAc} 0%, ${avBc} 100%)`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: '#fff', fontWeight: 700, fontSize: 14,
                 }}>{initials(order.client_name)}</div>
@@ -1005,7 +1005,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: 14, flexShrink: 0,
-                  background: `linear-gradient(135deg, ${avAr} 0%, ${avBr} 100%)`,
+                  '--av-hue': avBr, background: `linear-gradient(135deg, ${avAr} 0%, ${avBr} 100%)`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

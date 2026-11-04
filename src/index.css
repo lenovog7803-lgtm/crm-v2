@@ -1364,3 +1364,18 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 [style*="--av-hue"], .ios-row-avatar { display: none !important; }
 /* разделители в списках, где были аватары, — от левого края текста */
 .ios-list:has(.ios-row-avatar) .ios-row + .ios-row::before { left: 16px; }
+
+/* ===== Блоки страниц (карточки, виджеты, боковое меню, шапка) — эталонное стекло, как у окон и меню =====
+   (синие карточки с переливом — .grad-card и «Маржа» — не трогаем) */
+.card:not(.grad-card), .ios-widget:not(.grad-card), .kanban-card {
+  background:
+    radial-gradient(120% 120% at 15% -40%, rgba(var(--paper-rgb), 0.75) 0%, rgba(var(--paper-rgb), 0) 55%),
+    linear-gradient(180deg, rgba(var(--paper-rgb), 0.7) 0%, rgba(var(--paper-rgb), 0.56) 100%) !important;
+  backdrop-filter: blur(20px) saturate(200%) brightness(1.04) !important; -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.04) !important;
+  border: none !important;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), inset 0 0 18px rgba(255,255,255,calc(0.35 * var(--rim-k))),
+    0 0 0 0.5px rgba(14,23,38,0.06), 0 22px 40px -22px rgba(20,30,55,0.3) !important;
+}
+:root[data-theme="dark"] .card:not(.grad-card), :root[data-theme="dark"] .ios-widget:not(.grad-card), :root[data-theme="dark"] .kanban-card {
+  background: rgba(30,31,34,0.82) !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06), 0 10px 30px -16px rgba(0,0,0,0.6) !important;
+}
