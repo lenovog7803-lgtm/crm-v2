@@ -387,15 +387,8 @@ function GoalEditModal({ goalKey, value, onChange, onClose, onSave }) {
   const [saving, setSaving] = useState(false)
   useEscapeKey(onClose)
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.45)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 1000, display: 'grid', padding: 20 }}>
-      <div style={{
-        margin: 'auto', background: 'rgba(var(--paper-rgb), 0.85)',
-        backdropFilter: 'blur(28px) saturate(180%)', WebkitBackdropFilter: 'blur(28px) saturate(180%)',
-        borderRadius: 20, width: '100%', maxWidth: 340,
-        border: '1px solid rgba(255,255,255,calc(0.8 * var(--rim-k)))',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), 0 40px 80px -20px rgba(20,30,55,0.35)',
-        animation: 'modalIn 0.22s var(--ease) both',
-      }}>
+    <div className="dash-modal-scrim" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="dash-modal" style={{ maxWidth: 340 }}>
         <div style={{ padding: 24 }}>
           <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: 'var(--ink)', marginBottom: 4 }}>
             План: {meta.label}
