@@ -7,6 +7,7 @@ import { CircularProgress } from './CircularProgress'
 import MarginChart from './MarginChart'
 import { SkeletonCard } from './Skeleton'
 import { mouseOnly } from '../motion'
+import { inPeriod } from '../utils'
 import { SwapText } from './Transitions'
 import GradientLayer from './GradientLayer'
 
@@ -20,30 +21,7 @@ const fmtMonthLabel = m => {
 }
 
 function filterByPeriod(orders, period) {
-  const now = new Date()
-  return orders.filter(o => {
-    const raw = o.unload_date || o.load_date || o.created_at
-    if (!raw) return period === 'all'
-    const d = new Date(raw)
-    if (isNaN(d)) return period === 'all'
-    if (period === 'month') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
-    if (period === 'last_month') {
-      const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-      return d.getMonth() === lm.getMonth() && d.getFullYear() === lm.getFullYear()
-    }
-    if (period === 'quarter') {
-      const q = Math.floor(now.getMonth() / 3)
-      return Math.floor(d.getMonth() / 3) === q && d.getFullYear() === now.getFullYear()
-    }
-    if (period === 'year') return d.getFullYear() === now.getFullYear()
-    if (/^\d{4}-\d{2}$/.test(period)) return (raw || '').slice(0, 7) === period
-    if (/^\d{4}-Q[1-4]$/.test(period)) {
-      const year = parseInt(period.slice(0, 4), 10)
-      const q = parseInt(period.slice(6), 10)
-      return d.getFullYear() === year && Math.floor(d.getMonth() / 3) + 1 === q
-    }
-    return true
-  })
+  return orders.filter(o => inPeriod(o.unload_date || o.load_date || o.created_at, period))
 }
 
 function getPrevPeriod(period) {

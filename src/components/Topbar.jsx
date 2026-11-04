@@ -179,8 +179,8 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
         </button>
       )}
 
-      {/* Период — только на дашборде */}
-      {page === 'dashboard' && (
+      {/* Период — на дашборде и в финансах (один общий выбор) */}
+      {(page === 'dashboard' || page === 'finance') && (
         <Select className="topbar-period" value={period} onChange={e => onPeriodChange && onPeriodChange(e.target.value)}
 >
           {PERIOD_OPTIONS.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}

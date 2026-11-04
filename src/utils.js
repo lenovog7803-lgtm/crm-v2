@@ -59,3 +59,22 @@ export const getGradient = str => {
   for (const c of (str || '')) h = (h * 31 + c.charCodeAt(0)) & 0xffff
   return GRADIENTS[h % GRADIENTS.length]
 }
+
+// Попадает ли дата в период из выбора «Текущий месяц / Прошлый / Квартал / Год / Всё время / 2026-10 / 2026-Q3».
+export function inPeriod(raw, period) {
+  if (period === 'all') return true
+  if (!raw) return false
+  const d = new Date(raw)
+  if (isNaN(d)) return false
+  const now = new Date()
+  if (period === 'month') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+  if (period === 'last_month') {
+    const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+    return d.getMonth() === lm.getMonth() && d.getFullYear() === lm.getFullYear()
+  }
+  if (period === 'quarter') return Math.floor(d.getMonth() / 3) === Math.floor(now.getMonth() / 3) && d.getFullYear() === now.getFullYear()
+  if (period === 'year') return d.getFullYear() === now.getFullYear()
+  if (/^\d{4}-\d{2}$/.test(period)) return String(raw).slice(0, 7) === period
+  if (/^\d{4}-Q[1-4]$/.test(period)) return d.getFullYear() === parseInt(period.slice(0, 4), 10) && Math.floor(d.getMonth() / 3) + 1 === parseInt(period.slice(6), 10)
+  return true
+}

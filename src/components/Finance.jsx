@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getOrders, getClients, getCarriers, getPaymentsIn, getPaymentsOut, createPaymentIn, createPaymentOut, deletePaymentIn, deletePaymentOut, generateReconciliation, getReconciliationHistory, getClientPPLedger, addClientPPEntry, deleteClientPPEntry, getCarrierPPLedger, addCarrierPPEntry, deleteCarrierPPEntry } from '../api'
-import { fmtMoney, initials, getGradient, fmtDate } from '../utils'
+import { fmtMoney, initials, getGradient, fmtDate, inPeriod } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
 import { useToast } from './Toast'
@@ -11,7 +11,7 @@ import { EmptyState } from './EmptyState'
 import DateInput from './DateInput'
 import CardGradient from './CardGradient'
 
-export default function Finance({ refreshKey }) {
+export default function Finance({ refreshKey, period = 'all' }) {
   const isMobile = useIsMobile()
   const { show } = useToast()
   const [orders, setOrders] = useState([])
@@ -81,8 +81,12 @@ export default function Finance({ refreshKey }) {
   // Hero totals — из заявок по флагам оплаты (client_paid / carrier_paid)
   const paidClientOrders = orders.filter(o => o.client_paid && !o.deleted)
   const paidCarrierOrders = orders.filter(o => o.carrier_paid && !o.deleted)
-  const totalIncome = paidClientOrders.reduce((s, o) => s + parseFloat(o.client_rate || 0), 0)
-  const totalExpense = paidCarrierOrders.reduce((s, o) => s + parseFloat(o.carrier_rate || 0), 0)
+  // суммы сверху — за период из верхней панели (та же дата заявки, что на дашборде)
+  const orderInPeriod = o => inPeriod(o.unload_date || o.load_date || o.created_at, period)
+  const periodClientPaid = paidClientOrders.filter(orderInPeriod)
+  const periodCarrierPaid = paidCarrierOrders.filter(orderInPeriod)
+  const totalIncome = periodClientPaid.reduce((s, o) => s + parseFloat(o.client_rate || 0), 0)
+  const totalExpense = periodCarrierPaid.reduce((s, o) => s + parseFloat(o.carrier_rate || 0), 0)
   const netProfit = totalIncome - totalExpense
   const marginPct = totalIncome > 0 ? Math.round((netProfit / totalIncome) * 100) : 0
 
@@ -92,7 +96,7 @@ export default function Finance({ refreshKey }) {
     ...paymentsOut.map(p => ({ ...p, kind: 'expense', name: p.carrier_name || '—', gradKey: p.carrier_name || '' })),
   ].sort((a, b) => (b.date || '').localeCompare(a.date || ''))
 
-  let filtered = [...allPayments]
+  let filtered = allPayments.filter(p => inPeriod(p.date, period))
   if (typeFilter === 'income') filtered = filtered.filter(p => p.kind === 'income')
   if (typeFilter === 'expense') filtered = filtered.filter(p => p.kind === 'expense')
 
@@ -193,13 +197,13 @@ export default function Finance({ refreshKey }) {
               <div className="grad-kicker" style={{ color: 'var(--fg-1e9e5a)' }}>Поступления</div>
               <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
               <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
-              <div style={{ marginTop: 6, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{paidClientOrders.length} заявок оплачено</div>
+              <div style={{ marginTop: 6, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{periodClientPaid.length} заявок оплачено</div>
             </div>
             <div onClick={() => setShowOutModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '14px 14px', color: 'var(--ink)' }}>
               <div className="grad-kicker" style={{ color: 'var(--fg-7c3aed)' }}>Списания</div>
               <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
               <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
-              <div style={{ marginTop: 6, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{paidCarrierOrders.length} заявок оплачено</div>
+              <div style={{ marginTop: 6, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{periodCarrierPaid.length} заявок оплачено</div>
             </div>
           </div>
         </div>
@@ -225,13 +229,13 @@ export default function Finance({ refreshKey }) {
             <div className="grad-kicker" style={{ color: 'var(--fg-1e9e5a)' }}>Поступления</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
             <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
-            <div style={{ marginTop: 14, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{paidClientOrders.length} заявок оплачено</div>
+            <div style={{ marginTop: 14, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{periodClientPaid.length} заявок оплачено</div>
           </div>
           <div onClick={() => setShowOutModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '26px 24px', color: 'var(--ink)' }}>
             <div className="grad-kicker" style={{ color: 'var(--fg-7c3aed)' }}>Списания</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
             <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
-            <div style={{ marginTop: 14, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{paidCarrierOrders.length} заявок оплачено</div>
+            <div style={{ marginTop: 14, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{periodCarrierPaid.length} заявок оплачено</div>
           </div>
         </div>
       )}
@@ -508,13 +512,13 @@ export default function Finance({ refreshKey }) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
                   <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Поступления от клиентов</div>
-                  <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>Итого: {totalIncome.toLocaleString('ru-RU')} BYN · {paidClientOrders.length} заявок</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>Итого: {totalIncome.toLocaleString('ru-RU')} BYN · {periodClientPaid.length} заявок</div>
                 </div>
                 <button onClick={() => setShowInModal(false)} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.1)', background: 'transparent', cursor: 'pointer', fontSize: 18, color: 'var(--text-tertiary)' }}>×</button>
               </div>
-              {paidClientOrders.length === 0 ? (
+              {periodClientPaid.length === 0 ? (
                 <div style={{ textAlign: 'center', color: 'var(--text-tertiary)', padding: 40 }}>Нет оплаченных заявок</div>
-              ) : paidClientOrders.map((o, i) => {
+              ) : periodClientPaid.map((o, i) => {
                 const [avA, avB] = getGradient(o.client_name || '')
                 return (
                   <div key={o.id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.06)' }}>
@@ -557,13 +561,13 @@ export default function Finance({ refreshKey }) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
                   <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Оплачено перевозчикам</div>
-                  <div style={{ fontSize: 12, color: 'var(--fg-e0473b)', fontWeight: 600, marginTop: 2 }}>Итого: -{totalExpense.toLocaleString('ru-RU')} BYN · {paidCarrierOrders.length} заявок</div>
+                  <div style={{ fontSize: 12, color: 'var(--fg-e0473b)', fontWeight: 600, marginTop: 2 }}>Итого: -{totalExpense.toLocaleString('ru-RU')} BYN · {periodCarrierPaid.length} заявок</div>
                 </div>
                 <button onClick={() => setShowOutModal(false)} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.1)', background: 'transparent', cursor: 'pointer', fontSize: 18, color: 'var(--text-tertiary)' }}>×</button>
               </div>
-              {paidCarrierOrders.length === 0 ? (
+              {periodCarrierPaid.length === 0 ? (
                 <div style={{ textAlign: 'center', color: 'var(--text-tertiary)', padding: 40 }}>Нет оплаченных заявок</div>
-              ) : paidCarrierOrders.map((o, i) => {
+              ) : periodCarrierPaid.map((o, i) => {
                 const [avA, avB] = getGradient(o.carrier_name || '')
                 return (
                   <div key={o.id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 8px', borderBottom: '1px solid rgba(var(--ink-rgb), 0.06)', borderLeft: '3px solid rgba(var(--rgb-224-71-59), 0.35)', background: 'rgba(var(--rgb-224-71-59), 0.03)' }}>

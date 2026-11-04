@@ -388,6 +388,7 @@ function MainApp() {
               <Finance
                 onAddPayment={openPaymentModal}
                 refreshKey={financeKey}
+                period={dashboardPeriod}
               />
             )}
 
