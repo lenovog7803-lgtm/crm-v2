@@ -7,7 +7,7 @@ import MarginChart from './MarginChart'
 import GoalsRings from './GoalsRings'
 import { SkeletonCard } from './Skeleton'
 import { mouseOnly } from '../motion'
-import { inPeriod } from '../utils'
+import { inPeriod, initials, getGradient } from '../utils'
 import { SwapText } from './Transitions'
 import GradientLayer from './GradientLayer'
 
@@ -238,44 +238,91 @@ const Chevron = ({ color }) => (
   <svg width="8" height="13" viewBox="0 0 8 13" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5 }}><polyline points="1.5 1.5 6.5 6.5 1.5 11.5" /></svg>
 )
 
+// дней с выгрузки (или загрузки) — сколько висит долг
+const daysWaiting = o => {
+  const d = o.unload_date || o.load_date
+  return d ? Math.max(0, Math.floor((Date.now() - new Date(d).getTime()) / 864e5)) : null
+}
+
+// Долги по контрагентам: сверху итог, ниже кто сколько должен / кому сколько платить;
+// клик по контрагенту раскрывает его заявки.
 function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
   useEscapeKey(onClose)
+  const [open, setOpen] = useState(null)
   const total = orders.reduce((sum, o) => sum + (o.client_rate || 0), 0)
+  const groups = Object.values(orders.reduce((acc, o) => {
+    const name = (party === 'carrier' ? o.carrier_name : o.client_name) || 'Без названия'
+    const g = acc[name] || (acc[name] = { name, sum: 0, orders: [], oldest: 0 })
+    g.sum += o.client_rate || 0
+    g.orders.push(o)
+    g.oldest = Math.max(g.oldest, daysWaiting(o) || 0)
+    return acc
+  }, {})).sort((a, b) => b.sum - a.sum)
+
   return (
     <div className="dash-modal-scrim" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div className="dash-modal" style={{ maxWidth: 560 }}>
         <div style={{ padding: '24px 24px 20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
             <div>
-              <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>{title}</div>
-              {orders.length > 0 && (
-                <div style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 3, fontVariantNumeric: 'tabular-nums' }}>
-                  {orders.length} заявок · <b style={{ color: 'var(--ink)', fontWeight: 600 }}>{total.toLocaleString('ru-RU')} BYN</b>
-                </div>
-              )}
+              <div style={{ fontSize: 13, color: 'var(--text-3)', fontWeight: 600 }}>{title}</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 4 }}>
+                <span style={{ fontSize: 30, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.03em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{total.toLocaleString('ru-RU')}</span>
+                <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-tertiary)' }}>BYN</span>
+              </div>
+              <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 6 }}>
+                {orders.length} заявок · {groups.length} {party === 'carrier' ? 'перевозчиков' : 'клиентов'}
+              </div>
             </div>
             <button onClick={onClose} className="ios-sheet-close" aria-label="Закрыть"><svg width="12" height="12" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
           </div>
           {orders.length === 0 && <div style={{ color: 'var(--text-tertiary)', fontSize: 13, textAlign: 'center', padding: '20px 0' }}>Нет неоплаченных заявок</div>}
-          {/* список как в iOS: одна группа, строки через тонкие линии */}
-          {orders.length > 0 && (
-            <div className="ios-list" style={{ maxHeight: '62vh', overflowY: 'auto' }}>
-              {orders.map((o, i) => (
-                <div key={i} className="ios-row debt-row" onClick={() => { onOpenOrder && onOpenOrder(o.id); onClose() }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {(o.route_from && o.route_to) ? `${o.route_from} → ${o.route_to}` : '—'}
+          {groups.length > 0 && (
+            <div className="ios-list" style={{ maxHeight: '58vh', overflowY: 'auto' }}>
+              {groups.map(g => {
+                const [a, b] = getGradient(g.name)
+                const isOpen = open === g.name
+                return (
+                  <div key={g.name} className="debt-group">
+                    <div className="ios-row" onClick={() => setOpen(isOpen ? null : g.name)} aria-expanded={isOpen}>
+                      <span style={{ width: 38, height: 38, borderRadius: 99, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 13, fontWeight: 700, background: `linear-gradient(135deg, ${a}, ${b})` }}>{initials(g.name)}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{g.name}</div>
+                        <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>
+                          {g.orders.length} {g.orders.length === 1 ? 'заявка' : g.orders.length < 5 ? 'заявки' : 'заявок'}
+                          {g.oldest > 0 && <> · <span style={{ color: g.oldest > 30 ? 'var(--fg-c81923)' : 'inherit' }}>до {g.oldest} дн.</span></>}
+                        </div>
+                      </div>
+                      <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+                        {g.sum.toLocaleString('ru-RU')} <span style={{ fontSize: 12, color: 'var(--text-tertiary)', fontWeight: 500 }}>BYN</span>
+                      </div>
+                      <svg width="13" height="8" viewBox="0 0 13 8" fill="none" stroke="var(--text-quaternary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                        style={{ flexShrink: 0, transition: 'transform 0.2s var(--ease)', transform: isOpen ? 'rotate(180deg)' : 'none' }}><path d="M1.5 1.5l5 5 5-5"/></svg>
                     </div>
-                    <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {o.order_number || `#${o.id}`} · {(party === 'carrier' ? o.carrier_name : o.client_name) || '—'}
-                    </div>
+                    {isOpen && (
+                      <div className="debt-orders">
+                        {g.orders.map(o => {
+                          const days = daysWaiting(o)
+                          return (
+                            <div key={o.id} className="debt-order" onClick={() => { onOpenOrder && onOpenOrder(o.id); onClose() }}>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: 13.5, fontWeight: 500, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {(o.route_from && o.route_to) ? `${o.route_from} → ${o.route_to}` : '—'}
+                                </div>
+                                <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 1 }}>
+                                  {o.order_number || `#${o.id}`}{days !== null && <> · <span style={{ color: days > 30 ? 'var(--fg-c81923)' : 'inherit' }}>{days} дн.</span></>}
+                                </div>
+                              </div>
+                              <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{(o.client_rate || 0).toLocaleString('ru-RU')}</span>
+                              <svg width="7" height="12" viewBox="0 0 8 13" fill="none" stroke="var(--text-quaternary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1.5 1.5l5 5-5 5"/></svg>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
                   </div>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
-                    {(o.client_rate || 0).toLocaleString('ru-RU')} <span style={{ fontSize: 12, color: 'var(--text-tertiary)', fontWeight: 500 }}>BYN</span>
-                  </div>
-                  <svg width="8" height="13" viewBox="0 0 8 13" fill="none" stroke="var(--text-quaternary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M1.5 1.5l5 5-5 5"/></svg>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
