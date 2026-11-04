@@ -3,8 +3,9 @@ import { getDashboard, getOrders, getGoals, saveGoals } from '../api'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useEscapeKey } from '../hooks/useEscapeKey'
 import { CountUp } from './CountUp'
-import { CircularProgress } from './CircularProgress'
 import MarginChart from './MarginChart'
+import GoalsRings from './GoalsRings'
+import { AreaSparkline } from '../bklit/charts/sparkline'
 import { SkeletonCard } from './Skeleton'
 import { mouseOnly } from '../motion'
 import { inPeriod } from '../utils'
@@ -18,6 +19,22 @@ const fmtMonthLabel = m => {
   if (!m || !m.includes('-')) return m
   const [y, mo] = m.split('-')
   return `${MONTH_RU[parseInt(mo) - 1]} ${y}`
+}
+
+// По неделям за 12 недель (последняя точка — эта неделя): pick(o) → [дата, ключ] или null.
+// Ключ задан — считаем разных (клиентов/перевозчиков), нет — просто штуки.
+function weeklySeries(orders, pick, weeks = 12) {
+  const now = Date.now(), WEEK = 7 * 864e5
+  const sets = Array.from({ length: weeks }, () => new Set())
+  const counts = new Array(weeks).fill(0)
+  for (const o of orders) {
+    const p = pick(o); if (!p || !p[0]) continue
+    const t = new Date(p[0]).getTime(); if (isNaN(t)) continue
+    const i = weeks - 1 - Math.floor((now - t) / WEEK)
+    if (i < 0 || i >= weeks) continue
+    if (p[1] != null) sets[i].add(p[1]); else counts[i]++
+  }
+  return counts.map((c, i) => ({ v: c + sets[i].size }))
 }
 
 function filterByPeriod(orders, period) {
@@ -550,41 +567,13 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 12 }}>
               Цели месяца
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-              {[
+            <GoalsRings onEdit={key => { setEditingGoal(key); setGoalInput(String(goals[`${key}_goal`] ?? '')) }}
+              items={[
                 { key: 'profit', label: 'Прибыль', fact: goals.profit_fact, goal: goals.profit_goal, color: 'var(--fg-1366f0)', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
                 { key: 'trips', label: 'Рейсы', fact: goals.trips_fact, goal: goals.trips_goal, color: 'var(--fg-1e9e5a)', fmt: v => Math.round(v) },
                 { key: 'margin', label: 'Маржа/рейс', fact: goals.margin_fact, goal: goals.margin_goal, color: 'var(--fg-d97706)', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
                 { key: 'new_clients', label: 'Новые клиенты', fact: goals.new_clients_fact, goal: goals.new_clients_goal, color: 'var(--fg-7c3aed)', fmt: v => Math.round(v) },
-              ].map(g => {
-                const pct = g.goal > 0 ? (g.fact / g.goal) * 100 : 0
-                return (
-                  <div key={g.label}
-                    onClick={() => { setEditingGoal(g.key); setGoalInput(String(g.goal)) }}
-                    title="Изменить план на этот месяц"
-                    style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', borderRadius: 12, padding: 4, margin: -4, transition: 'background 0.15s var(--ease)' }}
-                    onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.04)')}
-                    onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
-                  >
-                    <div style={{ position: 'relative', flexShrink: 0 }}>
-                      <div style={{ filter: `drop-shadow(0 4px 10px color-mix(in srgb, ${g.color} 25%, transparent))` }}>
-                        <CircularProgress pct={pct} color={g.color} size={48} stroke={7} track={`color-mix(in srgb, ${g.color} 13%, transparent)`} />
-                      </div>
-                      <div style={{
-                        position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 11, fontWeight: 700, color: g.color, fontVariantNumeric: 'tabular-nums',
-                      }}>{Math.round(pct)}%</div>
-                    </div>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600 }}>{g.label}</div>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)', marginTop: 2, whiteSpace: 'nowrap' }}>
-                        {g.fmt(g.fact)} <span style={{ fontWeight: 500, color: 'var(--text-tertiary)' }}>/ {g.fmt(g.goal)}</span>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+              ]} />
           </div>
         )}
 
@@ -594,12 +583,12 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       {/* KPI — одна полоса из четырёх цифр */}
       <div className="dashboard-stat-grid card ios-widget kpi-strip" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', padding: 6 }}>
         {[
-          { label: 'Активных заявок', value: active, color: 'var(--fg-1366f0)',
+          { label: 'Активных заявок', value: active, color: 'var(--fg-1366f0)', series: weeklySeries(allOrders, o => [o.load_date || o.created_at]),
             onClick: () => { localStorage.setItem('orders_statusFilter', 'active'); onNav('orders') } },
-          { label: 'Доставлено', value: done, color: 'var(--fg-1e9e5a)',
+          { label: 'Доставлено', value: done, color: 'var(--fg-1e9e5a)', series: weeklySeries(allOrders, o => ['done', 'delivered', 'completed'].includes(o.status) ? [o.unload_date || o.load_date] : null),
             onClick: () => { localStorage.setItem('orders_statusFilter', 'done'); onNav('orders') } },
-          { label: 'Клиентов', value: clientsCount, color: 'var(--fg-d97706)', onClick: () => onNav('clients') },
-          { label: 'Перевозчиков', value: carriersCount, color: 'var(--fg-7c3aed)', onClick: () => onNav('carriers') },
+          { label: 'Клиентов', value: clientsCount, color: 'var(--fg-d97706)', series: weeklySeries(allOrders, o => [o.load_date || o.created_at, o.client_name]), onClick: () => onNav('clients') },
+          { label: 'Перевозчиков', value: carriersCount, color: 'var(--fg-7c3aed)', series: weeklySeries(allOrders, o => [o.load_date || o.created_at, o.carrier_name]), onClick: () => onNav('carriers') },
         ].map(kpi => (
           <div key={kpi.label} className="kpi-cell" onClick={kpi.onClick}
             style={{ padding: isMobile ? '10px 12px' : '12px 18px', cursor: 'pointer', borderRadius: 16 }}>
@@ -608,6 +597,12 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
               <div style={{ fontWeight: 700, fontSize: isMobile ? 24 : 28, color: kpi.color, lineHeight: 1, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}>
                 <CountUp value={kpi.value} format={v => Math.round(v).toLocaleString('ru-RU')} />
               </div>
+              {/* мини-график Bklit: как менялось по неделям за 12 недель */}
+              {!isMobile && (
+                <div className="bklit" style={{ width: 110, flexShrink: 0 }} title="по неделям, 12 недель">
+                  <AreaSparkline data={kpi.series} dataKey="v" height={34} color={kpi.color} strokeWidth={2} fillOpacity={0.25} animate />
+                </div>
+              )}
             </div>
           </div>
         ))}

@@ -34,3 +34,36 @@ export function clipRevealTransition(enterTransition?: Transition): Transition {
     ease: DEFAULT_CHART_ENTER_TRANSITION.ease,
   };
 }
+
+
+// добавлено из свежего Bklit (bklit.com/r/chart-animation.json) для кольцевой диаграммы
+export const GRID_RING_STAGGER_S = 0.08;
+
+export const GRID_RING_SPRING: Transition = {
+  type: "spring",
+  stiffness: 100,
+  damping: 15,
+  mass: 1,
+};
+
+export const GRID_SPOKE_STAGGER_S = 0.05;
+
+export const GRID_SPOKE_SPRING: Transition = {
+  type: "spring",
+  stiffness: 80,
+  damping: 15,
+  mass: 1,
+};
+
+export const GRID_VALUE_LABEL_STAGGER_S = 0.06;
+
+export const GRID_ANGLE_LABEL_STAGGER_S = 0.08;
+
+export const GRID_ANGLE_LABEL_FADE_S = 0.5;
+
+export function gridLabelDelay(
+  ringCount: number,
+  ringStagger: number = GRID_RING_STAGGER_S
+): number {
+  return ringCount * ringStagger * 0.5;
+}

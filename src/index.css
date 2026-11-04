@@ -1195,3 +1195,5 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .kpi-strip .kpi-cell + .kpi-cell::before { content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 1px; background: rgba(var(--ink-rgb), 0.08); }
 @media (hover: hover) { .kpi-strip .kpi-cell:hover { background: rgba(var(--ink-rgb), 0.04); } }
 @media (max-width: 768px) { .kpi-strip .kpi-cell:nth-child(3)::before { display: none; } }
+/* строки целей рядом с кольцами */
+.goal-row { display: flex; align-items: center; gap: 8px; width: 100%; padding: 4px 8px; border: none; border-radius: 10px; cursor: pointer; font-family: var(--font-sys); transition: background 0.15s var(--ease); }
