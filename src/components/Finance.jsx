@@ -347,7 +347,7 @@ export default function Finance({ refreshKey, period = 'all' }) {
                 }}>
                 <div style={{
                   width: 32, height: 32, borderRadius: 10, flexShrink: 0,
-                  background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
+                  '--av-hue': avB, background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: '#fff', fontSize: 11, fontWeight: 700,
                 }}>{initials(p.name)}</div>
@@ -524,7 +524,7 @@ export default function Finance({ refreshKey, period = 'all' }) {
                   <div key={o.id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.06)' }}>
                     <div style={{
                       width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                      background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
+                      '--av-hue': avB, background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12, fontWeight: 700,
                     }}>{initials(o.client_name)}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -573,7 +573,7 @@ export default function Finance({ refreshKey, period = 'all' }) {
                   <div key={o.id || i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 8px', borderBottom: '1px solid rgba(var(--ink-rgb), 0.06)', borderLeft: '3px solid rgba(var(--rgb-224-71-59), 0.35)', background: 'rgba(var(--rgb-224-71-59), 0.03)' }}>
                     <div style={{
                       width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                      background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
+                      '--av-hue': avB, background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 12, fontWeight: 700,
                     }}>{initials(o.carrier_name)}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>

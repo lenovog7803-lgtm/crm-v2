@@ -293,7 +293,7 @@ function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
                 return (
                   <div key={g.name} className="debt-group">
                     <div className="ios-row" onClick={() => setOpen(isOpen ? null : g.name)} aria-expanded={isOpen}>
-                      <span style={{ width: 38, height: 38, borderRadius: 99, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 13, fontWeight: 700, background: `linear-gradient(135deg, ${a}, ${b})` }}>{initials(g.name)}</span>
+                      <span style={{ width: 38, height: 38, borderRadius: 99, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 13, fontWeight: 700, '--av-hue': b, background: `linear-gradient(135deg, ${a}, ${b})` }}>{initials(g.name)}</span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{g.name}</div>
                         <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>

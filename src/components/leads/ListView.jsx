@@ -132,7 +132,7 @@ export default function ListView({ industry }) {
               const sub = [l.contact_person, l.phone, l.industry, l.city].filter(Boolean).join(' · ')
               return (
                 <div key={l.id} className="ios-row" onClick={() => setActiveLead(l)}>
-                  <div className="ios-row-avatar" style={{ background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)` }}>{initials(l.name)}</div>
+                  <div className="ios-row-avatar" style={{ '--av-hue': avB, background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)` }}>{initials(l.name)}</div>
                   <div className="ios-row-text">
                     <div className="ios-row-title">{l.name}</div>
                     {sub && <div className="ios-row-sub">{sub}</div>}

@@ -75,7 +75,7 @@ export default function Clients({ onOpenClient, onAdd, refreshKey, search = '' }
           const sub = [contact, client.city, inn && `УНП ${inn}`, terms].filter(Boolean).join(' · ')
           return (
             <div key={client.id} className="ios-row" onClick={() => onOpenClient(client.id)}>
-              <div className="ios-row-avatar" style={{ background: `linear-gradient(160deg, ${avA} 0%, ${avB} 100%)` }}>{initials(client.name)}</div>
+              <div className="ios-row-avatar" style={{ '--av-hue': avB, background: `linear-gradient(160deg, ${avA} 0%, ${avB} 100%)` }}>{initials(client.name)}</div>
               <div className="ios-row-text">
                 <div className="ios-row-title">{client.name}</div>
                 <div className="ios-row-sub">{sub || phone || client.email || 'Нет данных'}</div>

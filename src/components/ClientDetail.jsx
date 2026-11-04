@@ -169,7 +169,7 @@ export default function ClientDetail({ clientId, onMeta, onBack, onDelete, onOpe
       <div className="card" style={{ padding: '32px', textAlign: 'center' }}>
         <div style={{
           width: 72, height: 72, borderRadius: 22, margin: '0 auto 16px',
-          background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
+          '--av-hue': avB, background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: '#fff', fontWeight: 800, fontSize: 24,
           boxShadow: `0 12px 30px -12px color-mix(in srgb, ${avB} 50%, transparent)`,

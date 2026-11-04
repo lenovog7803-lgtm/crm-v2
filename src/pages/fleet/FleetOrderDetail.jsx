@@ -386,7 +386,7 @@ export default function FleetOrderDetail({ orderId, onBack }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{
                 width: 44, height: 44, borderRadius: 14, flexShrink: 0,
-                background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
+                '--av-hue': avB, background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 14,
               }}>{initials(order.client_name || '—')}</div>
               <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink)', minWidth: 0 }}>{order.client_name || 'Не указан'}</div>

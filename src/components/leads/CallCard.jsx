@@ -47,7 +47,7 @@ export default function CallCard({ lead, onEdit, part }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
           <div style={{
             width: 56, height: 56, borderRadius: 15, flexShrink: 0,
-            background: `linear-gradient(160deg, ${avA} 0%, ${avB} 100%)`,
+            '--av-hue': avB, background: `linear-gradient(160deg, ${avA} 0%, ${avB} 100%)`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: '#fff', fontWeight: 700, fontSize: 19, letterSpacing: '-0.02em',
             boxShadow: `0 6px 16px -6px color-mix(in srgb, ${avB} 56%, transparent), inset 0 1px 0 rgba(255,255,255,0.35)`,

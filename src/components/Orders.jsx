@@ -549,7 +549,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
                   <div style={{
                     width: 32, height: 32, borderRadius: 10, flexShrink: 0,
-                    background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
+                    '--av-hue': avB, background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     color: '#fff', fontSize: 11, fontWeight: 700,
                   }}>{initials(order.client_name)}</div>

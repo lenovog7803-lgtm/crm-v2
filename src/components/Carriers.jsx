@@ -83,7 +83,7 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
           const sub = [driver, cap, vehicleType, carrier.plate, carrier.regions].filter(Boolean).join(' · ')
           return (
             <div key={carrier.id} className="ios-row" onClick={() => onOpenCarrier(carrier.id)}>
-              <div className="ios-row-avatar" style={{ background: `linear-gradient(160deg, ${avA} 0%, ${avB} 100%)` }}>
+              <div className="ios-row-avatar" style={{ '--av-hue': avB, background: `linear-gradient(160deg, ${avA} 0%, ${avB} 100%)` }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
                 </svg>
