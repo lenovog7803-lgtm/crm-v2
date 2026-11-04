@@ -1254,19 +1254,31 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   color: var(--fg-1366f0); background: rgba(var(--paper-rgb), 0.95) !important; box-shadow: 0 1px 3px rgba(20,30,55,0.08) !important;
 }
 
-/* ===== Все выпадающие списки — тёмное стекло, как меню macOS: белый текст, пункт под курсором — синяя плашка ===== */
+/* ===== Все выпадающие списки — жидкое стекло, как меню iOS 26 =====
+   Светлое, прозрачное, сильно размытое; по краю — светлая кромка-блик; пункт под курсором — стеклянная «капля». */
 .topbar-menu, .apple-select-menu {
-  background: rgba(32, 34, 40, 0.78) !important;
-  backdrop-filter: blur(30px) saturate(180%) !important; -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
-  box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.14), 0 0 0 0.5px rgba(0,0,0,0.25), 0 18px 44px -14px rgba(0,0,0,0.5) !important;
-  color: #FFFFFF;
+  isolation: isolate; color: var(--ink); padding: 6px;
+  background: linear-gradient(180deg, rgba(var(--paper-rgb), 0.58) 0%, rgba(var(--paper-rgb), 0.42) 100%) !important;
+  backdrop-filter: blur(24px) saturate(200%) brightness(1.06) !important; -webkit-backdrop-filter: blur(24px) saturate(200%) brightness(1.06) !important;
+  border-radius: 22px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.95 * var(--rim-k))), inset 0 -1px 0 rgba(255,255,255,calc(0.35 * var(--rim-k))),
+    0 0 0 0.5px rgba(var(--ink-rgb), 0.08), 0 20px 50px -18px rgba(20,30,55,0.35) !important;
 }
-.apple-select-item, .topbar-menu button { color: rgba(255,255,255,0.92); }
-.apple-select-item[data-active="true"]:not(.is-disabled), .topbar-menu button:hover { background: #0A84FF !important; color: #FFFFFF; }
-.apple-select-item.is-disabled { color: rgba(255,255,255,0.35); }
-.apple-select-check { color: #FFFFFF; }
-.apple-select-sep, .topbar-menu-sep { background: rgba(255,255,255,0.12); }
-.topbar-menu button svg { color: rgba(255,255,255,0.7); }
-.topbar-menu button:hover svg { color: #FFFFFF; }
-.topbar-menu button.is-danger, .topbar-menu button.is-danger svg { color: #FF6961; }
-.topbar-menu button.is-danger:hover, .topbar-menu button.is-danger:hover svg { color: #FFFFFF; background: #FF453A !important; }
+/* светящаяся кромка: свет сверху-слева, отражение снизу-справа */
+.topbar-menu::before, .apple-select-menu::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: linear-gradient(140deg, rgba(255,255,255,calc(0.95 * var(--rim-k))) 0%, rgba(255,255,255,calc(0.15 * var(--rim-k))) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,calc(0.6 * var(--rim-k))) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.apple-select-item, .topbar-menu button { color: var(--ink); border-radius: 14px; transition: background 0.12s var(--ease), box-shadow 0.12s var(--ease); }
+.apple-select-item[data-active="true"]:not(.is-disabled), .topbar-menu button:hover {
+  background: rgba(var(--paper-rgb), 0.75) !important; color: var(--ink);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), 0 4px 12px -4px rgba(20,30,55,0.18), 0 0 0 0.5px rgba(var(--ink-rgb), 0.05);
+}
+.apple-select-item.is-disabled { color: var(--text-tertiary); }
+.apple-select-check { color: var(--fg-1366f0); }
+.apple-select-sep, .topbar-menu-sep { background: rgba(var(--ink-rgb), 0.08); }
+.topbar-menu button svg { color: var(--text-3); }
+.topbar-menu button.is-danger, .topbar-menu button.is-danger svg { color: var(--fg-c81923); }
+:root[data-theme="dark"] .topbar-menu, :root[data-theme="dark"] .apple-select-menu { background: rgba(40,42,48,0.62) !important; }
+:root[data-theme="dark"] .topbar-menu::before, :root[data-theme="dark"] .apple-select-menu::before { opacity: 0.25; }
