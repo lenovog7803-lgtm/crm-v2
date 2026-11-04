@@ -959,8 +959,6 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
                 order.client_name && { key: 'client', label: 'Клиент', name: order.client_name,
                   sub: order.client_phone, open: onOpenClient && (order.client_id || order.client_name) ? openClientDetail : null },
                 order.carrier_name && { key: 'carrier', label: 'Перевозчик', name: order.carrier_name,
-                  sub: [order.vehicle_plate, order.vehicle_type, order.driver_name, order.driver_phone || order.carrier_phone].filter(Boolean).join(' · ')
-                    || (!order.vehicle_plate && !order.driver_name ? order.vehicle_info : ''),
                   open: onOpenCarrier && (order.carrier_id || order.carrier_name) ? openCarrierDetail : null },
               ].filter(Boolean).map((p, i) => (
                 <div key={p.key} className="party-row" onClick={p.open || undefined} role={p.open ? 'button' : undefined}
