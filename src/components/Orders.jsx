@@ -339,7 +339,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
             className={`orders-pill orders-pill-btn${docFilters.length > 0 ? ' is-on' : ''}`}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
             Документы{docFilters.length > 0 && ` · ${docFilters.length}`}
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" style={{ transform: showDocFilter ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s var(--ease)' }}><path d="M2 3.5l3 3 3-3" /></svg>
+            <svg width="10" height="14" viewBox="0 0 10 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ opacity: 0.6 }}><polyline points="2 5 5 2 8 5" /><polyline points="2 9 5 12 8 9" /></svg>
           </button>
           <span style={{ flex: 1 }} />
           <button className="btn-primary" onClick={onAddOrder} style={{ flexShrink: 0 }}>
