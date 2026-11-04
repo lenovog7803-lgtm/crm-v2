@@ -1352,3 +1352,10 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
     background: rgba(var(--paper-rgb), 0.9) !important; box-shadow: 0 0 0 3.5px rgba(var(--rgb-19-102-240), 0.18) !important;
   }
 }
+/* выпадающие меню, уведомления, календарь — прозрачность как у эталонных окон */
+.topbar-menu, .apple-select-menu, .glass-pop, .ios-cal {
+  background:
+    radial-gradient(120% 70% at 15% -20%, rgba(var(--paper-rgb), 0.6) 0%, rgba(var(--paper-rgb), 0) 55%),
+    linear-gradient(180deg, rgba(var(--paper-rgb), 0.46) 0%, rgba(var(--paper-rgb), 0.34) 100%) !important;
+  backdrop-filter: blur(22px) saturate(200%) brightness(1.04) !important; -webkit-backdrop-filter: blur(22px) saturate(200%) brightness(1.04) !important;
+}
