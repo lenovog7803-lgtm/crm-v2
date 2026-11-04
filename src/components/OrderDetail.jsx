@@ -12,6 +12,7 @@ import { Loader } from './Loader'
 import { SuccessCheck } from './Transitions'
 import { iosConfirm } from './IOSAlert'
 import CardGradient from './CardGradient'
+import { SlidingTabs } from './SlidingTabs'
 
 const STATUSES = [
   { id: 'new', label: 'Новая', color: 'var(--fg-7c3aed)', bg: 'rgba(var(--rgb-124-58-237), 0.1)' },
@@ -848,26 +849,9 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
           {/* Status */}
           <div className="card" style={{ padding: '20px 20px' }}>
             <SLabel>СТАТУС ЗАЯВКИ</SLabel>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {STATUSES.map(s => (
-                <div
-                  key={s.id}
-                  onClick={() => handleStatusChange(s.id)}
-                  style={{
-                    padding: '8px 18px', borderRadius: 20, cursor: 'pointer',
-                    fontSize: 13, fontWeight: 600,
-                    background: view.status === s.id ? s.bg : 'rgba(var(--ink-rgb), 0.04)',
-                    color: view.status === s.id ? s.color : 'var(--text-3)',
-                    border: `1.5px solid ${view.status === s.id ? `color-mix(in srgb, ${s.color} 31%, transparent)` : 'rgba(var(--ink-rgb), 0.08)'}`,
-                    transition: 'all 0.2s',
-                  }}
-                  onPointerEnter={mouseOnly(e => { if (view.status !== s.id) { e.currentTarget.style.background = s.bg; e.currentTarget.style.color = s.color } })}
-                  onPointerLeave={mouseOnly(e => { if (view.status !== s.id) { e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.04)'; e.currentTarget.style.color = 'var(--text-3)' } })}
-                >
-                  {s.label}
-                </div>
-              ))}
-            </div>
+            {/* тот же переключатель, что «Экспедиция / Автопарк» и фильтры: дорожка, выбранный — белая капсула цветом статуса */}
+            <SlidingTabs options={STATUSES.map(st => ({ key: st.id, label: st.label }))} value={view.status} onChange={handleStatusChange}
+              activeColor={(STATUSES.find(st => st.id === view.status) || {}).color} fontSize={13} />
           </div>
 
           {/* Payments */}
