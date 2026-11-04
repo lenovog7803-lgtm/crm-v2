@@ -26,13 +26,13 @@ const bulkBtnStyle = { background: 'transparent', border: 'none', color: 'var(--
 
 const DOC_FILTER_OPTIONS = [
   { key: 'docs_to_client_sent',         label: 'Отправлены клиенту',          not: false },
-  { key: '!docs_to_client_sent',        label: 'НЕ отправлены клиенту',       not: true  },
+  { key: '!docs_to_client_sent',        label: 'Не отправлены клиенту',       not: true  },
   { key: 'docs_from_client_received',   label: 'Получены от клиента',          not: false },
-  { key: '!docs_from_client_received',  label: 'НЕ получены от клиента',      not: true  },
+  { key: '!docs_from_client_received',  label: 'Не получены от клиента',      not: true  },
   { key: 'docs_to_carrier_sent',        label: 'Отправлены перевозчику',       not: false },
-  { key: '!docs_to_carrier_sent',       label: 'НЕ отправлены перевозчику',   not: true  },
+  { key: '!docs_to_carrier_sent',       label: 'Не отправлены перевозчику',   not: true  },
   { key: 'docs_from_carrier_received',  label: 'Получены от перевозчика',      not: false },
-  { key: '!docs_from_carrier_received', label: 'НЕ получены от перевозчика',  not: true  },
+  { key: '!docs_from_carrier_received', label: 'Не получены от перевозчика',  not: true  },
 ]
 
 export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '', onClearSearch, scrollToOrderId }) {
@@ -643,19 +643,13 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           zIndex: 500, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
         }}>
           {showStatusMenu && (
-            <div style={{
-              background: 'rgba(var(--paper-rgb), 0.65)', backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-              border: '1px solid rgba(255,255,255,calc(0.7 * var(--rim-k)))', borderRadius: 14, padding: 8,
-              display: 'flex', flexDirection: 'column', gap: 2,
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), 0 20px 50px -12px rgba(14,23,38,0.35)', minWidth: 180,
-            }}>
+            <div className="glass-pop" style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 180 }}>
               {BULK_STATUSES.map(s => (
                 <button
                   key={s.id}
                   onClick={() => handleBulkStatus(s.id)}
-                  style={{ ...bulkBtnStyle, textAlign: 'left', padding: '8px 10px' }}
-                  onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.06)')}
-                  onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
+                  className="glass-pop-item"
+                  style={{ ...bulkBtnStyle, textAlign: 'left', padding: '8px 12px' }}
                 >{s.label}</button>
               ))}
             </div>

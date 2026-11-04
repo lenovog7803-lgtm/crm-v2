@@ -1,7 +1,8 @@
 :root {
   /* iOS 26: системный шрифт Apple (на Mac/iPhone — SF Pro), на Windows — Segoe UI */
   --font-sys: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+  /* один шрифт на всю CRM: бывший моноширинный (номера, суммы) — тот же системный, цифры ровными столбиками (tabular-nums у body) */
+  --font-mono: var(--font-sys);
 }
 :root {
   /* Radius scale — everything in the app should round to one of these,
@@ -1256,7 +1257,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 
 /* ===== Все выпадающие списки — жидкое стекло, как меню iOS 26 =====
    Светлое, прозрачное, сильно размытое; по краю — светлая кромка-блик; пункт под курсором — стеклянная «капля». */
-.topbar-menu, .apple-select-menu {
+.topbar-menu, .apple-select-menu, .glass-pop {
   isolation: isolate; color: var(--ink); padding: 6px;
   background: linear-gradient(180deg, rgba(var(--paper-rgb), 0.58) 0%, rgba(var(--paper-rgb), 0.42) 100%) !important;
   backdrop-filter: blur(16px) saturate(160%) !important; -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
@@ -1280,3 +1281,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 @keyframes glassMenuIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 .apple-select-menu, .topbar-menu.t-dropdown-in { animation: glassMenuIn 0.16s ease-out both !important; }
 .apple-select-menu.is-closing { animation: fadeOut 0.12s ease-in both !important; }
+/* свои всплывающие окна (уведомления, смена статуса, подсказки поиска) — то же стекло; пункт под курсором — капля */
+.glass-pop-item { border-radius: 12px; cursor: pointer; transition: background 0.12s var(--ease), box-shadow 0.12s var(--ease); }
+@media (hover: hover) { .glass-pop-item:hover { background: rgba(var(--paper-rgb), 0.75) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), 0 4px 12px -4px rgba(20,30,55,0.18), 0 0 0 0.5px rgba(var(--ink-rgb), 0.05); } }

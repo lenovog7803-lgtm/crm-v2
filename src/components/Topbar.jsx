@@ -246,12 +246,9 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
         </button>
 
         {bellOpen && (
-          <div className="t-dropdown-in" style={{
+          <div className="glass-pop t-dropdown-in" style={{
             position: 'absolute', top: 'calc(100% + 10px)', right: 0, zIndex: 9999,
-            background: 'rgba(var(--paper-rgb), 0.98)', backdropFilter: 'blur(24px)',
-            borderRadius: 18, border: '1px solid rgba(255,255,255,calc(0.9 * var(--rim-k)))',
-            boxShadow: '0 20px 60px rgba(20,30,55,0.18)',
-            minWidth: 320, maxWidth: 380, overflow: 'hidden',
+            minWidth: 320, maxWidth: 380, overflow: 'hidden', padding: 0,
           }}>
             {notifications.length > 0 && (
               <>

@@ -627,16 +627,15 @@ function PartySearchSelect({ items, labelKey, value, onChange, placeholder }) {
         style={{ height: 36, padding: '0 10px', fontSize: 13, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.14)', background: 'rgba(var(--paper-rgb), 0.8)', fontFamily: 'var(--font-sys)', color: 'var(--ink)', outline: 'none', width: '100%', boxSizing: 'border-box' }}
       />
       {open && (
-        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, maxHeight: 240, overflowY: 'auto', background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 10, boxShadow: '0 8px 24px rgba(14,23,38,0.14)', zIndex: 20 }}>
+        <div className="glass-pop" style={{ position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0, maxHeight: 260, overflowY: 'auto', zIndex: 20 }}>
           {filtered.length === 0 ? (
             <div style={{ padding: '10px 12px', fontSize: 12.5, color: 'var(--text-3)' }}>Ничего не найдено</div>
           ) : filtered.slice(0, 200).map(item => (
             <div
               key={item.id}
               onMouseDown={() => { onChange(item.id, item[labelKey] || item.name || ''); setOpen(false); setQuery('') }}
-              style={{ padding: '8px 12px', fontSize: 12.5, cursor: 'pointer', color: 'var(--ink)' }}
-              onPointerEnter={mouseOnly(e => { e.currentTarget.style.background = 'var(--fill)' })}
-              onPointerLeave={mouseOnly(e => { e.currentTarget.style.background = 'transparent' })}
+              className="glass-pop-item"
+              style={{ padding: '8px 12px', fontSize: 13, color: 'var(--ink)' }}
             >
               {item[labelKey] || item.name}
             </div>
