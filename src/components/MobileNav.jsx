@@ -72,7 +72,6 @@ const NAV = [
     key: 'orders',
     label: 'Заявки',
     badge: 'newOrders',
-    badgeColor: 'var(--fg-7c3aed)',
     icon: (a) => (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={a ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">
         <line x1="8" y1="6" x2="21" y2="6"/>
@@ -112,7 +111,6 @@ const NAV = [
     key: 'more',
     label: 'Ещё',
     badge: 'moreBadge',
-    badgeColor: 'var(--fg-0e9f6e)',
     icon: (a) => (
       <svg width="24" height="24" viewBox="0 0 24 24" fill={a ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={a ? 0 : 1.8}>
         <circle cx="5" cy="12" r={a ? 2.4 : 1.8}/><circle cx="12" cy="12" r={a ? 2.4 : 1.8}/><circle cx="19" cy="12" r={a ? 2.4 : 1.8}/>
@@ -140,7 +138,6 @@ const MANAGER_NAV = [
     key: 'tasks',
     label: 'Задачи',
     badge: 'pendingTasks',
-    badgeColor: 'var(--fg-d97706)',
     icon: (a) => (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={a ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">
         <polyline points="9 11 12 14 22 4"/>
@@ -152,7 +149,6 @@ const MANAGER_NAV = [
     key: 'leads',
     label: 'Обзвон',
     badge: 'newLeads',
-    badgeColor: 'var(--fg-1366f0)',
     icon: (a) => (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={a ? 2.4 : 1.8} strokeLinecap="round" strokeLinejoin="round">
         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 9.7 19.79 19.79 0 0 1 1.63 1.06 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6.08 6.08l.96-.96a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -275,7 +271,7 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
       {navList.map(item => {
         const active = activeKey === item.key
         const badgeVal = item.badge ? allCounts[item.badge] : 0
-        const badgeColor = item.badgeColor || 'var(--fg-1366f0)'
+        const badgeColor = 'var(--bg-ff3b30)'  // все счётчики-уведомления красные, как в iOS
         return (
           <button
             key={item.key}
