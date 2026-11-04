@@ -6,7 +6,6 @@ import { CountUp } from './CountUp'
 import MarginChart from './MarginChart'
 import GoalsRings from './GoalsRings'
 import { Gauge } from '../bklit/charts/gauge'
-import ClientsPie from './ClientsPie'
 import { SkeletonCard } from './Skeleton'
 import { mouseOnly } from '../motion'
 import { inPeriod, initials, getGradient } from '../utils'
@@ -341,14 +340,10 @@ function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
   )
 }
 
-// цвета долей в «Топ клиентов» — оттенки синего главной карточки
-const PIE_COLORS = ['#3A62C0', '#5585DC', '#7FA3EA', '#A9C2F2', '#CFDCF8']
-
-function TopRow({ rank, name, value, dot }) {
+function TopRow({ rank, name, value }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
       <span style={{ width: 24, height: 24, borderRadius: 8, flexShrink: 0, background: 'rgba(var(--ink-rgb), 0.05)', color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>{rank}</span>
-      {dot && <span style={{ width: 8, height: 8, borderRadius: 99, background: dot, flexShrink: 0 }} />}
       <span style={{ flex: 1, fontSize: 13, fontWeight: 500, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
       <span style={{ fontSize: 13, fontWeight: 600, color: /^[-−]/.test(String(value)) ? 'var(--fg-c81923)' : 'var(--ink)', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>{value}</span>
     </div>
@@ -701,14 +696,8 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           </div>
           {topClients.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {/* кольцо долей: 5 главных клиентов + «остальные» серым */}
-              <ClientsPie slices={(() => {
-                const top = topClients.slice(0, 5).map((c, i) => ({ label: c.name || c.client_name, value: c.rev || c.revenue || c.total_revenue || 0, color: PIE_COLORS[i] }))
-                const rest = revenue - top.reduce((s, x) => s + x.value, 0)
-                return rest > 0 ? [...top, { label: 'остальные', value: rest, color: 'rgba(var(--ink-rgb), 0.12)' }] : top
-              })()} />
-              {topClients.slice(0, 5).map((c, i) => (
-                <TopRow key={i} rank={i + 1} name={c.name || c.client_name} dot={PIE_COLORS[i]}
+              {topClients.slice(0, 6).map((c, i) => (
+                <TopRow key={i} rank={i + 1} name={c.name || c.client_name}
                   value={`${Math.round(c.rev || c.revenue || c.total_revenue || 0).toLocaleString('ru-RU')} Br`} />
               ))}
             </div>
@@ -723,12 +712,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           </div>
           {topByMargin.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {/* спидометр Bklit: средняя маржинальность за период (маржа / выручка) */}
-              <div className="bklit debt-gauge" style={{ width: 196, margin: '0 auto 12px' }}>
-                <Gauge value={revenue > 0 ? Math.max(0, Math.round(margin / revenue * 100)) : 0} centerValue={revenue > 0 ? Math.round(margin / revenue * 100) : 0}
-                  width={196} height={150} minWidth={196} suffix="%" defaultLabel="маржинальность" activeFill="var(--bg-1366f0)" inactiveFill="rgba(var(--ink-rgb), 0.08)" />
-              </div>
-              {topByMargin.slice(0, 5).map((c, i) => (
+              {topByMargin.slice(0, 6).map((c, i) => (
                 <TopRow key={i} rank={i + 1} name={c.name || c.client_name}
                   value={`${(c.pct || c.margin_pct || c.margin_percent || 0).toFixed(1)}%`} />
               ))}
@@ -744,14 +728,8 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           </div>
           {topDebtors.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {/* кольцо долей долга: 5 главных должников + «остальные» */}
-              <ClientsPie centerLabel="долг, BYN" slices={(() => {
-                const top = topDebtors.slice(0, 5).map((c, i) => ({ label: c.name, value: c.amt || 0, color: PIE_COLORS[i] }))
-                const rest = topDebtors.slice(5).reduce((s, c) => s + (c.amt || 0), 0)
-                return rest > 0 ? [...top, { label: 'остальные', value: rest, color: 'rgba(var(--ink-rgb), 0.12)' }] : top
-              })()} />
-              {topDebtors.slice(0, 5).map((c, i) => (
-                <TopRow key={i} rank={i + 1} name={c.name} dot={PIE_COLORS[i]}
+              {topDebtors.slice(0, 6).map((c, i) => (
+                <TopRow key={i} rank={i + 1} name={c.name}
                   value={`${Math.round(c.amt || 0).toLocaleString('ru-RU')} Br`} />
               ))}
             </div>
