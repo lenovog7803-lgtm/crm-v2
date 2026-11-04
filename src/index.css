@@ -1297,22 +1297,25 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 /* ===== Окна — тот же материал, что выпадающие списки (см. «жидкое стекло, как меню iOS 26»).
    Группы полей и поля — как пункт под курсором в списке: стеклянная «капля». Только компьютер. ===== */
 @media (min-width: 769px) {
-  /* за всеми окнами — одинаковая светлая дымка, чуть гуще прежнего */
+  /* за окнами — светлая дымка */
   .modal-overlay, .dash-modal-scrim { background: rgba(var(--paper-rgb), 0.5) !important; backdrop-filter: blur(14px) saturate(130%) !important; -webkit-backdrop-filter: blur(14px) saturate(130%) !important; }
-  /* окна: раскладка и плотность как были; от «идеального» стекла — только кромка, блик и мягкие группы */
-  .modal-panel.ios-sheet, .dash-modal {
-    border-radius: 26px !important;
-    background:
-      radial-gradient(120% 60% at 15% -20%, rgba(var(--paper-rgb), 0.9) 0%, rgba(var(--paper-rgb), 0) 55%),
-      linear-gradient(180deg, rgba(var(--paper-rgb), 0.94) 0%, rgba(var(--paper-rgb), 0.88) 100%) !important;
+  .modal-panel.ios-sheet, .dash-modal { border-radius: 26px !important; }
+  /* группы полей — лёгкая стеклянная подложка с тонкой светлой кромкой */
+  .modal-panel .ios-form-group, .dash-modal .ios-list {
+    background: rgba(var(--paper-rgb), 0.32) !important; border: none !important; border-radius: 20px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.8 * var(--rim-k))), inset 0 0 0 1px rgba(255,255,255,calc(0.45 * var(--rim-k))) !important;
   }
-  .modal-panel .ios-form-group {
-    background: rgba(var(--paper-rgb), 0.72) !important; border-radius: 20px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.95 * var(--rim-k))), inset 0 0 14px rgba(255,255,255,calc(0.35 * var(--rim-k))), 0 0 0 0.5px rgba(var(--ink-rgb), 0.06) !important;
-  }
+  /* поля — полупрозрачные капсулы */
   .app-root .modal-panel input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([data-plain]),
   .app-root .modal-panel textarea:not([data-plain]),
-  .app-root .modal-panel .apple-select:not(.status-pill) { border-radius: 12px !important; }
+  .app-root .modal-panel .apple-select:not(.status-pill) {
+    background: rgba(var(--paper-rgb), 0.62) !important; border: none !important; border-radius: 14px !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--ink-rgb), 0.06), inset 0 1px 2px rgba(20,30,55,0.05) !important;
+  }
+  .app-root .modal-panel input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([data-plain]):focus,
+  .app-root .modal-panel textarea:not([data-plain]):focus {
+    background: rgba(var(--paper-rgb), 0.9) !important; box-shadow: 0 0 0 3.5px rgba(var(--rgb-19-102-240), 0.18) !important;
+  }
 }
 :root[data-theme="dark"] .modal-panel.ios-sheet, :root[data-theme="dark"] .dash-modal, :root[data-theme="dark"] .ios-cal { background: rgba(40,42,48,0.62) !important; }
 /* телефон: шторка снизу — плотная и со скруглением только сверху (стекло при выезде тормозит) */
