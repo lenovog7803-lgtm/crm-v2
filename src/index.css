@@ -1393,3 +1393,6 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 }
 .card:not(.grad-card)::after, .ios-widget:not(.grad-card)::after, .desktop-sidebar.liquid-glass::after, .topbar-mobile.liquid-glass::after { display: none !important; }
 :root[data-theme="dark"] .card:not(.grad-card)::before, :root[data-theme="dark"] .ios-widget:not(.grad-card)::before, :root[data-theme="dark"] .kanban-card::before { opacity: 0.2 !important; }
+/* переключатель на всю ширину области */
+.glass-tabs-fill { width: 100%; }
+.glass-tabs-fill .lg-segmented :is(.lg-tab, .lg-tab-copy) { font-size: 14px; }

@@ -850,7 +850,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
           <div className="card" style={{ padding: '20px 20px' }}>
             <SLabel>СТАТУС ЗАЯВКИ</SLabel>
             {/* тот же переключатель, что «Экспедиция / Автопарк» и фильтры: дорожка, выбранный — белая капсула, один синий цвет */}
-            <SlidingTabs options={STATUSES.map(st => ({ key: st.id, label: st.label }))} value={view.status} onChange={handleStatusChange} fontSize={13} />
+            <SlidingTabs options={STATUSES.map(st => ({ key: st.id, label: st.label }))} value={view.status} onChange={handleStatusChange} fill />
           </div>
 
           {/* Payments */}
