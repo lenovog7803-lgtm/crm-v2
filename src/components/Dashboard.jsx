@@ -723,10 +723,14 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           </div>
           {topByMargin.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {topByMargin.slice(0, 6).map((c, i) => (
+              {/* спидометр Bklit: средняя маржинальность за период (маржа / выручка) */}
+              <div className="bklit debt-gauge" style={{ width: 196, margin: '0 auto 12px' }}>
+                <Gauge value={revenue > 0 ? Math.max(0, Math.round(margin / revenue * 100)) : 0} centerValue={revenue > 0 ? Math.round(margin / revenue * 100) : 0}
+                  width={196} height={150} minWidth={196} suffix="%" defaultLabel="маржинальность" activeFill="var(--bg-1366f0)" inactiveFill="rgba(var(--ink-rgb), 0.08)" />
+              </div>
+              {topByMargin.slice(0, 5).map((c, i) => (
                 <TopRow key={i} rank={i + 1} name={c.name || c.client_name}
-                  value={`${(c.pct || c.margin_pct || c.margin_percent || 0).toFixed(1)}%`}
-                  color="var(--fg-1e9e5a)" bg="rgba(var(--rgb-30-158-90), 0.1)" />
+                  value={`${(c.pct || c.margin_pct || c.margin_percent || 0).toFixed(1)}%`} />
               ))}
             </div>
           ) : <div style={{ color: 'var(--text-tertiary)', fontSize: 13 }}>Нет данных за период</div>}
@@ -740,10 +744,15 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           </div>
           {topDebtors.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {topDebtors.slice(0, 6).map((c, i) => (
-                <TopRow key={i} rank={i + 1} name={c.name}
-                  value={`${Math.round(c.amt || 0).toLocaleString('ru-RU')} Br`}
-                  color="var(--fg-d97706)" bg="rgba(var(--rgb-217-119-6), 0.12)" />
+              {/* кольцо долей долга: 5 главных должников + «остальные» */}
+              <ClientsPie centerLabel="долг, BYN" slices={(() => {
+                const top = topDebtors.slice(0, 5).map((c, i) => ({ label: c.name, value: c.amt || 0, color: PIE_COLORS[i] }))
+                const rest = topDebtors.slice(5).reduce((s, c) => s + (c.amt || 0), 0)
+                return rest > 0 ? [...top, { label: 'остальные', value: rest, color: 'rgba(var(--ink-rgb), 0.12)' }] : top
+              })()} />
+              {topDebtors.slice(0, 5).map((c, i) => (
+                <TopRow key={i} rank={i + 1} name={c.name} dot={PIE_COLORS[i]}
+                  value={`${Math.round(c.amt || 0).toLocaleString('ru-RU')} Br`} />
               ))}
             </div>
           ) : <div style={{ color: 'var(--text-tertiary)', fontSize: 13 }}>Нет должников</div>}
