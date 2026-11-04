@@ -1297,19 +1297,25 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 /* ===== Окна — тот же материал, что выпадающие списки (см. «жидкое стекло, как меню iOS 26»).
    Группы полей и поля — как пункт под курсором в списке: стеклянная «капля». Только компьютер. ===== */
 @media (min-width: 769px) {
-  /* за окнами — светлая дымка */
-  .modal-overlay, .dash-modal-scrim { background: rgba(var(--paper-rgb), 0.5) !important; backdrop-filter: blur(14px) saturate(130%) !important; -webkit-backdrop-filter: blur(14px) saturate(130%) !important; }
-  .modal-panel.ios-sheet, .dash-modal { border-radius: 26px !important; }
+  /* дымка за окном — сильное размытие без побеления: цвета страницы остаются, иначе стеклу нечего показывать */
+  .modal-overlay, .dash-modal-scrim { background: rgba(var(--paper-rgb), 0.14) !important; backdrop-filter: blur(22px) saturate(170%) !important; -webkit-backdrop-filter: blur(22px) saturate(170%) !important; }
+  /* окна — прозрачнее меню (большая площадь), с бликом и светящейся кромкой из общего материала */
+  .modal-panel.ios-sheet, .dash-modal {
+    border-radius: 26px !important;
+    background:
+      radial-gradient(120% 70% at 15% -20%, rgba(var(--paper-rgb), 0.6) 0%, rgba(var(--paper-rgb), 0) 55%),
+      linear-gradient(180deg, rgba(var(--paper-rgb), 0.46) 0%, rgba(var(--paper-rgb), 0.34) 100%) !important;
+  }
   /* группы полей — лёгкая стеклянная подложка с тонкой светлой кромкой */
   .modal-panel .ios-form-group, .dash-modal .ios-list {
-    background: rgba(var(--paper-rgb), 0.32) !important; border: none !important; border-radius: 20px;
+    background: rgba(var(--paper-rgb), 0.22) !important; border: none !important; border-radius: 20px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.8 * var(--rim-k))), inset 0 0 0 1px rgba(255,255,255,calc(0.45 * var(--rim-k))) !important;
   }
   /* поля — полупрозрачные капсулы */
   .app-root .modal-panel input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([data-plain]),
   .app-root .modal-panel textarea:not([data-plain]),
   .app-root .modal-panel .apple-select:not(.status-pill) {
-    background: rgba(var(--paper-rgb), 0.62) !important; border: none !important; border-radius: 14px !important;
+    background: rgba(var(--paper-rgb), 0.5) !important; border: none !important; border-radius: 14px !important;
     box-shadow: inset 0 0 0 1px rgba(var(--ink-rgb), 0.06), inset 0 1px 2px rgba(20,30,55,0.05) !important;
   }
   .app-root .modal-panel input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([data-plain]):focus,
@@ -1321,4 +1327,10 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 /* телефон: шторка снизу — плотная и со скруглением только сверху (стекло при выезде тормозит) */
 @media (max-width: 768px) {
   .modal-panel.ios-sheet { background: var(--surface) !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; border-radius: 30px 30px 0 0 !important; }
+}
+/* строки списков в окнах дашборда — прозрачные, разделители светлые */
+@media (min-width: 769px) {
+  .dash-modal .ios-row { background: transparent; }
+  .dash-modal .ios-row + .ios-row::before, .dash-modal .debt-group + .debt-group { box-shadow: none; }
+  .dash-modal .debt-group + .debt-group { border-top: 0.5px solid rgba(255,255,255,0.55); }
 }
