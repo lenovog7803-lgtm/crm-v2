@@ -624,18 +624,21 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             that resolves to one specific month (goals don't exist per-quarter). */}
         {/* карточка целей рисуется сразу вместе со всеми — цели приходят отдельным запросом и подставляются, когда придут */}
         {goalsMonth && goals !== null && (
-          <div className={`card ios-widget${goals ? '' : ' loading-glass'}`} style={{ padding: isMobile ? '16px 14px' : '16px 20px' }}>
+          <div className={`card ios-widget${goals ? '' : ' loading-glass'}`} style={{ padding: isMobile ? '16px 14px' : '16px 20px', display: 'flex', flexDirection: 'column' }}>
             {!goals && <span className="sheen" />}
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 12 }}>
               Цели месяца
             </div>
-            {goals ? <GoalsRings onEdit={key => { setEditingGoal(key); setGoalInput(String(goals[`${key}_goal`] ?? '')) }}
+            {/* кольца и список — по центру оставшейся высоты карточки */}
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+            {goals ? <GoalsRings size={isMobile ? 112 : 150} onEdit={key => { setEditingGoal(key); setGoalInput(String(goals[`${key}_goal`] ?? '')) }}
               items={[
                 { key: 'profit', label: 'Прибыль', fact: goals.profit_fact, goal: goals.profit_goal, color: '#04769F', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
                 { key: 'trips', label: 'Рейсы', fact: goals.trips_fact, goal: goals.trips_goal, color: '#0593C6', fmt: v => Math.round(v) },
                 { key: 'margin', label: 'Маржа/рейс', fact: goals.margin_fact, goal: goals.margin_goal, color: '#6CCBEB', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
                 { key: 'new_clients', label: 'Новые клиенты', fact: goals.new_clients_fact, goal: goals.new_clients_goal, color: '#DB3996', fmt: v => Math.round(v) },
               ]} /> : <div style={{ height: 112 }} />}
+            </div>
           </div>
         )}
 

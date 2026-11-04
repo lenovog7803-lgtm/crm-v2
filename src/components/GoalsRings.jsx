@@ -13,10 +13,10 @@ export default function GoalsRings({ items, onEdit, size = 112 }) {
   const pct = g => (g.goal > 0 ? Math.round((g.fact / g.goal) * 100) : 0)
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 20, width: '100%' }}>
       {/* --border — цвет пустой дорожки кольца у Bklit */}
       <div className="bklit" style={{ position: 'relative', width: size, height: size, flexShrink: 0, '--border': 'rgba(var(--ink-rgb), 0.07)' }}>
-        <RingChart data={data} size={size} strokeWidth={9} ringGap={3} baseInnerRadius={size / 2 - 2 - items.length * 9 - (items.length - 1) * 3}
+        <RingChart data={data} size={size} strokeWidth={Math.round(size / 12)} ringGap={Math.round(size / 36)} baseInnerRadius={size / 2 - 2 - items.length * Math.round(size / 12) - (items.length - 1) * Math.round(size / 36)}
           padding={2} startAngle={0} endAngle={Math.PI * 2} hoveredIndex={hovered === null ? null : items.length - 1 - hovered} onHoverChange={i => setHovered(i === null ? null : items.length - 1 - i)}>
           {data.map((d, i) => <Ring key={d.label} index={i} color={d.color} />)}
         </RingChart>
