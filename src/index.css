@@ -1396,3 +1396,19 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 /* переключатель на всю ширину области */
 .glass-tabs-fill { width: 100%; }
 .glass-tabs-fill .lg-segmented :is(.lg-tab, .lg-tab-copy) { font-size: 14px; }
+
+/* ===== Сегменты glisse — жидкое стекло и в покое (как iOS 26): стеклянная дорожка, выбранный пункт — выпуклая капля ===== */
+.lg-segmented > .lg-tab-bar-glass {
+  background-image: none !important;
+  background-color: rgba(var(--paper-rgb), 0.35) !important;
+  box-shadow: inset 0 1px 2px rgba(20,30,55,0.08), inset 0 0 0 1px rgba(255,255,255,calc(0.55 * var(--rim-k))), inset 0 -1px 0 rgba(255,255,255,calc(0.8 * var(--rim-k)));
+}
+.lg-segmented-thumb {
+  background:
+    radial-gradient(120% 90% at 30% -10%, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, rgba(var(--paper-rgb), 0.95) 0%, rgba(var(--paper-rgb), 0.75) 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,1), inset 0 0 0 0.5px rgba(255,255,255,0.9), inset 0 -1px 1px rgba(20,30,55,0.05),
+    0 3px 10px -3px rgba(20,30,55,0.25), 0 0 0 0.5px rgba(var(--ink-rgb), 0.06) !important;
+}
+.lg-segmented :is(.lg-tab, .lg-tab-copy)[data-selected] { font-weight: 600; }
+:root[data-theme="dark"] .lg-segmented-thumb { background: rgba(255,255,255,0.16) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2) !important; }
