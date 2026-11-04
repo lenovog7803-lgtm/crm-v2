@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getDashboard, getOrders, getGoals, saveGoals } from '../api'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useEscapeKey } from '../hooks/useEscapeKey'
@@ -489,6 +489,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
     : period === 'last_month'
       ? `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, '0')}`
       : /^\d{4}-\d{2}$/.test(period) ? period : null
+  const shownOnce = useRef(false)
   const [goals, setGoals] = useState(undefined)  // undefined — грузится, null — целей нет/ошибка
   const [editingGoal, setEditingGoal] = useState(null)
   const [goalInput, setGoalInput] = useState('')
@@ -509,7 +510,9 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
   const netProfit = (goals && goalsMonth) ? goals.profit_fact : margin * 0.8
 
 
-  if (loading) return (
+  // при первом открытии ждём и цели — чтобы всё проявилось разом, а не цели вдогонку
+  const waitGoals = !!goalsMonth && goals === undefined && !shownOnce.current
+  if (loading || waitGoals) return (
     // заготовки той же формы, что и дашборд: «Маржа» во всю ширину, под ней долги и цели, полоса цифр
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div className="ios-widget loading-glass" style={{ height: isMobile ? 300 : 450 }}><span className="sheen" /></div>
@@ -523,6 +526,8 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       <div className="ios-widget loading-glass" style={{ height: 52 }}><span className="sheen" /></div>
     </div>
   )
+
+  shownOnce.current = true
 
   // A hover lift shared by the hero/KPI cards below — direct style mutation
   // (matching the onMouseEnter/onMouseLeave pattern already used for the
