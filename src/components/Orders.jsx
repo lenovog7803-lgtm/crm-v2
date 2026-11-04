@@ -6,13 +6,12 @@ import { useIsMobile } from '../hooks/useIsMobile'
 import { SkeletonRow } from './Skeleton'
 import { useToast } from './Toast'
 import { EmptyState } from './EmptyState'
-import { SlidingTabs } from './SlidingTabs'
 import Select from './Select'
+import MultiMenu from './MultiMenu'
 import { mouseOnly, spring, project, rubberband, velocityTracker, haptic } from '../motion'
 import { SwapText } from './Transitions'
 import { StatusOrb } from './StatusOrb'
 import { useChangeFlash } from '../hooks/useChangeFlash'
-import CheckCircle from './CheckCircle'
 import { iosConfirm } from './IOSAlert'
 import DateInput from './DateInput'
 
@@ -54,7 +53,6 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   const [docFilters, setDocFilters] = useState(() => {
     try { return JSON.parse(localStorage.getItem('orders_docFilters') || '[]') } catch { return [] }
   })
-  const [showDocFilter, setShowDocFilter] = useState(false)
   const [selected, setSelected] = useState(new Set())
   const [selectMode, setSelectMode] = useState(false)
   const [showStatusMenu, setShowStatusMenu] = useState(false)
@@ -274,6 +272,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
   const statusChips = [
     { key: 'all', label: 'Все' },
     { key: 'new', label: 'Новые' },
+    { key: 'active', label: 'Активные (новые и в пути)' },
     { key: 'in_progress', label: 'В пути' },
     { key: 'done', label: 'Выполнено' },
     { key: 'cancelled', label: 'Отменено' },
@@ -323,11 +322,10 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
       <div className="card" style={{ padding: isMobile ? '10px 12px' : '14px 16px' }}>
         {/* Scrollable filter row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
-          <SlidingTabs
-            options={statusChips}
-            value={statusChips.some(c => c.key === statusFilter) ? statusFilter : 'all'}
-            onChange={setStatusFilter}
-          />
+          {/* статус — выпадающий список, как «Оплата» и «Документы» */}
+          <Select className={`orders-pill${statusFilter !== 'all' ? ' is-on' : ''}`} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+            {statusChips.map(c => <option key={c.key} value={c.key}>{c.key === 'all' ? 'Статус: все' : c.label}</option>)}
+          </Select>
           {/* оплата — один выпадающий выбор вместо трёх кнопок */}
           <Select className={`orders-pill${payFilter ? ' is-on' : ''}`} value={payFilter || ''} onChange={e => setPayFilter(e.target.value || null)}>
             <option value="">Оплата: все</option>
@@ -335,12 +333,13 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
             <option value="carrierUnpaid">Не оплачено перевозчику</option>
             <option value="debt">Клиент оплатил, перевозчику — нет</option>
           </Select>
-          <button type="button" onClick={() => setShowDocFilter(v => !v)} aria-expanded={showDocFilter}
-            className={`orders-pill orders-pill-btn${docFilters.length > 0 ? ' is-on' : ''}`}>
+          <MultiMenu className={`orders-pill orders-pill-btn${docFilters.length > 0 ? ' is-on' : ''}`}
+            items={DOC_FILTER_OPTIONS.map(f => ({ key: f.key, label: f.label }))} group={2}
+            selected={docFilters} onToggle={toggleDocFilter} onClear={() => setDocFilters([])}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
             Документы{docFilters.length > 0 && ` · ${docFilters.length}`}
             <svg width="10" height="14" viewBox="0 0 10 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ opacity: 0.6 }}><polyline points="2 5 5 2 8 5" /><polyline points="2 9 5 12 8 9" /></svg>
-          </button>
+          </MultiMenu>
           <span style={{ flex: 1 }} />
           <button className="btn-primary" onClick={onAddOrder} style={{ flexShrink: 0 }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
@@ -348,42 +347,6 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           </button>
         </div>
 
-        {/* Doc filter panel — inline below, no positioning */}
-        {showDocFilter && (
-          <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(var(--ink-rgb), 0.07)' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 2 }}>
-              {DOC_FILTER_OPTIONS.map((f, i) => (
-                <>
-                  {i % 2 === 0 && i > 0 && (
-                    <div key={`sep-${i}`} style={{ gridColumn: '1/-1', height: 1, background: 'rgba(var(--ink-rgb), 0.05)', margin: '3px 0' }} />
-                  )}
-                  <label key={f.key} style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    padding: '7px 10px', cursor: 'pointer', borderRadius: 9,
-                    fontSize: 12.5, fontWeight: f.not ? 500 : 600,
-                    color: f.not ? 'var(--text-3)' : 'var(--ink)',
-                    background: docFilters.includes(f.key)
-                      ? (f.not ? 'rgba(var(--rgb-200-25-35), 0.07)' : 'rgba(var(--rgb-19-102-240), 0.07)')
-                      : 'transparent',
-                    transition: 'background 0.12s',
-                  }}>
-                    <CheckCircle checked={docFilters.includes(f.key)} onChange={() => toggleDocFilter(f.key)}
-                      color={f.not ? 'var(--fg-ff3b30)' : 'var(--fg-0a84ff)'} size={17} />
-                    {f.label}
-                  </label>
-                </>
-              ))}
-            </div>
-            {docFilters.length > 0 && (
-              <button onClick={() => { setDocFilters([]); setShowDocFilter(false) }} style={{
-                padding: '7px 10px', border: 'none', cursor: 'pointer', marginTop: 6,
-                background: 'rgba(var(--rgb-200-25-35), 0.07)', color: 'var(--fg-c81923)',
-                fontFamily: 'var(--font-sys)', fontSize: 12, fontWeight: 600, borderRadius: 10,
-                textAlign: 'left', width: '100%',
-              }}>Сбросить фильтр</button>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Mobile: iOS-style grouped list */}
