@@ -5,7 +5,6 @@ import { useEscapeKey } from '../hooks/useEscapeKey'
 import { CountUp } from './CountUp'
 import MarginChart from './MarginChart'
 import GoalsRings from './GoalsRings'
-import { AreaSparkline } from '../bklit/charts/sparkline'
 import { SkeletonCard } from './Skeleton'
 import { mouseOnly } from '../motion'
 import { inPeriod } from '../utils'
@@ -19,22 +18,6 @@ const fmtMonthLabel = m => {
   if (!m || !m.includes('-')) return m
   const [y, mo] = m.split('-')
   return `${MONTH_RU[parseInt(mo) - 1]} ${y}`
-}
-
-// По неделям за 12 недель (последняя точка — эта неделя): pick(o) → [дата, ключ] или null.
-// Ключ задан — считаем разных (клиентов/перевозчиков), нет — просто штуки.
-function weeklySeries(orders, pick, weeks = 12) {
-  const now = Date.now(), WEEK = 7 * 864e5
-  const sets = Array.from({ length: weeks }, () => new Set())
-  const counts = new Array(weeks).fill(0)
-  for (const o of orders) {
-    const p = pick(o); if (!p || !p[0]) continue
-    const t = new Date(p[0]).getTime(); if (isNaN(t)) continue
-    const i = weeks - 1 - Math.floor((now - t) / WEEK)
-    if (i < 0 || i >= weeks) continue
-    if (p[1] != null) sets[i].add(p[1]); else counts[i]++
-  }
-  return counts.map((c, i) => ({ v: c + sets[i].size }))
 }
 
 function filterByPeriod(orders, period) {
@@ -581,28 +564,23 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       </div>
 
       {/* KPI — одна полоса из четырёх цифр */}
-      <div className="dashboard-stat-grid card ios-widget kpi-strip" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', padding: 6 }}>
+      <div className="dashboard-stat-grid card ios-widget kpi-strip" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', padding: 4 }}>
         {[
-          { label: 'Активных заявок', value: active, color: 'var(--fg-1366f0)', series: weeklySeries(allOrders, o => [o.load_date || o.created_at]),
+          { label: 'активных заявок', value: active, color: 'var(--fg-1366f0)',
             onClick: () => { localStorage.setItem('orders_statusFilter', 'active'); onNav('orders') } },
-          { label: 'Доставлено', value: done, color: 'var(--fg-1e9e5a)', series: weeklySeries(allOrders, o => ['done', 'delivered', 'completed'].includes(o.status) ? [o.unload_date || o.load_date] : null),
+          { label: 'доставлено', value: done, color: 'var(--fg-1e9e5a)',
             onClick: () => { localStorage.setItem('orders_statusFilter', 'done'); onNav('orders') } },
-          { label: 'Клиентов', value: clientsCount, color: 'var(--fg-d97706)', series: weeklySeries(allOrders, o => [o.load_date || o.created_at, o.client_name]), onClick: () => onNav('clients') },
-          { label: 'Перевозчиков', value: carriersCount, color: 'var(--fg-7c3aed)', series: weeklySeries(allOrders, o => [o.load_date || o.created_at, o.carrier_name]), onClick: () => onNav('carriers') },
+          { label: 'клиентов', value: clientsCount, color: 'var(--fg-d97706)', onClick: () => onNav('clients') },
+          { label: 'перевозчиков', value: carriersCount, color: 'var(--fg-7c3aed)', onClick: () => onNav('carriers') },
         ].map(kpi => (
           <div key={kpi.label} className="kpi-cell" onClick={kpi.onClick}
-            style={{ padding: isMobile ? '10px 12px' : '12px 18px', cursor: 'pointer', borderRadius: 16 }}>
-            <div style={{ fontSize: isMobile ? 12 : 13, color: 'var(--text-3)', fontWeight: 600, marginBottom: isMobile ? 6 : 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{kpi.label}</div>
-            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 8 }}>
-              <div style={{ fontWeight: 700, fontSize: isMobile ? 24 : 28, color: kpi.color, lineHeight: 1, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}>
+            style={{ padding: isMobile ? '8px 10px' : '10px 16px', cursor: 'pointer', borderRadius: 14 }}>
+            {/* одна строка: число и подпись рядом */}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, minWidth: 0 }}>
+              <span style={{ fontWeight: 700, fontSize: isMobile ? 20 : 22, color: kpi.color, lineHeight: 1, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
                 <CountUp value={kpi.value} format={v => Math.round(v).toLocaleString('ru-RU')} />
-              </div>
-              {/* мини-график Bklit: как менялось по неделям за 12 недель */}
-              {!isMobile && (
-                <div className="bklit" style={{ width: 110, flexShrink: 0 }} title="по неделям, 12 недель">
-                  <AreaSparkline data={kpi.series} dataKey="v" height={34} color={kpi.color} strokeWidth={2} fillOpacity={0.25} animate />
-                </div>
-              )}
+              </span>
+              <span style={{ fontSize: 13, color: 'var(--text-3)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{kpi.label}</span>
             </div>
           </div>
         ))}
