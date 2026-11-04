@@ -6,7 +6,6 @@ import { CountUp } from './CountUp'
 import MarginChart from './MarginChart'
 import GoalsRings from './GoalsRings'
 import { Gauge } from '../bklit/charts/gauge'
-import { SkeletonCard } from './Skeleton'
 import { mouseOnly } from '../motion'
 import { inPeriod, initials, getGradient } from '../utils'
 import { SwapText } from './Transitions'
@@ -510,14 +509,17 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
 
 
   if (loading) return (
+    // заготовки той же формы, что и дашборд: «Маржа» во всю ширину, под ней долги и цели, полоса цифр
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.3fr 1fr 1fr', gap: 16 }}>
-        {[1, 2, 3].map(i => <SkeletonCard key={i} lines={2} />)}
+      <div className="ios-widget" style={{ height: isMobile ? 300 : 450 }} />
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="ios-widget" style={{ height: 130 }} />
+          <div className="ios-widget" style={{ height: 130 }} />
+        </div>
+        <div className="ios-widget" style={{ height: 276 }} />
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 12 }}>
-        {[1, 2, 3, 4].map(i => <SkeletonCard key={i} lines={1} />)}
-      </div>
-      <SkeletonCard lines={6} />
+      <div className="ios-widget" style={{ height: 52 }} />
     </div>
   )
 

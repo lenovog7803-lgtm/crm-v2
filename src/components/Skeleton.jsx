@@ -1,12 +1,8 @@
 export function Skeleton({ width = '100%', height = 16, radius = 8, style = {} }) {
   return (
-    <div style={{
-      width, height, borderRadius: radius,
-      background: 'linear-gradient(90deg, var(--fill-2) 25%, var(--fill) 50%, var(--fill-2) 75%)',
-      backgroundSize: '200% 100%',
-      animation: 'skeletonShimmer 1.4s ease-in-out infinite',
-      ...style,
-    }} />
+    // без серых мерцающих полосок: пока грузится — пустое стекло нужного размера,
+    // потом содержимое мягко проявляется (.card/.ios-widget, см. «проявление» в index.css)
+    <div aria-hidden="true" style={{ width, height, borderRadius: radius, ...style }} />
   )
 }
 
