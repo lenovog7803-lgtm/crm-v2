@@ -1334,3 +1334,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   .dash-modal .ios-row + .ios-row::before, .dash-modal .debt-group + .debt-group { box-shadow: none; }
   .dash-modal .debt-group + .debt-group { border-top: 0.5px solid rgba(255,255,255,0.55); }
 }
+/* список в окнах дашборда — без своей рамки и подложки, строки прямо на стекле окна */
+@media (min-width: 769px) {
+  .dash-modal .ios-list { background: transparent !important; box-shadow: none !important; border-radius: 0; }
+}
