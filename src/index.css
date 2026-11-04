@@ -1382,3 +1382,14 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 /* строки «Клиент / Перевозчик» в карточке заявки */
 .party-row { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 10px 20px; transition: background 0.12s var(--ease); }
 @media (hover: hover) { .party-row[role="button"]:hover { background: rgba(var(--ink-rgb), 0.035); } }
+/* светящаяся кромка блоков — ровно как у эталона (.topbar-drop::before) */
+.card:not(.grad-card), .kanban-card, .desktop-sidebar.liquid-glass, .topbar-mobile.liquid-glass { isolation: isolate; }
+.card:not(.grad-card):not(.ios-widget), .kanban-card { position: relative; }
+.card:not(.grad-card)::before, .ios-widget:not(.grad-card)::before, .kanban-card::before,
+.desktop-sidebar.liquid-glass::before, .topbar-mobile.liquid-glass::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 1.5px; pointer-events: none; opacity: 1 !important;
+  background: linear-gradient(135deg, rgba(var(--paper-rgb), 0.4) 0%, rgba(var(--paper-rgb), 0) 40%, rgba(var(--paper-rgb), 0) 60%, rgba(var(--paper-rgb), 0.85) 100%) !important;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.card:not(.grad-card)::after, .ios-widget:not(.grad-card)::after, .desktop-sidebar.liquid-glass::after, .topbar-mobile.liquid-glass::after { display: none !important; }
+:root[data-theme="dark"] .card:not(.grad-card)::before, :root[data-theme="dark"] .ios-widget:not(.grad-card)::before, :root[data-theme="dark"] .kanban-card::before { opacity: 0.2 !important; }
