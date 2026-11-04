@@ -164,25 +164,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
         {/* большой заголовок iOS: крупный вверху страницы, сжимается при прокрутке */}
         <div className="ios-title" style={{ fontSize: compact ? (isMobile ? 17 : 18) : (isMobile ? 24 : 26) }}>{meta.title}</div>
         {!isMobile && (
-          <div className="ios-subtitle" style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 4 }}>
-            {meta.subtitle}
-            {/* период меняет содержимое страницы — поэтому он у заголовка, а не среди общих кнопок */}
-            {page === 'dashboard' && <>
-              <span aria-hidden="true">·</span>
-              <Select
-          className="topbar-period"
-          value={period}
-          onChange={e => onPeriodChange && onPeriodChange(e.target.value)}
-          style={{ height: 24, padding: '0 6px', borderRadius: 8, border: 'none', background: 'transparent', fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600, color: 'var(--fg-1366f0)', outline: 'none', cursor: 'pointer' }}
-        >
-          {PERIOD_OPTIONS.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
-          {extraQuarters.length > 0 && <option disabled>──────────</option>}
-          {extraQuarters.map(q => <option key={q} value={q}>{fmtQuarter(q)}</option>)}
-          {extraMonths.length > 0 && <option disabled>──────────</option>}
-          {extraMonths.map(m => <option key={m} value={m}>{fmtMonth(m)}</option>)}
-        </Select>
-            </>}
-          </div>
+          <div className="ios-subtitle" style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>{meta.subtitle}</div>
         )}
       </div>
       {/* шапка-остров: «ручка» раскрытия снизу */}
@@ -195,6 +177,20 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
         </button>
+      )}
+
+      {/* Период — только на дашборде: капсула в одном ряду с кнопками */}
+      {page === 'dashboard' && (
+        <div className="topbar-period-wrap">
+          <svg className="topbar-period-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="3"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg>
+          <Select className="topbar-period" value={period} onChange={e => onPeriodChange && onPeriodChange(e.target.value)}>
+            {PERIOD_OPTIONS.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}
+            {extraQuarters.length > 0 && <option disabled>──────────</option>}
+            {extraQuarters.map(q => <option key={q} value={q}>{fmtQuarter(q)}</option>)}
+            {extraMonths.length > 0 && <option disabled>──────────</option>}
+            {extraMonths.map(m => <option key={m} value={m}>{fmtMonth(m)}</option>)}
+          </Select>
+        </div>
       )}
 
       {/* Search — desktop: в покое только лупа; наведение, Tab или клик — строка плавно выезжает влево */}
