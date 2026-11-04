@@ -1240,3 +1240,16 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   .scroll-area .card, .scroll-area .ios-widget, .scroll-area .ios-list { animation: none; }
   .loading-glass .sheen { display: none; }
 }
+
+/* Заявки: капсулы фильтров в стиле верхней панели — стекло, тонкая рамка; включённый фильтр — синий */
+.app-root .apple-select.orders-pill, .orders-pill-btn {
+  height: 34px; min-height: 34px; padding: 0 12px 0 14px; gap: 6px; flex-shrink: 0; cursor: pointer;
+  font-family: var(--font-sys); font-size: 13px; font-weight: 600; color: var(--text-secondary);
+  background: rgba(var(--paper-rgb), 0.7) !important; border: none !important; border-radius: 999px !important;
+  box-shadow: 0 0 0 1px rgba(var(--ink-rgb), 0.07), 0 1px 2px rgba(20,30,55,0.05) !important;
+  display: inline-flex; align-items: center; transition: background 0.15s var(--ease), color 0.15s var(--ease);
+}
+@media (hover: hover) { .app-root .apple-select.orders-pill:hover, .orders-pill-btn:hover { background: rgba(var(--paper-rgb), 0.95) !important; color: var(--ink); } }
+.app-root .apple-select.orders-pill.is-on, .orders-pill-btn.is-on {
+  color: var(--fg-1366f0); background: rgba(var(--rgb-19-102-240), 0.1) !important; box-shadow: 0 0 0 1px rgba(var(--rgb-19-102-240), 0.3) !important;
+}

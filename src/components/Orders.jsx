@@ -7,6 +7,7 @@ import { SkeletonRow } from './Skeleton'
 import { useToast } from './Toast'
 import { EmptyState } from './EmptyState'
 import { SlidingTabs } from './SlidingTabs'
+import Select from './Select'
 import { mouseOnly, spring, project, rubberband, velocityTracker, haptic } from '../motion'
 import { SwapText } from './Transitions'
 import { StatusOrb } from './StatusOrb'
@@ -327,61 +328,23 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
             value={statusChips.some(c => c.key === statusFilter) ? statusFilter : 'all'}
             onChange={setStatusFilter}
           />
-          <div style={{ width: 1, height: 20, background: 'rgba(var(--ink-rgb), 0.1)', flexShrink: 0 }} />
-          <button onClick={() => setPayFilter(payFilter === 'clientUnpaid' ? null : 'clientUnpaid')} style={{
-            padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer', flexShrink: 0,
-            fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
-            background: payFilter === 'clientUnpaid' ? 'rgba(var(--rgb-30-158-90), 0.15)' : 'rgba(var(--ink-rgb), 0.06)',
-            color: payFilter === 'clientUnpaid' ? 'var(--fg-1e9e5a)' : 'var(--text-secondary)',
-          }}>Не оплачено клиентом</button>
-          <button onClick={() => setPayFilter(payFilter === 'carrierUnpaid' ? null : 'carrierUnpaid')} style={{
-            padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer', flexShrink: 0,
-            fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
-            background: payFilter === 'carrierUnpaid' ? 'rgba(var(--rgb-124-58-237), 0.15)' : 'rgba(var(--ink-rgb), 0.06)',
-            color: payFilter === 'carrierUnpaid' ? 'var(--fg-7c3aed)' : 'var(--text-secondary)',
-          }}>Не оплачено перевозчику</button>
-          <div style={{ width: 1, height: 20, background: 'rgba(var(--ink-rgb), 0.1)', flexShrink: 0 }} />
-          {/* Doc filter toggle button */}
-          <button onClick={() => setShowDocFilter(v => !v)} style={{
-            padding: '6px 14px', borderRadius: 12, cursor: 'pointer', flexShrink: 0,
-            fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
-            background: docFilters.length > 0 ? 'rgba(var(--rgb-19-102-240), 0.12)' : showDocFilter ? 'rgba(var(--ink-rgb), 0.1)' : 'rgba(var(--ink-rgb), 0.06)',
-            color: docFilters.length > 0 ? 'var(--fg-1366f0)' : 'var(--text-secondary)',
-            border: docFilters.length > 0 ? '1px solid rgba(var(--rgb-19-102-240), 0.3)' : '1px solid transparent',
-            display: 'flex', alignItems: 'center', gap: 6,
-          }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-            </svg>
-            Документы {docFilters.length > 0 && `(${docFilters.length})`}
+          {/* оплата — один выпадающий выбор вместо трёх кнопок */}
+          <Select className={`orders-pill${payFilter ? ' is-on' : ''}`} value={payFilter || ''} onChange={e => setPayFilter(e.target.value || null)}>
+            <option value="">Оплата: все</option>
+            <option value="clientUnpaid">Не оплачено клиентом</option>
+            <option value="carrierUnpaid">Не оплачено перевозчику</option>
+            <option value="debt">Клиент оплатил, перевозчику — нет</option>
+          </Select>
+          <button type="button" onClick={() => setShowDocFilter(v => !v)} aria-expanded={showDocFilter}
+            className={`orders-pill orders-pill-btn${docFilters.length > 0 ? ' is-on' : ''}`}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg>
+            Документы{docFilters.length > 0 && ` · ${docFilters.length}`}
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" style={{ transform: showDocFilter ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s var(--ease)' }}><path d="M2 3.5l3 3 3-3" /></svg>
           </button>
-          {/* Долг перевозчику */}
-          <button onClick={() => setPayFilter(payFilter === 'debt' ? null : 'debt')} title="Долг перевозчику" style={{
-            width: 34, height: 34, borderRadius: 11, border: 'none', cursor: 'pointer', flexShrink: 0,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: payFilter === 'debt' ? 'rgba(var(--rgb-217-119-6), 0.18)' : 'rgba(var(--paper-rgb), 0.55)',
-            backdropFilter: 'blur(12px) saturate(160%)',
-            boxShadow: payFilter === 'debt' ? '0 0 0 1.5px rgba(var(--rgb-217-119-6), 0.45), inset 0 1px 0 rgba(255,255,255,calc(0.4 * var(--rim-k)))' : '0 1px 3px rgba(14,23,38,0.1), inset 0 1px 0 rgba(255,255,255,calc(0.7 * var(--rim-k)))',
-            color: payFilter === 'debt' ? 'var(--fg-d97706)' : 'var(--text-3)', transition: 'all 0.2s',
-          }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
-            </svg>
-          </button>
-          {/* Новая заявка */}
-          <button onClick={onAddOrder} title="Новая заявка" style={{
-            width: 34, height: 34, borderRadius: 11, border: 'none', cursor: 'pointer', flexShrink: 0,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(var(--rgb-19-102-240), 0.12)', backdropFilter: 'blur(12px) saturate(160%)',
-            boxShadow: '0 1px 3px rgba(14,23,38,0.1), inset 0 1px 0 rgba(255,255,255,calc(0.5 * var(--rim-k)))',
-            color: 'var(--fg-1366f0)', transition: 'all 0.2s',
-          }}
-            onPointerEnter={mouseOnly(e => { e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.22)' })}
-            onPointerLeave={mouseOnly(e => { e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.12)' })}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round">
-              <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
+          <span style={{ flex: 1 }} />
+          <button className="btn-primary" onClick={onAddOrder} style={{ flexShrink: 0 }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+            Новая заявка
           </button>
         </div>
 
