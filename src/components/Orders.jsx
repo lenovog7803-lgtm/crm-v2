@@ -456,7 +456,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
 
       <div className="card" style={{ overflow: 'hidden' }}>
         <div style={{
-          display: 'grid', gridTemplateColumns: '140px minmax(0, 1fr) minmax(0, 1fr) 110px 90px',
+          display: 'grid', gridTemplateColumns: '140px minmax(0, 0.75fr) minmax(0, 1.25fr) 110px 90px',
           padding: '12px 20px',
           borderBottom: '1px solid rgba(var(--ink-rgb), 0.06)',
           background: 'rgba(var(--ink-rgb), 0.02)',
@@ -521,7 +521,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                   {isSelected && <span style={{ color: '#fff', fontSize: 11 }}>✓</span>}
                 </div>
               )}
-              <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '140px minmax(0, 1fr) minmax(0, 1fr) 110px 90px', alignItems: 'center' }}>
+              <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '140px minmax(0, 0.75fr) minmax(0, 1.25fr) 110px 90px', alignItems: 'center' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, fontSize: 13.5, color: 'var(--fg-1366f0)' }}>
