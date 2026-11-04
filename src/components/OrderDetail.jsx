@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { getOrder, updateOrder as apiUpdate, deleteOrder as apiDelete, restoreTrash, markPayment, addPayment, deletePayment, restorePayment, syncOrderDocUrls, generateClientDoc, generateCarrierDoc, generateAct, getClient, getClients, getCarrier, getCarriers, getOrderHistory, getGoogleAuthUrl } from '../api'
-import { fmtMoney, initials, getGradient, fmtDate, hasUnreconciledPayment } from '../utils'
+import { fmtMoney, fmtDate, hasUnreconciledPayment } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { useRealtime } from '../hooks/useRealtime'
 import { useToast } from './Toast'
@@ -116,27 +116,6 @@ function SLabel({ children }) {
 
 function FieldLabel({ children }) {
   return <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', marginBottom: 5 }}>{children}</div>
-}
-
-function ClickableName({ name, onClick }) {
-  const [pressed, setPressed] = useState(false)
-  const handleClick = () => {
-    setPressed(true)
-    setTimeout(onClick, 90)
-  }
-  return (
-    <span
-      onClick={handleClick}
-      style={{
-        cursor: 'pointer', display: 'inline-block', padding: '2px 6px', margin: '-2px -6px',
-        borderRadius: 8, background: pressed ? 'rgba(var(--rgb-19-102-240), 0.12)' : 'transparent',
-        transition: 'background 0.12s ease',
-        fontWeight: 700, fontSize: 14, color: 'var(--fg-1366f0)',
-        textDecoration: 'underline', textDecorationColor: 'rgba(var(--rgb-19-102-240), 0.4)',
-        fontFamily: 'var(--font-sys)',
-      }}
-    >{name}</span>
-  )
 }
 
 const LONG_PRESS_MS = 2000
@@ -699,8 +678,6 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
     show(`Карточка перевозчика «${order.carrier_name || order.carrier_id}» не найдена в базе`, { type: 'error' })
   }
 
-  const [avAc, avBc] = getGradient(order.client_name || '')
-  const [avAr, avBr] = getGradient(order.carrier_name || '')
   const curStatus = STATUSES.find(s => s.id === view.status) || STATUSES[0]
 
   return (
@@ -823,7 +800,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
         </div>
       )}
 
-      <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 16, alignItems: 'start' }}>
+      <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.6fr) minmax(0, 1fr)', gap: 16, alignItems: 'start' }}>
         {/* LEFT COLUMN */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {/* Главная карточка — мягкий синий живой градиент */}
@@ -975,73 +952,27 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
 
         {/* RIGHT COLUMN */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {/* Client */}
-          {order.client_name && (
-            <div className="card" style={{ padding: '20px' }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: 14 }}>КЛИЕНТ</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{
-                  width: 44, height: 44, borderRadius: 14, flexShrink: 0,
-                  '--av-hue': avBc, background: `linear-gradient(135deg, ${avAc} 0%, ${avBc} 100%)`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: '#fff', fontWeight: 700, fontSize: 14,
-                }}>{initials(order.client_name)}</div>
-                <div>
-                  {onOpenClient && (order.client_id || order.client_name) ? (
-                    <ClickableName name={order.client_name} onClick={openClientDetail} />
-                  ) : (
-                    <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>{order.client_name}</div>
-                  )}
-                  {order.client_phone && <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>{order.client_phone}</div>}
+          {/* Стороны — одна карточка из двух строк, как в «Настройках» iPhone: подпись слева, название справа */}
+          {(order.client_name || order.carrier_name) && (
+            <div className="card" style={{ padding: '6px 0' }}>
+              {[
+                order.client_name && { key: 'client', label: 'Клиент', name: order.client_name,
+                  sub: order.client_phone, open: onOpenClient && (order.client_id || order.client_name) ? openClientDetail : null },
+                order.carrier_name && { key: 'carrier', label: 'Перевозчик', name: order.carrier_name,
+                  sub: [order.vehicle_plate, order.vehicle_type, order.driver_name, order.driver_phone || order.carrier_phone].filter(Boolean).join(' · ')
+                    || (!order.vehicle_plate && !order.driver_name ? order.vehicle_info : ''),
+                  open: onOpenCarrier && (order.carrier_id || order.carrier_name) ? openCarrierDetail : null },
+              ].filter(Boolean).map((p, i) => (
+                <div key={p.key} className="party-row" onClick={p.open || undefined} role={p.open ? 'button' : undefined}
+                  style={{ cursor: p.open ? 'pointer' : 'default', borderTop: i ? '0.5px solid rgba(var(--sep-rgb), 0.14)' : 'none' }}>
+                  <span style={{ fontSize: 13, color: 'var(--text-3)', width: 92, flexShrink: 0 }}>{p.label}</span>
+                  <span style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
+                    <span style={{ display: 'block', fontSize: 14.5, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
+                    {p.sub && <span style={{ display: 'block', fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.sub}</span>}
+                  </span>
+                  {p.open && <svg width="8" height="13" viewBox="0 0 8 13" fill="none" stroke="var(--text-quaternary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M1.5 1.5l5 5-5 5" /></svg>}
                 </div>
-              </div>
-            </div>
-          )}
-
-          {/* Carrier */}
-          {order.carrier_name && (
-            <div className="card" style={{ padding: '20px' }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: 14 }}>ПЕРЕВОЗЧИК</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{
-                  width: 44, height: 44, borderRadius: 14, flexShrink: 0,
-                  '--av-hue': avBr, background: `linear-gradient(135deg, ${avAr} 0%, ${avBr} 100%)`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="1" y="3" width="15" height="13" rx="1" />
-                    <path d="M16 8h4l3 3v5h-7V8z" />
-                    <circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" />
-                  </svg>
-                </div>
-                <div>
-                  {onOpenCarrier && (order.carrier_id || order.carrier_name) ? (
-                    <ClickableName name={order.carrier_name} onClick={openCarrierDetail} />
-                  ) : (
-                    <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>{order.carrier_name}</div>
-                  )}
-                  {order.carrier_phone && <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>{order.carrier_phone}</div>}
-                </div>
-              </div>
-              {(order.vehicle_plate || order.vehicle_type || order.driver_name || order.driver_phone) && (
-                <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  {(order.vehicle_plate || order.vehicle_type) && (
-                    <div style={{ padding: '7px 12px', borderRadius: 10, background: 'rgba(var(--ink-rgb), 0.04)', fontSize: 12, color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
-                      {[order.vehicle_plate, order.vehicle_type].filter(Boolean).join(' · ')}
-                    </div>
-                  )}
-                  {(order.driver_name || order.driver_phone) && (
-                    <div style={{ padding: '7px 12px', borderRadius: 10, background: 'rgba(var(--ink-rgb), 0.04)', fontSize: 12, color: 'var(--text-secondary)' }}>
-                      {[order.driver_name, order.driver_phone].filter(Boolean).join(' · ')}
-                    </div>
-                  )}
-                  {!order.vehicle_plate && !order.driver_name && order.vehicle_info && (
-                    <div style={{ padding: '7px 12px', borderRadius: 10, background: 'rgba(var(--ink-rgb), 0.04)', fontSize: 12, color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
-                      {order.vehicle_info}
-                    </div>
-                  )}
-                </div>
-              )}
+              ))}
             </div>
           )}
 

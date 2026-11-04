@@ -1379,3 +1379,6 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 :root[data-theme="dark"] .card:not(.grad-card), :root[data-theme="dark"] .ios-widget:not(.grad-card), :root[data-theme="dark"] .kanban-card, :root[data-theme="dark"] .desktop-sidebar.liquid-glass, :root[data-theme="dark"] .topbar-mobile.liquid-glass {
   background: rgba(30,31,34,0.82) !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06), 0 10px 30px -16px rgba(0,0,0,0.6) !important;
 }
+/* строки «Клиент / Перевозчик» в карточке заявки */
+.party-row { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 10px 20px; transition: background 0.12s var(--ease); }
+@media (hover: hover) { .party-row[role="button"]:hover { background: rgba(var(--ink-rgb), 0.035); } }
