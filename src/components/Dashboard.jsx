@@ -468,8 +468,8 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
   return (
     <div style={{ padding: isMobile ? 0 : '0 2px', display: 'flex', flexDirection: 'column', gap: isMobile ? 10 : 16 }}>
 
-      {/* Главный ряд: слева маржа с графиком, справа долги и цели */}
-      <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, alignItems: 'stretch' }}>
+      {/* Главный ряд: маржа с графиком на всю ширину, под ней в ряд долги и цели */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Маржа — главная карточка: цифра, график, итоги */}
         <div
           {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.4), 0 18px 44px -22px rgba(40,90,190,0.45)', 'inset 0 1px 0 rgba(255,255,255,0.4), 0 24px 54px -18px rgba(40,90,190,0.52)')}
@@ -523,7 +523,9 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
+        <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, alignItems: 'stretch' }}>
+          {/* два долга стопкой — по высоте как «Цели месяца» */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {[
           { icon: 'in', label: 'Ожидается от клиентов', color: 'var(--fg-d97706)', value: clientDebt, count: debtorOrders.length, onClick: () => setShowDebtors(true) },
           { icon: 'out', label: 'К оплате перевозчикам', color: 'var(--fg-7c3aed)', value: carrierDebt, count: carrierDebtOrders.length, onClick: () => setShowCarrierDebt(true) },
@@ -543,6 +545,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             </div>
           </div>
         ))}
+          </div>
         {/* Monthly goals — real plan/fact from the backend, only for a period
             that resolves to one specific month (goals don't exist per-quarter). */}
         {goals && (
