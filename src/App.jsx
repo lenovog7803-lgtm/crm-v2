@@ -134,6 +134,7 @@ function MainApp() {
 
   // Refresh triggers — increment to tell the component to re-fetch
   const [dashboardPeriod, setDashboardPeriod] = useState('month')
+  const [financePeriod, setFinancePeriod] = useState('all')  // «Финансы» всегда открываются за всё время
   const [availableMonths, setAvailableMonths] = useState([])
 
   const [ordersKey, setOrdersKey] = useState(0)
@@ -355,7 +356,7 @@ function MainApp() {
         />
 
         <main className="app-main">
-          <Topbar compact={scrolled} page={page} meta={detailMeta?.page === page ? detailMeta : null} onSignOut={signOut} period={dashboardPeriod} onPeriodChange={setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={handleSearchChange} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} onOpenPalette={() => setPaletteOpen(true)} />
+          <Topbar compact={scrolled} page={page} meta={detailMeta?.page === page ? detailMeta : null} onSignOut={signOut} period={page === 'finance' ? financePeriod : dashboardPeriod} onPeriodChange={page === 'finance' ? setFinancePeriod : setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={handleSearchChange} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} onOpenPalette={() => setPaletteOpen(true)} />
           <div className={`scroll-area${motionRef.current.cls}`} key={page} onScroll={handleScrollParallax}>
             {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} onMonthsLoaded={setAvailableMonths} preloadedOrders={allOrders} />}
             {page === 'my-dashboard' && <ErrorBoundary><ManagerDashboard /></ErrorBoundary>}
@@ -388,7 +389,7 @@ function MainApp() {
               <Finance
                 onAddPayment={openPaymentModal}
                 refreshKey={financeKey}
-                period={dashboardPeriod}
+                period={financePeriod}
               />
             )}
 
