@@ -489,12 +489,13 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
     : period === 'last_month'
       ? `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, '0')}`
       : /^\d{4}-\d{2}$/.test(period) ? period : null
-  const [goals, setGoals] = useState(null)
+  const [goals, setGoals] = useState(undefined)  // undefined — грузится, null — целей нет/ошибка
   const [editingGoal, setEditingGoal] = useState(null)
   const [goalInput, setGoalInput] = useState('')
   useEffect(() => {
     if (!goalsMonth) { setGoals(null); return }
-    getGoals(goalsMonth).then(setGoals).catch(() => setGoals(null))
+    setGoals(undefined)
+    getGoals(goalsMonth).then(g => setGoals(g || null)).catch(() => setGoals(null))
   }, [goalsMonth])
 
   // "Чистая прибыль" on the hero card used to be recomputed locally as
@@ -623,18 +624,20 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           </div>
         {/* Monthly goals — real plan/fact from the backend, only for a period
             that resolves to one specific month (goals don't exist per-quarter). */}
-        {goals && (
-          <div className="card ios-widget" style={{ padding: isMobile ? '16px 14px' : '16px 20px' }}>
+        {/* карточка целей рисуется сразу вместе со всеми — цели приходят отдельным запросом и подставляются, когда придут */}
+        {goalsMonth && goals !== null && (
+          <div className={`card ios-widget${goals ? '' : ' loading-glass'}`} style={{ padding: isMobile ? '16px 14px' : '16px 20px' }}>
+            {!goals && <span className="sheen" />}
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 12 }}>
               Цели месяца
             </div>
-            <GoalsRings onEdit={key => { setEditingGoal(key); setGoalInput(String(goals[`${key}_goal`] ?? '')) }}
+            {goals ? <GoalsRings onEdit={key => { setEditingGoal(key); setGoalInput(String(goals[`${key}_goal`] ?? '')) }}
               items={[
                 { key: 'profit', label: 'Прибыль', fact: goals.profit_fact, goal: goals.profit_goal, color: '#04769F', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
                 { key: 'trips', label: 'Рейсы', fact: goals.trips_fact, goal: goals.trips_goal, color: '#0593C6', fmt: v => Math.round(v) },
                 { key: 'margin', label: 'Маржа/рейс', fact: goals.margin_fact, goal: goals.margin_goal, color: '#6CCBEB', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
                 { key: 'new_clients', label: 'Новые клиенты', fact: goals.new_clients_fact, goal: goals.new_clients_goal, color: '#DB3996', fmt: v => Math.round(v) },
-              ]} />
+              ]} /> : <div style={{ height: 112 }} />}
           </div>
         )}
 

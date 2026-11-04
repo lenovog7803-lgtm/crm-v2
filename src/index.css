@@ -1218,22 +1218,21 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 /* ===== Загрузка и проявление =====
    Пока грузится — по пустому стеклу пробегает световой блик (волной от карточки к карточке).
    Когда данные пришли — карточки «фокусируются»: из размытия и снизу, по очереди. */
+/* только opacity и transform — их рисует видеокарта; размытие (filter: blur) на стекле тормозило */
 @keyframes cardIn {
-  0% { opacity: 0; filter: blur(14px); transform: translateY(18px) scale(0.965); }
-  60% { opacity: 1; filter: blur(0); }
-  100% { opacity: 1; filter: none; transform: none; }
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to { opacity: 1; transform: none; }
 }
-.scroll-area .card, .scroll-area .ios-widget, .scroll-area .ios-list { animation: cardIn 0.75s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.scroll-area :is(.card, .ios-widget, .ios-list):nth-child(2) { animation-delay: 70ms; }
-.scroll-area :is(.card, .ios-widget, .ios-list):nth-child(3) { animation-delay: 140ms; }
-.scroll-area :is(.card, .ios-widget, .ios-list):nth-child(4) { animation-delay: 210ms; }
-.scroll-area :is(.card, .ios-widget, .ios-list):nth-child(n+5) { animation-delay: 280ms; }
+.scroll-area .card, .scroll-area .ios-widget, .scroll-area .ios-list { animation: cardIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.scroll-area :is(.card, .ios-widget, .ios-list):nth-child(2) { animation-delay: 50ms; }
+.scroll-area :is(.card, .ios-widget, .ios-list):nth-child(3) { animation-delay: 100ms; }
+.scroll-area :is(.card, .ios-widget, .ios-list):nth-child(n+4) { animation-delay: 150ms; }
 
 @keyframes glassSheen { from { transform: translateX(-120%) skewX(-18deg); } to { transform: translateX(220%) skewX(-18deg); } }
 .loading-glass { position: relative; overflow: hidden; }
 .loading-glass .sheen { position: absolute; inset: -20% auto -20% 0; width: 45%; pointer-events: none;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,calc(0.75 * var(--rim-k) + 0.06)), transparent);
-  animation: glassSheen 1.6s cubic-bezier(0.45, 0, 0.25, 1) infinite; }
+  animation: glassSheen 1.6s cubic-bezier(0.45, 0, 0.25, 1) infinite; will-change: transform; }
 .loading-glass:nth-child(2) .sheen, .loading-glass:nth-child(2) > .loading-glass .sheen { animation-delay: 0.12s; }
 .loading-glass:nth-child(3) .sheen { animation-delay: 0.24s; }
 .loading-glass:nth-child(n+4) .sheen { animation-delay: 0.36s; }
