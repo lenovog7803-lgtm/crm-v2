@@ -468,9 +468,9 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
   return (
     <div style={{ padding: isMobile ? 0 : '0 2px', display: 'flex', flexDirection: 'column', gap: isMobile ? 10 : 16 }}>
 
-      {/* Hero row — виджеты iOS */}
-      <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 1fr', gap: 16 }}>
-        {/* Маржа — мягкий синий живой градиент */}
+      {/* Главный ряд: слева маржа с графиком, справа долги и цели */}
+      <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, alignItems: 'stretch' }}>
+        {/* Маржа — главная карточка: цифра, график, итоги */}
         <div
           {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.4), 0 18px 44px -22px rgba(40,90,190,0.45)', 'inset 0 1px 0 rgba(255,255,255,0.4), 0 24px 54px -18px rgba(40,90,190,0.52)')}
           style={{
@@ -504,6 +504,13 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             </span>
             <span style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.72)' }}>BYN</span>
           </div>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.72)', marginTop: 6 }}>
+            ставка клиента − ставка перевозчика{chart.prev && chart.prev.length > 0 && chart.prev.some(v => v > 0) && ' · сплошная — этот период, бледная — прошлый'}
+          </div>
+          {/* график маржи прямо в главной карточке — белые линии на градиенте */}
+          <div className="hero-chart" style={{ margin: isMobile ? '12px -6px 0' : '16px -8px 0' }}>
+            <MarginChart dates={chart.dates} current={chart.current} prev={chart.prev} labels={chart.mode === 'months' ? chart.labels : undefined} height={isMobile ? 170 : 230} />
+          </div>
           <div style={{ display: 'flex', gap: isMobile ? 16 : 28, marginTop: isMobile ? 14 : 20, paddingTop: isMobile ? 12 : 14, borderTop: '1px solid rgba(255,255,255,calc(0.25 * var(--rim-k)))' }}>
             <div>
               <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', marginBottom: 2 }}>Выручка</div>
@@ -516,29 +523,76 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           </div>
         </div>
 
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
         {[
           { icon: 'in', label: 'Ожидается от клиентов', color: 'var(--fg-d97706)', value: clientDebt, count: debtorOrders.length, onClick: () => setShowDebtors(true) },
           { icon: 'out', label: 'К оплате перевозчикам', color: 'var(--fg-7c3aed)', value: carrierDebt, count: carrierDebtOrders.length, onClick: () => setShowCarrierDebt(true) },
         ].map(w => (
           <div key={w.icon} className="ios-widget" onClick={w.onClick}
             {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.9), 0 14px 40px -22px rgba(20,30,55,0.22)', 'inset 0 1px 0 rgba(255,255,255,0.9), 0 20px 46px -18px rgba(20,30,55,0.3)')}
-            style={{ padding: isMobile ? '16px 18px' : '22px 24px', cursor: 'pointer' }}>
+            style={{ padding: isMobile ? '14px 16px' : '16px 20px', cursor: 'pointer' }}>
             <WidgetHead label={w.label} color={w.color} right={<Chevron color={w.color} />} />
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
-              <span style={{ fontWeight: 700, fontSize: isMobile ? 28 : 34, letterSpacing: '-0.03em', color: 'var(--ink)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+              <span style={{ fontWeight: 700, fontSize: isMobile ? 26 : 28, letterSpacing: '-0.03em', color: 'var(--ink)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                 <CountUp value={w.value} />
               </span>
               <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-tertiary)' }}>BYN</span>
             </div>
-            <div style={{ marginTop: isMobile ? 10 : 16, fontSize: 13, color: 'var(--text-3)' }}>
+            <div style={{ marginTop: 8, fontSize: 13, color: 'var(--text-3)' }}>
               <span style={{ fontWeight: 600, color: w.color }}>{w.count}</span> заявок
             </div>
           </div>
         ))}
+        {/* Monthly goals — real plan/fact from the backend, only for a period
+            that resolves to one specific month (goals don't exist per-quarter). */}
+        {goals && (
+          <div className="card ios-widget" style={{ padding: isMobile ? '16px 14px' : '16px 20px' }}>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 12 }}>
+              Цели месяца
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              {[
+                { key: 'profit', label: 'Прибыль', fact: goals.profit_fact, goal: goals.profit_goal, color: 'var(--fg-1366f0)', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
+                { key: 'trips', label: 'Рейсы', fact: goals.trips_fact, goal: goals.trips_goal, color: 'var(--fg-1e9e5a)', fmt: v => Math.round(v) },
+                { key: 'margin', label: 'Маржа/рейс', fact: goals.margin_fact, goal: goals.margin_goal, color: 'var(--fg-d97706)', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
+                { key: 'new_clients', label: 'Новые клиенты', fact: goals.new_clients_fact, goal: goals.new_clients_goal, color: 'var(--fg-7c3aed)', fmt: v => Math.round(v) },
+              ].map(g => {
+                const pct = g.goal > 0 ? (g.fact / g.goal) * 100 : 0
+                return (
+                  <div key={g.label}
+                    onClick={() => { setEditingGoal(g.key); setGoalInput(String(g.goal)) }}
+                    title="Изменить план на этот месяц"
+                    style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', borderRadius: 12, padding: 4, margin: -4, transition: 'background 0.15s var(--ease)' }}
+                    onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.04)')}
+                    onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
+                  >
+                    <div style={{ position: 'relative', flexShrink: 0 }}>
+                      <div style={{ filter: `drop-shadow(0 4px 10px color-mix(in srgb, ${g.color} 25%, transparent))` }}>
+                        <CircularProgress pct={pct} color={g.color} size={48} stroke={7} track={`color-mix(in srgb, ${g.color} 13%, transparent)`} />
+                      </div>
+                      <div style={{
+                        position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 11, fontWeight: 700, color: g.color, fontVariantNumeric: 'tabular-nums',
+                      }}>{Math.round(pct)}%</div>
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600 }}>{g.label}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)', marginTop: 2, whiteSpace: 'nowrap' }}>
+                        {g.fmt(g.fact)} <span style={{ fontWeight: 500, color: 'var(--text-tertiary)' }}>/ {g.fmt(g.goal)}</span>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        </div>
       </div>
 
-      {/* KPI */}
-      <div className="dashboard-stat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+      {/* KPI — одна полоса из четырёх цифр */}
+      <div className="dashboard-stat-grid card ios-widget kpi-strip" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', padding: 6 }}>
         {[
           { label: 'Активных заявок', value: active, color: 'var(--fg-1366f0)',
             onClick: () => { localStorage.setItem('orders_statusFilter', 'active'); onNav('orders') } },
@@ -547,64 +601,17 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           { label: 'Клиентов', value: clientsCount, color: 'var(--fg-d97706)', onClick: () => onNav('clients') },
           { label: 'Перевозчиков', value: carriersCount, color: 'var(--fg-7c3aed)', onClick: () => onNav('carriers') },
         ].map(kpi => (
-          <div key={kpi.label} className="ios-widget"
-            onClick={kpi.onClick}
-            {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.9), 0 14px 40px -22px rgba(20,30,55,0.2)', 'inset 0 1px 0 rgba(255,255,255,0.9), 0 18px 44px -18px rgba(20,30,55,0.3)')}
-            style={{ padding: isMobile ? '12px 14px' : '16px 18px', cursor: 'pointer' }}>
+          <div key={kpi.label} className="kpi-cell" onClick={kpi.onClick}
+            style={{ padding: isMobile ? '10px 12px' : '12px 18px', cursor: 'pointer', borderRadius: 16 }}>
             <div style={{ fontSize: isMobile ? 12 : 13, color: 'var(--text-3)', fontWeight: 600, marginBottom: isMobile ? 6 : 8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{kpi.label}</div>
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 8 }}>
-              <div style={{ fontWeight: 700, fontSize: isMobile ? 26 : 32, color: kpi.color, lineHeight: 1, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ fontWeight: 700, fontSize: isMobile ? 24 : 28, color: kpi.color, lineHeight: 1, letterSpacing: '-0.03em', fontVariantNumeric: 'tabular-nums' }}>
                 <CountUp value={kpi.value} format={v => Math.round(v).toLocaleString('ru-RU')} />
               </div>
             </div>
           </div>
         ))}
       </div>
-
-      {/* Monthly goals — real plan/fact from the backend, only for a period
-          that resolves to one specific month (goals don't exist per-quarter). */}
-      {goals && (
-        <div className="card ios-widget" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: isMobile ? 12 : 18 }}>
-            Цели месяца
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: isMobile ? 14 : 20 }}>
-            {[
-              { key: 'profit', label: 'Прибыль', fact: goals.profit_fact, goal: goals.profit_goal, color: 'var(--fg-1366f0)', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
-              { key: 'trips', label: 'Рейсы', fact: goals.trips_fact, goal: goals.trips_goal, color: 'var(--fg-1e9e5a)', fmt: v => Math.round(v) },
-              { key: 'margin', label: 'Маржа/рейс', fact: goals.margin_fact, goal: goals.margin_goal, color: 'var(--fg-d97706)', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
-              { key: 'new_clients', label: 'Новые клиенты', fact: goals.new_clients_fact, goal: goals.new_clients_goal, color: 'var(--fg-7c3aed)', fmt: v => Math.round(v) },
-            ].map(g => {
-              const pct = g.goal > 0 ? (g.fact / g.goal) * 100 : 0
-              return (
-                <div key={g.label}
-                  onClick={() => { setEditingGoal(g.key); setGoalInput(String(g.goal)) }}
-                  title="Изменить план на этот месяц"
-                  style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', borderRadius: 12, padding: 4, margin: -4, transition: 'background 0.15s var(--ease)' }}
-                  onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.04)')}
-                  onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'transparent')}
-                >
-                  <div style={{ position: 'relative', flexShrink: 0 }}>
-                    <div style={{ filter: `drop-shadow(0 4px 10px color-mix(in srgb, ${g.color} 25%, transparent))` }}>
-                      <CircularProgress pct={pct} color={g.color} size={isMobile ? 54 : 64} stroke={isMobile ? 8 : 10} track={`color-mix(in srgb, ${g.color} 13%, transparent)`} />
-                    </div>
-                    <div style={{
-                      position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: isMobile ? 11 : 12, fontWeight: 700, color: g.color, fontVariantNumeric: 'tabular-nums',
-                    }}>{Math.round(pct)}%</div>
-                  </div>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600 }}>{g.label}</div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)', marginTop: 2, whiteSpace: 'nowrap' }}>
-                      {g.fmt(g.fact)} <span style={{ fontWeight: 500, color: 'var(--text-tertiary)' }}>/ {g.fmt(g.goal)}</span>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
 
       {editingGoal && (
         <GoalEditModal
@@ -629,25 +636,6 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           }}
         />
       )}
-
-      {/* Chart */}
-      <div className="card ios-widget" style={{ padding: isMobile ? '16px 14px 12px' : '24px 24px 16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: 'var(--ink)' }}>Маржа</div>
-            <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>ставка клиента − ставка перевозчика</div>
-          </div>
-          {chart.prev && chart.prev.length > 0 && chart.prev.some(v => v > 0) && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <div style={{ width: 10, height: 10, background: 'var(--bg-1366f0)', borderRadius: 3 }} />
-              <span style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, marginRight: 8 }}>этот период</span>
-              <div style={{ width: 10, height: 10, background: '#9AAFD0', borderRadius: 3 }} />
-              <span style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600 }}>прошлый период</span>
-            </div>
-          )}
-        </div>
-        <MarginChart dates={chart.dates} current={chart.current} prev={chart.prev} labels={chart.mode === 'months' ? chart.labels : undefined} height={isMobile ? 190 : 240} />
-      </div>
 
       {/* Bottom 3-col */}
       <div className="dashboard-big-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr)', gap: isMobile ? 10 : 16 }}>

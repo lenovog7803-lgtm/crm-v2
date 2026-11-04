@@ -1183,3 +1183,15 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .app-root .apple-select.topbar-period.is-open, .app-root .apple-select.topbar-period:focus-visible {
   border: none !important; box-shadow: 0 0 0 1px rgba(var(--ink-rgb), 0.08), 0 1px 2px rgba(20,30,55,0.06) !important;
 }
+
+/* Дашборд: график внутри синей карточки «Маржа» — белые линии и подписи */
+.hero-chart .bklit {
+  --chart-1: #FFFFFF; --chart-2: rgba(255,255,255,0.45);
+  --chart-label: rgba(255,255,255,0.7); --chart-foreground-muted: rgba(255,255,255,0.7); --muted-foreground: rgba(255,255,255,0.7);
+  --chart-grid: rgba(255,255,255,0.18); --chart-crosshair: rgba(255,255,255,0.6);
+}
+/* полоса из четырёх цифр: ячейки разделены тонкой линией, подсвечиваются при наведении */
+.kpi-strip .kpi-cell { position: relative; transition: background 0.15s var(--ease); }
+.kpi-strip .kpi-cell + .kpi-cell::before { content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 1px; background: rgba(var(--ink-rgb), 0.08); }
+@media (hover: hover) { .kpi-strip .kpi-cell:hover { background: rgba(var(--ink-rgb), 0.04); } }
+@media (max-width: 768px) { .kpi-strip .kpi-cell:nth-child(3)::before { display: none; } }
