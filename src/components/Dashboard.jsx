@@ -472,20 +472,20 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Маржа — главная карточка: цифра, график, итоги */}
         <div
-          {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.4), 0 18px 44px -22px rgba(40,90,190,0.45)', 'inset 0 1px 0 rgba(255,255,255,0.4), 0 24px 54px -18px rgba(40,90,190,0.52)')}
+          {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.4), 0 18px 44px -22px rgba(5,110,150,0.4)', 'inset 0 1px 0 rgba(255,255,255,0.4), 0 24px 54px -18px rgba(5,110,150,0.48)')}
           style={{
             // мягкий синий (это же — запасная заливка, если живого градиента нет)
-            background: 'radial-gradient(120% 80% at 10% -20%, rgba(255,255,255,0.3), transparent 50%), linear-gradient(150deg, #6E9CEB 0%, #5585DC 55%, #4A74C9 100%)',
+            background: 'radial-gradient(45% 60% at 70% 60%, rgba(219,57,150,0.45), transparent 70%), linear-gradient(150deg, #58C3E8 0%, #0593C6 60%, #047AA6 100%)',
             backdropFilter: 'blur(28px) saturate(180%)', WebkitBackdropFilter: 'blur(28px) saturate(180%)',
             border: '1px solid rgba(255,255,255,calc(0.35 * var(--rim-k)))',
             borderRadius: 26, padding: isMobile ? '16px 18px' : '22px 24px', color: '#fff',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.4 * var(--rim-k))), 0 18px 44px -22px rgba(40,90,190,0.45)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.4 * var(--rim-k))), 0 18px 44px -22px rgba(5,110,150,0.4)',
             transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
             position: 'relative', overflow: 'hidden', isolation: 'isolate',
           }}>
           {/* свой живой градиент в мягких синих тонах; без WebGL / на телефоне — статичная заливка выше */}
           <div style={{ position: 'absolute', inset: 0, zIndex: -1, borderRadius: 'inherit', overflow: 'hidden', pointerEvents: 'none' }}>
-            <GradientLayer colors={['#5B8BE0', '#8AB0F2', '#4269BF']} speed={0.16} />
+            <GradientLayer colors={['#3FB4DE', '#E77DB9', '#9ADCF3']} speed={0.16} />
           </div>
           <WidgetHead label="Маржа" color="rgba(255,255,255,0.24)" labelColor="rgba(255,255,255,0.92)"
             right={marginDiff !== null && (
@@ -555,10 +555,10 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             </div>
             <GoalsRings onEdit={key => { setEditingGoal(key); setGoalInput(String(goals[`${key}_goal`] ?? '')) }}
               items={[
-                { key: 'profit', label: 'Прибыль', fact: goals.profit_fact, goal: goals.profit_goal, color: '#3A62C0', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
-                { key: 'trips', label: 'Рейсы', fact: goals.trips_fact, goal: goals.trips_goal, color: '#5585DC', fmt: v => Math.round(v) },
-                { key: 'margin', label: 'Маржа/рейс', fact: goals.margin_fact, goal: goals.margin_goal, color: '#7FA3EA', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
-                { key: 'new_clients', label: 'Новые клиенты', fact: goals.new_clients_fact, goal: goals.new_clients_goal, color: '#AFC6F3', fmt: v => Math.round(v) },
+                { key: 'profit', label: 'Прибыль', fact: goals.profit_fact, goal: goals.profit_goal, color: '#04769F', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
+                { key: 'trips', label: 'Рейсы', fact: goals.trips_fact, goal: goals.trips_goal, color: '#0593C6', fmt: v => Math.round(v) },
+                { key: 'margin', label: 'Маржа/рейс', fact: goals.margin_fact, goal: goals.margin_goal, color: '#6CCBEB', fmt: v => `${Math.round(v).toLocaleString('ru-RU')} BYN` },
+                { key: 'new_clients', label: 'Новые клиенты', fact: goals.new_clients_fact, goal: goals.new_clients_goal, color: '#DB3996', fmt: v => Math.round(v) },
               ]} />
           </div>
         )}
