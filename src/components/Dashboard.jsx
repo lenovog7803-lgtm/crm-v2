@@ -241,12 +241,12 @@ const Chevron = ({ color }) => (
 function DebtModal({ title, orders, onClose, onOpenOrder }) {
   useEscapeKey(onClose)
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.45)', backdropFilter: 'blur(8px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 20 }}>
-      <div style={{ margin: 'auto', background: 'rgba(var(--paper-rgb), 0.97)', backdropFilter: 'blur(30px)', borderRadius: 24, maxWidth: 560, width: '90%', border: '1px solid rgba(255,255,255,calc(0.8 * var(--rim-k)))', boxShadow: '0 40px 80px rgba(20,30,55,0.3)', animation: 'modalIn 0.22s var(--ease) both' }}>
+    <div className="dash-modal-scrim" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="dash-modal" style={{ maxWidth: 560 }}>
         <div style={{ padding: 28 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>{title}</div>
-            <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.1)', background: 'transparent', cursor: 'pointer', fontSize: 20, color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+            <button onClick={onClose} className="ios-sheet-close" aria-label="Закрыть"><svg width="12" height="12" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
           </div>
           {orders.length === 0 && <div style={{ color: 'var(--text-tertiary)', fontSize: 13, textAlign: 'center', padding: '20px 0' }}>Нет неоплаченных заявок</div>}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -280,7 +280,7 @@ function TopRow({ rank, name, value }) {
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
       <span style={{ width: 24, height: 24, borderRadius: 8, flexShrink: 0, background: 'rgba(var(--ink-rgb), 0.05)', color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>{rank}</span>
       <span style={{ flex: 1, fontSize: 13, fontWeight: 500, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 700, color: 'var(--ink)', flexShrink: 0 }}>{value}</span>
+      <span style={{ fontSize: 13, fontWeight: 600, color: /^[-−]/.test(String(value)) ? 'var(--fg-c81923)' : 'var(--ink)', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>{value}</span>
     </div>
   )
 }
@@ -288,15 +288,15 @@ function TopRow({ rank, name, value }) {
 function FullListModal({ title, subtitle, items, valueOf, color, bg, onClose }) {
   useEscapeKey(onClose)
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 20 }}>
-      <div style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 520, border: '1px solid rgba(var(--ink-rgb), 0.08)', boxShadow: '0 40px 80px rgba(20,30,55,0.28)', animation: 'modalIn 0.22s var(--ease) both' }}>
+    <div className="dash-modal-scrim" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="dash-modal" style={{ maxWidth: 520 }}>
         <div style={{ padding: 26 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
             <div>
               <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>{title}</div>
               <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{subtitle}</div>
             </div>
-            <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.1)', background: 'var(--fill)', cursor: 'pointer', fontSize: 18, color: 'var(--text-3)', flexShrink: 0 }}>×</button>
+            <button onClick={onClose} className="ios-sheet-close" aria-label="Закрыть"><svg width="12" height="12" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
           </div>
           {items.length === 0 ? (
             <div style={{ textAlign: 'center', padding: 30, fontSize: 13, color: 'var(--text-3)' }}>Нет данных</div>
@@ -472,20 +472,20 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Маржа — главная карточка: цифра, график, итоги */}
         <div
-          {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.4), 0 18px 44px -22px rgba(5,110,150,0.4)', 'inset 0 1px 0 rgba(255,255,255,0.4), 0 24px 54px -18px rgba(5,110,150,0.48)')}
+          {...liftHandlers('inset 0 1px 0 rgba(255,255,255,0.4), 0 18px 44px -22px rgba(40,90,190,0.45)', 'inset 0 1px 0 rgba(255,255,255,0.4), 0 24px 54px -18px rgba(40,90,190,0.52)')}
           style={{
             // мягкий синий (это же — запасная заливка, если живого градиента нет)
-            background: 'radial-gradient(45% 60% at 70% 60%, rgba(219,57,150,0.45), transparent 70%), linear-gradient(150deg, #58C3E8 0%, #0593C6 60%, #047AA6 100%)',
+            background: 'radial-gradient(120% 80% at 10% -20%, rgba(255,255,255,0.3), transparent 50%), linear-gradient(150deg, #6E9CEB 0%, #5585DC 55%, #4A74C9 100%)',
             backdropFilter: 'blur(28px) saturate(180%)', WebkitBackdropFilter: 'blur(28px) saturate(180%)',
             border: '1px solid rgba(255,255,255,calc(0.35 * var(--rim-k)))',
             borderRadius: 26, padding: isMobile ? '16px 18px' : '22px 24px', color: '#fff',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.4 * var(--rim-k))), 0 18px 44px -22px rgba(5,110,150,0.4)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.4 * var(--rim-k))), 0 18px 44px -22px rgba(40,90,190,0.45)',
             transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
             position: 'relative', overflow: 'hidden', isolation: 'isolate',
           }}>
           {/* свой живой градиент в мягких синих тонах; без WebGL / на телефоне — статичная заливка выше */}
           <div style={{ position: 'absolute', inset: 0, zIndex: -1, borderRadius: 'inherit', overflow: 'hidden', pointerEvents: 'none' }}>
-            <GradientLayer colors={['#3FB4DE', '#E77DB9', '#9ADCF3']} speed={0.16} />
+            <GradientLayer colors={['#5B8BE0', '#8AB0F2', '#4269BF']} speed={0.16} />
           </div>
           <WidgetHead label="Маржа" color="rgba(255,255,255,0.24)" labelColor="rgba(255,255,255,0.92)"
             right={marginDiff !== null && (

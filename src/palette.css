@@ -32,15 +32,5 @@
 /* график: этот период — небесный, прошлый — серый */
 :root:not([data-theme="dark"]) .bklit { --chart-1: #0593C6; --chart-2: #B8C2CC; }
 
-/* фон: прежние мягкие пятна, но в цветах референса — небо и чуть розового, без фиолетового */
-:root:not([data-theme="dark"]) .aurora-bg::before {
-  background:
-    radial-gradient(ellipse 80% 60% at 10% 10%, rgba(5,147,198,0.16) 0%, transparent 60%),
-    radial-gradient(ellipse 70% 60% at 90% 5%, rgba(5,147,198,0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 60% at 85% 90%, rgba(219,57,150,0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 70% 60% at 5% 85%, rgba(5,147,198,0.10) 0%, transparent 60%);
-}
-:root:not([data-theme="dark"]) .aurora-orb-a { background: radial-gradient(circle, rgba(5,147,198,0.18) 0%, transparent 70%); }
-:root:not([data-theme="dark"]) .aurora-orb-b { background: radial-gradient(circle, rgba(219,57,150,0.10) 0%, transparent 70%); }
 /* график внутри цветной карточки «Маржа» — белые линии (перебивает небесный график выше) */
 :root:not([data-theme="dark"]) .hero-chart .bklit { --chart-1: #FFFFFF; --chart-2: rgba(255,255,255,0.5); }
