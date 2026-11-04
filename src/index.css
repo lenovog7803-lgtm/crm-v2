@@ -1253,3 +1253,20 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .app-root .apple-select.orders-pill.is-on, .orders-pill-btn.is-on, .app-root .apple-select.orders-pill.is-open {
   color: var(--fg-1366f0); background: rgba(var(--paper-rgb), 0.95) !important; box-shadow: 0 1px 3px rgba(20,30,55,0.08) !important;
 }
+
+/* ===== Все выпадающие списки — тёмное стекло, как меню macOS: белый текст, пункт под курсором — синяя плашка ===== */
+.topbar-menu, .apple-select-menu {
+  background: rgba(32, 34, 40, 0.78) !important;
+  backdrop-filter: blur(30px) saturate(180%) !important; -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+  box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.14), 0 0 0 0.5px rgba(0,0,0,0.25), 0 18px 44px -14px rgba(0,0,0,0.5) !important;
+  color: #FFFFFF;
+}
+.apple-select-item, .topbar-menu button { color: rgba(255,255,255,0.92); }
+.apple-select-item[data-active="true"]:not(.is-disabled), .topbar-menu button:hover { background: #0A84FF !important; color: #FFFFFF; }
+.apple-select-item.is-disabled { color: rgba(255,255,255,0.35); }
+.apple-select-check { color: #FFFFFF; }
+.apple-select-sep, .topbar-menu-sep { background: rgba(255,255,255,0.12); }
+.topbar-menu button svg { color: rgba(255,255,255,0.7); }
+.topbar-menu button:hover svg { color: #FFFFFF; }
+.topbar-menu button.is-danger, .topbar-menu button.is-danger svg { color: #FF6961; }
+.topbar-menu button.is-danger:hover, .topbar-menu button.is-danger:hover svg { color: #FFFFFF; background: #FF453A !important; }
