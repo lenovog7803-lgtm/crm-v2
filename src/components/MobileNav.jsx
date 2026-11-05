@@ -1,8 +1,8 @@
-import { useRef, useState, useLayoutEffect } from 'react'
+import { useState } from 'react'
+import { TabBar } from 'glisse'
 import { useAuth } from '../AuthContext'
 import { ModalOverlay, useSheet } from './Modal'
 import { PopNumber } from './Transitions'
-import { useSpringPill } from '../hooks/useSpringPill'
 
 // Нижняя панель на телефоне — не больше 5 вкладок (как в iOS); всё остальное — в «Ещё».
 // «Ещё» оформлено как «Настройки» iPhone: серый фон, белые скруглённые группы,
@@ -234,87 +234,38 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
   const activeKey = !isManager && MORE_KEYS.has(page) ? 'more' : (ACTIVE_KEYS[page] || page)
   const allCounts = { ...counts, moreBadge: (counts?.newReplies || 0) + (counts?.newLeads || 0) }
 
-  // A capsule that glides behind the active icon (Telegram-style tab bar)
-  // instead of the icon just swapping color in place. Sized/positioned off
-  // the button's own box now that there's no label underneath pulling the
-  // icon up — full nav height, centered on the icon.
-  const btnRefs = useRef({})
-  const [pill, setPill] = useState(null)
-  const pillRef = useRef(null)
-  const PILL_SIZE = 48
-
-  useLayoutEffect(() => {
-    const el = btnRefs.current[activeKey]
-    if (el) setPill({ left: el.offsetLeft + (el.offsetWidth - PILL_SIZE) / 2 })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeKey])
-  useSpringPill(pillRef, pill?.left, PILL_SIZE, activeKey)
+  // Нижняя панель — TabBar из glisse: жидкое стекло как в «Телефоне» iOS 26 —
+  // выбранную вкладку можно потянуть, капля становится линзой и преломляет иконки под собой.
+  const items = navList.map(item => {
+    const active = activeKey === item.key
+    const badgeVal = item.badge ? allCounts[item.badge] : 0
+    return {
+      value: item.key,
+      label: item.label,
+      icon: (
+        <span style={{ position: 'relative', display: 'flex' }}>
+          {item.icon(active)}
+          {badgeVal > 0 && (
+            <span className="t-badge-pop" style={{
+              position: 'absolute', top: -4, right: -8, minWidth: 15, height: 15, borderRadius: 99,
+              background: 'var(--bg-ff3b30)', color: '#fff', fontSize: 8, fontWeight: 800,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px', lineHeight: 1,
+            }}><PopNumber value={badgeVal > 99 ? '99+' : badgeVal} /></span>
+          )}
+        </span>
+      ),
+    }
+  })
 
   return (
     <>
-    {/* iOS 26: плавающая стеклянная капсула над краем экрана, активная вкладка — стеклянная линза */}
-    <div className="mobile-nav liquid-glass lg-tabbar" style={{
-      position: 'fixed', zIndex: 1000,
-      left: 14, right: 14, bottom: 'calc(8px + env(safe-area-inset-bottom))',
-      height: 60, borderRadius: 30,
-      alignItems: 'stretch',
-      justifyContent: 'space-around',
-      paddingInline: 6,
+    <div className="mobile-nav" style={{
+      position: 'fixed', zIndex: 1000, left: 0, right: 0, bottom: 'calc(8px + env(safe-area-inset-bottom))',
+      justifyContent: 'center', pointerEvents: 'none',
     }}>
-      {pill && (
-        <div ref={pillRef} className="seg-thumb" style={{
-          position: 'absolute', left: 0, top: '50%', height: PILL_SIZE,  // место ставит пружина (useSpringPill)
-          marginTop: -PILL_SIZE / 2,
-          borderRadius: 22, pointerEvents: 'none',
-        }} />
-      )}
-      {navList.map(item => {
-        const active = activeKey === item.key
-        const badgeVal = item.badge ? allCounts[item.badge] : 0
-        const badgeColor = 'var(--bg-ff3b30)'  // все счётчики-уведомления красные, как в iOS
-        return (
-          <button
-            key={item.key}
-            ref={el => { btnRefs.current[item.key] = el }}
-            onClick={() => (item.key === 'more' ? setMoreOpen(true) : onNav(item.key))}
-            style={{
-              flex: 1,
-              border: 'none',
-              background: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative',
-              color: active ? 'var(--fg-1366f0)' : '#8E8E93',
-              WebkitTapHighlightColor: 'transparent',
-              transition: 'color 0.1s',
-              padding: 0,
-            }}
-          >
-            {/* The little pop of motion the moment a tab becomes active —
-                scale bounces past 1 and settles, via a keyframe rather than
-                a plain transition so it reads as a jump, not just a resize. */}
-            <span style={{
-              position: 'relative', display: 'flex',
-              animation: active ? 'navIconPop 0.3s var(--ease)' : 'none',
-            }}>
-              {item.icon(active)}
-              {badgeVal > 0 && (
-                <span className="t-badge-pop" style={{
-                  position: 'absolute', top: -4, right: -6,
-                  minWidth: 15, height: 15, borderRadius: 99,
-                  background: badgeColor,
-                  border: '1.5px solid rgba(255,255,255,calc(0.9 * var(--rim-k)))',
-                  color: '#fff', fontSize: 8, fontWeight: 800,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  padding: '0 3px', lineHeight: 1,
-                }}><PopNumber value={badgeVal > 99 ? '99+' : badgeVal} /></span>
-              )}
-            </span>
-          </button>
-        )
-      })}
+      <TabBar items={items} value={activeKey} aria-label="Разделы"
+        style={{ pointerEvents: 'auto', '--lg-tab-width': `min(76px, calc((100vw - 40px) / ${items.length}))` }}
+        onValueChange={key => (key === 'more' ? setMoreOpen(true) : onNav(key))} />
     </div>
     {moreOpen && <MoreSheet page={page} counts={allCounts} onNav={onNav} onClose={() => setMoreOpen(false)} />}
     </>

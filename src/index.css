@@ -1459,3 +1459,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .lg-segmented :is(.lg-tab, .lg-tab-copy)[data-selected] { color: var(--fg-1366f0); }
 /* дорожка сегментов — без обводки-линии по краю овала */
 .lg-segmented > .lg-tab-bar-glass { box-shadow: none !important; }
+/* линза сегментов при перетаскивании — чище, как на iPhone: меньше искривления краёв, лёгкая светлая заливка
+   (сильное преломление вытягивало соседние линии-разделители в серые полосы) */
+.lg-segmented, .lg-tab-bar { --lg-glass-bend: 0.22; --lg-glass-dispersion: 0.25; --lg-rim-shine: 0.5; }
+.lg-segmented[data-lifted] .lg-tab-lens.lg-glass, .lg-tab-bar[data-lifted] .lg-tab-lens.lg-glass { background-color: rgba(255,255,255,0.4) !important; }
