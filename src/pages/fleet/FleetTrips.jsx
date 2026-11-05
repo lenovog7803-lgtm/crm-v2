@@ -126,7 +126,7 @@ export default function FleetTrips({ onOpenTrip }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
           {groupByMonth(trips).map(([mk, monthTrips]) => (
             <div key={mk}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: 10 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: 0, color: 'var(--text-tertiary)', marginBottom: 10 }}>
                 {monthTitle(mk)} · {monthTrips.length}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>

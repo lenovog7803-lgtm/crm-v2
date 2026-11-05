@@ -290,7 +290,7 @@ export default function Finance({ refreshKey, period = 'all' }) {
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 1fr 1fr', gap: 10, alignItems: 'end' }}>
               {/* Контрагент */}
               <div>
-                <div style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--text-tertiary)', letterSpacing: '0.08em', marginBottom: 5 }}>{addType === 'income' ? 'КЛИЕНТ' : 'ПЕРЕВОЗЧИК'}</div>
+                <div style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--text-tertiary)', letterSpacing: '0.08em', marginBottom: 5 }}>{addType === 'income' ? 'Клиент' : 'Перевозчик'}</div>
                 <Select value={addPartyId} onChange={e => setAddPartyId(e.target.value)} required style={{ ...iStyle, width: '100%' }}>
                   <option value="">— Выберите —</option>
                   {(addType === 'income' ? clients : carriers).map(x => (
@@ -407,7 +407,7 @@ export default function Finance({ refreshKey, period = 'all' }) {
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(var(--ink-rgb), 0.08)' }}>
                 {['№', 'Заявка', 'Дата выгрузки', 'Сумма', 'Сальдо'].map(h => (
-                  <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)' }}>{h}</th>
+                  <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 13, fontWeight: 600, letterSpacing: 0, color: 'var(--text-tertiary)' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -482,7 +482,7 @@ export default function Finance({ refreshKey, period = 'all' }) {
         </div>
         {recHistory.length > 0 && (
           <div style={{ marginTop: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-tertiary)', letterSpacing: '0.08em', marginBottom: 8 }}>ИСТОРИЯ</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-tertiary)', letterSpacing: '0.08em', marginBottom: 8 }}>История</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
               {recHistory.slice(0, 5).map((r, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12.5 }}>

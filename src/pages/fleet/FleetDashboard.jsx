@@ -178,7 +178,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
           {d.overdue && d.overdue.length > 0 && (
             <div className="card" style={{ padding: '18px 20px', border: '1px solid rgba(var(--rgb-200-25-35), 0.25)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
-                <div style={{ fontSize: 11, color: 'var(--fg-c81923)', fontWeight: 700, letterSpacing: '0.1em' }}>ПРОСРОЧКА ОПЛАТЫ</div>
+                <div style={{ fontSize: 13, color: 'var(--fg-c81923)', fontWeight: 600, letterSpacing: 0 }}>Просрочка оплаты</div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--fg-c81923)' }}>{int(d.overdue_total)} Br</div>
               </div>
               {d.overdue.map((o, i) => (
@@ -198,7 +198,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
           {d.driver_debts && d.driver_debts.length > 0 && (
             <div className="card" style={{ padding: '18px 20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
-                <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 700, letterSpacing: '0.1em' }}>ДОЛГ ВОДИТЕЛЯМ</div>
+                <div style={{ fontSize: 13, color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: 0 }}>Долг водителям</div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--fg-d97706)' }}>{int(d.driver_debt_total)} Br</div>
               </div>
               {d.driver_debts.map((dr, i) => (
@@ -214,9 +214,9 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
 
       {/* Должники + Топ клиентов */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
-        {[['ДОЛЖНИКИ', d.debtors, 'var(--fg-d97706)'], ['ТОП КЛИЕНТОВ', d.top_clients, 'var(--fg-1e9e5a)']].map(([title, items, accent]) => (
+        {[['Должники', d.debtors, 'var(--fg-d97706)'], ['Топ клиентов', d.top_clients, 'var(--fg-1e9e5a)']].map(([title, items, accent]) => (
           <div key={title} className="card" style={{ padding: '18px 20px' }}>
-            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.1em', marginBottom: 10 }}>{title}</div>
+            <div style={{ fontSize: 13, color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: 0, marginBottom: 10 }}>{title}</div>
             {(!items || items.length === 0) ? (
               <div style={{ fontSize: 12.5, color: 'var(--text-3)' }}>нет</div>
             ) : items.map((it, i) => (

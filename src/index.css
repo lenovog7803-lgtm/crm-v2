@@ -1367,7 +1367,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 
 /* ===== Блоки страниц (карточки, виджеты, боковое меню, шапка) — эталонное стекло, как у окон и меню =====
    (синие карточки с переливом — .grad-card и «Маржа» — не трогаем) */
-.card:not(.grad-card), .ios-widget:not(.grad-card), .kanban-card, .desktop-sidebar.liquid-glass, .topbar-mobile.liquid-glass {
+.desktop-sidebar.liquid-glass, .topbar-mobile.liquid-glass {
   background:
     radial-gradient(120% 120% at 15% -40%, rgba(var(--paper-rgb), 0.75) 0%, rgba(var(--paper-rgb), 0) 55%),
     linear-gradient(180deg, rgba(var(--paper-rgb), 0.7) 0%, rgba(var(--paper-rgb), 0.56) 100%) !important;
@@ -1385,7 +1385,6 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 /* светящаяся кромка блоков — ровно как у эталона (.topbar-drop::before) */
 .card:not(.grad-card), .kanban-card, .desktop-sidebar.liquid-glass, .topbar-mobile.liquid-glass { isolation: isolate; }
 .card:not(.grad-card):not(.ios-widget), .kanban-card { position: relative; }
-.card:not(.grad-card)::before, .ios-widget:not(.grad-card)::before, .kanban-card::before,
 .desktop-sidebar.liquid-glass::before, .topbar-mobile.liquid-glass::before {
   content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; padding: 1.5px; pointer-events: none; opacity: 1 !important;
   background: linear-gradient(135deg, rgba(var(--paper-rgb), 0.4) 0%, rgba(var(--paper-rgb), 0) 40%, rgba(var(--paper-rgb), 0) 60%, rgba(var(--paper-rgb), 0.85) 100%) !important;
@@ -1423,3 +1422,24 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 }
 .lg-segmented :is(.lg-tab, .lg-tab-copy)[data-selected] { color: var(--fg-1366f0); }
 .lg-segmented { --lg-segment-label: var(--ink); --lg-tab-selected: var(--fg-1366f0); }
+
+/* ===== Слой содержимого — НЕ жидкое стекло (Apple HIG: «Don't use Liquid Glass in the content layer»).
+   Карточки, таблицы, списки, блоки заявки — плотный «обычный материал»: почти белый, мягкая тень, без бликов и кромок.
+   Стекло остаётся только у слоя управления: боковое меню, шапка, меню, всплывающие окна, переключатели. ===== */
+.card:not(.grad-card), .ios-widget:not(.grad-card), .kanban-card {
+  background: rgba(var(--paper-rgb), 0.94) !important;
+  backdrop-filter: blur(12px) saturate(120%) !important; -webkit-backdrop-filter: blur(12px) saturate(120%) !important;
+  border: none !important;
+  box-shadow: 0 0 0 0.5px rgba(var(--ink-rgb), 0.06), 0 1px 2px rgba(20,30,55,0.04), 0 8px 24px -14px rgba(20,30,55,0.18) !important;
+}
+.card:not(.grad-card)::before, .card:not(.grad-card)::after, .ios-widget:not(.grad-card)::before, .ios-widget:not(.grad-card)::after, .kanban-card::before { display: none !important; }
+:root[data-theme="dark"] .card:not(.grad-card), :root[data-theme="dark"] .ios-widget:not(.grad-card), :root[data-theme="dark"] .kanban-card {
+  background: var(--surface) !important; box-shadow: 0 0 0 0.5px rgba(255,255,255,0.06) !important;
+}
+/* окна — два слоя: стеклянная оболочка + плотная подложка под формой (чтобы текст читался) */
+@media (min-width: 769px) {
+  .modal-panel .ios-form-group { background: rgba(var(--paper-rgb), 0.92) !important; box-shadow: 0 0 0 0.5px rgba(var(--ink-rgb), 0.06) !important; }
+  .app-root .modal-panel input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([data-plain]),
+  .app-root .modal-panel textarea:not([data-plain]),
+  .app-root .modal-panel .apple-select:not(.status-pill) { background: var(--surface) !important; box-shadow: inset 0 0 0 1px rgba(var(--ink-rgb), 0.1) !important; }
+}

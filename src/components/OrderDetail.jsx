@@ -69,7 +69,7 @@ function OrderHistorySection({ orderId }) {
         onClick={toggle}
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
       >
-        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)' }}>
+        <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: 0, color: 'var(--text-tertiary)' }}>
           ИСТОРИЯ ИЗМЕНЕНИЙ
         </span>
         <span style={{ fontSize: 12, color: 'var(--text-3)' }}>{open ? 'свернуть ▲' : 'показать ▼'}</span>
@@ -101,7 +101,7 @@ function OrderHistorySection({ orderId }) {
 }
 
 const sLabel = {
-  fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: 12,
+  fontSize: 13, fontWeight: 600, letterSpacing: 0, color: 'var(--text-tertiary)', marginBottom: 12,
 }
 
 const iStyle = {
@@ -848,14 +848,14 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
 
           {/* Status */}
           <div className="card" style={{ padding: '20px 20px' }}>
-            <SLabel>СТАТУС ЗАЯВКИ</SLabel>
+            <SLabel>Статус заявки</SLabel>
             {/* тот же переключатель, что «Экспедиция / Автопарк» и фильтры: дорожка, выбранный — белая капсула, один синий цвет */}
             <SlidingTabs options={STATUSES.map(st => ({ key: st.id, label: st.label }))} value={view.status} onChange={handleStatusChange} fill />
           </div>
 
           {/* Payments */}
           <div className="card" style={{ padding: '20px 20px' }}>
-            <SLabel>ОПЛАТА</SLabel>
+            <SLabel>Оплата</SLabel>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <PaymentButton type="client" order={view} onClick={() => handlePayment('client')} onLongPress={() => setPaymentModal('client')} onRestore={() => restorePaymentSide('client')} />
               <PaymentButton type="carrier" order={view} onClick={() => handlePayment('carrier')} onLongPress={() => setPaymentModal('carrier')} onRestore={() => restorePaymentSide('carrier')} />
@@ -864,7 +864,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
 
           {/* Docs */}
           <div className="card" style={{ padding: '20px 20px' }}>
-            <SLabel>ДОКУМЕНТООБОРОТ</SLabel>
+            <SLabel>Документооборот</SLabel>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {DOC_STEPS.map(step => {
                 const isDone = !!view[step.key]
@@ -960,7 +960,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
           {/* Documents */}
           <div className="card" style={{ padding: '20px' }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 14 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)', flex: 1 }}>ДОКУМЕНТЫ</div>
+              <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: 0, color: 'var(--text-tertiary)', flex: 1 }}>Документы</div>
               <button
                 onClick={reauthGoogle}
                 disabled={gAuthBusy}
@@ -1057,7 +1057,7 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
           {/* Cargo info */}
           {Boolean(order.cargo || order.weight_tons || order.payment_days) && (
             <div className="card" style={{ padding: '20px' }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: 14 }}>ГРУЗ И УСЛОВИЯ</div>
+              <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: 0, color: 'var(--text-tertiary)', marginBottom: 14 }}>Груз и условия</div>
               {Boolean(order.cargo) && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
                   <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>Груз</span>

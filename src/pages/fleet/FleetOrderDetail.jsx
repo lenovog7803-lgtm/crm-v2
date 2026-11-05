@@ -15,13 +15,13 @@ import { iosConfirm } from '../../components/IOSAlert'
 import DateInput from '../../components/DateInput'
 import CardGradient from '../../components/CardGradient'
 
-const sLabel = { fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)', marginBottom: 12 }
+const sLabel = { fontSize: 13, fontWeight: 600, letterSpacing: 0, color: 'var(--text-tertiary)', marginBottom: 12 }
 const SLabel = ({ children }) => <div style={sLabel}>{children}</div>
 const iStyle = {
   width: '100%', padding: '10px 12px', borderRadius: 10, border: '1px solid var(--line)',
   background: 'var(--fill)', fontSize: 13, color: 'var(--ink)', boxSizing: 'border-box',
 }
-const lbl = { fontSize: 10, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6 }
+const lbl = { fontSize: 10, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', marginBottom: 6 }
 const today = () => new Date().toISOString().slice(0, 10)
 const joinDot = (...xs) => xs.filter(Boolean).join('  ·  ')
 const money = (v, cur) => `${Math.round(Number(v) || 0).toLocaleString('ru-RU')} ${cur || 'BYN'}`
@@ -142,7 +142,7 @@ function PaymentsCard({ order, cur, onReload, onFull }) {
   return (
     <div className="card" style={{ padding: '20px 20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <SLabel>ОПЛАТА ОТ КЛИЕНТА</SLabel>
+        <SLabel>Оплата от клиента</SLabel>
         <span style={{
           fontSize: 11, fontWeight: 700, borderRadius: 6, padding: '3px 8px',
           color: order.paid ? 'var(--fg-1e9e5a)' : overdue ? 'var(--fg-c81923)' : 'var(--fg-d97706)',
@@ -221,7 +221,7 @@ function OrderComments({ orderId, comments, onReload }) {
   }
   return (
     <div className="card" style={{ padding: '20px 20px' }}>
-      <SLabel>КОММЕНТАРИИ</SLabel>
+      <SLabel>Комментарии</SLabel>
       {list.map(c => (
         <div key={c.id} style={{ padding: '7px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)', fontSize: 12.5, color: '#3A424E' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
@@ -337,7 +337,7 @@ export default function FleetOrderDetail({ orderId, onBack }) {
 
           {/* Статус груза */}
           <div className="card" style={{ padding: '20px 20px' }}>
-            <SLabel>СТАТУС ГРУЗА</SLabel>
+            <SLabel>Статус груза</SLabel>
             <SlidingTabs
               options={TRIP_STATUS.map(s => ({ key: s.key, label: s.label }))}
               value={order.cargo_status || 'active'}
@@ -350,7 +350,7 @@ export default function FleetOrderDetail({ orderId, onBack }) {
 
           {/* Корреспонденция */}
           <div className="card" style={{ padding: '20px 20px' }}>
-            <SLabel>КОРРЕСПОНДЕНЦИЯ</SLabel>
+            <SLabel>Корреспонденция</SLabel>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <Step
                 done={!!order.letter_sent_to_client}
@@ -382,7 +382,7 @@ export default function FleetOrderDetail({ orderId, onBack }) {
         <div style={col}>
           {/* Клиент */}
           <div className="card" style={{ padding: '20px 20px' }}>
-            <SLabel>КЛИЕНТ</SLabel>
+            <SLabel>Клиент</SLabel>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{
                 width: 44, height: 44, borderRadius: 14, flexShrink: 0,
@@ -401,7 +401,7 @@ export default function FleetOrderDetail({ orderId, onBack }) {
 
           {/* Документы */}
           <div className="card" style={{ padding: '20px 20px' }}>
-            <SLabel>ДОКУМЕНТЫ</SLabel>
+            <SLabel>Документы</SLabel>
             <div style={{ marginBottom: 12 }}>
               <SlidingTabs
                 options={[{ key: 'our', label: 'Наш договор' }, { key: 'client', label: 'Договор клиента' }]}
@@ -429,7 +429,7 @@ export default function FleetOrderDetail({ orderId, onBack }) {
 
           {/* Документы перевозки — номера, вносятся по ходу */}
           <div className="card" style={{ padding: '20px 20px' }}>
-            <SLabel>ДОКУМЕНТЫ ПЕРЕВОЗКИ</SLabel>
+            <SLabel>Документы перевозки</SLabel>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               {[['cmr_number', '№ CMR'], ['waybill_number', '№ ТТН / ТН'], ['invoice_number', '№ счёта']].map(([k, lab]) => (
                 <div key={k}>
@@ -443,7 +443,7 @@ export default function FleetOrderDetail({ orderId, onBack }) {
 
           {/* Груз и маршрут */}
           <div className="card" style={{ padding: '20px 20px' }}>
-            <SLabel>ГРУЗ И МАРШРУТ</SLabel>
+            <SLabel>Груз и маршрут</SLabel>
             <InfoRow label="Отправка" value={joinDot(order.city_from, order.loading_address)} />
             <InfoRow label="Получение" value={joinDot(order.city_to, order.unloading_address)} />
             <InfoRow label="Груз" value={joinDot(order.weight_tons && `${order.weight_tons} т`, order.pallets_count && `${order.pallets_count} палет`, order.pallet_size, order.volume_m3 && `${order.volume_m3} м³`)} />

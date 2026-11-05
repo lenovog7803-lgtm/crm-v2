@@ -415,12 +415,12 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                         <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, fontSize: 13, color: 'var(--fg-1366f0)' }}>
                           {order.order_number || order.id}
                         </span>
-                        {overdue && <span style={{ fontSize: 10, color: 'var(--fg-c81923)', fontWeight: 700 }}>ПРОСРОЧЕНО</span>}
-                        {missingClientPP && <span style={{ fontSize: 10, color: 'var(--fg-c81923)', fontWeight: 700 }}>НЕТ ПП КЛИЕНТА</span>}
-                        {missingCarrierPP && <span style={{ fontSize: 10, color: 'var(--fg-c81923)', fontWeight: 700 }}>НЕТ ПП ПЕРЕВОЗЧИКА</span>}
-                        {missingClientDate && <span style={{ fontSize: 10, color: 'var(--fg-d97706)', fontWeight: 700 }}>НЕТ ДАТЫ КЛИЕНТА</span>}
-                        {missingCarrierDate && <span style={{ fontSize: 10, color: 'var(--fg-d97706)', fontWeight: 700 }}>НЕТ ДАТЫ ПЕРЕВОЗЧИКА</span>}
-                        {unreconciled && <span style={{ fontSize: 10, color: 'var(--fg-d97706)', fontWeight: 700 }}>ПРОВЕРЬТЕ ОПЛАТУ</span>}
+                        {overdue && <span style={{ fontSize: 10, color: 'var(--fg-c81923)', fontWeight: 700 }}>Просрочено</span>}
+                        {missingClientPP && <span style={{ fontSize: 10, color: 'var(--fg-c81923)', fontWeight: 700 }}>Нет ПП клиента</span>}
+                        {missingCarrierPP && <span style={{ fontSize: 10, color: 'var(--fg-c81923)', fontWeight: 700 }}>Нет ПП перевозчика</span>}
+                        {missingClientDate && <span style={{ fontSize: 10, color: 'var(--fg-d97706)', fontWeight: 700 }}>Нет даты клиента</span>}
+                        {missingCarrierDate && <span style={{ fontSize: 10, color: 'var(--fg-d97706)', fontWeight: 700 }}>Нет даты перевозчика</span>}
+                        {unreconciled && <span style={{ fontSize: 10, color: 'var(--fg-d97706)', fontWeight: 700 }}>Проверьте оплату</span>}
                       </div>
                       <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{route}</div>
                       <div style={{ fontSize: 12, color: '#8E8E93' }}>
@@ -461,8 +461,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           borderBottom: '1px solid rgba(var(--ink-rgb), 0.06)',
           background: 'rgba(var(--ink-rgb), 0.02)',
         }}>
-          {['ЗАЯВКА', 'МАРШРУТ', 'КЛИЕНТ', 'МАРЖА', 'ОПЛАТЫ'].map(h => (
-            <div key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)' }}>{h}</div>
+          {['Заявка', 'Маршрут', 'Клиент', 'Маржа', 'Оплаты'].map(h => (
+            <div key={h} style={{ fontSize: 13, fontWeight: 600, letterSpacing: 0, color: 'var(--text-tertiary)' }}>{h}</div>
           ))}
         </div>
         {loading && (
@@ -527,11 +527,11 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                   <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, fontSize: 13.5, color: 'var(--fg-1366f0)' }}>
                     {order.order_number || order.id}
                   </div>
-                  {missingClientPP && <span style={{ fontSize: 9.5, color: 'var(--fg-c81923)', fontWeight: 700 }}>НЕТ ПП КЛИЕНТА</span>}
-                  {missingCarrierPP && <span style={{ fontSize: 9.5, color: 'var(--fg-c81923)', fontWeight: 700 }}>НЕТ ПП ПЕРЕВОЗЧИКА</span>}
-                  {missingClientDate && <span style={{ fontSize: 9.5, color: 'var(--fg-d97706)', fontWeight: 700 }}>НЕТ ДАТЫ КЛИЕНТА</span>}
-                  {missingCarrierDate && <span style={{ fontSize: 9.5, color: 'var(--fg-d97706)', fontWeight: 700 }}>НЕТ ДАТЫ ПЕРЕВОЗЧИКА</span>}
-                  {unreconciled && <span style={{ fontSize: 9.5, color: 'var(--fg-d97706)', fontWeight: 700 }}>ПРОВЕРЬТЕ ОПЛАТУ</span>}
+                  {missingClientPP && <span style={{ fontSize: 9.5, color: 'var(--fg-c81923)', fontWeight: 700 }}>Нет ПП клиента</span>}
+                  {missingCarrierPP && <span style={{ fontSize: 9.5, color: 'var(--fg-c81923)', fontWeight: 700 }}>Нет ПП перевозчика</span>}
+                  {missingClientDate && <span style={{ fontSize: 9.5, color: 'var(--fg-d97706)', fontWeight: 700 }}>Нет даты клиента</span>}
+                  {missingCarrierDate && <span style={{ fontSize: 9.5, color: 'var(--fg-d97706)', fontWeight: 700 }}>Нет даты перевозчика</span>}
+                  {unreconciled && <span style={{ fontSize: 9.5, color: 'var(--fg-d97706)', fontWeight: 700 }}>Проверьте оплату</span>}
                 </div>
                 {/* статус — цветная точка и слово (просроченная — красная) */}
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 4, fontSize: 12, fontWeight: 600, color: overdue ? 'var(--fg-c81923)' : statusColor(order.status) }}>
@@ -693,7 +693,7 @@ function CorrespondenceModal({ orderIds, onClose, onSaved }) {
           Заявок выбрано: {orderIds.length}
         </div>
 
-        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', marginBottom: 10 }}>
           Тип
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 18 }}>
@@ -714,7 +714,7 @@ function CorrespondenceModal({ orderIds, onClose, onSaved }) {
           ))}
         </div>
 
-        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', marginBottom: 8 }}>
           Дата и время
         </div>
         <DateInput
