@@ -1454,3 +1454,6 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 }
 .lg-segmented { --lg-tab-selected: var(--ink); }
 .lg-segmented :is(.lg-tab, .lg-tab-copy)[data-selected] { color: var(--ink); }
+/* текст выбранного пункта — синий (капля остаётся прозрачным стеклом) */
+.lg-segmented { --lg-tab-selected: var(--fg-1366f0); }
+.lg-segmented :is(.lg-tab, .lg-tab-copy)[data-selected] { color: var(--fg-1366f0); }
