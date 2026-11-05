@@ -189,16 +189,10 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
   }
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)',
-      zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24,
-    }}>
-      <div onClick={e => e.stopPropagation()} style={{
-        margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 460,
-        padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)',
-      }}>
+    <div className="dash-modal-scrim">
+      <div className="dash-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 460, padding: 26 }}>
         <div style={{
-          fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
+          fontSize: 13, fontWeight: 600,
           color: isCarrier ? 'var(--fg-e0473b)' : 'var(--fg-1e9e5a)', marginBottom: 6,
         }}>
           {isCarrier ? 'Платим перевозчику' : 'Получаем от клиента'}
@@ -228,7 +222,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
 
         {isCash ? (
           <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-3)', marginBottom: 10 }}>
               Дата получения
             </div>
             <DateInput
@@ -244,7 +238,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
         ) : (
         <div style={{ marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-3)' }}>
               Платёжные поручения
             </div>
             <button

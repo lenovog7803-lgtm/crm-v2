@@ -11,7 +11,7 @@ const fieldStyle = {
   width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid var(--line)',
   background: 'var(--fill)', fontSize: 14, color: 'var(--ink)', boxSizing: 'border-box',
 }
-const lbl = { fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }
+const lbl = { fontSize: 13, fontWeight: 600, color: 'var(--text-3)', marginBottom: 8 }
 
 // Логика ввода ПП — как в экспедировании (OrderPaymentModal): номер ПП + дата,
 // либо «наличными» без номера. Записывает paid / pp_number / payment_date.
@@ -41,9 +41,9 @@ export default function FleetPaymentModal({ order, onClose, onSaved }) {
   }
 
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 400, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
-        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--fg-1e9e5a)', marginBottom: 6 }}>Оплата от клиента</div>
+    <div className="dash-modal-scrim" onClick={onClose}>
+      <div className="dash-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 400, padding: 26 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg-1e9e5a)', marginBottom: 6 }}>Оплата от клиента</div>
         <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 20 }}>{order.client_name || '—'} · {(order.rate || 0).toLocaleString('ru-RU')} Br</div>
 
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, cursor: 'pointer', fontSize: 13, color: 'var(--ink)' }}>
