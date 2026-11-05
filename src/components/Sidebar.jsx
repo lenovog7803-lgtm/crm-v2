@@ -531,7 +531,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
 
       {/* Переключатель режима — только для директора / аккаунта с fleet_access */}
       {canFleet && expanded && (
-        <div style={{ paddingTop: 12, marginBottom: 12 }}>
+        <div style={{ paddingTop: 12, borderTop: '1px solid rgba(var(--ink-rgb), 0.08)', marginBottom: 12 }}>
           <SlidingTabs
             options={[{ key: 'forwarding', label: 'Экспедиция' }, { key: 'fleet', label: 'Автопарк' }]}
             value={mode}
@@ -558,7 +558,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
       {/* User */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 10, paddingTop: 12,
-        paddingLeft: 2,
+        borderTop: '1px solid rgba(var(--ink-rgb), 0.08)', paddingLeft: 2,
       }}>
         <div
           ref={avatarRef}
