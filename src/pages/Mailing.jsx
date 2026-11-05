@@ -86,13 +86,12 @@ const nextWorkdayLabel = () => {
 // ---------------- Обзор ----------------
 // В стиле дашборда CRM: hero-карточки с градиентом, KPI-полоса, кольцевой прогресс, CountUp.
 const RAMP_STEPS = [{ until: 3, lim: 5 }, { until: 7, lim: 10 }, { until: 12, lim: 15 }, { until: Infinity, lim: 20 }]
-const LOG_ICON = { 'письмо': '✉️', 'напоминание': '🔁', 'ответ': '💬', 'возврат': '↩️', 'тест': '🧪', 'автостоп': '⛔️', 'проверка почты': '📥' }
 
 const heroBase = {
   borderRadius: 22, position: 'relative', overflow: 'clip',
   transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
 }
-const bigNum = (color, size) => ({ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: size, letterSpacing: '-0.03em', lineHeight: 1, color })
+const bigNum = (color, size) => ({ fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: size, letterSpacing: '-0.03em', lineHeight: 1, color })
 
 function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoContacts, replies }) {
   const { show } = useToast()
@@ -150,9 +149,9 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
 
   const funnel = [
     { label: 'Отправлено', value: sentTotal, color: 'var(--fg-1366f0)' },
-    { label: 'Ответили', value: answered, color: 'var(--fg-0e9f6e)' },
-    { label: 'Интерес', value: (counts.interested || 0) + (counts.deal || 0), color: 'var(--fg-d97706)' },
-    { label: 'Сделка', value: counts.deal || 0, color: 'var(--fg-7c3aed)' },
+    { label: 'Ответили', value: answered, color: 'var(--fg-1366f0)' },
+    { label: 'Интерес', value: (counts.interested || 0) + (counts.deal || 0), color: 'var(--fg-1366f0)' },
+    { label: 'Сделка', value: counts.deal || 0, color: 'var(--fg-1366f0)' },
   ]
   const kpis = [
     { label: 'В очереди', value: state.queue_new || 0, hint: state.queue_follow ? `+${state.queue_follow} напоминаний` : 'новых адресов', color: 'var(--fg-1366f0)', bg: 'rgba(var(--rgb-19-102-240), 0.08)', group: '' },
@@ -229,8 +228,8 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
           <div className="grad-kicker" style={{ color: 'var(--fg-1e9e5a)' }}>Ответили</div>
           <div style={bigNum('var(--ink)', isMobile ? 28 : 34)}><PopNumber value={answered} /></div>
           <div style={{ fontSize: 12, color: 'var(--fg-1e9e5a)', marginTop: 6 }}>{replyPct}% от отправленных</div>
-          <div style={{ marginTop: 14, fontSize: 12.5, color: 'var(--ink)', fontWeight: 700 }}>
-            {state.replies_new ? `🔔 ${state.replies_new} новых — разобрать →` : 'Все ответы →'}
+          <div style={{ marginTop: 14, fontSize: 13.5, color: 'var(--fg-1366f0)', fontWeight: 500 }}>
+            {state.replies_new ? `${state.replies_new} новых — разобрать` : 'Все ответы'}
           </div>
         </div>
 
@@ -262,8 +261,8 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
               })}
             </div>
           )}
-          <div style={{ marginTop: 14, display: 'inline-block', padding: '4px 10px', borderRadius: 99, background: `color-mix(in srgb, ${healthColor} 10%, transparent)`,
-            fontSize: 12, fontWeight: 700, color: healthColor }}>
+          <div style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 500, color: 'var(--ink)' }}>
+            <span style={{ width: 7, height: 7, borderRadius: 99, background: healthColor }} />
             {healthTone === 'ok' && bounceRate > 4 ? 'Норма · мало писем для выводов' : healthCard.label}
           </div>
           {h.reason && <div style={{ fontSize: 11.5, color: 'var(--text-2b)', marginTop: 8, lineHeight: 1.4 }}>{h.reason}</div>}
@@ -280,12 +279,13 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
         {kpis.map(k => (
           <div key={k.label} className="ios-widget" onClick={() => onGoContacts(k.group)}
             style={{ padding: isMobile ? '12px 14px' : '18px 20px', cursor: 'pointer' }}>
-            <div style={{ fontSize: isMobile ? 10 : 11, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: 6 }}>{k.label}</div>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: isMobile ? 24 : 32, color: k.color, background: k.bg,
-              borderRadius: 12, padding: isMobile ? '5px 10px' : '7px 14px', display: 'inline-block', lineHeight: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, color: 'var(--text-secondary)', marginBottom: 8 }}>
+              <span style={{ width: 7, height: 7, borderRadius: 99, background: k.color }} />{k.label}
+            </div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: isMobile ? 24 : 30, color: 'var(--ink)', lineHeight: 1, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
               <PopNumber value={k.value} />
             </div>
-            <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginTop: 8 }}>{k.hint}</div>
+            <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 8 }}>{k.hint}</div>
           </div>
         ))}
       </div>
@@ -379,10 +379,6 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
           </div>
           {replies.slice(0, 4).map(c => (
             <div key={c.id} onClick={onGoReplies} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 0', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)', cursor: 'pointer' }}>
-              <div style={{ width: 34, height: 34, borderRadius: 11, background: 'rgba(14,159,110,0.12)', color: 'var(--fg-0e9f6e)', flexShrink: 0,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14 }}>
-                {(c.company || c.email || '').trim().charAt(0).toUpperCase() || '?'}
-              </div>
               <div style={{ minWidth: 0, flex: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>{c.company || c.email}</div>
                 <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -401,10 +397,9 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
         {log.length === 0 && <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>Пока пусто</div>}
         {(logOpen ? log : log.slice(0, 8)).map(l => (
           <div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)', fontSize: 12.5 }}>
-            <span style={{ width: 26, height: 26, borderRadius: 9, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13,
-              background: l.ok ? 'rgba(var(--ink-rgb), 0.04)' : 'rgba(var(--rgb-224-71-59), 0.08)' }}>{LOG_ICON[l.kind] || '•'}</span>
+            <span style={{ width: 7, height: 7, borderRadius: 99, flexShrink: 0, background: l.ok ? 'rgba(var(--ink-rgb), 0.2)' : 'var(--fg-ff3b30)' }} />
             <div style={{ minWidth: 0, flex: 1 }}>
-              <span style={{ fontWeight: 700, color: l.ok ? 'var(--ink)' : 'var(--fg-e0473b)' }}>{l.company || l.email || l.kind}</span>
+              <span style={{ fontWeight: 500, color: 'var(--ink)' }}>{l.company || l.email || l.kind}</span>
               <span style={{ color: 'var(--text-3)' }}> · {l.kind}{l.detail ? ` — ${l.detail}` : ''}</span>
             </div>
             <span style={{ color: 'var(--text-tertiary)', flexShrink: 0 }}>{fmtTs(l.ts).slice(5)}</span>
@@ -420,20 +415,8 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
   )
 }
 
-const TAG_COLORS = {
-  purchase: ['rgba(var(--rgb-217-119-6), 0.1)', 'var(--fg-b45309)'],
-  clients: ['rgba(14,159,110,0.1)', '#0E7A55'],
-  sale: ['rgba(var(--rgb-19-102-240), 0.08)', 'var(--fg-1366f0)'],
-}
-
-function CampaignTag({ name, kind }) {
-  const [bg, color] = TAG_COLORS[kind] || TAG_COLORS.sale
-  return (
-    <span style={{ display: 'inline-block', marginTop: 4, padding: '2px 8px', borderRadius: 99, fontSize: 11, fontWeight: 700,
-      background: bg, color }}>
-      {name}
-    </span>
-  )
+function CampaignTag({ name }) {
+  return <span style={{ display: 'inline-block', marginTop: 4, fontSize: 12.5, color: 'var(--text-3)' }}>{name}</span>
 }
 
 // ---------------- Ответы ----------------
@@ -813,13 +796,16 @@ function Contacts({ campaignId, campaignName, onChanged, groups = {}, loginFor, 
                 <td style={{ padding: '10px 14px', color: 'var(--text-secondary)' }}>{c.city || ''}</td>
                 <td style={{ padding: '10px 14px', color: 'var(--text-secondary)' }}>{c.priority || ''}</td>
                 <td style={{ padding: '10px 14px' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ width: 7, height: 7, borderRadius: 99, flexShrink: 0, background: (STATUS[c.status] || STATUS.new).color }} />
                   <Select
                     value={c.status} className="status-pill"
                     onChange={e => setContactStatus(c, e.target.value)}
-                    style={{ border: 'none', background: (STATUS[c.status] || STATUS.new).bg, color: (STATUS[c.status] || STATUS.new).color, borderRadius: 99, padding: '4px 8px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}
+                    style={{ border: 'none', background: 'transparent', color: 'var(--ink)', borderRadius: 99, padding: '4px 6px', fontSize: 13, fontWeight: 400, cursor: 'pointer' }}
                   >
                     {Object.entries(STATUS).map(([k, s]) => <option key={k} value={k}>{s.label}</option>)}
                   </Select>
+                  </span>
                 </td>
                 <td style={{ padding: '10px 14px', color: 'var(--text-3)', fontSize: 12, whiteSpace: 'nowrap' }}>
                   {c.first_sent || ''}{c.followup_sent ? ` · напом. ${c.followup_sent}` : ''}
@@ -1212,9 +1198,9 @@ function MailboxSettings({ mailbox, onSaved, onDeleted }) {
 }
 
 const chip = (active) => ({
-  padding: '7px 13px', borderRadius: 99, cursor: 'pointer', fontSize: 12.5, fontWeight: 600, fontFamily: 'var(--font-sys)',
+  padding: '7px 13px', borderRadius: 99, cursor: 'pointer', fontSize: 13.5, fontWeight: active ? 500 : 400, fontFamily: 'var(--font-sys)',
   border: 'none',
-  background: active ? 'var(--fg-1366f0)' : 'rgba(118,118,128,0.12)', color: active ? '#fff' : '#3C4552',
+  background: active ? 'rgba(var(--rgb-19-102-240), 0.1)' : 'transparent', color: active ? 'var(--fg-1366f0)' : 'var(--ink)',
   display: 'inline-flex', alignItems: 'center', gap: 7,
 })
 
@@ -1431,7 +1417,7 @@ function CampaignBar({ campaigns, value, onChange, onAdd }) {
         <button key={c.id} onClick={() => onChange(c.id)} style={chip(value === c.id)}>
           <span title={c.running ? 'работает' : 'остановлено'} style={{ width: 7, height: 7, borderRadius: 99, background: c.running ? 'var(--fg-0e9f6e)' : 'var(--text-quaternary)' }} />
           {c.name}
-          <span style={{ fontSize: 10.5, fontWeight: 700, color: c.kind === 'purchase' ? 'var(--fg-b45309)' : c.kind === 'clients' ? 'var(--fg-0e9f6e)' : 'var(--text-3)' }}>{KIND_LABEL[c.kind] || ''}</span>
+          <span style={{ fontSize: 12.5, color: 'var(--text-3)' }}>{KIND_LABEL[c.kind] || ''}</span>
           {c.replies_new > 0 && (
             <span style={{ minWidth: 16, height: 16, borderRadius: 99, background: 'var(--bg-0e9f6e)', color: '#fff', fontSize: 10, fontWeight: 800,
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>{c.replies_new}</span>
@@ -1461,17 +1447,14 @@ export function ExpiredMailboxes({ mailboxes }) {
     }
   }
   return (
-    <div style={{ marginBottom: 14, padding: '12px 14px', borderRadius: 16, background: 'rgba(224,71,59,0.1)', border: '1px solid rgba(224,71,59,0.35)',
-      display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--fg-e0473b)' }}>
+    <div className="card" style={{ marginBottom: 14, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+      <span style={{ width: 8, height: 8, borderRadius: 99, background: 'var(--fg-ff3b30)', flexShrink: 0 }} />
+      <div style={{ fontSize: 14, color: 'var(--ink)', flex: 1, minWidth: 220 }}>
         Gmail вышел из аккаунта — письма с {expired.length > 1 ? 'этих почт' : 'этой почты'} не уходят и ответы не проверяются
       </div>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         {expired.map(m => (
-          <button key={m.id} onClick={() => relogin(m)} style={{ border: 'none', cursor: 'pointer', borderRadius: 99, padding: '7px 14px',
-            fontSize: 13, fontWeight: 700, fontFamily: 'inherit', background: 'var(--fg-e0473b)', color: '#fff' }}>
-            Войти в {m.login || m.name} →
-          </button>
+          <button key={m.id} onClick={() => relogin(m)} className="btn-primary">Войти в {m.login || m.name}</button>
         ))}
       </div>
     </div>
@@ -1536,11 +1519,7 @@ export default function Mailing() {
 
   return (
     <div>
-      <div style={{ marginBottom: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-        <div>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 20, color: 'var(--ink)' }}>Рассылка</div>
-          <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>Письма по направлениям с дневным лимитом, напоминанием и проверкой ответов</div>
-        </div>
+      <div style={{ marginBottom: 14, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <SlidingTabs options={tabsWith(state?.replies_new, hasPurchase)} value={tab} onChange={t => { setContactsGroup(''); setTab(t) }} />
       </div>
 
