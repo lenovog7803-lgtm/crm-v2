@@ -1411,3 +1411,5 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   content: '' !important; display: block !important; position: absolute; inset: 0; z-index: -2; border-radius: inherit; pointer-events: none; background: none !important;
   backdrop-filter: blur(20px) saturate(200%) brightness(1.04); -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.04);
 }
+/* линза при перетаскивании — крупнее, как на демо glisse (Lift: 50 × 33 px) */
+:root .lg-segmented, :root .lg-tab-bar { --lg-lens-grow-x: 50px; --lg-lens-grow-y: 33px; }
