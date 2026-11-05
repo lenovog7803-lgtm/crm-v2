@@ -1457,3 +1457,5 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 /* текст выбранного пункта — синий (капля остаётся прозрачным стеклом) */
 .lg-segmented { --lg-tab-selected: var(--fg-1366f0); }
 .lg-segmented :is(.lg-tab, .lg-tab-copy)[data-selected] { color: var(--fg-1366f0); }
+/* дорожка сегментов — без обводки-линии по краю овала */
+.lg-segmented > .lg-tab-bar-glass { box-shadow: none !important; }
