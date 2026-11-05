@@ -5,6 +5,7 @@ import { initials } from '../utils'
 import { SlidingTabs } from './SlidingTabs'
 import { mouseOnly, haptic, rubberband } from '../motion'
 import { useSpringPill } from '../hooks/useSpringPill'
+import GlassBg from './GlassBg'
 import { PopNumber } from './Transitions'
 
 const HIDDEN_MENU_WIDTH = 200
@@ -428,6 +429,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
       overflow: 'hidden',
       flexShrink: 0,
     }}>
+      <GlassBg />
       {/* Brand */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, paddingLeft: 2 }}>
         <div style={{
