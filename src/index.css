@@ -1463,3 +1463,5 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
    (сильное преломление вытягивало соседние линии-разделители в серые полосы) */
 .lg-segmented, .lg-tab-bar { --lg-glass-bend: 0.22; --lg-glass-dispersion: 0.25; --lg-rim-shine: 0.5; }
 .lg-segmented[data-lifted] .lg-tab-lens.lg-glass, .lg-tab-bar[data-lifted] .lg-tab-lens.lg-glass { background-color: rgba(255,255,255,0.4) !important; }
+/* кромка линзы — светлая (у glisse в светлой теме она по умолчанию затемняется: --lg-lens-shine: -1.5) */
+:root:not([data-theme="dark"]) { --lg-lens-shine: 1; }
