@@ -29,7 +29,8 @@ const Chevrons = () => (
   </svg>
 )
 
-export default function Select({ value, onChange, onBlur, children, style, className = '', disabled, ...rest }) {
+// fit — на телефоне ширина по выбранной подписи, а не по самому длинному пункту (фильтры заявок)
+export default function Select({ value, onChange, onBlur, children, style, className = '', disabled, fit, ...rest }) {
   const isMobile = useIsMobile()
   const options = collectOptions(children)
   const current = options.find(o => o.value === String(value ?? '')) || options.find(o => !o.disabled) || { label: '' }
@@ -121,6 +122,14 @@ export default function Select({ value, onChange, onBlur, children, style, class
   }
 
   // Телефон: родной список iOS/Android — лучшее, что есть на тач-экране
+  if (isMobile && fit) {
+    return (
+      <span className={`apple-select-native select-fit ${className}`} style={style}>
+        {current.label}
+        <select value={value} onChange={onChange} onBlur={onBlur} disabled={disabled} aria-label={current.label} {...rest}>{children}</select>
+      </span>
+    )
+  }
   if (isMobile) {
     return (
       <select value={value} onChange={onChange} onBlur={onBlur} disabled={disabled} className={`apple-select-native ${className}`} style={style} {...rest}>

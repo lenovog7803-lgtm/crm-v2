@@ -10,7 +10,6 @@ import Select from './Select'
 import MultiMenu from './MultiMenu'
 import { mouseOnly, spring, project, rubberband, velocityTracker, haptic } from '../motion'
 import { SwapText } from './Transitions'
-import { StatusOrb } from './StatusOrb'
 import { useChangeFlash } from '../hooks/useChangeFlash'
 import { iosConfirm } from './IOSAlert'
 import DateInput from './DateInput'
@@ -312,11 +311,11 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
         {/* Scrollable filter row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
           {/* статус — выпадающий список, как «Оплата» и «Документы» */}
-          <Select className={`orders-pill${statusFilter !== 'all' ? ' is-on' : ''}`} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+          <Select fit className={`orders-pill${statusFilter !== 'all' ? ' is-on' : ''}`} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
             {statusChips.map(c => <option key={c.key} value={c.key}>{c.key === 'all' ? 'Статус: все' : c.label}</option>)}
           </Select>
           {/* оплата — один выпадающий выбор вместо трёх кнопок */}
-          <Select className={`orders-pill${payFilter ? ' is-on' : ''}`} value={payFilter || ''} onChange={e => setPayFilter(e.target.value || null)}>
+          <Select fit className={`orders-pill${payFilter ? ' is-on' : ''}`} value={payFilter || ''} onChange={e => setPayFilter(e.target.value || null)}>
             <option value="">Оплата: все</option>
             <option value="clientUnpaid">Не оплачено клиентом</option>
             <option value="carrierUnpaid">Не оплачено перевозчику</option>
@@ -408,7 +407,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                     )}
                     {/* Живой статус: «В пути» — точки бегут по орбите, «Новая» дышит,
                         доставленные и отменённые замерли; просроченная — красная и быстрее. */}
-                    <StatusOrb status={order.status} overdue={overdue} />
+                    <span style={{ width: 8, height: 8, borderRadius: 99, flexShrink: 0, background: overdue ? 'var(--fg-c81923)' : statusColor(order.status) }} />
                     {/* Main info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
