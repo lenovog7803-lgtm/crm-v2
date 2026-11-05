@@ -8,7 +8,6 @@ import Select from './Select'
 import { TopbarExpand } from './TopbarIsland'
 import { ThinkingOrb } from 'thinking-orbs'
 import { useAuth } from '../AuthContext'
-import GlassBg from './GlassBg'
 import { useTheme } from '../theme'
 
 const PAGE_META = {
@@ -139,7 +138,6 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
       position: 'relative',
       zIndex: 100,
     }}>
-      <GlassBg />
       {/* Mobile search expanded */}
       {isMobile && mobileSearchOpen ? (
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8 }}>

@@ -1416,9 +1416,9 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 
 /* ===== Боковое меню и шапка — стекло glisse (<GlassBg>: Glass с Bend 0.46 / Frost 6px / Rim 0.21) =====
    свой фон, кромку и слой размытия у них снимаем — всё рисует Glass; оставляем только тень. */
-.desktop-sidebar.liquid-glass, .topbar-mobile.liquid-glass {
+.desktop-sidebar.liquid-glass {
   background: transparent !important; border: none !important;
   box-shadow: 0 14px 40px -22px rgba(20,30,55,0.25) !important; isolation: isolate;
 }
-.desktop-sidebar.liquid-glass::before, .desktop-sidebar.liquid-glass::after,
-.topbar-mobile.liquid-glass::before, .topbar-mobile.liquid-glass::after { display: none !important; }
+.desktop-sidebar.liquid-glass::before, .desktop-sidebar.liquid-glass::after { display: none !important; }
+/* шапка — лёгкое CSS-стекло: под ней прокручивается страница, и преломление glisse пересчитывалось каждый кадр (тормозило) */
