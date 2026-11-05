@@ -1422,14 +1422,3 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 }
 .desktop-sidebar.liquid-glass::before, .desktop-sidebar.liquid-glass::after { display: none !important; }
 /* шапка — лёгкое CSS-стекло: под ней прокручивается страница, и преломление glisse пересчитывалось каждый кадр (тормозило) */
-
-/* раскрывающаяся панель шапки — то же стекло glisse, что у бокового меню; свой фон, размытие и кромку снимаем */
-.topbar-drop { background: transparent !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
-  box-shadow: 0 22px 40px -22px rgba(20,30,55,0.4) !important; }
-.topbar-drop::before { display: none !important; }
-/* на панели много текста — стекло плотнее (Apple: regular-вариант): сильнее размытие + лёгкая дымка поверх линзы */
-.topbar-drop .glass-bg { --lg-blur: 18px !important; }
-.topbar-drop::after { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
-  background: linear-gradient(180deg, rgba(var(--paper-rgb), 0.62) 0%, rgba(var(--paper-rgb), 0.5) 100%); }
-/* will-change: opacity закрывает стеклу вид на страницу (backdrop root) — оставляем только transform */
-.topbar-drop { will-change: transform !important; }

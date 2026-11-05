@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom'
 import { getGoals, getOrders, getFleetAnalytics, getFleetGoals, getTasks, getLeads, getLeadsAnalytics, getKudirEntries, getMissingPP } from '../api'
 import { motion } from 'motion/react'
 import { prefersReducedMotion } from '../motion'
-import GlassBg from './GlassBg'
 
 // Шапка как Dynamic Island: нажатие на пустое место шапки раскрывает её каплей вниз — сводка своей страницы.
 
@@ -366,9 +365,7 @@ export function TopbarExpand({ barRef, page, meta }) {
         initial={false}
         animate={open ? { scaleX: 1, scaleY: 1, opacity: 1 } : { scaleX: 36 / rect.width, scaleY: 4 / (bodyH + 7), opacity: 0 }}
         transition={reduce ? { duration: 0 } : { ...(open ? FLOW_OPEN : FLOW_CLOSE), opacity: { duration: open ? 0.14 : 0.2, delay: open ? 0 : 0.22, ease: 'easeOut' } }}
-        onAnimationComplete={() => { if (!open) barRef.current?.classList.remove('topbar-joined') }}>
-        <GlassBg />
-      </motion.div>
+        onAnimationComplete={() => { if (!open) barRef.current?.classList.remove('topbar-joined') }} />
       {/* содержимое — отдельным слоем поверх фона: не растягивается, только проявляется */}
       <motion.div ref={bodyRef} className="topbar-expand-body" style={{ width: rect.width, transformOrigin: '50% 0' }}
           initial={false} variants={reduce ? undefined : BODY}
