@@ -80,18 +80,24 @@ export default function QueueView({ industry, onCounts }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div className="ios-widget" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16 }}>
-        <div style={{ position: 'relative', flexShrink: 0, filter: `drop-shadow(0 4px 10px color-mix(in srgb, ${ringColor} 25%, transparent))` }}>
-          <CircularProgress pct={pct} color={ringColor} size={60} stroke={9} track={`color-mix(in srgb, ${ringColor} 13%, transparent)`} />
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: ringColor }}>{pct}%</div>
+      <div className="card" style={{ padding: '12px 16px 12px 14px', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+        <div style={{ position: 'relative', flexShrink: 0 }}>
+          <CircularProgress pct={pct} color={ringColor} size={40} stroke={5} track="rgba(var(--ink-rgb), 0.08)" />
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10.5, fontWeight: 600, color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{pct}%</div>
         </div>
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-3)' }}>Звонки сегодня</div>
-          <div style={{ marginTop: 2 }}>
-            <span style={{ fontWeight: 700, fontSize: 28, letterSpacing: '-0.03em', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{todayCalls}</span>
-            <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-tertiary)' }}> из {DAILY_GOAL}</span>
+        <div style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
+          <b style={{ fontSize: 17, fontWeight: 600, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{todayCalls}</b> из {DAILY_GOAL} звонков сегодня
+        </div>
+        {!loading && lead && <>
+          <div style={{ width: 1, height: 22, background: 'rgba(var(--ink-rgb), 0.1)' }} />
+          <span style={{ fontSize: 14, color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{index + 1} из {queue.length} в очереди</span>
+          <div style={{ display: 'flex', gap: 8, marginLeft: 'auto' }}>
+            {!lead.assigned_to && (
+              <button onClick={handleClaim} className="btn-primary">Взять в работу</button>
+            )}
+            <button onClick={advance} className="btn-ghost">Пропустить</button>
           </div>
-        </div>
+        </>}
       </div>
 
       {loading && <Loader padding={40} state="searching" label="Загрузка очереди…" />}
@@ -115,16 +121,6 @@ export default function QueueView({ industry, onCounts }) {
 
       {!loading && lead && (
         <>
-          <div className="card" style={{ padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-secondary)' }}>{index + 1} из {queue.length} в очереди</span>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {!lead.assigned_to && (
-                <button onClick={handleClaim} className="btn-primary" style={{ padding: '8px 14px', fontSize: 12.5 }}>Взять в работу</button>
-              )}
-              <button onClick={advance} className="btn-ghost">Пропустить →</button>
-            </div>
-          </div>
-
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, alignItems: 'start' }}>
             <CallCard lead={lead} onEdit={setEditLead} />
             <ScriptPanel stage={lead.stage} />

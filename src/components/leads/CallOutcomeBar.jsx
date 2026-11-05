@@ -5,7 +5,7 @@ import { SwapText } from '../Transitions'
 import Select from '../Select'
 import DateInput from '../DateInput'
 
-const labelStyle = { fontSize: 13, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.01em', marginBottom: 10, display: 'block' }
+const labelStyle = { fontSize: 15, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.01em', marginBottom: 12, display: 'block' }
 
 export default function CallOutcomeBar({ lead, onSave, saving, columns = 3 }) {
   const [outcome, setOutcome] = useState(null)
@@ -57,20 +57,17 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 3 }) {
             className="call-outcome"
             aria-pressed={outcome === o.id}
             style={{
-              display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 14,
-              background: outcome === o.id ? `color-mix(in srgb, ${o.color} 12%, transparent)` : 'rgba(var(--paper-rgb), 0.75)',
-              boxShadow: outcome === o.id ? `inset 0 0 0 1.5px color-mix(in srgb, ${o.color} 40%, transparent)` : 'inset 0 0 0 1px rgba(14,23,38,0.07), 0 1px 2px rgba(14,23,38,0.04)',
+              display: 'flex', alignItems: 'center', gap: 10, padding: '0 14px', height: 44, borderRadius: 12,
+              background: outcome === o.id ? 'rgba(var(--rgb-19-102-240), 0.1)' : 'rgba(var(--ink-rgb), 0.035)',
+              boxShadow: outcome === o.id ? 'inset 0 0 0 1.5px rgba(var(--rgb-19-102-240), 0.45)' : 'none',
               border: 'none', cursor: 'pointer', textAlign: 'left',
             }}
           >
             <span style={{
-              width: 30, height: 30, borderRadius: 9, flexShrink: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: outcome === o.id ? o.color : `color-mix(in srgb, ${o.color} 10%, transparent)`,
-              color: outcome === o.id ? '#fff' : o.color,
-              transition: 'all 0.15s var(--ease)',
-            }}><OutcomeIcon id={o.id} size={14} /></span>
-            <span style={{ fontFamily: 'var(--font-sys)', fontSize: 13.5, fontWeight: outcome === o.id ? 700 : 500, color: outcome === o.id ? o.color : 'var(--ink)' }}>
+              width: 18, height: 18, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: outcome === o.id ? 'var(--fg-1366f0)' : 'var(--text-3)', transition: 'color 0.15s var(--ease)',
+            }}><OutcomeIcon id={o.id} size={17} /></span>
+            <span style={{ fontFamily: 'var(--font-sys)', fontSize: 14, fontWeight: outcome === o.id ? 600 : 400, color: outcome === o.id ? 'var(--fg-1366f0)' : 'var(--ink)' }}>
               {o.label}
             </span>
           </button>

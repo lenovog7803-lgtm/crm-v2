@@ -1443,3 +1443,11 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .lg-segmented > .lg-tab-bar-glass { background-image: none !important; box-shadow: none !important; }
 :root[data-theme="dark"] .lg-segmented { --lg-segment-track: transparent; }
 .lg-segmented > .lg-tab-bar-glass { background-color: transparent !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+
+/* база обзвона: метки лида — одна строка тихого текста через точку; телефон — синим; круглые кнопки-иконки по центру */
+.lead-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 0; font-size: 13.5px; color: var(--text-3); }
+.lead-meta > span + span::before { content: '·'; margin: 0 8px; color: var(--text-3); }
+.call-pill--tel { background: rgba(var(--rgb-19-102-240), 0.1); color: var(--fg-1366f0); }
+.call-pill--tel:hover { background: rgba(var(--rgb-19-102-240), 0.16); }
+.call-icon-btn { display: inline-flex; align-items: center; justify-content: center; padding: 0; width: 30px; height: 30px; }
+.call-outcome:hover { transform: none; }

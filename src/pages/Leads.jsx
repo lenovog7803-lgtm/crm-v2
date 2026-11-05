@@ -40,10 +40,11 @@ export default function Leads() {
         )}
 
         {view === 'queue' && (
-          <div style={{ display: 'flex', gap: 6, marginLeft: 'auto', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 18, marginLeft: 'auto', flexWrap: 'wrap', paddingRight: 4 }}>
             {[['Просрочено', counts.overdue, 'var(--fg-ff3b30)'], ['Сегодня', counts.today, 'var(--fg-1366f0)'], ['Горячих', counts.hot, 'var(--fg-d97706)'], ['Новых', counts.new, 'var(--text-3)']].map(([t, n, c]) => (
-              <span key={t} style={{ padding: '4px 11px', borderRadius: 99, background: `color-mix(in srgb, ${c} 9%, transparent)`, color: c, fontSize: 12.5, fontWeight: 600, whiteSpace: 'nowrap' }}>
-                {t} <b style={{ fontVariantNumeric: 'tabular-nums' }}>{n}</b>
+              <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 13, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                <span style={{ width: 7, height: 7, borderRadius: 99, background: c, opacity: n ? 1 : 0.35 }} />
+                {t} <b style={{ color: 'var(--ink)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{n}</b>
               </span>
             ))}
           </div>

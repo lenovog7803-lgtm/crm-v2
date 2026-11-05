@@ -13,8 +13,6 @@ function NoteIcon(p) {
   )
 }
 
-const chip = (bg, color) => ({ padding: '4px 11px', borderRadius: 99, background: bg, color, fontSize: 12, fontWeight: 600 })
-
 // part: 'header' — шапка (без истории), 'history' — описание и история, по умолчанию — всё
 export default function CallCard({ lead, onEdit, part }) {
   const [history, setHistory] = useState([])
@@ -53,11 +51,11 @@ export default function CallCard({ lead, onEdit, part }) {
             boxShadow: `0 6px 16px -6px color-mix(in srgb, ${avB} 56%, transparent), inset 0 1px 0 rgba(255,255,255,0.35)`,
           }}>{initials(lead.name)}</div>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 21, letterSpacing: '-0.02em', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.name}</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 22, letterSpacing: '-0.02em', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.name}</div>
             {lead.phone ? (
-              <a href={`tel:${lead.phone.replace(/[^\d+]/g, '')}`} className="call-pill call-pill--green" style={{ marginTop: 6 }} title="Позвонить">
+              <a href={`tel:${lead.phone.replace(/[^\d+]/g, '')}`} className="call-pill call-pill--tel" style={{ marginTop: 6 }} title="Позвонить">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" /></svg>
-                <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}>{lead.phone}</span>
+                <span style={{ fontVariantNumeric: 'tabular-nums' }}>{lead.phone}</span>
               </a>
             ) : <div style={{ fontSize: 13, color: 'var(--text-tertiary)', marginTop: 4 }}>нет телефона</div>}
           </div>
@@ -68,13 +66,12 @@ export default function CallCard({ lead, onEdit, part }) {
         </button>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <span style={chip(stage.bg, stage.color)}>{stage.label}</span>
-        {cadenceStep > 0 && <span style={chip('rgba(var(--ink-rgb), 0.06)', 'var(--text-secondary)')}>шаг каденции {cadenceStep} из 5</span>}
-        {lead.industry && <span style={chip('rgba(var(--rgb-244-122-31), 0.1)', 'var(--fg-f47a1f)')}>{lead.industry}</span>}
-        {lead.city && <span style={chip('rgba(var(--ink-rgb), 0.06)', 'var(--text-secondary)')}>{lead.city}</span>}
-        {lead.region && <span style={chip('rgba(var(--ink-rgb), 0.06)', 'var(--text-secondary)')}>{lead.region}</span>}
-        {attempts > 0 && <span style={chip('rgba(var(--rgb-217-119-6), 0.12)', 'var(--fg-d97706)')}>попыток дозвона: {attempts}</span>}
+      <div className="lead-meta">
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--ink)', fontWeight: 500 }}>
+          <span style={{ width: 7, height: 7, borderRadius: 99, background: stage.color }} />{stage.label}
+        </span>
+        {[cadenceStep > 0 && `шаг каденции ${cadenceStep} из 5`, lead.industry, lead.city, lead.region, attempts > 0 && `попыток дозвона: ${attempts}`]
+          .filter(Boolean).map(t => <span key={t}>{t}</span>)}
       </div>
 
       {attempts >= 3 && (
@@ -89,14 +86,14 @@ export default function CallCard({ lead, onEdit, part }) {
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', fontSize: 12.5 }}>
+      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', fontSize: 13.5 }}>
         {lead.website && (
-          <a href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`} target="_blank" rel="noreferrer" style={{ color: 'var(--fg-1366f0)', fontWeight: 600 }}>
+          <a href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`} target="_blank" rel="noreferrer" style={{ color: 'var(--fg-1366f0)', textDecoration: 'none' }}>
             {lead.website}
           </a>
         )}
         {lead.email && (
-          <a href={`mailto:${lead.email}`} style={{ color: 'var(--fg-1366f0)', fontWeight: 600 }}>{lead.email}</a>
+          <a href={`mailto:${lead.email}`} style={{ color: 'var(--fg-1366f0)', textDecoration: 'none' }}>{lead.email}</a>
         )}
       </div>
 
@@ -104,13 +101,13 @@ export default function CallCard({ lead, onEdit, part }) {
   )
   const historyEl = (
     <>      {lead.notes && (
-        <div style={{ fontSize: 13.5, color: 'var(--text-strong)', lineHeight: 1.55, background: 'rgba(var(--ink-rgb), 0.035)', borderRadius: 14, padding: '12px 14px' }}>
+        <div style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
           {lead.notes}
         </div>
       )}
 
       <div>
-        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)', marginBottom: 10, letterSpacing: '-0.01em' }}>
+        <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', marginBottom: 10, letterSpacing: '-0.01em' }}>
           История звонков {timeline.length > 0 && <span style={{ color: 'var(--text-tertiary)', fontWeight: 600 }}>{timeline.length}</span>}
         </div>
         {timeline.length === 0 && <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)' }}>Звонков ещё не было</div>}

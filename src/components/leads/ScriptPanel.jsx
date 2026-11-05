@@ -49,14 +49,18 @@ export default function ScriptPanel({ stage }) {
   return (
     <div className="card call-sheet" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 14, color: 'var(--ink)', letterSpacing: '-0.01em' }}>
-          Скрипт <span style={{ padding: '2px 9px', borderRadius: 99, fontSize: 11.5, fontWeight: 600, background: st.bg || 'rgba(var(--ink-rgb), 0.06)', color: st.color }}>{st.label}</span>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, fontWeight: 600, fontSize: 15, color: 'var(--ink)', letterSpacing: '-0.01em' }}>
+          Скрипт <span style={{ fontSize: 13, fontWeight: 400, color: 'var(--text-3)' }}>{st.label}</span>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
           {!editing && (
-            <button onClick={startEdit} title="Редактировать" className="call-icon-btn">✎</button>
+            <button onClick={startEdit} title="Редактировать" aria-label="Редактировать" className="call-icon-btn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
+            </button>
           )}
-          <button onClick={() => setCollapsed(true)} title="Свернуть" className="call-icon-btn">»</button>
+          <button onClick={() => setCollapsed(true)} title="Свернуть" aria-label="Свернуть" className="call-icon-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+          </button>
         </div>
       </div>
 
@@ -73,7 +77,7 @@ export default function ScriptPanel({ stage }) {
           </div>
         </>
       ) : (
-        <div style={{ fontFamily: 'var(--font-sys)', fontSize: 14.5, color: '#2A3342', whiteSpace: 'pre-wrap', lineHeight: 1.65, letterSpacing: '-0.005em' }}>
+        <div style={{ fontFamily: 'var(--font-sys)', fontSize: 14, color: 'var(--ink)', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
           {text || 'Нет скрипта для этой стадии.'}
         </div>
       )}
