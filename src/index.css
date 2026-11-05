@@ -1438,3 +1438,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 }
 .lg-segmented-thumb { box-shadow: none !important; }
 :root[data-theme="dark"] .lg-segmented { --lg-segment-track: rgba(255,255,255,0.08); --lg-segment-thumb: rgba(255,255,255,0.14); }
+/* дорожки у переключателей нет совсем — только пункты и капсула выбранного */
+.lg-segmented { --lg-segment-track: transparent; }
+.lg-segmented > .lg-tab-bar-glass { background-image: none !important; box-shadow: none !important; }
+:root[data-theme="dark"] .lg-segmented { --lg-segment-track: transparent; }
