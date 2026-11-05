@@ -1399,3 +1399,15 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 /* сегменты и нижняя панель — glisse как у автора; меняем только цвет текста выбранного пункта */
 .lg-segmented { --lg-tab-selected: var(--fg-1366f0); }
 .lg-segmented :is(.lg-tab, .lg-tab-copy)[data-selected] { color: var(--fg-1366f0); }
+
+/* ===== Линза glisse внутри меню и карточек =====
+   Элемент с backdrop-filter — «корень подложки»: всё, что внутри, видит только его содержимое, а не страницу,
+   и линза glisse рисовала пустоту серыми полосами. Поэтому:
+   — у карточек размытие снято (они и так плотные, 0.94);
+   — у бокового меню и шапки размытие перенесено на отдельный нижний слой ::after — вид тот же, а сам элемент больше не «корень». */
+.card:not(.grad-card), .ios-widget:not(.grad-card), .kanban-card { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.desktop-sidebar.liquid-glass, .topbar-mobile.liquid-glass { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.desktop-sidebar.liquid-glass::after, .topbar-mobile.liquid-glass::after {
+  content: '' !important; display: block !important; position: absolute; inset: 0; z-index: -2; border-radius: inherit; pointer-events: none; background: none !important;
+  backdrop-filter: blur(20px) saturate(200%) brightness(1.04); -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.04);
+}
