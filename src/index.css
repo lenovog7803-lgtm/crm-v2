@@ -1223,7 +1223,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   from { opacity: 0; transform: translateY(16px) scale(0.97); }
   to { opacity: 1; transform: none; }
 }
-.scroll-area .card, .scroll-area .ios-widget, .scroll-area .ios-list { animation: cardIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.scroll-area .card, .scroll-area .ios-widget, .scroll-area .ios-list { animation: cardIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards; /* backwards: после конца анимация отпускает карточку, иначе линза glisse внутри видит серую кашу */ }
 .scroll-area :is(.card, .ios-widget, .ios-list):nth-child(2) { animation-delay: 50ms; }
 .scroll-area :is(.card, .ios-widget, .ios-list):nth-child(3) { animation-delay: 100ms; }
 .scroll-area :is(.card, .ios-widget, .ios-list):nth-child(n+4) { animation-delay: 150ms; }
