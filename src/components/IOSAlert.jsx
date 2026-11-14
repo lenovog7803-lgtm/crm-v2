@@ -25,7 +25,7 @@ function Alert({ message, okLabel, cancelLabel, destructive, onDone }) {
         <div className="ios-alert-title">{title}</div>
         {body && <div className="ios-alert-body">{body}</div>}
         <div className="ios-alert-actions">
-          <button className="ios-alert-btn" onClick={() => finish(false)}>{cancelLabel}</button>
+          {cancelLabel && <button className="ios-alert-btn" onClick={() => finish(false)}>{cancelLabel}</button>}
           <button ref={okRef} className={`ios-alert-btn ios-alert-btn--${destructive ? 'danger' : 'primary'}`} onClick={() => finish(true)}>{okLabel}</button>
         </div>
       </div>
@@ -41,7 +41,10 @@ export function iosConfirm(message, opts = {}) {
     const host = document.createElement('div')
     document.body.appendChild(host)
     const root = createRoot(host)
-    root.render(<Alert message={message} okLabel={okLabel} cancelLabel={opts.cancelLabel || 'Отмена'} destructive={destructive}
+    root.render(<Alert message={message} okLabel={okLabel} cancelLabel={opts.cancelLabel === null ? null : (opts.cancelLabel || 'Отмена')} destructive={destructive}
       onDone={(v) => { root.unmount(); host.remove(); resolve(v) }} />)
   })
 }
+
+// Сообщение об ошибке с одной кнопкой: «Не удалось удалить. Проверьте интернет…»
+export const iosError = (message) => iosConfirm(message, { okLabel: 'Понятно', cancelLabel: null, destructive: false })

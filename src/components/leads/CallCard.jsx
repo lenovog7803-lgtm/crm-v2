@@ -16,6 +16,7 @@ function NoteIcon(p) {
 // part: 'header' — шапка (без истории), 'history' — описание и история, по умолчанию — всё
 export default function CallCard({ lead, onEdit, part }) {
   const [history, setHistory] = useState([])
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     if (!lead?.id || part === 'header') return
@@ -28,6 +29,9 @@ export default function CallCard({ lead, onEdit, part }) {
   const attempts = lead.call_attempts || 0
   const cadenceStep = lead.cadence_step || 0
   const [avA, avB] = getGradient(lead.name || '')
+  const digits = (lead.phone || '').replace(/[^\d+]/g, '')
+  const intl = digits.replace(/\D/g, '').replace(/^80(?=\d{9}$)/, '375')   // 8 0ХХ … → 375 ХХ … для мессенджеров
+  const copyPhone = () => navigator.clipboard?.writeText(lead.phone).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500) }).catch(() => {})
 
   const legacyNotes = (lead.call_notes || []).map((n, i) => ({
     id: `legacy-${i}-${n.date}`,
@@ -44,19 +48,25 @@ export default function CallCard({ lead, onEdit, part }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
           <div style={{
-            width: 56, height: 56, borderRadius: 15, flexShrink: 0,
+            width: 56, height: 56, borderRadius: 16, flexShrink: 0,
             '--av-hue': avB, background: `linear-gradient(160deg, ${avA} 0%, ${avB} 100%)`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', fontWeight: 700, fontSize: 19, letterSpacing: '-0.02em',
+            color: '#fff', fontWeight: 700, fontSize: 20, letterSpacing: '-0.02em',
             boxShadow: `0 6px 16px -6px color-mix(in srgb, ${avB} 56%, transparent), inset 0 1px 0 rgba(255,255,255,0.35)`,
           }}>{initials(lead.name)}</div>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 22, letterSpacing: '-0.02em', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.name}</div>
             {lead.phone ? (
-              <a href={`tel:${lead.phone.replace(/[^\d+]/g, '')}`} className="call-pill call-pill--tel" style={{ marginTop: 6 }} title="Позвонить">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" /></svg>
-                <span style={{ fontVariantNumeric: 'tabular-nums' }}>{lead.phone}</span>
-              </a>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
+                <a href={`tel:${digits}`} className="call-pill call-pill--tel" title="Позвонить">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" /></svg>
+                  <span style={{ fontVariantNumeric: 'tabular-nums' }}>{lead.phone}</span>
+                </a>
+                <button onClick={copyPhone} className="call-pill" title="Скопировать номер">{copied ? 'Скопировано' : 'Копировать'}</button>
+                <a href={`viber://chat?number=%2B${intl}`} className="call-pill" title="Написать в Viber">Viber</a>
+                <a href={`https://t.me/+${intl}`} target="_blank" rel="noreferrer" className="call-pill" title="Написать в Telegram">Telegram</a>
+                <a href={`https://wa.me/${intl}`} target="_blank" rel="noreferrer" className="call-pill" title="Написать в WhatsApp">WhatsApp</a>
+              </div>
             ) : <div style={{ fontSize: 13, color: 'var(--text-tertiary)', marginTop: 4 }}>нет телефона</div>}
           </div>
         </div>
@@ -76,7 +86,7 @@ export default function CallCard({ lead, onEdit, part }) {
 
       {attempts >= 3 && (
         <div style={{ background: 'rgba(var(--rgb-224-71-59), 0.08)', border: '1px solid rgba(var(--rgb-224-71-59), 0.2)', borderRadius: 12, padding: '10px 14px', fontSize: 12, color: 'var(--fg-e0473b)' }}>
-          {attempts} неудачных дозвона подряд. После 5-й лид уйдёт в «Нет контакта».
+          {attempts} неудачных дозвона подряд. После 5-го лид уйдёт в «Отказ» с причиной «Не дозвонились».
         </div>
       )}
 
@@ -86,7 +96,7 @@ export default function CallCard({ lead, onEdit, part }) {
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', fontSize: 13.5 }}>
+      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', fontSize: 14 }}>
         {lead.website && (
           <a href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`} target="_blank" rel="noreferrer" style={{ color: 'var(--fg-1366f0)', textDecoration: 'none' }}>
             {lead.website}
@@ -110,14 +120,14 @@ export default function CallCard({ lead, onEdit, part }) {
         <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', marginBottom: 10, letterSpacing: '-0.01em' }}>
           История звонков {timeline.length > 0 && <span style={{ color: 'var(--text-tertiary)', fontWeight: 600 }}>{timeline.length}</span>}
         </div>
-        {timeline.length === 0 && <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)' }}>Звонков ещё не было</div>}
+        {timeline.length === 0 && <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>Звонков ещё не было</div>}
         <div className="call-timeline" style={{ display: 'flex', flexDirection: 'column', maxHeight: 240, overflowY: 'auto' }}>
           {timeline.map((h) => {
             if (h.kind === 'note') {
               return (
                 <div key={h.id} className="call-tl-row">
                   <div style={{
-                    width: 28, height: 28, borderRadius: 9, flexShrink: 0,
+                    width: 28, height: 28, borderRadius: 10, flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     background: 'rgba(138,147,160,0.15)', color: 'var(--text-3)',
                   }}><NoteIcon width={12} height={12} /></div>
@@ -125,7 +135,7 @@ export default function CallCard({ lead, onEdit, part }) {
                     <div style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 700 }}>
                       {h.author ? `${h.author} · ` : ''}{h.created_at ? new Date(h.created_at).toLocaleString('ru-RU') : ''}
                     </div>
-                    {h.text && <div style={{ fontSize: 13.5, color: 'var(--text-strong)', marginTop: 2 }}>{h.text}</div>}
+                    {h.text && <div style={{ fontSize: 14, color: 'var(--text-strong)', marginTop: 2 }}>{h.text}</div>}
                   </div>
                 </div>
               )
@@ -134,7 +144,7 @@ export default function CallCard({ lead, onEdit, part }) {
             return (
               <div key={h.id} className="call-tl-row">
                 <div style={{
-                  width: 28, height: 28, borderRadius: 9, flexShrink: 0,
+                  width: 28, height: 28, borderRadius: 10, flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   background: `color-mix(in srgb, ${(o?.color || 'var(--text-3)')} 10%, transparent)`, color: o?.color || 'var(--text-3)',
                 }}><OutcomeIcon id={o?.id || 'reached'} size={12} /></div>
@@ -142,7 +152,7 @@ export default function CallCard({ lead, onEdit, part }) {
                   <div style={{ fontSize: 11, color: o?.color || 'var(--text-3)', fontWeight: 700 }}>
                     {o?.label || h.outcome} · {new Date(h.created_at).toLocaleString('ru-RU')}
                   </div>
-                  {h.comment && <div style={{ fontSize: 13.5, color: 'var(--text-strong)', marginTop: 2 }}>{h.comment}</div>}
+                  {h.comment && <div style={{ fontSize: 14, color: 'var(--text-strong)', marginTop: 2 }}>{h.comment}</div>}
                   {h.lost_reason && <div style={{ fontSize: 12, color: 'var(--fg-e0473b)', marginTop: 2 }}>Причина: {h.lost_reason}</div>}
                 </div>
               </div>

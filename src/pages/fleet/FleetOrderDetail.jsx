@@ -58,8 +58,8 @@ function StepModal({ title, fields, onClose, onConfirm }) {
   const set = (k, v) => setVals(p => ({ ...p, [k]: v }))
   const go = async () => { setSaving(true); try { await onConfirm(vals) } catch { setSaving(false) } }
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 400, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
+    <div onClick={onClose} className="dash-modal-scrim">
+      <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 400, padding: 26 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 18 }}>{title}</div>
         {fields.map((f, i) => (
           <div key={f.key} style={{ marginBottom: 14 }}>
@@ -69,8 +69,8 @@ function StepModal({ title, fields, onClose, onConfirm }) {
           </div>
         ))}
         <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', fontSize: 14, color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
-          <button onClick={go} disabled={saving} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: 'var(--bg-1e9e5a)', color: '#FFFFFF', fontSize: 14, fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
+          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+          <button onClick={go} disabled={saving} className="btn-primary" style={{ flex: 2, background: 'var(--bg-1e9e5a)', opacity: saving ? 0.6 : 1, boxShadow: 'none', justifyContent: 'center' }}>
             <SwapText>{saving ? 'Сохраняю…' : 'Подтвердить'}</SwapText>
           </button>
         </div>
@@ -82,7 +82,7 @@ function StepModal({ title, fields, onClose, onConfirm }) {
 function InfoRow({ label, value }) {
   if (value === '' || value == null) return null
   return (
-    <div style={{ display: 'flex', gap: 12, fontSize: 12.5, padding: '6px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
+    <div style={{ display: 'flex', gap: 12, fontSize: 13, padding: '6px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
       <span style={{ color: 'var(--text-tertiary)', minWidth: 120, flexShrink: 0 }}>{label}</span>
       <span style={{ color: 'var(--ink)', fontWeight: 500 }}>{value}</span>
     </div>
@@ -93,7 +93,7 @@ function InfoRow({ label, value }) {
 function DocRow({ label, url, color, bg, busy, onClick }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, background: bg, borderRadius: 10, padding: '10px 12px', fontSize: 12.5, fontWeight: 500, color: url ? color : 'var(--text-3)', overflow: 'hidden' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, background: bg, borderRadius: 10, padding: '10px 12px', fontSize: 13, fontWeight: 500, color: url ? color : 'var(--text-3)', overflow: 'hidden' }}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" />
         </svg>
@@ -101,7 +101,7 @@ function DocRow({ label, url, color, bg, busy, onClick }) {
       </div>
       <button onClick={onClick} disabled={busy} style={{
         border: 'none', background: bg, color, borderRadius: 10, padding: '10px 14px',
-        fontSize: 12.5, fontWeight: 700, cursor: busy ? 'default' : 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+        fontSize: 13, fontWeight: 700, cursor: busy ? 'default' : 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
       }}>{busy ? '…' : url ? 'Открыть' : '+ Создать'}</button>
     </div>
   )
@@ -156,7 +156,7 @@ function PaymentsCard({ order, cur, onReload, onFull }) {
         <span style={{ color: 'var(--fg-1e9e5a)' }}>{money(paidAmt, cur === 'BYN' ? 'Br' : cur)}</span>
         <span style={{ color: 'var(--text-tertiary)' }}>из {money(rate, cur === 'BYN' ? 'Br' : cur)}</span>
       </div>
-      <div style={{ height: 6, borderRadius: 4, background: 'rgba(var(--ink-rgb), 0.06)', overflow: 'hidden', marginBottom: 6 }}>
+      <div style={{ height: 6, borderRadius: 6, background: 'rgba(var(--ink-rgb), 0.06)', overflow: 'hidden', marginBottom: 6 }}>
         <div style={{ width: `${pct}%`, height: '100%', background: order.paid ? 'var(--fg-1e9e5a)' : 'var(--fg-1366f0)', transition: 'width 0.3s' }} />
       </div>
       <div style={{ fontSize: 11, color: overdue ? 'var(--fg-c81923)' : 'var(--text-tertiary)', marginBottom: 12 }}>
@@ -171,7 +171,7 @@ function PaymentsCard({ order, cur, onReload, onFull }) {
           </span>
           <span style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <b style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink)' }}>{money(p.amount, cur === 'BYN' ? 'Br' : cur)}</b>
-            <button onClick={() => delPay(p.id)} style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 13 }}>✕</button>
+            <button onClick={() => delPay(p.id)} className="btn-x" style={{ fontSize: 13 }}>✕</button>
           </span>
         </div>
       ))}
@@ -189,15 +189,15 @@ function PaymentsCard({ order, cur, onReload, onFull }) {
             </label>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => setAdding(false)} style={{ flex: 1, padding: 10, borderRadius: 10, background: 'var(--fill)', border: '1px solid var(--line)', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 12 }}>Отмена</button>
+            <button onClick={() => setAdding(false)} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
             <button onClick={addPay} className="btn-primary" style={{ flex: 2, padding: 10, fontSize: 12 }}>Добавить платёж</button>
           </div>
         </div>
       ) : (
         <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-          <button onClick={() => setAdding(true)} style={{ flex: 1, padding: '9px 12px', borderRadius: 10, border: '1px solid var(--fg-1366f0)', background: 'rgba(var(--rgb-19-102-240), 0.06)', color: 'var(--fg-1366f0)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>+ платёж</button>
+          <button onClick={() => setAdding(true)} className="btn-ghost" style={{ flex: 1, color: 'var(--fg-1366f0)', justifyContent: 'center' }}>+ платёж</button>
           {!order.paid && (
-            <button onClick={onFull} style={{ flex: 1, padding: '9px 12px', borderRadius: 10, border: '1px solid var(--fg-1e9e5a)', background: 'rgba(var(--rgb-30-158-90), 0.06)', color: 'var(--fg-1e9e5a)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>Оплачен полностью</button>
+            <button onClick={onFull} className="btn-ghost" style={{ flex: 1, color: 'var(--fg-1e9e5a)', justifyContent: 'center' }}>Оплачен полностью</button>
           )}
         </div>
       )}
@@ -223,10 +223,10 @@ function OrderComments({ orderId, comments, onReload }) {
     <div className="card" style={{ padding: '20px 20px' }}>
       <SLabel>Комментарии</SLabel>
       {list.map(c => (
-        <div key={c.id} style={{ padding: '7px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)', fontSize: 12.5, color: '#3A424E' }}>
+        <div key={c.id} style={{ padding: '7px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)', fontSize: 13, color: '#3A424E' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
             <span style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>{c.author || '—'} · {fmtDate(c.created_at)}</span>
-            <button onClick={() => del(c.id)} style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 12 }}>✕</button>
+            <button onClick={() => del(c.id)} className="btn-x" style={{ fontSize: 12 }}>✕</button>
           </div>
           <div style={{ marginTop: 2, whiteSpace: 'pre-wrap' }}>{c.text}</div>
         </div>
@@ -291,7 +291,7 @@ export default function FleetOrderDetail({ orderId, onBack }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
         <PillBtn variant="neutral" icon="back" onClick={onBack}>Назад</PillBtn>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 16, color: 'var(--ink)' }}>{order.order_number || order.client_name || 'Загрузка'}</span>
+          <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 17, color: 'var(--ink)' }}>{order.order_number || order.client_name || 'Загрузка'}</span>
           <span style={{ fontSize: 12, color: 'var(--text-tertiary)', marginLeft: 10 }}>{order.client_name} · {order.trip_name || 'Рейс'} · {order.direction === 'backward' ? 'обратка' : 'прямой'}</span>
         </div>
         <PillBtn variant="edit" icon="edit" onClick={() => setEditing(true)}>Редактировать</PillBtn>

@@ -87,7 +87,7 @@ input[type="number"] {
 
 @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 @keyframes pageIn { from { opacity:0; } to { opacity:1; } }
-@keyframes modalOut { from { opacity:1; transform:scale(1); } to { opacity:0; transform:scale(0.96); } }
+@keyframes modalOut { from { opacity:1; transform:none; } to { opacity:0; transform:translateY(6px); } }  /* без scale: на стекле он пересчитывает размытие каждый кадр */
 @keyframes fadeOut { from { opacity:1; } to { opacity:0; } }
 @keyframes floatA { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(3%,4%) scale(1.08);} }
 @keyframes floatB { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-4%,3%) scale(1.1);} }
@@ -101,8 +101,8 @@ input[type="number"] {
   100% { transform: scale(2.4); opacity: 0; }
 }
 @keyframes modalIn {
-  from { opacity: 0; transform: scale(0.96) translateY(8px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
 }
 @keyframes navIconPop {
   0% { transform: scale(1); }
@@ -122,7 +122,7 @@ input[type="number"] {
 
 .btn-primary {
   display: flex; align-items: center; gap: 8px;
-  padding: 10px 18px; border-radius: 999px; border: none; cursor: pointer;
+  padding: 10px 18px; border-radius: 99px; border: none; cursor: pointer;
   background: linear-gradient(180deg, #2A7BFF 0%, var(--fg-1366f0) 100%); color: #fff;
   font-family: var(--font-sys); font-size: 14px; font-weight: 600; letter-spacing: -0.01em;
   box-shadow: 0 8px 20px -10px rgba(var(--rgb-19-102-240), 0.75), inset 0 1px 0 rgba(255,255,255,calc(0.28 * var(--rim-k)));
@@ -134,9 +134,9 @@ input[type="number"] {
 
 .btn-ghost {
   display: flex; align-items: center; gap: 7px;
-  padding: 9px 16px; border-radius: 999px;
+  padding: 9px 16px; border-radius: 99px;
   border: none; background: rgba(118,118,128,0.12);
-  color: var(--ink); font-family: var(--font-sys); font-size: 13.5px; font-weight: 600; letter-spacing: -0.01em; cursor: pointer;
+  color: var(--ink); font-family: var(--font-sys); font-size: 14px; font-weight: 600; letter-spacing: -0.01em; cursor: pointer;
   box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.55 * var(--rim-k)));
   transition: background 0.15s var(--ease), transform 0.15s var(--ease);
 }
@@ -153,7 +153,7 @@ input[type="number"] {
 .sidebar-nav-btn.active:hover { background: transparent; }
 
 .section-label {
-  font-size: 10.5px; font-weight: 700; letter-spacing: 0.12em; color: var(--text-tertiary);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: var(--text-tertiary);
   margin: 8px 0 -4px 4px;
 }
 
@@ -483,7 +483,7 @@ input[type="number"] {
 .search-pill.is-open:focus-within .search-pill-icon { transform: translateY(-50%) rotate(0deg) scale(0.92); }
 .search-pill-input {
   width: 100%; height: 100%; border: none; outline: none; background: transparent;
-  padding: 0 46px 0 34px; font-family: var(--font-sys); font-size: 13.5px; color: var(--ink);
+  padding: 0 46px 0 34px; font-family: var(--font-sys); font-size: 14px; color: var(--ink);
   opacity: 0; filter: blur(3px); transform: translateX(8px);
   transition: opacity 220ms ease 0ms, filter 220ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -526,7 +526,7 @@ input[type="number"] {
   box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.85 * var(--rim-k))), 0 0 0 0.5px rgba(14,23,38,0.14), 0 40px 100px -24px rgba(14,23,38,0.5);
   animation: callWindowIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-@keyframes callWindowIn { from { opacity: 0; transform: scale(0.97) translateY(6px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes callWindowIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }  /* без scale/blur — на стекле они лагают */
 /* «листы» внутри окна: белые, без рамок, мягкая тень — как группы в настройках macOS */
 .call-window .card.call-sheet {
   background: rgba(var(--paper-rgb), 0.86) !important; border: none !important; border-radius: 20px !important;
@@ -586,7 +586,7 @@ input[type="number"] {
 .apple-select-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .apple-select-menu {
   position: fixed; z-index: 3000; overflow-y: auto; padding: 5px; border-radius: 12px;
-  font-family: var(--font-sys); font-size: 13.5px; color: var(--ink);
+  font-family: var(--font-sys); font-size: 14px; color: var(--ink);
   background: rgba(var(--paper-rgb), 0.86); backdrop-filter: blur(30px) saturate(190%); -webkit-backdrop-filter: blur(30px) saturate(190%);
   box-shadow: 0 0 0 0.5px rgba(14,23,38,0.18), 0 12px 32px -8px rgba(14,23,38,0.35), inset 0 1px 0 rgba(255,255,255,calc(0.7 * var(--rim-k)));
   animation: appleMenuIn 260ms cubic-bezier(0.32, 0.72, 0, 1) both;
@@ -755,11 +755,11 @@ input[type="number"] {
 @keyframes iosAlertIn { from { opacity: 0; transform: scale(1.12); } to { opacity: 1; transform: scale(1); } }
 @keyframes iosAlertOut { to { opacity: 0; transform: scale(0.96); } }
 .ios-alert-title { font-size: 17px; font-weight: 600; color: var(--ink); letter-spacing: -0.02em; line-height: 1.3; }
-.ios-alert-body { margin-top: 6px; font-size: 13.5px; color: var(--text-secondary); line-height: 1.4; }
+.ios-alert-body { margin-top: 6px; font-size: 14px; color: var(--text-secondary); line-height: 1.4; }
 .ios-alert-actions { display: flex; gap: 8px; margin-top: 18px; }
 .ios-alert-btn {
-  flex: 1; height: 44px; border-radius: 999px; border: none; cursor: pointer; font-family: var(--font-sys);
-  font-size: 15.5px; font-weight: 600; background: rgba(118,118,128,0.14); color: var(--ink); transition: filter 0.12s, transform 0.12s;
+  flex: 1; height: 44px; border-radius: 99px; border: none; cursor: pointer; font-family: var(--font-sys);
+  font-size: 15px; font-weight: 600; background: rgba(118,118,128,0.14); color: var(--ink); transition: filter 0.12s, transform 0.12s;
 }
 .ios-alert-btn:active { transform: scale(0.97); }
 .ios-alert-btn--primary { background: var(--bg-1366f0); color: #fff; }
@@ -775,7 +775,7 @@ input[type="number"] {
   box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), 0 0 0 0.5px rgba(14,23,38,0.14), 0 40px 100px -24px rgba(14,23,38,0.45) !important;
 }
 .ios-sheet-close {
-  width: 34px; height: 34px; border-radius: 999px; border: none; cursor: pointer; flex-shrink: 0;
+  width: 34px; height: 34px; border-radius: 99px; border: none; cursor: pointer; flex-shrink: 0;
   display: inline-flex; align-items: center; justify-content: center; color: var(--text-strong);
   background: rgba(118,118,128,0.14); box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.7 * var(--rim-k)));
   transition: background 0.15s, transform 0.15s;
@@ -805,7 +805,7 @@ input[type="number"] {
   color: #fff; font-weight: 600; font-size: 15px; letter-spacing: -0.01em; box-shadow: inset 0 1px 0 rgba(255,255,255,calc(0.3 * var(--rim-k)));
 }
 .ios-row-text { flex: 1; min-width: 0; }
-.ios-row-title { font-size: 15.5px; font-weight: 600; color: var(--ink); letter-spacing: -0.015em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ios-row-title { font-size: 15px; font-weight: 600; color: var(--ink); letter-spacing: -0.015em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ios-row-sub { font-size: 13px; color: var(--text-3); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ios-row-actions { display: flex; gap: 6px; flex-shrink: 0; }
 .ios-row-icon {
@@ -819,7 +819,7 @@ input[type="number"] {
 @media (hover: hover) { .ios-row .ios-row-del { opacity: 0; } .ios-row:hover .ios-row-del { opacity: 1; } }
 .ios-row-chevron { color: rgba(var(--sep-rgb), 0.3); flex-shrink: 0; margin-left: 2px; }
 .ios-row-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 99px; flex-shrink: 0;
-  background: rgba(255,149,0,0.12); color: var(--fg-d97706); font-size: 12.5px; font-weight: 700; }
+  background: rgba(255,149,0,0.12); color: var(--fg-d97706); font-size: 13px; font-weight: 700; }
 
 /* iOS 26 — виджет дашборда: белое стекло, большой радиус */
 .ios-widget {
@@ -938,7 +938,7 @@ input[type="number"] {
 .mail-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--bg-1366f0); flex-shrink: 0; margin-top: 5px; }
 
 /* ===== iMessage: переписка ===== */
-.bubble { max-width: 78%; padding: 9px 14px; border-radius: 20px; font-size: 14.5px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+.bubble { max-width: 78%; padding: 9px 14px; border-radius: 20px; font-size: 15px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
 .bubble--me { align-self: flex-end; background: var(--bg-1366f0); color: #fff; border-bottom-right-radius: 6px; }
 .bubble--them { align-self: flex-start; background: #E9E9EB; color: var(--ink); border-bottom-left-radius: 6px; }
 .bubble-meta { font-size: 11px; color: var(--text-3); margin: 2px 6px 0; }
@@ -987,7 +987,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 /* Отклик в момент касания (телефон): всё нажимаемое реагирует сразу, а не после отпускания.
    У кнопок со своей анимацией нажатия (масштаб, фон) — своя, здесь их не трогаем. */
 @media (hover: none) {
-  :where(button, a, [role="button"], [style*="cursor: pointer"]):not(.btn-primary, .btn-ghost, .ios-row, .ios-row-icon, .ios-check, .ios-switch, .ios-cal-day, .ios-alert-btn, .ios-sheet-close, .composer-send, .call-close, .call-pill, .call-outcome, .call-save, .ios-widget, .grad-card, .mail-row, .seg-track button, .mobile-nav button):not(:disabled):active {
+  :where(button, a, [role="button"], [style*="cursor: pointer"]):not(.btn-primary, .btn-ghost, .btn-icon, .btn-x, .btn-bare, .btn-chip, .ios-row, .ios-row-icon, .ios-check, .ios-switch, .ios-cal-day, .ios-alert-btn, .ios-sheet-close, .composer-send, .call-close, .call-pill, .call-outcome, .call-save, .ios-widget, .grad-card, .mail-row, .seg-track button, .mobile-nav button):not(:disabled):active {
     opacity: 0.55; transition: opacity 0s;
   }
   /* нажимаемые карточки чуть «проседают», как виджеты iOS */
@@ -1002,7 +1002,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .plan-bar > div { height: 100%; border-radius: 99px; background: var(--bg-1366f0); transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
 .plan-bar--hero { height: 8px; margin-top: 14px; background: rgba(255,255,255,0.25); }
 .plan-bar--hero > div { background: var(--surface); }
-.plan-pill { font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 99px; white-space: nowrap;
+.plan-pill { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 99px; white-space: nowrap;
   background: rgba(118,118,128,0.12); color: var(--text-secondary); }
 .plan-pill.g { background: rgba(var(--rgb-30-158-90), 0.12); color: var(--fg-1e9e5a); }
 .plan-pill.o { background: rgba(var(--rgb-217-119-6), 0.13); color: #C26A05; }
@@ -1012,7 +1012,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .plan-metric .plan-bar { grid-column: 1 / -1; }
 .plan-krs { margin-top: 12px; padding-top: 10px; border-top: 0.5px solid rgba(var(--sep-rgb), 0.18); display: flex; flex-direction: column; gap: 7px; }
 .plan-kr { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); }
-.plan-kr-val { color: var(--text-3); font-size: 12.5px; font-variant-numeric: tabular-nums; text-align: right; }
+.plan-kr-val { color: var(--text-3); font-size: 13px; font-variant-numeric: tabular-nums; text-align: right; }
 .plan-kr-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: rgba(118,118,128,0.25); }
 .plan-kr-dot.ok { background: var(--bg-1e9e5a); } .plan-kr-dot.wip { background: var(--bg-d97706); } .plan-kr-dot.fail { background: var(--bg-d63b30); }
 .plan-month { display: flex; align-items: center; gap: 12px; padding: 11px 16px; font-family: var(--font-sys); }
@@ -1021,7 +1021,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .plan-now { font-size: 10px; font-weight: 700; color: var(--fg-1366f0); background: rgba(var(--rgb-19-102-240), 0.1); border-radius: 99px; padding: 1px 6px; }
 .plan-month-num { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; width: 110px; }
 .plan-month-num span { font-weight: 400; color: var(--text-tertiary); }
-.plan-legend { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; color: var(--text-3); }
+.plan-legend { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--text-3); }
 .plan-legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
 .plan-edit { border-collapse: collapse; font-size: 13px; }
 .plan-edit th { text-align: left; font-weight: 600; color: var(--text-3); font-size: 12px; padding: 0 6px 6px; }
@@ -1031,14 +1031,14 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .plan-scn { position: relative; height: 8px; border-radius: 99px; background: rgba(var(--ink-rgb), 0.06); margin-top: 5px; }
 .plan-scn > div { height: 100%; border-radius: 99px; opacity: 0.85; transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
 .plan-scn > i { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; border-radius: 2px; background: #0E1726; opacity: 0.5; }
-.plan-need { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: rgba(var(--rgb-19-102-240), 0.06); font-size: 13.5px; line-height: 1.5; color: var(--ink); }
+.plan-need { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: rgba(var(--rgb-19-102-240), 0.06); font-size: 14px; line-height: 1.5; color: var(--ink); }
 .plan-light-bar { display: flex; gap: 3px; height: 14px; border-radius: 99px; overflow: hidden; }
 .plan-light-bar > div { min-width: 6px; }
-.plan-light-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; font-size: 12.5px; color: var(--ink); }
+.plan-light-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; font-size: 13px; color: var(--ink); }
 .plan-light-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 .plan-light-n { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin-top: 2px; }
 .plan-light-n span { font-size: 12px; font-weight: 500; color: var(--text-3); }
-.plan-light-sub { font-size: 11.5px; color: var(--text-3); }
+.plan-light-sub { font-size: 12px; color: var(--text-3); }
 .plan-light-worst { margin-top: 14px; padding-top: 10px; border-top: 0.5px solid rgba(var(--sep-rgb), 0.18); display: flex; flex-direction: column; gap: 6px; }
 .plan-week-stat { padding: 10px 12px; border-radius: 14px; background: rgba(118,118,128,0.06); min-width: 0; }
 .plan-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
@@ -1048,7 +1048,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .plan-day-bars { height: 70px; width: 18px; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; }
 .plan-day-bars > div { width: 100%; border-radius: 4px; transition: height 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
 .plan-day-n { font-size: 12px; font-weight: 700; color: var(--ink); min-height: 15px; font-variant-numeric: tabular-nums; }
-.plan-day-label { font-size: 11.5px; font-weight: 600; color: var(--text-secondary); }
+.plan-day-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
 .plan-day-label span { color: var(--text-tertiary); font-weight: 400; }
 
 /* План: раскрывающийся блок */
@@ -1088,7 +1088,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 @media (prefers-reduced-transparency: reduce) { .topbar-drop { background: var(--surface); backdrop-filter: none; -webkit-backdrop-filter: none; } }
 /* содержимое — полной ширины по центру капли: не перестраивается, пока капля растёт */
 .topbar-expand-body { position: absolute; top: 7px; left: 0; will-change: transform, opacity;
-  padding: 14px 24px 18px; border-top: 0.5px solid rgba(var(--sep-rgb), 0.1); font-family: var(--font-sys); font-size: 12.5px; color: var(--ink); }
+  padding: 14px 24px 18px; border-top: 0.5px solid rgba(var(--sep-rgb), 0.1); font-family: var(--font-sys); font-size: 13px; color: var(--ink); }
 .topbar-expand-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
 .topbar-expand-head b { font-size: 15px; font-weight: 700; letter-spacing: -0.015em; }
 .topbar-expand-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
@@ -1096,7 +1096,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .island-stat-v { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; margin-top: 2px;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .island-stat-of { font-size: 12px; font-weight: 500; color: var(--text-tertiary); letter-spacing: 0; }
-.island-stat-sub { font-size: 11.5px; color: var(--text-3); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.island-stat-sub { font-size: 12px; color: var(--text-3); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .island-muted { color: var(--text-3); font-size: 12px; }
 .island-row { display: flex; justify-content: space-between; gap: 8px; }
 .island-row b { font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -1135,7 +1135,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 
 /* ===== Верхняя панель: одинаковые круглые кнопки и меню «⋯» ===== */
 .topbar-btn {
-  position: relative; width: 38px; height: 38px; flex-shrink: 0; border-radius: 999px; border: none; cursor: pointer;
+  position: relative; width: 38px; height: 38px; flex-shrink: 0; border-radius: 99px; border: none; cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center; color: var(--text-secondary);
   background: rgba(var(--paper-rgb), 0.7); box-shadow: 0 0 0 1px rgba(var(--ink-rgb), 0.06), 0 1px 2px rgba(20,30,55,0.06);
   transition: background 0.15s var(--ease), transform 0.1s var(--ease);
@@ -1157,10 +1157,10 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .topbar-menu button.is-danger, .topbar-menu button.is-danger svg { color: var(--fg-c81923); }
 .topbar-menu-sep { height: 1px; margin: 4px 8px; background: rgba(var(--ink-rgb), 0.08); }
 /* поиск в покое — такой же круг, как остальные кнопки; раскрытый — капсула */
-.topbar-search.search-pill { border-radius: 999px; border-color: transparent; box-shadow: 0 0 0 1px rgba(var(--ink-rgb), 0.06), 0 1px 2px rgba(20,30,55,0.06); }
+.topbar-search.search-pill { border-radius: 99px; border-color: transparent; box-shadow: 0 0 0 1px rgba(var(--ink-rgb), 0.06), 0 1px 2px rgba(20,30,55,0.06); }
 /* период — того же вида, что круглые кнопки рядом: стекло, тень, края капсулой */
 .app-root .apple-select.topbar-period { height: 38px; min-height: 38px; padding: 0 12px 0 16px; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text-secondary);
-  background: rgba(var(--paper-rgb), 0.7) !important; border: none !important; border-radius: 999px !important;
+  background: rgba(var(--paper-rgb), 0.7) !important; border: none !important; border-radius: 99px !important;
   box-shadow: 0 0 0 1px rgba(var(--ink-rgb), 0.06), 0 1px 2px rgba(20,30,55,0.06) !important; }
 @media (hover: hover) { .app-root .apple-select.topbar-period:hover { background: rgba(var(--paper-rgb), 0.95) !important; color: var(--ink); } }
 .app-root .apple-select.topbar-period.is-open { background: rgba(var(--paper-rgb), 0.95) !important; color: var(--ink); }
@@ -1245,7 +1245,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
    включённый — белая капсула с синим текстом, как выбранный статус */
 .app-root .apple-select.orders-pill, .orders-pill-btn {
   height: 30px; min-height: 30px; padding: 0 12px 0 14px; gap: 6px; flex-shrink: 0; cursor: pointer;
-  font-family: var(--font-sys); font-size: 12.5px; font-weight: 600; color: var(--text-secondary);
+  font-family: var(--font-sys); font-size: 13px; font-weight: 600; color: var(--text-secondary);
   background: transparent !important; border: none !important; border-radius: 99px !important; box-shadow: none !important;
   display: inline-flex; align-items: center; transition: background 0.15s var(--ease), color 0.15s var(--ease);
 }
@@ -1445,7 +1445,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .lg-segmented > .lg-tab-bar-glass { background-color: transparent !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 
 /* база обзвона: метки лида — одна строка тихого текста через точку; телефон — синим; круглые кнопки-иконки по центру */
-.lead-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 0; font-size: 13.5px; color: var(--text-3); }
+.lead-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 0; font-size: 14px; color: var(--text-3); }
 .lead-meta > span + span::before { content: '·'; margin: 0 8px; color: var(--text-3); }
 .call-pill--tel { background: rgba(var(--rgb-19-102-240), 0.1); color: var(--fg-1366f0); }
 .call-pill--tel:hover { background: rgba(var(--rgb-19-102-240), 0.16); }
@@ -1471,3 +1471,43 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 }
 .app-root .apple-select-native.select-fit.orders-pill.is-on { color: var(--fg-1366f0); }
 @media (max-width: 768px) { .glass-tabs-fill .lg-segmented :is(.lg-tab, .lg-tab-copy) { font-size: 13px; } }
+
+/* подсказка клавиши на кнопках звонка — только там, где есть клавиатура */
+.call-key { margin-left: auto; min-width: 18px; padding: 1px 5px; border-radius: 6px; font: 500 11px var(--font-sys); text-align: center;
+  color: var(--text-3); background: rgba(var(--ink-rgb), 0.06); }
+.call-key--on { margin-left: 10px; color: #fff; background: rgba(255,255,255,0.22); }
+@media (hover: none) { .call-key { display: none; } }
+
+/* самодельные окна (корзина, бэкапы, автопарк, акты) на общем стекле: поля — те же полупрозрачные капсулы, что в общей модалке */
+@media (min-width: 769px) {
+  .app-root .dash-form input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([data-plain]),
+  .app-root .dash-form textarea:not([data-plain]),
+  .app-root .dash-form .apple-select:not(.status-pill) {
+    background: rgba(var(--paper-rgb), 0.5) !important; border: none !important; border-radius: 14px !important;
+    box-shadow: inset 0 0 0 1px rgba(var(--ink-rgb), 0.06), inset 0 1px 2px rgba(20,30,55,0.05) !important;
+  }
+  .app-root .dash-form input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([data-plain]):focus,
+  .app-root .dash-form textarea:not([data-plain]):focus {
+    background: rgba(var(--paper-rgb), 0.9) !important; box-shadow: 0 0 0 3.5px rgba(var(--rgb-19-102-240), 0.18) !important;
+  }
+}
+
+/* ===== Единый набор кнопок: btn-primary, btn-ghost (выше) + круглая иконка и крестик удаления ===== */
+.btn-icon { display: grid; place-items: center; padding: 0; flex-shrink: 0; border: none; border-radius: 99px; cursor: pointer;
+  background: rgba(118,118,128,0.12); color: var(--text-secondary); font-family: var(--font-sys); line-height: 1;
+  transition: background 0.15s var(--ease), transform 0.15s var(--ease), filter 0.15s var(--ease); }
+@media (hover: hover) { .btn-icon:hover { filter: brightness(0.94); } :root[data-theme="dark"] .btn-icon:hover { filter: brightness(1.25); } }
+.btn-icon:active { transform: scale(0.92); }
+.btn-x { padding: 4px 6px; border: none; border-radius: 8px; background: none; cursor: pointer; color: var(--text-quaternary); line-height: 1;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease); }
+@media (hover: hover) { .btn-x:hover { color: var(--fg-e0473b); background: rgba(var(--rgb-224-71-59), 0.1); } }
+
+/* кнопка без подложки (иконка или текст в строке), чип-переключатель состояния и малый размер серой кнопки */
+.btn-bare { border: none; background: none; cursor: pointer; color: inherit; font-family: var(--font-sys); transition: opacity 0.15s var(--ease), transform 0.15s var(--ease); }
+@media (hover: hover) { .btn-bare:hover { opacity: 0.7; } }
+.btn-bare:active { transform: scale(0.94); }
+.btn-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: none; border-radius: 99px; cursor: pointer;
+  font-family: var(--font-sys); font-size: 12px; font-weight: 600; white-space: nowrap;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease), border-color 0.15s var(--ease), transform 0.15s var(--ease); }
+.btn-chip:active { transform: scale(0.97); }
+.btn-ghost.btn-sm { padding: 5px 12px; font-size: 12px; }

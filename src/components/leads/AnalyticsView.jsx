@@ -19,7 +19,7 @@ function StatCard({ label, value, color = 'var(--ink)' }) {
   return (
     <div className="card" style={{ padding: 18 }}>
       <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: 6 }}>{label}</div>
-      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 26, color }}>{value}</div>
+      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 28, color }}>{value}</div>
     </div>
   )
 }
@@ -39,7 +39,7 @@ export function CallsHeatmap({ data, onDayClick }) {
     <div className="card" style={{ padding: 20 }}>
       <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 14 }}>Активность обзвона</div>
       {data.length === 0 ? (
-        <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)' }}>Нет данных за период</div>
+        <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>Нет данных за период</div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, 16px)', gap: 4 }}>
           {data.map((d) => (
@@ -47,7 +47,7 @@ export function CallsHeatmap({ data, onDayClick }) {
               key={d.date}
               onClick={() => onDayClick(d.date)}
               title={`${d.date}: ${d.calls} звонков`}
-              style={{ width: 16, height: 16, borderRadius: 4, background: colorFor(d.calls), cursor: 'pointer' }}
+              style={{ width: 16, height: 16, borderRadius: 6, background: colorFor(d.calls), cursor: 'pointer' }}
             />
           ))}
         </div>
@@ -55,7 +55,7 @@ export function CallsHeatmap({ data, onDayClick }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12, fontSize: 11, color: 'var(--text-3)' }}>
         меньше
         {['#F0F1F4', '#CFE0FF', '#8FB6FF', '#4C8CFF', 'var(--fg-1366f0)'].map(c => (
-          <div key={c} style={{ width: 12, height: 12, borderRadius: 3, background: c }} />
+          <div key={c} style={{ width: 12, height: 12, borderRadius: 6, background: c }} />
         ))}
         больше
       </div>
@@ -67,7 +67,7 @@ export function CallsHeatmap({ data, onDayClick }) {
 // под воронкой — сколько лидов на этапе и конверсия из прошлого этапа.
 export function FunnelChart({ funnel }) {
   const stages = funnel || []
-  if (!stages.length) return <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)' }}>Нет данных</div>
+  if (!stages.length) return <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>Нет данных</div>
   const troubled = (f, i) => i > 0 && f.conversion < 30
   return (
     <div className="bklit">
@@ -99,18 +99,18 @@ function DayCallsModal({ date, onClose }) {
   }, [date])
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 520, padding: 26 }}>
+    <div className="dash-modal-scrim">
+      <div className="dash-modal dash-form" style={{ maxWidth: 520, padding: 26 }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 }}>
           <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)' }}>
             Звонки за {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
           </div>
-          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.1)', background: 'var(--fill)', cursor: 'pointer', fontSize: 18, color: 'var(--text-3)', flexShrink: 0 }}>×</button>
+          <button onClick={onClose} className="btn-icon" style={{ width: 32, height: 32, fontSize: 17, flexShrink: 0 }}>×</button>
         </div>
         <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 16 }}>{loading ? <InlineLoader state="composing" /> : `${calls.length} звонков`}</div>
         <div style={{ maxHeight: '55vh', overflowY: 'auto' }}>
           {!loading && calls.length === 0 && (
-            <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)', textAlign: 'center', padding: 20 }}>Звонков в этот день не было</div>
+            <div style={{ fontSize: 13, color: 'var(--text-tertiary)', textAlign: 'center', padding: 20 }}>Звонков в этот день не было</div>
           )}
           {calls.map((c, i) => (
             <div key={c.id || i} style={{ padding: '9px 0', borderBottom: '1px solid var(--fill-2)' }}>
@@ -158,9 +158,9 @@ export default function AnalyticsView() {
       <div className="card" style={{ padding: 20 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 4 }}>Звонки против плана</div>
         <div style={{ display: 'flex', gap: 20, marginBottom: 16, flexWrap: 'wrap' }}>
-          <div style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Всего звонков: <b style={{ color: 'var(--ink)' }}>{data.total_calls}</b></div>
-          <div style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Среднее в день: <b style={{ color: 'var(--ink)' }}>{avgPerDay}</b></div>
-          <div style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>Дней с выполненным планом: <b style={{ color: 'var(--fg-1e9e5a)' }}>{daysGoalMet}</b> из {days.length}</div>
+          <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Всего звонков: <b style={{ color: 'var(--ink)' }}>{data.total_calls}</b></div>
+          <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Среднее в день: <b style={{ color: 'var(--ink)' }}>{avgPerDay}</b></div>
+          <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Дней с выполненным планом: <b style={{ color: 'var(--fg-1e9e5a)' }}>{daysGoalMet}</b> из {days.length}</div>
         </div>
         <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', gap: 6, height: 140, paddingTop: 10 }}>
           <div style={{
@@ -174,11 +174,11 @@ export default function AnalyticsView() {
             return (
               <div key={d.date} title={`${d.date}: ${d.calls}`} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                 <div style={{ width: '100%', maxWidth: 26, height: h, borderRadius: 6, background: met ? 'var(--fg-1e9e5a)' : 'var(--fg-1366f0)' }} />
-                <span style={{ fontSize: 9, color: 'var(--text-tertiary)' }}>{d.date.slice(5)}</span>
+                <span style={{ fontSize: 10, color: 'var(--text-tertiary)' }}>{d.date.slice(5)}</span>
               </div>
             )
           })}
-          {days.length === 0 && <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)' }}>Нет данных за период</div>}
+          {days.length === 0 && <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>Нет данных за период</div>}
         </div>
       </div>
 
@@ -198,7 +198,7 @@ export default function AnalyticsView() {
             {(data.lost_reasons || []).map(r => (
               <div key={r.reason}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>{r.reason}</span>
+                  <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{r.reason}</span>
                   <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>{r.count} · {totalLost ? Math.round(r.count / totalLost * 100) : 0}%</span>
                 </div>
                 <div style={{ height: 10, borderRadius: 6, background: 'rgba(var(--ink-rgb), 0.06)' }}>
@@ -206,7 +206,7 @@ export default function AnalyticsView() {
                 </div>
               </div>
             ))}
-            {(!data.lost_reasons || data.lost_reasons.length === 0) && <div style={{ fontSize: 12.5, color: 'var(--text-tertiary)' }}>Отказов не было</div>}
+            {(!data.lost_reasons || data.lost_reasons.length === 0) && <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>Отказов не было</div>}
           </div>
         </div>
 
@@ -226,7 +226,7 @@ export default function AnalyticsView() {
           <thead>
             <tr>
               {['Отрасль', 'Всего', 'Обзвонено', 'Клиентов', 'Отказов', 'Конверсия'].map(h => (
-                <th key={h} style={{ textAlign: 'left', padding: '8px 12px', fontSize: 10.5, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</th>
+                <th key={h} style={{ textAlign: 'left', padding: '8px 12px', fontSize: 11, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</th>
               ))}
             </tr>
           </thead>

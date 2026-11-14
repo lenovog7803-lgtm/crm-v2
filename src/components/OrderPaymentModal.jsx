@@ -242,8 +242,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
               Платёжные поручения
             </div>
             <button
-              onClick={addRow}
-              style={{ width: 22, height: 22, borderRadius: 7, border: '1px solid var(--fg-1366f0)', background: 'transparent', color: 'var(--fg-1366f0)', fontSize: 14, fontWeight: 700, cursor: 'pointer', lineHeight: 1 }}
+              onClick={addRow} className="btn-icon" style={{ width: 22, height: 22, color: 'var(--fg-1366f0)', fontSize: 14, fontWeight: 700 }}
               title="Добавить ещё один ПП"
               type="button"
             >
@@ -282,8 +281,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
                     onClick={() => commitExisting(p)}
                     disabled={busy}
                     title="Сохранить изменения"
-                    type="button"
-                    style={{ width: 24, height: 24, border: 'none', background: 'transparent', color: 'var(--fg-1e9e5a)', fontSize: 15, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}
+                    type="button" className="btn-bare" style={{ width: 24, height: 24, color: 'var(--fg-1e9e5a)', fontSize: 15, fontWeight: 700, flexShrink: 0 }}
                   >
                     ✓
                   </button>
@@ -292,8 +290,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
                   onClick={() => removeExisting(p.id)}
                   disabled={busy}
                   title="Удалить сохранённый платёж"
-                  type="button"
-                  style={{ width: 24, height: 24, border: 'none', background: 'transparent', color: 'var(--fg-e0473b)', fontSize: 16, cursor: 'pointer', flexShrink: 0 }}
+                  type="button" className="btn-bare" style={{ width: 24, height: 24, color: 'var(--fg-e0473b)', fontSize: 17, flexShrink: 0 }}
                 >
                   ×
                 </button>
@@ -325,8 +322,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
               <button
                 onClick={() => removeRow(p.id)}
                 title="Удалить платёж"
-                type="button"
-                style={{ width: 24, height: 24, border: 'none', background: 'transparent', color: 'var(--fg-e0473b)', fontSize: 16, cursor: 'pointer', flexShrink: 0 }}
+                type="button" className="btn-bare" style={{ width: 24, height: 24, color: 'var(--fg-e0473b)', fontSize: 17, flexShrink: 0 }}
               >
                 ×
               </button>
@@ -352,13 +348,12 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
         {error && <div style={{ fontSize: 12, color: 'var(--fg-c81923)', textAlign: 'center', marginBottom: 16 }}>{error}</div>}
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', fontSize: 14, color: 'var(--text-secondary)', cursor: 'pointer' }}>
+          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>
             Отмена
           </button>
           <button
             onClick={save}
-            disabled={saving}
-            style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: isCash || matches ? (isCarrier ? 'var(--fg-e0473b)' : 'var(--fg-1366f0)') : 'var(--fg-d97706)', color: '#FFFFFF', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}
+            disabled={saving} className="btn-primary" style={{ flex: 2, background: isCash || matches ? (isCarrier ? 'var(--fg-e0473b)' : 'var(--fg-1366f0)') : 'var(--fg-d97706)', color: '#FFFFFF', boxShadow: 'none', justifyContent: 'center' }}
           >
             <SwapText>{saving ? 'Сохраняю…' : isCash ? 'Подтвердить оплату наличными' : matches ? 'Подтвердить оплату' : 'Сохранить (суммы не совпадают)'}</SwapText>
           </button>

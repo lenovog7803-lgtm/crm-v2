@@ -449,7 +449,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
           </div>
         )}
         {expanded && (
-          <button onClick={onToggle} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-tertiary)', padding: 4, display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+          <button onClick={onToggle} className="btn-bare" style={{ color: 'var(--text-tertiary)', padding: 4, display: 'flex', alignItems: 'center', flexShrink: 0 }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6"/>
             </svg>
@@ -458,11 +458,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
       </div>
 
       {!expanded && (
-        <button onClick={onToggle} style={{
-          background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-tertiary)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: '6px 0', marginBottom: 8,
-        }}>
+        <button onClick={onToggle} className="btn-bare" style={{ color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 0', marginBottom: 8 }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="9 18 15 12 9 6"/>
           </svg>
@@ -501,7 +497,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
                 display: 'flex', alignItems: 'center', gap: 10, padding: '0 10px',
                 justifyContent: expanded ? 'flex-start' : 'center',
                 color: active ? 'var(--fg-1366f0)' : 'var(--text-secondary)',
-                fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13.5,
+                fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 14,
                 whiteSpace: 'nowrap',
                 position: 'relative', zIndex: 1, textAlign: 'left',
                 touchAction: drag ? 'none' : 'pan-y', userSelect: 'none', WebkitUserSelect: 'none',
@@ -584,7 +580,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{userName}</div>
               <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>{userRole}</div>
             </div>
-            <button onClick={onSignOut} title="Выйти" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-tertiary)', padding: 4 }}>
+            <button onClick={onSignOut} title="Выйти" className="btn-bare" style={{ color: 'var(--text-tertiary)', padding: 4 }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                 <polyline points="16 17 21 12 16 7"/>
@@ -614,7 +610,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
               boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), 0 14px 40px -22px rgba(20,30,55,0.35)',
             }}
           >
-            <div style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--text-tertiary)', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '6px 10px 4px' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-tertiary)', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '6px 10px 4px' }}>
               Скрытые функции
             </div>
             {HIDDEN_NAV.filter(item => (item.egorOnly ? isEgorDir : true) && (item.directorOnly ? isDirector : true)).map(item => (

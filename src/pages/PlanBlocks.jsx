@@ -34,7 +34,7 @@ function Disclosure({ id, title, summary, tabs, children }) {
         style={{ padding: isMobile ? '16px 16px' : '18px 22px' }}>
         <span style={{ flex: 1, textAlign: 'left' }}>
           <span style={{ display: 'block', fontWeight: 700, fontSize: 15, color: 'var(--ink)' }}>{title}</span>
-          {!open && summary && <span style={{ display: 'block', fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>{summary}</span>}
+          {!open && summary && <span style={{ display: 'block', fontSize: 13, color: 'var(--text-3)', marginTop: 2 }}>{summary}</span>}
         </span>
         <svg className={`plan-disc-chev${open ? ' is-open' : ''}`} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
       </button>
@@ -211,10 +211,10 @@ export function SalesWeek({ orders }) {
             { label: 'Новые клиенты', v: newClients.length, goal: null, color: 'var(--fg-1e9e5a)', note: newClients.map(c => c.name).join(', ') || 'пока нет' },
           ].map(t => (
             <div key={t.label} className="plan-week-stat">
-              <div style={{ fontSize: 12.5, fontWeight: 600, color: t.color }}>{t.label}</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: t.color }}>{t.label}</div>
               <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--ink)', letterSpacing: '-0.02em' }}>{t.v}{t.goal != null && <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-tertiary)' }}> / {t.goal}</span>}</div>
               {t.goal != null && <div className="plan-bar" style={{ marginTop: 6 }}><div style={{ width: `${Math.min(100, (+t.v || 0) / t.goal * 100)}%`, background: t.color }} /></div>}
-              {t.note && <div style={{ fontSize: 11.5, color: 'var(--text-3)', marginTop: 5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.note}</div>}
+              {t.note && <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.note}</div>}
             </div>
           ))}
         </div>
@@ -234,7 +234,7 @@ export function SalesWeek({ orders }) {
             )
           })}
         </div>
-        <div style={{ display: 'flex', gap: 14, marginTop: 8, fontSize: 11.5, color: 'var(--text-3)', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 14, marginTop: 8, fontSize: 12, color: 'var(--text-3)', flexWrap: 'wrap' }}>
           <span className="plan-legend"><i style={{ background: 'var(--bg-1366f0)' }} />звонки</span>
           <span className="plan-legend"><i style={{ background: 'var(--bg-5856d6)' }} />письма</span>
           <span className="plan-legend"><i style={{ background: 'rgba(var(--rgb-217-119-6), 0.18)' }} />дни продаж по расписанию</span>

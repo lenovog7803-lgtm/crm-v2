@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getClients, deleteClient as apiDelete } from '../api'
 import { initials, getGradient } from '../utils'
 import { SkeletonList } from './Skeleton'
+import { iosError } from './IOSAlert'
 import { mouseOnly } from '../motion'
 
 // Imported data sometimes has several phone numbers jammed into one field,
@@ -29,7 +30,7 @@ export default function Clients({ onOpenClient, onAdd, refreshKey, search = '' }
 
   const handleDelete = async (e, id) => {
     e.stopPropagation()
-    await apiDelete(id).catch(console.error)
+    try { await apiDelete(id) } catch (err) { console.error(err); iosError('Клиент не удалён. Проверьте интернет и попробуйте ещё раз.'); return }
     setClients(prev => prev.filter(c => c.id !== id))
   }
 

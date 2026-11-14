@@ -197,13 +197,13 @@ export default function Finance({ refreshKey, period = 'all' }) {
               <div className="grad-kicker" style={{ color: 'var(--fg-1e9e5a)' }}>Поступления</div>
               <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
               <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
-              <div style={{ marginTop: 6, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{periodClientPaid.length} заявок оплачено</div>
+              <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-3)', fontWeight: 600 }}>{periodClientPaid.length} заявок оплачено</div>
             </div>
             <div onClick={() => setShowOutModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '14px 14px', color: 'var(--ink)' }}>
               <div className="grad-kicker" style={{ color: 'var(--fg-7c3aed)' }}>Списания</div>
               <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
               <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
-              <div style={{ marginTop: 6, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{periodCarrierPaid.length} заявок оплачено</div>
+              <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-3)', fontWeight: 600 }}>{periodCarrierPaid.length} заявок оплачено</div>
             </div>
           </div>
         </div>
@@ -229,13 +229,13 @@ export default function Finance({ refreshKey, period = 'all' }) {
             <div className="grad-kicker" style={{ color: 'var(--fg-1e9e5a)' }}>Поступления</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
             <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
-            <div style={{ marginTop: 14, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{periodClientPaid.length} заявок оплачено</div>
+            <div style={{ marginTop: 14, fontSize: 12, color: 'var(--text-3)', fontWeight: 600 }}>{periodClientPaid.length} заявок оплачено</div>
           </div>
           <div onClick={() => setShowOutModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '26px 24px', color: 'var(--ink)' }}>
             <div className="grad-kicker" style={{ color: 'var(--fg-7c3aed)' }}>Списания</div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
             <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
-            <div style={{ marginTop: 14, fontSize: 11.5, color: 'var(--text-3)', fontWeight: 600 }}>{periodCarrierPaid.length} заявок оплачено</div>
+            <div style={{ marginTop: 14, fontSize: 12, color: 'var(--text-3)', fontWeight: 600 }}>{periodCarrierPaid.length} заявок оплачено</div>
           </div>
         </div>
       )}
@@ -263,12 +263,7 @@ export default function Finance({ refreshKey, period = 'all' }) {
             value={typeFilter}
             onChange={k => { setTypeFilter(k); setShowAll(false) }}
           />
-          <button onClick={() => setShowAdd(v => !v)} style={{
-            width: 32, height: 32, borderRadius: 10, border: 'none', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: showAdd ? 'rgba(var(--rgb-200-25-35), 0.1)' : 'rgba(var(--rgb-19-102-240), 0.12)',
-            color: showAdd ? 'var(--fg-c81923)' : 'var(--fg-1366f0)',
-          }}>
+          <button onClick={() => setShowAdd(v => !v)} className="btn-icon" style={{ width: 32, height: 32, background: showAdd ? 'rgba(var(--rgb-200-25-35), 0.1)' : 'rgba(var(--rgb-19-102-240), 0.12)', color: showAdd ? 'var(--fg-c81923)' : 'var(--fg-1366f0)' }}>
             {showAdd
               ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -290,7 +285,7 @@ export default function Finance({ refreshKey, period = 'all' }) {
             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 1fr 1fr', gap: 10, alignItems: 'end' }}>
               {/* Контрагент */}
               <div>
-                <div style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--text-tertiary)', letterSpacing: '0.08em', marginBottom: 5 }}>{addType === 'income' ? 'Клиент' : 'Перевозчик'}</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-tertiary)', letterSpacing: '0.08em', marginBottom: 5 }}>{addType === 'income' ? 'Клиент' : 'Перевозчик'}</div>
                 <Select value={addPartyId} onChange={e => setAddPartyId(e.target.value)} required style={{ ...iStyle, width: '100%' }}>
                   <option value="">— Выберите —</option>
                   {(addType === 'income' ? clients : carriers).map(x => (
@@ -315,15 +310,8 @@ export default function Finance({ refreshKey, period = 'all' }) {
               </div>
             </div>
             <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
-              <button type="submit" disabled={addLoading} style={{
-                padding: '8px 20px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                background: 'var(--chip-strong)', color: '#fff',
-                fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600,
-              }}>{addLoading ? 'Сохранение...' : 'Добавить платёж'}</button>
-              <button type="button" onClick={() => setShowAdd(false)} style={{
-                padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.12)', cursor: 'pointer',
-                background: 'transparent', color: 'var(--text-secondary)', fontFamily: 'var(--font-sys)', fontSize: 13,
-              }}>Отмена</button>
+              <button type="submit" disabled={addLoading} className="btn-primary">{addLoading ? 'Сохранение...' : 'Добавить платёж'}</button>
+              <button type="button" onClick={() => setShowAdd(false)} className="btn-ghost">Отмена</button>
             </div>
           </form>
         )}
@@ -341,7 +329,7 @@ export default function Finance({ refreshKey, period = 'all' }) {
                 onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.05)')}
                 onPointerLeave={mouseOnly(e => e.currentTarget.style.background = i % 2 === 0 ? 'rgba(var(--ink-rgb), 0.02)' : 'transparent')}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 12, padding: '10px 8px', borderRadius: 11,
+                  display: 'flex', alignItems: 'center', gap: 12, padding: '10px 8px', borderRadius: 12,
                   background: i % 2 === 0 ? 'rgba(var(--ink-rgb), 0.02)' : 'transparent',
                   transition: 'background 0.15s var(--ease)',
                 }}>
@@ -353,21 +341,17 @@ export default function Finance({ refreshKey, period = 'all' }) {
                 }}>{initials(p.name)}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
-                  <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginTop: 1 }}>
+                  <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 1 }}>
                     {p.kind === 'income' ? 'Поступление' : 'Списание'}
                     {p.pp_number ? ` · ПП ${p.pp_number}` : ''}
                     {p.order_number ? <span style={{ color: 'var(--fg-1366f0)', fontFamily: 'var(--font-mono)' }}> · {p.order_number}</span> : ''}
                   </div>
                 </div>
-                <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', flexShrink: 0 }}>{fmtDate(p.date) || '—'}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-tertiary)', flexShrink: 0 }}>{fmtDate(p.date) || '—'}</div>
                 <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: p.kind === 'income' ? 'var(--fg-1e9e5a)' : 'var(--fg-1366f0)', flexShrink: 0 }}>
                   {p.kind === 'income' ? '+' : '-'}{(p.amount || 0).toLocaleString('ru-RU')} BYN
                 </div>
-                <button onClick={() => handleDeletePayment(p)} style={{
-                  width: 28, height: 28, borderRadius: 8, border: 'none', cursor: 'pointer',
-                  background: 'rgba(var(--rgb-200-25-35), 0.07)', color: 'var(--fg-c81923)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                }}>
+                <button onClick={() => handleDeletePayment(p)} className="btn-icon" style={{ width: 28, height: 28, background: 'rgba(var(--rgb-200-25-35), 0.07)', color: 'var(--fg-c81923)', flexShrink: 0 }}>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                     <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
                   </svg>
@@ -380,11 +364,7 @@ export default function Finance({ refreshKey, period = 'all' }) {
           )}
         </div>
         {filtered.length > PREVIEW && (
-          <button onClick={() => setShowAll(v => !v)} style={{
-            width: '100%', marginTop: 10, padding: '9px', borderRadius: 11,
-            border: '1px solid rgba(var(--rgb-19-102-240), 0.2)', background: 'rgba(var(--rgb-19-102-240), 0.04)',
-            cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600, color: 'var(--fg-1366f0)',
-          }}>{showAll ? 'Свернуть' : `Показать все (${filtered.length})`}</button>
+          <button onClick={() => setShowAll(v => !v)} className="btn-ghost" style={{ width: '100%', marginTop: 10, color: 'var(--fg-1366f0)', justifyContent: 'center' }}>{showAll ? 'Свернуть' : `Показать все (${filtered.length})`}</button>
         )}
       </div>
 
@@ -452,11 +432,7 @@ export default function Finance({ refreshKey, period = 'all' }) {
                 placeholder={`Поиск: ${recType === 'client' ? 'клиент' : 'перевозчик'}...`}
               />
               {recPartyId && (
-                <button onClick={() => setShowLedger(true)} style={{
-                  width: 26, height: 26, borderRadius: 8, border: '1px solid var(--fg-1366f0)',
-                  background: 'transparent', color: 'var(--fg-1366f0)', fontSize: 15, fontWeight: 700,
-                  cursor: 'pointer', marginLeft: 8, lineHeight: 1,
-                }} title={`Список платежей ${recType === 'client' ? 'клиента' : 'перевозчику'} для акта сверки`}>
+                <button onClick={() => setShowLedger(true)} className="btn-icon" style={{ width: 26, height: 26, color: 'var(--fg-1366f0)', fontSize: 15, fontWeight: 700, marginLeft: 8 }} title={`Список платежей ${recType === 'client' ? 'клиента' : 'перевозчику'} для акта сверки`}>
                   +
                 </button>
               )}
@@ -472,20 +448,14 @@ export default function Finance({ refreshKey, period = 'all' }) {
               <option value="all">Всё время</option>
             </Select>
           </div>
-          <button onClick={handleGenerateReconciliation} disabled={recLoading || !recPartyId} style={{
-            height: 36, padding: '0 20px', borderRadius: 11, border: 'none',
-            cursor: recPartyId ? 'pointer' : 'not-allowed',
-            background: recPartyId ? 'var(--fg-1366f0)' : 'rgba(var(--ink-rgb), 0.08)',
-            color: recPartyId ? '#fff' : 'var(--text-tertiary)',
-            fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600, opacity: recLoading ? 0.7 : 1,
-          }}>{recLoading ? 'Генерация...' : 'Сформировать акт'}</button>
+          <button onClick={handleGenerateReconciliation} disabled={recLoading || !recPartyId} className="btn-primary" style={{ height: 36, opacity: recLoading ? 0.7 : 1 }}>{recLoading ? 'Генерация...' : 'Сформировать акт'}</button>
         </div>
         {recHistory.length > 0 && (
           <div style={{ marginTop: 14 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-tertiary)', letterSpacing: '0.08em', marginBottom: 8 }}>История</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
               {recHistory.slice(0, 5).map((r, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 12.5 }}>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13 }}>
                   <span style={{ color: 'var(--text-secondary)' }}>{fmtDate(r.date || r.created_at)}</span>
                   <span style={{ fontWeight: 600, color: 'var(--ink)', flex: 1 }}>{r.counterparty_name || r.counterparty_id}</span>
                   {r.url && <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--fg-1366f0)', fontWeight: 600, textDecoration: 'none' }}>Открыть</a>}
@@ -498,23 +468,15 @@ export default function Finance({ refreshKey, period = 'all' }) {
 
       {/* Модалка — детали поступлений */}
       {showInModal && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.4)', backdropFilter: 'blur(8px)',
-          zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 16,
-        }}>
-          <div onClick={e => e.stopPropagation()} style={{
-            margin: 'auto',
-            background: 'rgba(var(--paper-rgb), 0.95)', backdropFilter: 'blur(30px)', borderRadius: 24,
-            width: '90%', maxWidth: 560,
-            border: '1px solid rgba(255,255,255,calc(0.8 * var(--rim-k)))', boxShadow: '0 40px 80px rgba(20,30,55,0.3)',
-          }}>
+        <div className="dash-modal-scrim">
+          <div className="dash-modal dash-form" onClick={e => e.stopPropagation()} style={{ maxWidth: 560 }}>
             <div style={{ padding: 28 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
-                  <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Поступления от клиентов</div>
+                  <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)' }}>Поступления от клиентов</div>
                   <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>Итого: {totalIncome.toLocaleString('ru-RU')} BYN · {periodClientPaid.length} заявок</div>
                 </div>
-                <button onClick={() => setShowInModal(false)} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.1)', background: 'transparent', cursor: 'pointer', fontSize: 18, color: 'var(--text-tertiary)' }}>×</button>
+                <button onClick={() => setShowInModal(false)} className="btn-icon" style={{ width: 32, height: 32, fontSize: 17 }}>×</button>
               </div>
               {periodClientPaid.length === 0 ? (
                 <div style={{ textAlign: 'center', color: 'var(--text-tertiary)', padding: 40 }}>Нет оплаченных заявок</div>
@@ -547,23 +509,15 @@ export default function Finance({ refreshKey, period = 'all' }) {
 
       {/* Модалка — детали списаний */}
       {showOutModal && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.4)', backdropFilter: 'blur(8px)',
-          zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 16,
-        }}>
-          <div onClick={e => e.stopPropagation()} style={{
-            margin: 'auto',
-            background: 'rgba(var(--paper-rgb), 0.95)', backdropFilter: 'blur(30px)', borderRadius: 24,
-            width: '90%', maxWidth: 560,
-            border: '1px solid rgba(255,255,255,calc(0.8 * var(--rim-k)))', boxShadow: '0 40px 80px rgba(20,30,55,0.3)',
-          }}>
+        <div className="dash-modal-scrim">
+          <div className="dash-modal dash-form" onClick={e => e.stopPropagation()} style={{ maxWidth: 560 }}>
             <div style={{ padding: 28 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
-                  <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Оплачено перевозчикам</div>
+                  <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)' }}>Оплачено перевозчикам</div>
                   <div style={{ fontSize: 12, color: 'var(--fg-e0473b)', fontWeight: 600, marginTop: 2 }}>Итого: -{totalExpense.toLocaleString('ru-RU')} BYN · {periodCarrierPaid.length} заявок</div>
                 </div>
-                <button onClick={() => setShowOutModal(false)} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.1)', background: 'transparent', cursor: 'pointer', fontSize: 18, color: 'var(--text-tertiary)' }}>×</button>
+                <button onClick={() => setShowOutModal(false)} className="btn-icon" style={{ width: 32, height: 32, fontSize: 17 }}>×</button>
               </div>
               {periodCarrierPaid.length === 0 ? (
                 <div style={{ textAlign: 'center', color: 'var(--text-tertiary)', padding: 40 }}>Нет оплаченных заявок</div>
@@ -629,7 +583,7 @@ function PartySearchSelect({ items, labelKey, value, onChange, placeholder }) {
       {open && (
         <div className="glass-pop" style={{ position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0, maxHeight: 260, overflowY: 'auto', zIndex: 20 }}>
           {filtered.length === 0 ? (
-            <div style={{ padding: '10px 12px', fontSize: 12.5, color: 'var(--text-3)' }}>Ничего не найдено</div>
+            <div style={{ padding: '10px 12px', fontSize: 13, color: 'var(--text-3)' }}>Ничего не найдено</div>
           ) : filtered.slice(0, 200).map(item => (
             <div
               key={item.id}
@@ -681,21 +635,21 @@ function PPLedgerModal({ type, entityId, entityName, onClose }) {
   }
 
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 520, padding: 26 }}>
+    <div onClick={onClose} className="dash-modal-scrim">
+      <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 520, padding: 26 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
           <div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)' }}>{type === 'client' ? 'Платежи клиента' : 'Платежи перевозчику'}</div>
             <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{entityName} · всего {total.toLocaleString('ru-RU')} Br</div>
           </div>
-          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, border: '1px solid var(--line)', background: 'var(--fill)', cursor: 'pointer', fontSize: 18, color: 'var(--text-3)' }}>×</button>
+          <button onClick={onClose} className="btn-icon" style={{ width: 32, height: 32, fontSize: 17 }}>×</button>
         </div>
 
         <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
           <input value={ppNumber} onChange={e => setPpNumber(e.target.value)} placeholder="№ ПП" style={{ width: 90, padding: '9px 10px', borderRadius: 10, border: '1px solid var(--line)', fontSize: 12 }} />
           <DateInput type="date" value={ppDate} onChange={e => setPpDate(e.target.value)} style={{ width: 130, padding: '9px 10px', borderRadius: 10, border: '1px solid var(--line)', fontSize: 12 }} />
           <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Сумма" style={{ flex: 1, padding: '9px 10px', borderRadius: 10, border: '1px solid var(--line)', fontSize: 12 }} />
-          <button onClick={add} style={{ width: 34, height: 34, borderRadius: 10, background: 'var(--bg-1366f0)', color: '#fff', border: 'none', fontSize: 16, cursor: 'pointer' }}>+</button>
+          <button onClick={add} className="btn-icon" style={{ width: 34, height: 34, background: 'var(--bg-1366f0)', color: '#fff', fontSize: 17 }}>+</button>
         </div>
 
         <div style={{ maxHeight: '45vh', overflowY: 'auto' }}>
@@ -710,7 +664,7 @@ function PPLedgerModal({ type, entityId, entityName, onClose }) {
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: accentColor }}>
                 {Number(e.amount).toLocaleString('ru-RU')} Br
               </div>
-              <button onClick={() => remove(e.id)} style={{ border: 'none', background: 'transparent', color: 'var(--fg-e0473b)', fontSize: 15, cursor: 'pointer' }}>×</button>
+              <button onClick={() => remove(e.id)} className="btn-bare" style={{ color: 'var(--fg-e0473b)', fontSize: 15 }}>×</button>
             </div>
           ))}
         </div>

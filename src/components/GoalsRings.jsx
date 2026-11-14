@@ -28,8 +28,8 @@ export default function GoalsRings({ items, onEdit, size = 112 }) {
             className="goal-row" style={{ background: hovered === i ? 'rgba(var(--ink-rgb), 0.04)' : 'transparent' }}>
             <span style={{ width: 8, height: 8, borderRadius: 99, background: g.color, flexShrink: 0 }} />
             <span style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-              <span style={{ display: 'block', fontSize: 11.5, color: 'var(--text-tertiary)', fontWeight: 600 }}>{g.label}</span>
-              <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <span style={{ display: 'block', fontSize: 12, color: 'var(--text-tertiary)', fontWeight: 600 }}>{g.label}</span>
+              <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {g.fmt(g.fact)} <span style={{ fontWeight: 500, color: 'var(--text-tertiary)' }}>/ {g.fmt(g.goal)}</span>
               </span>
             </span>

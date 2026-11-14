@@ -66,7 +66,7 @@ function routeStats(orders, from, to, excludeId) {
 
 function SectionTitle({ title }) {
   return (
-    <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.01em' }}>
+    <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.01em' }}>
       {title}
     </div>
   )
@@ -410,17 +410,17 @@ function MarginHint({ margin, marginPct, client, carrier, route, from, to }) {
             {kind === 'bad' ? 'В минус' : kind === 'empty' ? 'Пустая заявка' : 'Маржа нормальная'}: {margin.toLocaleString('ru-RU')} Br{marginPct !== null && ` (${marginPct}%)`}
           </div>
           {kind !== 'ok' && client > 0 && carrier > 0 && (
-            <div style={{ fontSize: 12.5, opacity: 0.9 }}>
+            <div style={{ fontSize: 13, opacity: 0.9 }}>
               Порог — {MIN_MARGIN} Br и {Math.round(MIN_PCT * 100)}%. Нужно: клиенту от {int(needClient)} Br{maxCarrier > 0 ? ` или перевозчику до ${int(maxCarrier)} Br` : ''}.
             </div>
           )}
           {route && margin !== null && margin < route.margin - 20 && (
-            <div style={{ fontSize: 12.5, opacity: 0.9 }}>Ниже обычной по этому направлению (~{int(route.margin)} Br).</div>
+            <div style={{ fontSize: 13, opacity: 0.9 }}>Ниже обычной по этому направлению (~{int(route.margin)} Br).</div>
           )}
         </div>
       )}
       {route && (
-        <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', padding: '0 4px', lineHeight: 1.5 }}>
+        <div style={{ fontSize: 13, color: 'var(--text-secondary)', padding: '0 4px', lineHeight: 1.5 }}>
           <b style={{ color: 'var(--ink)', fontWeight: 600 }}>{from.split(',')[0]} → {to.split(',')[0]}</b>
           {route.recent ? ' за 3 месяца' : ' за всё время'}: {route.n} заявок · клиент платит обычно ~{int(route.client)} Br ·
           перевозчику ~{int(route.carrier)} Br · маржа ~{int(route.margin)} Br

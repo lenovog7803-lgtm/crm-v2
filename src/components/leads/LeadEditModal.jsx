@@ -1,141 +1,92 @@
 import { useState } from 'react'
-import { updateLead } from '../../api'
+import { createLead, updateLead, deleteLead } from '../../api'
 import { STAGES } from '../../constants/leads'
-import { useEscapeKey } from '../../hooks/useEscapeKey'
+import { ModalOverlay, ModalHeader } from '../Modal'
+import { iosConfirm } from '../IOSAlert'
 import { SwapText } from '../Transitions'
 import Select from '../Select'
 
-const labelStyle = { fontSize: 13, fontWeight: 500, color: 'var(--text-2b)', marginBottom: 6, paddingLeft: 4, display: 'block' }
-const fieldStyle = { width: '100%', background: 'var(--fill)' }
+const FIELDS = [
+  ['name', 'Название компании'], ['phone', 'Телефон'],
+  ['contact_person', 'Контактное лицо'], ['contact_position', 'Должность'],
+  ['email', 'Email'], ['website', 'Сайт'],
+  ['industry', 'Отрасль'], ['city', 'Город'],
+  ['region', 'Регион'],
+]
 
-export default function LeadEditModal({ lead, onClose, onSaved }) {
-  const [form, setForm] = useState({ ...lead })
+// Правка лида; без lead.id — создание нового. Общая модалка CRM (на телефоне — шторка).
+export default function LeadEditModal({ lead, onClose, onSaved, onDeleted }) {
+  const isNew = !lead?.id
+  const [form, setForm] = useState({ stage: 'new', ...lead })
   const [saving, setSaving] = useState(false)
-  useEscapeKey(onClose)
+  const [error, setError] = useState('')
 
   const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }))
 
-  const handleSave = async () => {
-    if (!lead?.id) return
+  const handleSave = async (e) => {
+    e.preventDefault()
+    if (!form.name?.trim() || !form.phone?.trim()) { setError('Укажите название и телефон'); return }
     setSaving(true)
+    setError('')
     try {
-      await updateLead(lead.id, {
-        name: form.name,
-        company: form.company,
-        phone: form.phone,
-        contact_person: form.contact_person,
-        contact_position: form.contact_position,
-        email: form.email,
-        website: form.website,
-        industry: form.industry,
-        city: form.city,
-        region: form.region,
-        stage: form.stage,
-        notes: form.notes,
-      })
-      onSaved?.({ ...lead, ...form })
+      const data = Object.fromEntries([...FIELDS.map(([k]) => k), 'stage', 'notes'].map(k => [k, form[k] ?? '']))
+      const saved = isNew ? await createLead(data) : await updateLead(lead.id, data)
+      onSaved?.({ ...lead, ...form, ...(saved?.id ? saved : {}) })
       onClose()
-    } catch (e) { console.error(e) }
+    } catch (err) {
+      console.error(err)
+      setError('Не сохранилось. Проверьте интернет и попробуйте ещё раз.')
+    }
     setSaving(false)
   }
 
+  const handleDelete = async () => {
+    if (!(await iosConfirm(`Удалить лида «${lead.name}»? Он попадёт в корзину, оттуда его можно вернуть.`))) return
+    try {
+      await deleteLead(lead.id)
+      onDeleted?.(lead.id)
+      onClose()
+    } catch (err) {
+      console.error(err)
+      setError('Не удалилось. Попробуйте ещё раз.')
+    }
+  }
+
   return (
-    <div
-      style={{
-        position: 'fixed', inset: 0,
-        background: 'rgba(var(--ink-rgb), 0.55)',
-        backdropFilter: 'blur(6px)',
-        zIndex: 1200,
-        overflowY: 'auto',
-        display: 'grid',
-        padding: 20,
-      }}
-    >
-      <div style={{
-        margin: 'auto',
-        background: 'var(--surface)',
-        borderRadius: 24,
-        width: '100%', maxWidth: 560,
-        border: '1px solid rgba(var(--ink-rgb), 0.08)',
-        boxShadow: '0 40px 80px rgba(20,30,55,0.28)',
-      }}>
-        <div style={{ padding: 26 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Редактировать лида</div>
-          <button
-            onClick={onClose}
-            style={{
-              width: 32, height: 32, borderRadius: 10, border: 'none', cursor: 'pointer',
-              background: 'var(--fill)', color: 'var(--text-secondary)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
+    <ModalOverlay onClose={onClose}>
+      <ModalHeader title={isNew ? 'Новый лид' : 'Редактировать лида'} onClose={onClose} />
+      <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
+          {FIELDS.map(([k, label], i) => (
+            <div className="form-field" key={k}>
+              <label className="form-label">{label}</label>
+              <input className="form-input" value={form[k] || ''} onChange={set(k)} autoFocus={isNew && i === 0} />
+            </div>
+          ))}
+          <div className="form-field">
+            <label className="form-label">Стадия</label>
+            <Select className="form-input" value={form.stage || 'new'} onChange={set('stage')}>
+              {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+            </Select>
+          </div>
+        </div>
+
+        <div className="form-field">
+          <label className="form-label">Заметки</label>
+          <textarea className="form-input" value={form.notes || ''} onChange={set('notes')} style={{ height: 80, resize: 'vertical' }} />
+        </div>
+
+        {error && <div style={{ fontSize: 12, color: 'var(--fg-c81923)', textAlign: 'center' }}>{error}</div>}
+        <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+          {!isNew && onDeleted && (
+            <button type="button" className="btn-ghost" onClick={handleDelete} style={{ justifyContent: 'center', color: 'var(--fg-e0473b)' }}>Удалить</button>
+          )}
+          <button type="button" className="btn-ghost" onClick={onClose} style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+          <button type="submit" className="btn-primary" disabled={saving} style={{ flex: 2, justifyContent: 'center' }}>
+            <SwapText>{saving ? 'Сохранение…' : isNew ? 'Добавить лида' : 'Сохранить'}</SwapText>
           </button>
         </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12 }}>
-            <div>
-              <label style={labelStyle}>Название компании</label>
-              <input value={form.name || ''} onChange={set('name')} className="form-input" style={fieldStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Телефон</label>
-              <input value={form.phone || ''} onChange={set('phone')} className="form-input" style={fieldStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Контактное лицо</label>
-              <input value={form.contact_person || ''} onChange={set('contact_person')} className="form-input" style={fieldStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Должность</label>
-              <input value={form.contact_position || ''} onChange={set('contact_position')} className="form-input" style={fieldStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Email</label>
-              <input value={form.email || ''} onChange={set('email')} className="form-input" style={fieldStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Сайт</label>
-              <input value={form.website || ''} onChange={set('website')} className="form-input" style={fieldStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Отрасль</label>
-              <input value={form.industry || ''} onChange={set('industry')} className="form-input" style={fieldStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Город</label>
-              <input value={form.city || ''} onChange={set('city')} className="form-input" style={fieldStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Регион</label>
-              <input value={form.region || ''} onChange={set('region')} className="form-input" style={fieldStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Стадия</label>
-              <Select value={form.stage || 'new'} onChange={set('stage')} className="form-input" style={fieldStyle}>
-                {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
-              </Select>
-            </div>
-          </div>
-
-          <div>
-            <label style={labelStyle}>Заметки</label>
-            <textarea value={form.notes || ''} onChange={set('notes')} className="form-input" style={{ ...fieldStyle, height: 80, resize: 'vertical' }} />
-          </div>
-
-          <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-            <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center', height: 44 }}>Отмена</button>
-            <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ flex: 2, justifyContent: 'center', height: 44 }}>
-              <SwapText>{saving ? 'Сохранение…' : 'Сохранить'}</SwapText>
-            </button>
-          </div>
-        </div>
-        </div>
-      </div>
-    </div>
+      </form>
+    </ModalOverlay>
   )
 }

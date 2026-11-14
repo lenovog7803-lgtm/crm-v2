@@ -15,15 +15,14 @@ export default class ErrorBoundary extends Component {
     if (this.state.error) {
       return (
         <div style={{ background: 'var(--surface)', borderRadius: 20, padding: 24, border: '1px solid rgba(var(--rgb-224-71-59), 0.25)' }}>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: 'var(--fg-e0473b)', marginBottom: 8 }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--fg-e0473b)', marginBottom: 8 }}>
             Ошибка в разделе
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 14, fontFamily: 'var(--font-mono)' }}>
             {String(this.state.error?.message || this.state.error)}
           </div>
           <button
-            onClick={() => this.setState({ error: null })}
-            style={{ padding: '10px 18px', borderRadius: 12, background: 'var(--bg-1366f0)', border: 'none', color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+            onClick={() => this.setState({ error: null })} className="btn-primary"
           >
             Попробовать снова
           </button>

@@ -148,7 +148,7 @@ export default function CommandPalette({ open, onClose, onOpenOrder, onOpenClien
           position: 'absolute', left: '50%', top: isMobile ? '8vh' : '16vh', transform: 'translateX(-50%)',
           width: isMobile ? 'calc(100% - 24px)' : 680, maxHeight: isMobile ? '78vh' : '64vh',
           display: 'flex', flexDirection: 'column', overflow: 'hidden', fontFamily: SYS,
-          borderRadius: 26, background: 'rgba(var(--paper-rgb), 0.72)',
+          borderRadius: 24, background: 'rgba(var(--paper-rgb), 0.72)',
           backdropFilter: 'blur(40px) saturate(190%)', WebkitBackdropFilter: 'blur(40px) saturate(190%)',
           border: '1px solid rgba(255,255,255,calc(0.65 * var(--rim-k)))',
           boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.8 * var(--rim-k))), 0 0 0 0.5px rgba(14,23,38,0.12), 0 30px 80px -20px rgba(14,23,38,0.45)',

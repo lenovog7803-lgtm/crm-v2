@@ -29,12 +29,7 @@ export default function LeaderboardView() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div className="card" style={{ padding: '10px 12px', display: 'flex', gap: 6, width: 'fit-content' }}>
         {PERIODS.map(p => (
-          <button key={p.id} onClick={() => setPeriod(p.id)} style={{
-            padding: '7px 16px', borderRadius: 99, border: 'none', cursor: 'pointer',
-            fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
-            background: period === p.id ? 'var(--chip-strong)' : 'rgba(var(--ink-rgb), 0.06)',
-            color: period === p.id ? '#fff' : 'var(--text-secondary)',
-          }}>{p.label}</button>
+          <button key={p.id} onClick={() => setPeriod(p.id)} className="btn-chip" style={{ border: 'none', background: period === p.id ? 'var(--chip-strong)' : 'rgba(var(--ink-rgb), 0.06)', color: period === p.id ? '#fff' : 'var(--text-secondary)' }}>{p.label}</button>
         ))}
       </div>
 
@@ -59,7 +54,7 @@ export default function LeaderboardView() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink)' }}>{r.name}</span>
-                    {isMe && <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--fg-1366f0)', background: 'rgba(var(--rgb-19-102-240), 0.1)', padding: '2px 8px', borderRadius: 20 }}>ЭТО ВЫ</span>}
+                    {isMe && <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-1366f0)', background: 'rgba(var(--rgb-19-102-240), 0.1)', padding: '2px 8px', borderRadius: 20 }}>ЭТО ВЫ</span>}
                   </div>
                   <div style={{ height: 6, borderRadius: 99, background: 'rgba(var(--ink-rgb), 0.06)', marginTop: 8, maxWidth: 300 }}>
                     <div style={{ height: '100%', borderRadius: 99, width: `${barWidth}%`, background: i === 0 ? 'var(--fg-d97706)' : 'var(--fg-1366f0)', transition: 'width 0.4s' }} />
@@ -67,16 +62,16 @@ export default function LeaderboardView() {
                 </div>
                 <div style={{ display: 'flex', gap: 22, flexShrink: 0, textAlign: 'right' }}>
                   <div>
-                    <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 18, color: 'var(--ink)' }}>{r.calls}</div>
-                    <div style={{ fontSize: 10.5, color: 'var(--text-tertiary)' }}>звонков</div>
+                    <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 17, color: 'var(--ink)' }}>{r.calls}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>звонков</div>
                   </div>
                   <div>
-                    <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 18, color: 'var(--fg-1e9e5a)' }}>{r.won}</div>
-                    <div style={{ fontSize: 10.5, color: 'var(--text-tertiary)' }}>в клиенты</div>
+                    <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 17, color: 'var(--fg-1e9e5a)' }}>{r.won}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>в клиенты</div>
                   </div>
                   <div>
-                    <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 18, color: 'var(--ink)' }}>{r.conversion}%</div>
-                    <div style={{ fontSize: 10.5, color: 'var(--text-tertiary)' }}>конверсия</div>
+                    <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 17, color: 'var(--ink)' }}>{r.conversion}%</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>конверсия</div>
                   </div>
                 </div>
               </div>

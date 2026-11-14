@@ -17,8 +17,8 @@ function ImportPreviewModal({ preview, onClose, onConfirm, applying }) {
   const orders = preview.orders || {}
   const hasDeletes = (orders.would_delete || []).length > 0
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 640, padding: 26, maxHeight: '86vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="dash-modal-scrim">
+      <div className="dash-modal dash-form" style={{ maxWidth: 640, padding: 26, maxHeight: '86vh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 4 }}>Что изменится при импорте из Таблицы</div>
         <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 16 }}>Ничего ещё не применено — только предпросмотр</div>
 
@@ -91,11 +91,10 @@ function ImportPreviewModal({ preview, onClose, onConfirm, applying }) {
         </div>
 
         <div style={{ display: 'flex', gap: 10, marginTop: 18, flexShrink: 0 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
+          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button
             onClick={onConfirm}
-            disabled={applying}
-            style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: 'var(--bg-1366f0)', color: '#FFFFFF', fontWeight: 700, cursor: 'pointer' }}
+            disabled={applying} className="btn-primary" style={{ flex: 2, justifyContent: 'center' }}
           >
             {applying ? 'Применяю…' : 'Применить изменения'}
           </button>
@@ -201,15 +200,13 @@ export default function Backups() {
           <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
             <button
               onClick={doPreview}
-              disabled={previewing}
-              style={{ padding: '9px 16px', borderRadius: 12, border: '1px solid rgba(var(--ink-rgb), 0.12)', background: 'var(--surface)', color: 'var(--ink)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+              disabled={previewing} className="btn-ghost"
             >
               {previewing ? 'Проверяю…' : 'Импорт из Таблицы'}
             </button>
             <button
               onClick={doCreate}
-              disabled={creating}
-              style={{ padding: '9px 16px', borderRadius: 12, border: '1px solid rgba(var(--rgb-19-102-240), 0.25)', background: 'rgba(var(--rgb-19-102-240), 0.08)', color: 'var(--fg-1366f0)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+              disabled={creating} className="btn-ghost" style={{ color: 'var(--fg-1366f0)' }}
             >
               {creating ? 'Создаю…' : 'Создать сейчас'}
             </button>
@@ -252,8 +249,7 @@ export default function Backups() {
             </div>
           </div>
           <button
-            onClick={() => setRestoreTarget(b)}
-            style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid rgba(var(--rgb-224-71-59), 0.3)', background: 'rgba(var(--rgb-224-71-59), 0.06)', color: 'var(--fg-e0473b)', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0, marginLeft: 12 }}
+            onClick={() => setRestoreTarget(b)} className="btn-ghost" style={{ color: 'var(--fg-e0473b)', flexShrink: 0, marginLeft: 12 }}
           >
             Восстановить
           </button>
@@ -261,8 +257,8 @@ export default function Backups() {
       ))}
 
       {restoreTarget && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-          <div style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 440, padding: 26 }}>
+        <div className="dash-modal-scrim">
+          <div className="dash-modal dash-form" style={{ maxWidth: 440, padding: 26 }}>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--fg-e0473b)', marginBottom: 8 }}>Восстановить из бэкапа?</div>
             <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 18, lineHeight: 1.5 }}>
               Это заменит текущие данные снимком от{' '}
@@ -279,11 +275,10 @@ export default function Backups() {
               style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--fill)', fontSize: 14, boxSizing: 'border-box', marginBottom: 18 }}
             />
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setRestoreTarget(null)} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
+              <button onClick={() => setRestoreTarget(null)} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
               <button
                 onClick={doRestore}
-                disabled={confirmWord.trim().toUpperCase() !== 'ВОССТАНОВИТЬ' || restoring}
-                style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: confirmWord.trim().toUpperCase() === 'ВОССТАНОВИТЬ' ? 'var(--fg-e0473b)' : 'var(--line)', color: confirmWord.trim().toUpperCase() === 'ВОССТАНОВИТЬ' ? '#FFFFFF' : 'var(--text-3)', fontWeight: 700, cursor: 'pointer' }}
+                disabled={confirmWord.trim().toUpperCase() !== 'ВОССТАНОВИТЬ' || restoring} className="btn-primary" style={{ flex: 2, background: confirmWord.trim().toUpperCase() === 'ВОССТАНОВИТЬ' ? 'var(--fg-e0473b)' : 'var(--line)', color: confirmWord.trim().toUpperCase() === 'ВОССТАНОВИТЬ' ? '#FFFFFF' : 'var(--text-3)', boxShadow: 'none', justifyContent: 'center' }}
               >
                 {restoring ? 'Восстанавливаю…' : 'Подтвердить восстановление'}
               </button>

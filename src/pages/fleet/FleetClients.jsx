@@ -57,7 +57,7 @@ export default function FleetClients({ onOpenClient }) {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
                 <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: 'var(--ink)' }}>{c.name}</div>
-                <button onClick={e => remove(e, c.id)} title="Удалить" style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 14 }}>✕</button>
+                <button onClick={e => remove(e, c.id)} title="Удалить" className="btn-x" style={{ fontSize: 14 }}>✕</button>
               </div>
               {(c.phone || c.contact_person) && (
                 <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 6 }}>

@@ -131,7 +131,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
       backdropFilter: 'blur(24px) saturate(180%)',
       WebkitBackdropFilter: 'blur(24px) saturate(180%)',
       border: '1px solid rgba(255,255,255,calc(0.7 * var(--rim-k)))',
-      borderRadius: 18,
+      borderRadius: 20,
       boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), 0 4px 16px -8px rgba(20,30,55,0.12)',
       marginBottom: 0,
       flexShrink: 0,
@@ -148,13 +148,13 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
             placeholder="Поиск..."
             style={{
               flex: 1, paddingLeft: 12, paddingRight: 12,
-              height: 38, borderRadius: 11,
+              height: 38, borderRadius: 12,
               border: '1px solid rgba(var(--ink-rgb), 0.12)',
               background: 'rgba(var(--paper-rgb), 0.7)',
               fontFamily: 'var(--font-sys)', fontSize: 14, color: 'var(--ink)', outline: 'none',
             }}
           />
-          <button onClick={() => { setMobileSearchOpen(false); onSearchChange && onSearchChange('') }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', padding: 4, fontSize: 13, fontFamily: 'var(--font-sys)', fontWeight: 600 }}>
+          <button onClick={() => { setMobileSearchOpen(false); onSearchChange && onSearchChange('') }} className="btn-bare" style={{ color: 'var(--text-3)', padding: 4, fontSize: 13, fontWeight: 600 }}>
             Отмена
           </button>
         </div>
@@ -164,7 +164,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
         {/* большой заголовок iOS: крупный вверху страницы, сжимается при прокрутке */}
         <div className="ios-title" style={{ fontSize: compact ? (isMobile ? 17 : 18) : (isMobile ? 24 : 26) }}>{meta.title}</div>
         {!isMobile && (
-          <div className="ios-subtitle" style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>{meta.subtitle}</div>
+          <div className="ios-subtitle" style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 2 }}>{meta.subtitle}</div>
         )}
       </div>
       {/* шапка-остров: «ручка» раскрытия снизу */}
@@ -172,7 +172,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
 
       {/* Mobile search icon */}
       {isMobile && (
-        <button onClick={() => setMobileSearchOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 6, display: 'flex' }}>
+        <button onClick={() => setMobileSearchOpen(true)} className="btn-bare" style={{ color: 'var(--text-secondary)', padding: 6, display: 'flex' }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
@@ -239,7 +239,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
               position: 'absolute', top: 3, right: 3,
               minWidth: 16, height: 16, borderRadius: 8, background: 'var(--bg-c81923)',
               border: '2px solid #fff', color: '#fff',
-              fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center',
               padding: '0 3px',
             }}><PopNumber value={badgeCount > 9 ? '9+' : badgeCount} /></span>
           )}
@@ -292,7 +292,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
                           )}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 12.5, color: 'var(--ink)', lineHeight: 1.4 }}>{n.message}</div>
+                          <div style={{ fontSize: 13, color: 'var(--ink)', lineHeight: 1.4 }}>{n.message}</div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
                             {n.created_at && (
                               <span style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
@@ -302,7 +302,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
                             {n.actionLabel && (
                               <button
                                 onClick={e => { e.stopPropagation(); n.onAction?.(); dismiss(n.id) }}
-                                style={{ fontSize: 11.5, fontWeight: 700, color: accent, background: `color-mix(in srgb, ${accent} 10%, transparent)`, border: 'none', borderRadius: 8, padding: '3px 9px', cursor: 'pointer' }}
+                                style={{ fontSize: 12, fontWeight: 700, color: accent, background: `color-mix(in srgb, ${accent} 10%, transparent)`, border: 'none', borderRadius: 8, padding: '3px 9px', cursor: 'pointer' }}
                               >
                                 {n.actionLabel}
                               </button>
@@ -354,7 +354,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
                       )}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</div>
                       <div style={{ fontSize: 11, color: 'var(--fg-c81923)', marginTop: 2 }}>Просрочено · {fmtDate(item.date)}</div>
                     </div>
                   </div>

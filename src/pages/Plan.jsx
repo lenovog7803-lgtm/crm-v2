@@ -188,7 +188,7 @@ export default function Plan() {
           <span>Прогноз на год: <b style={{ color: '#fff' }}>{int(forecast)} Br</b> ({forecastPct}% плана)</span>
           <span>Темп: <b style={{ color: '#fff' }}>{int(pace)} Br</b> в месяц за последние 3 мес.</span>
         </div>
-        {!anyFact && <div style={{ marginTop: 10, fontSize: 12.5, color: 'rgba(255,255,255,0.75)' }}>Год ещё не начался — прогноз по нынешнему темпу. Чтобы выйти на план, нужно {int(planYear / 12)} Br в месяц.</div>}
+        {!anyFact && <div style={{ marginTop: 10, fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>Год ещё не начался — прогноз по нынешнему темпу. Чтобы выйти на план, нужно {int(planYear / 12)} Br в месяц.</div>}
       </div>
 
       {/* Показатели года */}

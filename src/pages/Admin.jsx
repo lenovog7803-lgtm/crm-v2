@@ -94,7 +94,7 @@ function UserDetailModal({ user, onClose, onSaved }) {
             background: user.role === 'manager' ? 'rgba(var(--rgb-19-102-240), 0.1)' : 'rgba(var(--rgb-124-58-237), 0.1)',
             color: user.role === 'manager' ? 'var(--fg-1366f0)' : 'var(--fg-7c3aed)',
           }}>{ROLE_LABEL[user.role] || user.role}</span>
-          <span style={{ fontSize: 11.5, color: 'var(--text-tertiary)' }}>роль меняется отдельно, не через эту форму</span>
+          <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>роль меняется отдельно, не через эту форму</span>
         </div>
 
         <div>
@@ -127,7 +127,7 @@ function UserDetailModal({ user, onClose, onSaved }) {
         {error && <div style={{ fontSize: 12, color: 'var(--fg-c81923)', textAlign: 'center' }}>{error}</div>}
 
         <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-          <button onClick={onClose} style={{ flex: 1, height: 44, borderRadius: 13, border: '1px solid rgba(var(--ink-rgb), 0.12)', background: 'transparent', cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 14, fontWeight: 600, color: 'var(--text-secondary)' }}>Отмена</button>
+          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, height: 44, justifyContent: 'center' }}>Отмена</button>
           <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ flex: 2, justifyContent: 'center', opacity: saving ? 0.7 : 1 }}>
             <SwapText>{saving ? 'Сохранение…' : 'Сохранить'}</SwapText>
           </button>
@@ -256,12 +256,7 @@ function UsersTab() {
                       }}>{ROLE_LABEL[m.role] || m.role}</span>
                     </td>
                     <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)' }} onClick={e => e.stopPropagation()}>
-                      <button onClick={() => toggleStatus(m)} style={{
-                        padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
-                        fontSize: 11.5, fontWeight: 700,
-                        background: m.status === 'suspended' ? 'rgba(var(--rgb-224-71-59), 0.1)' : 'rgba(var(--rgb-30-158-90), 0.1)',
-                        color: m.status === 'suspended' ? 'var(--fg-e0473b)' : 'var(--fg-1e9e5a)',
-                      }}>
+                      <button onClick={() => toggleStatus(m)} className="btn-chip" style={{ border: 'none', background: m.status === 'suspended' ? 'rgba(var(--rgb-224-71-59), 0.1)' : 'rgba(var(--rgb-30-158-90), 0.1)', color: m.status === 'suspended' ? 'var(--fg-e0473b)' : 'var(--fg-1e9e5a)' }}>
                         {m.status === 'suspended' ? 'Заблокирован' : 'Активен'}
                       </button>
                     </td>
@@ -270,12 +265,12 @@ function UsersTab() {
                         type="number"
                         defaultValue={m.daily_call_goal || 45}
                         onBlur={e => changeGoal(m, e.target.value)}
-                        style={{ width: 70, padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(var(--ink-rgb), 0.12)', fontSize: 12.5, fontFamily: 'var(--font-mono)' }}
+                        style={{ width: 70, padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(var(--ink-rgb), 0.12)', fontSize: 13, fontFamily: 'var(--font-mono)' }}
                       />
                     </td>
                     <td style={{ padding: '11px 14px', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)', textAlign: 'right' }} onClick={e => e.stopPropagation()}>
                       {isManager && (
-                        <button onClick={() => remove(m)} style={{ padding: '6px 12px', borderRadius: 9, border: 'none', background: 'rgba(var(--rgb-200-25-35), 0.08)', color: 'var(--fg-c81923)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                        <button onClick={() => remove(m)} className="btn-ghost" style={{ color: 'var(--fg-c81923)' }}>
                           Удалить
                         </button>
                       )}
@@ -328,14 +323,14 @@ function SessionsTab() {
       {sessions.map(s => (
         <div key={s.id} className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--ink)' }}>{s.user_login} · <span style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>{ROLE_LABEL[s.role] || s.role}</span></div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink)' }}>{s.user_login} · <span style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>{ROLE_LABEL[s.role] || s.role}</span></div>
             <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{parseDeviceInfo(s.device_info)} · {s.ip || '—'}</div>
           </div>
           <div style={{ fontSize: 12, color: 'var(--text-secondary)', textAlign: 'right', flexShrink: 0 }}>
             <div>{relativeTime(s.last_activity)}</div>
             <div style={{ color: 'var(--text-tertiary)', marginTop: 2 }}>{s.activity_summary?.calls ?? 0} звонков · {s.activity_summary?.won ?? 0} в клиенты</div>
           </div>
-          <button onClick={() => logout(s)} style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid rgba(var(--rgb-224-71-59), 0.3)', background: 'rgba(var(--rgb-224-71-59), 0.06)', color: 'var(--fg-e0473b)', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
+          <button onClick={() => logout(s)} className="btn-ghost" style={{ color: 'var(--fg-e0473b)', flexShrink: 0 }}>
             Завершить сессию
           </button>
         </div>
@@ -392,12 +387,7 @@ function StatsTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div className="card" style={{ padding: '10px 12px', display: 'flex', gap: 6, width: 'fit-content' }}>
         {STAT_PERIODS.map(p => (
-          <button key={p.id} onClick={() => setPeriod(p.id)} style={{
-            padding: '7px 16px', borderRadius: 99, border: 'none', cursor: 'pointer',
-            fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
-            background: period === p.id ? 'var(--chip-strong)' : 'rgba(var(--ink-rgb), 0.06)',
-            color: period === p.id ? '#fff' : 'var(--text-secondary)',
-          }}>{p.label}</button>
+          <button key={p.id} onClick={() => setPeriod(p.id)} className="btn-chip" style={{ border: 'none', background: period === p.id ? 'var(--chip-strong)' : 'rgba(var(--ink-rgb), 0.06)', color: period === p.id ? '#fff' : 'var(--text-secondary)' }}>{p.label}</button>
         ))}
       </div>
 
@@ -452,12 +442,7 @@ export default function Admin() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div className="card" style={{ padding: '12px 16px', display: 'flex', gap: 6 }}>
         {TABS.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{
-            padding: '7px 15px', borderRadius: 99, border: 'none', cursor: 'pointer',
-            fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
-            background: tab === t.id ? 'var(--chip-strong)' : 'rgba(var(--ink-rgb), 0.06)',
-            color: tab === t.id ? '#fff' : 'var(--text-secondary)',
-          }}>{t.label}</button>
+          <button key={t.id} onClick={() => setTab(t.id)} className="btn-chip" style={{ border: 'none', background: tab === t.id ? 'var(--chip-strong)' : 'rgba(var(--ink-rgb), 0.06)', color: tab === t.id ? '#fff' : 'var(--text-secondary)' }}>{t.label}</button>
         ))}
       </div>
 

@@ -5,6 +5,7 @@ import { mouseOnly } from '../motion'
 import { Loader } from './Loader'
 import { StatusOrb } from './StatusOrb'
 import Select from './Select'
+import { iosError } from './IOSAlert'
 import { EmptyState } from './EmptyState'
 
 function Row({ label, value, mono }) {
@@ -25,7 +26,7 @@ function StarIcon() {
 }
 
 const iStyle = {
-  width: '100%', height: 34, padding: '0 10px', fontSize: 13, borderRadius: 9,
+  width: '100%', height: 34, padding: '0 10px', fontSize: 13, borderRadius: 10,
   border: '1px solid rgba(var(--ink-rgb), 0.14)', background: 'rgba(var(--paper-rgb), 0.8)',
   fontFamily: 'var(--font-sys)', color: 'var(--ink)', outline: 'none', boxSizing: 'border-box',
 }
@@ -122,14 +123,14 @@ export default function CarrierDetail({ carrierId, onMeta, onBack, onDelete, onO
       })
       setCarrier(updated || { ...carrier, ...form })
       setEditing(false)
-    } catch (err) { console.error(err) }
+    } catch (err) { console.error(err); iosError('Изменения не сохранились. Проверьте интернет и попробуйте ещё раз.') }
     setSaving(false)
   }
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
   const handleDelete = async () => {
-    await apiDelete(carrier.id).catch(console.error)
+    try { await apiDelete(carrier.id) } catch (err) { console.error(err); iosError('Перевозчик не удалён. Проверьте интернет и попробуйте ещё раз.'); return }
     onDelete(carrier.id)
     onBack()
   }
@@ -146,33 +147,23 @@ export default function CarrierDetail({ carrierId, onMeta, onBack, onDelete, onO
         <div style={{ flex: 1 }} />
         {editing ? (
           <>
-            <button onClick={cancelEdit} style={{ padding: '9px 16px', borderRadius: 12, border: '1px solid rgba(var(--ink-rgb), 0.12)', cursor: 'pointer', background: 'transparent', color: 'var(--text-secondary)', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13 }}>
+            <button onClick={cancelEdit} className="btn-ghost">
               Отмена
             </button>
-            <button onClick={saveEdit} disabled={saving} style={{ padding: '9px 18px', borderRadius: 12, border: 'none', cursor: 'pointer', background: 'var(--bg-1366f0)', color: '#fff', fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13 }}>
+            <button onClick={saveEdit} disabled={saving} className="btn-primary">
               {saving ? 'Сохранение...' : 'Сохранить'}
             </button>
           </>
         ) : (
           <>
-            <button onClick={startEdit} style={{
-              padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
-              background: 'rgba(var(--rgb-19-102-240), 0.1)', color: 'var(--fg-1366f0)',
-              fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13,
-              display: 'flex', alignItems: 'center', gap: 6,
-            }}>
+            <button onClick={startEdit} className="btn-ghost" style={{ color: 'var(--fg-1366f0)', display: 'flex', alignItems: 'center', gap: 6 }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
               </svg>
               Редактировать
             </button>
-            <button onClick={handleDelete} style={{
-              padding: '9px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
-              background: 'rgba(var(--rgb-200-25-35), 0.1)', color: 'var(--fg-c81923)',
-              fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13,
-              display: 'flex', alignItems: 'center', gap: 6,
-            }}>
+            <button onClick={handleDelete} className="btn-ghost" style={{ color: 'var(--fg-c81923)', display: 'flex', alignItems: 'center', gap: 6 }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
               </svg>
@@ -197,7 +188,7 @@ export default function CarrierDetail({ carrierId, onMeta, onBack, onDelete, onO
         </div>
         {editing ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 360, margin: '0 auto' }}>
-            <input value={form.company_name} onChange={e => set('company_name', e.target.value)} placeholder="Наименование" style={{ ...iStyle, textAlign: 'center', fontWeight: 700, fontSize: 16 }} />
+            <input value={form.company_name} onChange={e => set('company_name', e.target.value)} placeholder="Наименование" style={{ ...iStyle, textAlign: 'center', fontWeight: 700, fontSize: 17 }} />
             <input value={form.driver_name} onChange={e => set('driver_name', e.target.value)} placeholder="Водитель" style={{ ...iStyle, textAlign: 'center' }} />
             <input value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="Телефон" style={{ ...iStyle, textAlign: 'center' }} />
           </div>
@@ -207,7 +198,7 @@ export default function CarrierDetail({ carrierId, onMeta, onBack, onDelete, onO
             <div style={{ fontSize: 14, color: 'var(--text-tertiary)', marginTop: 4 }}>{driver}</div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 10 }}>
               <StarIcon />
-              <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--fg-d97706)' }}>{carrier.rating || '5.0'}</span>
+              <span style={{ fontSize: 17, fontWeight: 700, color: 'var(--fg-d97706)' }}>{carrier.rating || '5.0'}</span>
             </div>
             {carrier.phone && (
               <a href={`tel:${carrier.phone}`} style={{ display: 'block', marginTop: 8, fontSize: 15, fontWeight: 600, color: 'var(--fg-1366f0)', textDecoration: 'none' }}>{carrier.phone}</a>

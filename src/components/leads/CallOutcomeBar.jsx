@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { OUTCOMES, LOST_REASONS, DATE_PRESETS } from '../../constants/leads'
 import { OutcomeIcon } from './OutcomeIcon'
 import { SwapText } from '../Transitions'
 import Select from '../Select'
 import DateInput from '../DateInput'
+import { localDateTime } from './saveCall'
 
 const labelStyle = { fontSize: 15, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.01em', marginBottom: 12, display: 'block' }
 
@@ -25,20 +26,21 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 3 }) {
   const cfg = OUTCOMES.find(o => o.id === outcome) || null
   const showDateBlock = outcome && outcome !== 'no_answer' && outcome !== 'won' && outcome !== 'lost'
 
-  const setPreset = (days) => {
-    const d = new Date()
-    d.setDate(d.getDate() + days)
-    d.setHours(10, 0, 0, 0)
-    setNextCall(d.toISOString().slice(0, 16))
+  const setPreset = (days) => setNextCall(localDateTime(days))
+
+  // onSave возвращает текст ошибки, если звонок не записался
+  const send = async (payload) => {
+    setError('')
+    const err = await onSave(payload)
+    if (err) setError(err)
   }
 
   const handleSave = () => {
+    if (saving) return
     if (!outcome || !cfg) { setError('Выберите результат звонка'); return }
     if (cfg?.needsComment && !comment.trim()) { setError('Напишите комментарий'); return }
     if (cfg?.needsReason && !lostReason) { setError('Укажите причину отказа'); return }
-
-    setError('')
-    onSave({
+    send({
       outcome,
       comment: comment.trim(),
       lost_reason: cfg?.needsReason ? lostReason : undefined,
@@ -46,14 +48,40 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 3 }) {
     })
   }
 
+  // «Не взял трубку» дописывать нечем — сохраняем сразу, одним нажатием
+  const pick = (id) => {
+    if (saving) return
+    setOutcome(id); setError('')
+    if (id === 'no_answer') send({ outcome: id, comment: '' })
+  }
+
+  // Клавиши: 1–6 — результат, Enter — сохранить (в поле комментария — ⌘/Ctrl+Enter)
+  const keys = useRef({})
+  keys.current = { pick, handleSave }
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.defaultPrevented || e.altKey || document.querySelector('.ios-alert, .modal-overlay')) return
+      const typing = e.target.closest?.('input, textarea, select, [contenteditable]')
+      if (e.key === 'Enter' && (!typing || e.metaKey || e.ctrlKey)) {
+        if (e.target.closest?.('button, a')) return   // Enter на кнопке — её собственное нажатие
+        e.preventDefault(); keys.current.handleSave(); return
+      }
+      if (typing || e.metaKey || e.ctrlKey) return
+      const o = OUTCOMES[Number(e.key) - 1]
+      if (o) { e.preventDefault(); keys.current.pick(o.id) }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
   return (
     <div className="card call-sheet" style={{ padding: 20 }}>
       <span style={labelStyle}>Результат звонка</span>
       <div className="call-outcomes" style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: 8, marginBottom: 16 }}>
-        {OUTCOMES.map(o => (
+        {OUTCOMES.map((o, i) => (
           <button
             key={o.id}
-            onClick={() => { setOutcome(o.id); setError('') }}
+            onClick={() => pick(o.id)}
             className="call-outcome"
             aria-pressed={outcome === o.id}
             style={{
@@ -70,6 +98,7 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 3 }) {
             <span style={{ fontFamily: 'var(--font-sys)', fontSize: 14, fontWeight: outcome === o.id ? 600 : 400, color: outcome === o.id ? 'var(--fg-1366f0)' : 'var(--ink)' }}>
               {o.label}
             </span>
+            <kbd className="call-key">{i + 1}</kbd>
           </button>
         ))}
       </div>
@@ -102,7 +131,7 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 3 }) {
           <span style={labelStyle}>Когда перезвонить</span>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
             {DATE_PRESETS.map(p => (
-              <button key={p.days} onClick={() => setPreset(p.days)} className="btn-ghost" style={{ padding: '6px 12px', fontSize: 11.5 }}>
+              <button key={p.days} onClick={() => setPreset(p.days)} className="btn-ghost" style={{ padding: '6px 12px', fontSize: 12 }}>
                 {p.label}
               </button>
             ))}
@@ -115,7 +144,7 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 3 }) {
             style={{ width: '100%', background: 'var(--fill)' }}
           />
           {!nextCall && (
-            <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginTop: 6 }}>
+            <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 6 }}>
               Если не указать дату — бэкенд поставит её сам по каденции.
             </div>
           )}
@@ -125,7 +154,8 @@ export default function CallOutcomeBar({ lead, onSave, saving, columns = 3 }) {
       {error && <div style={{ fontSize: 12, color: 'var(--fg-e0473b)', marginBottom: 12 }}>{error}</div>}
 
       <button onClick={handleSave} disabled={saving || !outcome} className={`call-save${outcome ? ' is-ready' : ''}`}>
-        <SwapText>{saving ? 'Сохраняю…' : outcome ? 'Сохранить и следующий' : 'Выберите результат звонка'}</SwapText>
+        <SwapText>{saving ? 'Сохраняю…' : outcome ? 'Сохранить' : 'Выберите результат звонка'}</SwapText>
+        {outcome && !saving && <kbd className="call-key call-key--on">↵</kbd>}
       </button>
     </div>
   )

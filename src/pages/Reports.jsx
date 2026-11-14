@@ -53,7 +53,7 @@ function Stat({ label, value, color = 'var(--ink)', bg = 'rgba(var(--ink-rgb), 0
         fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 24, color,
         background: bg, borderRadius: 12, padding: '8px 14px', display: 'inline-block', lineHeight: 1,
       }}>{value}</div>
-      {sub != null && <div style={{ fontSize: 11.5, color: 'var(--text-3)', marginTop: 6 }}>{sub}</div>}
+      {sub != null && <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6 }}>{sub}</div>}
     </div>
   )
 }
@@ -63,7 +63,7 @@ function LegList({ title, items }) {
     <div>
       <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: 8 }}>{title}</div>
       {items.length === 0 ? (
-        <div style={{ fontSize: 12.5, color: 'var(--text-3)' }}>нет</div>
+        <div style={{ fontSize: 13, color: 'var(--text-3)' }}>нет</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {items.map((x, i) => (
@@ -99,10 +99,10 @@ function MoneyList({ title, items, accent = 'var(--ink)' }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10, marginBottom: 8 }}>
         <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600 }}>{title}</div>
-        <div style={{ fontSize: 12.5, fontWeight: 700, color: accent, flexShrink: 0 }}>{money(total)}</div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: accent, flexShrink: 0 }}>{money(total)}</div>
       </div>
       {items.length === 0 ? (
-        <div style={{ fontSize: 12.5, color: 'var(--text-3)' }}>нет</div>
+        <div style={{ fontSize: 13, color: 'var(--text-3)' }}>нет</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {items.map(([name, sum], i) => (
@@ -219,19 +219,15 @@ function ReportRow({ r }) {
   return (
     <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
       <button
-        onClick={() => setOpen(o => !o)}
-        style={{
-          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          gap: 12, padding: '14px 18px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
-        }}
+        onClick={() => setOpen(o => !o)} className="btn-bare" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '14px 18px', textAlign: 'left' }}
       >
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, minWidth: 0, flexWrap: 'wrap' }}>
           <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>{rowTitle(r)}</span>
-          <span style={{ fontSize: 12.5, color: 'var(--text-3)' }}>
+          <span style={{ fontSize: 13, color: 'var(--text-3)' }}>
             выручка {money(r.revenue)} · маржа {money(r.margin)}
           </span>
         </div>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, color: 'var(--fg-1366f0)', fontSize: 12.5, fontWeight: 600 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, color: 'var(--fg-1366f0)', fontSize: 13, fontWeight: 600 }}>
           {open ? 'Свернуть' : 'Открыть'}
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
             style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
@@ -320,22 +316,19 @@ export default function Reports() {
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button
             onClick={sendTaskReminders}
-            disabled={taskRem}
-            style={{ padding: '7px 15px', borderRadius: 99, border: '1px solid rgba(var(--ink-rgb), 0.14)', cursor: taskRem ? 'default' : 'pointer', fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600, background: 'var(--surface)', color: 'var(--ink)', opacity: taskRem ? 0.6 : 1, whiteSpace: 'nowrap' }}
+            disabled={taskRem} className="btn-ghost" style={{ opacity: taskRem ? 0.6 : 1, whiteSpace: 'nowrap' }}
           >
             {taskRem ? '…' : 'Напоминания по задачам'}
           </button>
           <button
             onClick={sendMorning}
-            disabled={morning}
-            style={{ padding: '7px 15px', borderRadius: 99, border: '1px solid rgba(var(--ink-rgb), 0.14)', cursor: morning ? 'default' : 'pointer', fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600, background: 'var(--surface)', color: 'var(--ink)', opacity: morning ? 0.6 : 1, whiteSpace: 'nowrap' }}
+            disabled={morning} className="btn-ghost" style={{ opacity: morning ? 0.6 : 1, whiteSpace: 'nowrap' }}
           >
             {morning ? '…' : 'Утренняя сводка'}
           </button>
           <button
             onClick={runNow}
-            disabled={running}
-            style={{ padding: '7px 15px', borderRadius: 99, border: 'none', cursor: running ? 'default' : 'pointer', fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600, background: 'var(--chip-strong)', color: '#fff', opacity: running ? 0.6 : 1, whiteSpace: 'nowrap' }}
+            disabled={running} className="btn-primary" style={{ opacity: running ? 0.6 : 1, whiteSpace: 'nowrap' }}
           >
             {running ? '…' : 'Сформировать сейчас'}
           </button>

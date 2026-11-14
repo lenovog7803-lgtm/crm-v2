@@ -187,7 +187,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
               <span style={bigNum('#fff', isMobile ? 34 : 42)}><PopNumber value={state.sent_today} /></span>
-              <span style={{ fontSize: 16, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>/ {state.limit} писем сегодня</span>
+              <span style={{ fontSize: 17, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>/ {state.limit} писем сегодня</span>
             </div>
             <div style={{ height: 6, borderRadius: 99, background: 'rgba(255,255,255,0.25)', marginTop: 14, overflow: 'hidden' }}>
               <div style={{ width: `${todayPct}%`, height: '100%', borderRadius: 99, background: 'linear-gradient(90deg, #5BE89B, #2FC7A0)', transition: 'width 0.6s var(--ease)' }} />
@@ -206,7 +206,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
             )}
             <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
               <button onClick={toggle} disabled={busy || (!state.running && !state.configured)}
-                style={{ padding: '10px 18px', borderRadius: 99, border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 13.5, fontWeight: 700,
+                style={{ padding: '10px 18px', borderRadius: 99, border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 14, fontWeight: 700,
                   background: state.running ? 'rgba(255,255,255,0.22)' : 'var(--surface)', color: state.running ? '#fff' : '#3A62B8',
                   opacity: (!state.running && !state.configured) ? 0.5 : 1 }}>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -228,7 +228,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
           <div className="grad-kicker" style={{ color: 'var(--fg-1e9e5a)' }}>Ответили</div>
           <div style={bigNum('var(--ink)', isMobile ? 28 : 34)}><PopNumber value={answered} /></div>
           <div style={{ fontSize: 12, color: 'var(--fg-1e9e5a)', marginTop: 6 }}>{replyPct}% от отправленных</div>
-          <div style={{ marginTop: 14, fontSize: 13.5, color: 'var(--fg-1366f0)', fontWeight: 500 }}>
+          <div style={{ marginTop: 14, fontSize: 14, color: 'var(--fg-1366f0)', fontWeight: 500 }}>
             {state.replies_new ? `${state.replies_new} новых — разобрать` : 'Все ответы'}
           </div>
         </div>
@@ -265,9 +265,9 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
             <span style={{ width: 7, height: 7, borderRadius: 99, background: healthColor }} />
             {healthTone === 'ok' && bounceRate > 4 ? 'Норма · мало писем для выводов' : healthCard.label}
           </div>
-          {h.reason && <div style={{ fontSize: 11.5, color: 'var(--text-2b)', marginTop: 8, lineHeight: 1.4 }}>{h.reason}</div>}
+          {h.reason && <div style={{ fontSize: 12, color: 'var(--text-2b)', marginTop: 8, lineHeight: 1.4 }}>{h.reason}</div>}
           {!h.reason && healthTone === 'ok' && bounceRate > 4 && (
-            <div style={{ fontSize: 11.5, color: 'var(--text-2b)', marginTop: 8, lineHeight: 1.4 }}>
+            <div style={{ fontSize: 12, color: 'var(--text-2b)', marginTop: 8, lineHeight: 1.4 }}>
               Защита оценивает каждую почту с 10 отправленных: больше 4% — темп вдвое ниже, больше 8% (от 20 писем) — остановка.
             </div>
           )}
@@ -285,7 +285,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: isMobile ? 24 : 30, color: 'var(--ink)', lineHeight: 1, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
               <PopNumber value={k.value} />
             </div>
-            <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 8 }}>{k.hint}</div>
+            <div style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 8 }}>{k.hint}</div>
           </div>
         ))}
       </div>
@@ -316,7 +316,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
                 const idx = RAMP_STEPS.findIndex(st => (mh.day || 1) <= st.until)
                 return (
                   <div key={m.id}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 12.5, marginBottom: 6 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 13, marginBottom: 6 }}>
                       <span style={{ fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.login || m.name}</span>
                       <span style={{ color: 'var(--text-3)', flexShrink: 0 }}>
                         {mh.auto ? `день ${mh.day || 1} · ${mh.limit ?? 0} в день` : `${mh.limit ?? 0} в день`}
@@ -358,7 +358,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
           <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
             {funnel.map(f => (
               <div key={f.label} style={{ display: 'grid', gridTemplateColumns: '92px 1fr 44px', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 12.5, color: 'var(--text-secondary)', fontWeight: 600 }}>{f.label}</span>
+                <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>{f.label}</span>
                 <div style={{ height: 10, borderRadius: 99, background: 'rgba(var(--ink-rgb), 0.05)', overflow: 'hidden' }}>
                   <div style={{ width: `${sentTotal ? Math.max(f.value ? 3 : 0, (f.value / sentTotal) * 100) : 0}%`, height: '100%', borderRadius: 99,
                     background: f.color, transition: 'width 0.6s var(--ease)' }} />
@@ -381,11 +381,11 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
             <div key={c.id} onClick={onGoReplies} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 0', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)', cursor: 'pointer' }}>
               <div style={{ minWidth: 0, flex: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>{c.company || c.email}</div>
-                <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ fontSize: 13, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {c.reply_snippet || 'ответ без текста'}
                 </div>
               </div>
-              <span style={{ fontSize: 11.5, color: 'var(--text-tertiary)', flexShrink: 0 }}>{fmtTs(c.replied_at).slice(5)}</span>
+              <span style={{ fontSize: 12, color: 'var(--text-tertiary)', flexShrink: 0 }}>{fmtTs(c.replied_at).slice(5)}</span>
             </div>
           ))}
         </div>
@@ -396,7 +396,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 10 }}>Журнал</div>
         {log.length === 0 && <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>Пока пусто</div>}
         {(logOpen ? log : log.slice(0, 8)).map(l => (
-          <div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)', fontSize: 12.5 }}>
+          <div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)', fontSize: 13 }}>
             <span style={{ width: 7, height: 7, borderRadius: 99, flexShrink: 0, background: l.ok ? 'rgba(var(--ink-rgb), 0.2)' : 'var(--fg-ff3b30)' }} />
             <div style={{ minWidth: 0, flex: 1 }}>
               <span style={{ fontWeight: 500, color: 'var(--ink)' }}>{l.company || l.email || l.kind}</span>
@@ -416,7 +416,7 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
 }
 
 function CampaignTag({ name }) {
-  return <span style={{ display: 'inline-block', marginTop: 4, fontSize: 12.5, color: 'var(--text-3)' }}>{name}</span>
+  return <span style={{ display: 'inline-block', marginTop: 4, fontSize: 13, color: 'var(--text-3)' }}>{name}</span>
 }
 
 // ---------------- Ответы ----------------
@@ -488,11 +488,11 @@ function Replies({ campaignId, loginFor, onChanged }) {
                     <span style={{ fontSize: 13, color: 'var(--text-3)', flexShrink: 0 }}>{fmtTs(c.replied_at).slice(5)}</span>
                     <svg width="7" height="12" viewBox="0 0 8 13" fill="none" style={{ flexShrink: 0, color: 'rgba(var(--sep-rgb), 0.3)' }}><path d="M1 1.5L6.5 7L1 12.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                   </div>
-                  <div style={{ fontSize: 13.5, color: 'var(--text-2b)', marginTop: 2, lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  <div style={{ fontSize: 14, color: 'var(--text-2b)', marginTop: 2, lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                     {(c.reply_snippet || c.reply_subject || '').replace(/\s+/g, ' ')}
                   </div>
                   <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 5 }}>
-                    <span style={{ padding: '1px 8px', borderRadius: 99, background: st.bg, color: st.color, fontSize: 11.5, fontWeight: 600 }}>{st.label}</span>
+                    <span style={{ padding: '1px 8px', borderRadius: 99, background: st.bg, color: st.color, fontSize: 12, fontWeight: 600 }}>{st.label}</span>
                     {c.awaiting_reply && <span style={{ fontSize: 12, color: 'var(--text-3)' }}>ждём ответа</span>}
                     {!campaignId && c.campaign_name && <span style={{ fontSize: 12, color: 'var(--text-3)' }}>{c.campaign_name}</span>}
                   </div>
@@ -583,7 +583,7 @@ function MailThread({ contact: c, gmailHref, onBack, onPatch }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {onBack && <button className="ios-sheet-close" onClick={onBack} aria-label="Назад" style={{ fontSize: 20 }}>‹</button>}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.company || c.email}</div>
+            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.company || c.email}</div>
             <div style={{ fontSize: 12, color: 'var(--text-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {[c.contact_name, c.email, data?.mailbox && `с почты ${data.mailbox}`].filter(Boolean).join(' · ')}
             </div>
@@ -605,7 +605,7 @@ function MailThread({ contact: c, gmailHref, onBack, onPatch }) {
         {!data && !err && <Loader padding={20} state="listening" label="Загрузка переписки…" />}
         {err && <div style={{ color: 'var(--fg-e0473b)', fontSize: 13 }}>{err}</div>}
         {data?.hint && (
-          <div style={{ padding: '10px 12px', borderRadius: 12, background: 'rgba(var(--rgb-217-119-6), 0.08)', color: 'var(--fg-b45309)', fontSize: 12.5, fontWeight: 600 }}>{data.hint}</div>
+          <div style={{ padding: '10px 12px', borderRadius: 12, background: 'rgba(var(--rgb-217-119-6), 0.08)', color: 'var(--fg-b45309)', fontSize: 13, fontWeight: 600 }}>{data.hint}</div>
         )}
         {data?.messages?.map(m => (
           <div key={m.id} style={{ display: 'flex', flexDirection: 'column', alignItems: m.from_me ? 'flex-end' : 'flex-start' }}>
@@ -614,9 +614,7 @@ function MailThread({ contact: c, gmailHref, onBack, onPatch }) {
               {m.attachments?.length > 0 && (
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
                   {m.attachments.map(a => (
-                    <button key={a.index} onClick={() => download(m, a)}
-                      style={{ border: 'none', cursor: 'pointer', borderRadius: 12, padding: '6px 10px', fontSize: 12.5, fontWeight: 600, fontFamily: 'inherit',
-                        background: m.from_me ? 'rgba(255,255,255,0.2)' : 'rgba(var(--paper-rgb), 0.8)', color: m.from_me ? '#fff' : 'var(--fg-1366f0)' }}>
+                    <button key={a.index} onClick={() => download(m, a)} className="btn-chip" style={{ border: 'none', background: m.from_me ? 'rgba(255,255,255,0.2)' : 'rgba(var(--paper-rgb), 0.8)', color: m.from_me ? '#fff' : 'var(--fg-1366f0)' }}>
                       📎 {a.name} · {fmtSize(a.size)}
                     </button>
                   ))}
@@ -746,7 +744,7 @@ function Contacts({ campaignId, campaignName, onChanged, groups = {}, loginFor, 
             <button className="btn-primary" onClick={() => setForm({ ...EMPTY_CONTACT })}>+ Контакт</button>
           </>
         ) : (
-          <span style={{ fontSize: 12.5, color: 'var(--text-3)' }}>Чтобы добавить контакты, выберите направление вверху</span>
+          <span style={{ fontSize: 13, color: 'var(--text-3)' }}>Чтобы добавить контакты, выберите направление вверху</span>
         )}
       </div>
 
@@ -774,7 +772,7 @@ function Contacts({ campaignId, campaignName, onChanged, groups = {}, loginFor, 
       <div className="ios-widget" style={{ padding: 0, overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
-            <tr style={{ textAlign: 'left', color: 'var(--text-3)', fontSize: 11.5 }}>
+            <tr style={{ textAlign: 'left', color: 'var(--text-3)', fontSize: 12 }}>
               {['Компания', ...(campaignId ? [] : ['Направление']), 'Email', 'Город', 'Пр.', 'Статус', 'Отправлено', ''].map(h => (
                 <th key={h} style={{ padding: '12px 14px', fontWeight: 600, borderBottom: '1px solid rgba(var(--ink-rgb), 0.07)' }}>{h}</th>
               ))}
@@ -785,13 +783,13 @@ function Contacts({ campaignId, campaignName, onChanged, groups = {}, loginFor, 
               <tr key={c.id} style={{ borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
                 <td style={{ padding: '10px 14px', color: 'var(--ink)', fontWeight: 600 }}>
                   {c.company || '—'}
-                  {c.contact_name && <div style={{ fontSize: 11.5, color: 'var(--text-3)', fontWeight: 400 }}>{c.contact_name}</div>}
+                  {c.contact_name && <div style={{ fontSize: 12, color: 'var(--text-3)', fontWeight: 400 }}>{c.contact_name}</div>}
                 </td>
                 {!campaignId && <td style={{ padding: '10px 14px', color: 'var(--text-secondary)', fontSize: 12, whiteSpace: 'nowrap' }}>{c.campaign_name}</td>}
                 <td style={{ padding: '10px 14px', color: 'var(--text-secondary)' }}>
                   {c.email || <span style={{ color: 'var(--text-quaternary)' }}>нет email</span>}
                   {c.last_error && <div style={{ fontSize: 11, color: 'var(--fg-e0473b)' }}>{c.last_error}</div>}
-                  {c.replied_at && <div><a href={gmailLink(loginFor(c.campaign_id), c.email)} target="_blank" rel="noreferrer" style={{ fontSize: 11.5, color: 'var(--fg-1366f0)' }}>переписка в Gmail ↗</a></div>}
+                  {c.replied_at && <div><a href={gmailLink(loginFor(c.campaign_id), c.email)} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: 'var(--fg-1366f0)' }}>переписка в Gmail ↗</a></div>}
                 </td>
                 <td style={{ padding: '10px 14px', color: 'var(--text-secondary)' }}>{c.city || ''}</td>
                 <td style={{ padding: '10px 14px', color: 'var(--text-secondary)' }}>{c.priority || ''}</td>
@@ -811,7 +809,7 @@ function Contacts({ campaignId, campaignName, onChanged, groups = {}, loginFor, 
                   {c.first_sent || ''}{c.followup_sent ? ` · напом. ${c.followup_sent}` : ''}
                 </td>
                 <td style={{ padding: '10px 14px', textAlign: 'right' }}>
-                  <button onClick={() => remove(c)} title="Удалить" style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 14 }}>✕</button>
+                  <button onClick={() => remove(c)} title="Удалить" className="btn-x" style={{ fontSize: 14 }}>✕</button>
                 </td>
               </tr>
             ))}
@@ -910,10 +908,7 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
               {mailboxes.map(m => {
                 const on = boxes.includes(m.id)
                 return (
-                  <button key={m.id} type="button" onClick={() => toggleBox(m.id)} aria-pressed={on}
-                    style={{ padding: '7px 11px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                      border: `1px solid ${on ? '#2563EB' : 'rgba(var(--ink-rgb), 0.12)'}`,
-                      background: on ? 'rgba(37,99,235,0.08)' : 'var(--surface)', color: on ? '#1D4ED8' : 'var(--text-secondary)' }}>
+                  <button key={m.id} type="button" onClick={() => toggleBox(m.id)} aria-pressed={on} className="btn-chip" style={{ border: `1px solid ${on ? '#2563EB' : 'rgba(var(--ink-rgb), 0.12)'}`, background: on ? 'rgba(37,99,235,0.08)' : 'var(--surface)', color: on ? '#1D4ED8' : 'var(--text-secondary)' }}>
                     {on ? '✓ ' : ''}{m.login || m.name || 'Почта'}
                   </button>
                 )
@@ -927,7 +922,7 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
           </div>
         </div>
         {hasBlanks && (
-          <div style={{ padding: '10px 12px', borderRadius: 12, background: 'rgba(var(--rgb-217-119-6), 0.08)', color: 'var(--fg-b45309)', fontSize: 12.5, fontWeight: 600 }}>
+          <div style={{ padding: '10px 12px', borderRadius: 12, background: 'rgba(var(--rgb-217-119-6), 0.08)', color: 'var(--fg-b45309)', fontSize: 13, fontWeight: 600 }}>
             В тексте остались [заготовки в квадратных скобках] — замените их своим текстом, иначе направление не запустится.
           </div>
         )}
@@ -953,9 +948,9 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
           </div>
         )}
         <div style={{ fontSize: 12, color: 'var(--text-3)', lineHeight: 1.6 }}>
-          Подставляются в тему и текст: {VARS.map(v => <code key={v} style={{ background: 'rgba(var(--ink-rgb), 0.05)', padding: '1px 5px', borderRadius: 5, marginRight: 4 }}>{v}</code>)}
+          Подставляются в тему и текст: {VARS.map(v => <code key={v} style={{ background: 'rgba(var(--ink-rgb), 0.05)', padding: '1px 5px', borderRadius: 6, marginRight: 4 }}>{v}</code>)}
           <br />Имя, компания и телефон берутся из подписи выбранной почты.
-          <br />Варианты слов: <code style={{ background: 'rgba(var(--ink-rgb), 0.05)', padding: '1px 5px', borderRadius: 5 }}>{'{Добрый день|Здравствуйте}'}</code> — в каждое письмо попадёт один вариант наугад, письма не одинаковые слово в слово, так меньше шансов попасть в спам. Нажимайте «Предпросмотр» несколько раз, чтобы увидеть разные варианты.
+          <br />Варианты слов: <code style={{ background: 'rgba(var(--ink-rgb), 0.05)', padding: '1px 5px', borderRadius: 6 }}>{'{Добрый день|Здравствуйте}'}</code> — в каждое письмо попадёт один вариант наугад, письма не одинаковые слово в слово, так меньше шансов попасть в спам. Нажимайте «Предпросмотр» несколько раз, чтобы увидеть разные варианты.
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button className="btn-ghost" onClick={() => doPreview()}>Предпросмотр</button>
@@ -971,10 +966,7 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginBottom: 14 }}>
             <span style={{ fontSize: 12, color: 'var(--text-3)' }}>Письмо с почты:</span>
             {mailboxes.filter(m => boxes.includes(m.id)).map(m => (
-              <button key={m.id} type="button" onClick={() => doPreview(m.id)}
-                style={{ padding: '5px 10px', borderRadius: 9, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                  border: `1px solid ${pvBox === m.id ? '#2563EB' : 'rgba(var(--ink-rgb), 0.12)'}`,
-                  background: pvBox === m.id ? 'rgba(37,99,235,0.08)' : 'var(--surface)', color: pvBox === m.id ? '#1D4ED8' : 'var(--text-secondary)' }}>
+              <button key={m.id} type="button" onClick={() => doPreview(m.id)} className="btn-chip" style={{ border: `1px solid ${pvBox === m.id ? '#2563EB' : 'rgba(var(--ink-rgb), 0.12)'}`, background: pvBox === m.id ? 'rgba(37,99,235,0.08)' : 'var(--surface)', color: pvBox === m.id ? '#1D4ED8' : 'var(--text-secondary)' }}>
                 {m.login || m.name}
               </button>
             ))}
@@ -984,7 +976,7 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
         {preview && [['Письмо', preview.first], ...(c.followup_enabled ? [['Напоминание', preview.follow]] : [])].map(([title, p]) => (
           <div key={title} style={{ marginBottom: 18 }}>
             <div style={labelStyle}>{title}{preview.company ? ` · ${preview.company}` : ''}</div>
-            <div style={{ fontWeight: 700, fontSize: 13.5, color: 'var(--ink)', marginBottom: 8 }}>{p.subject}</div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 8 }}>{p.subject}</div>
             <div style={{ whiteSpace: 'pre-wrap', fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55, background: 'var(--fill)', borderRadius: 12, padding: 14 }}>{p.body}</div>
           </div>
         ))}
@@ -1102,7 +1094,7 @@ function MailboxSettings({ mailbox, onSaved, onDeleted }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div className="ios-widget" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 18 }}>
         {mailbox.campaigns?.length > 0 && (
-          <div style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>С этой почты идут: <b>{mailbox.campaigns.join(', ')}</b></div>
+          <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>С этой почты идут: <b>{mailbox.campaigns.join(', ')}</b></div>
         )}
         <div>
           <div style={sectionTitle}>Способ отправки</div>
@@ -1113,7 +1105,7 @@ function MailboxSettings({ mailbox, onSaved, onDeleted }) {
           />
           {transport === 'gmail_api' && (
             <div style={{ marginTop: 12, padding: 14, borderRadius: 14, background: 'rgba(var(--rgb-19-102-240), 0.06)', border: '1px solid rgba(var(--rgb-19-102-240), 0.14)' }}>
-              <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                 Письма уходят через Gmail по HTTPS — работает на любом хостинге. Новый Gmail сначала добавьте в «Test users»
                 проекта Google (как janisozalins@gmail.com). Пароль приложения ниже нужен только для проверки ответов по IMAP.
               </div>
@@ -1133,7 +1125,7 @@ function MailboxSettings({ mailbox, onSaved, onDeleted }) {
           )}
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 12.5, color: 'var(--text-3)' }}>Заполнить серверы:</span>
+          <span style={{ fontSize: 13, color: 'var(--text-3)' }}>Заполнить серверы:</span>
           {Object.entries(PRESETS).map(([name, p]) => (
             <button key={name} className="btn-ghost" style={{ padding: '6px 12px' }} onClick={() => setS(prev => ({ ...prev, ...p }))}>{name}</button>
           ))}
@@ -1182,7 +1174,7 @@ function MailboxSettings({ mailbox, onSaved, onDeleted }) {
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           <button className="btn-ghost" onClick={testConn} disabled={busy}>Проверить подключение</button>
           {conn && (
-            <span style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
               Отправка: <b style={{ color: conn.smtp === 'ok' ? 'var(--fg-0e9f6e)' : 'var(--fg-e0473b)' }}>{conn.smtp}</b>
               {conn.imap && <> · Ответы (IMAP): <b style={{ color: conn.imap === 'ok' ? 'var(--fg-0e9f6e)' : 'var(--fg-e0473b)' }}>{conn.imap}</b></>}
             </span>
@@ -1198,7 +1190,7 @@ function MailboxSettings({ mailbox, onSaved, onDeleted }) {
 }
 
 const chip = (active) => ({
-  padding: '7px 13px', borderRadius: 99, cursor: 'pointer', fontSize: 13.5, fontWeight: active ? 500 : 400, fontFamily: 'var(--font-sys)',
+  padding: '7px 13px', borderRadius: 99, cursor: 'pointer', fontSize: 14, fontWeight: active ? 500 : 400, fontFamily: 'var(--font-sys)',
   border: 'none',
   background: active ? 'rgba(var(--rgb-19-102-240), 0.1)' : 'transparent', color: active ? 'var(--fg-1366f0)' : 'var(--ink)',
   display: 'inline-flex', alignItems: 'center', gap: 7,
@@ -1278,7 +1270,7 @@ function SupplierCard({ s, onChange, onRemove }) {
           <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 4 }}>{[s.contact_name, s.email, s.city, s.site].filter(Boolean).join(' · ')}</div>
         </div>
         <Select value={s.stage} className="status-pill" onChange={e => patch({ stage: e.target.value })}
-          style={{ alignSelf: 'flex-start', border: 'none', background: st.bg, color: st.color, borderRadius: 99, padding: '5px 10px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>
+          style={{ alignSelf: 'flex-start', border: 'none', background: st.bg, color: st.color, borderRadius: 99, padding: '5px 10px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
           {Object.entries(SUP_STAGES).map(([k, x]) => <option key={k} value={k}>{x.label}</option>)}
         </Select>
       </div>
@@ -1287,7 +1279,7 @@ function SupplierCard({ s, onChange, onRemove }) {
           placeholder="Телефон" style={{ ...inputStyle, width: 180 }} />
         <a className="btn-ghost" href={gmailLink('', s.email)} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>Переписка в Gmail ↗</a>
         <div style={{ flex: 1 }} />
-        <button onClick={onRemove} title="Убрать из списка" style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 14 }}>✕</button>
+        <button onClick={onRemove} title="Убрать из списка" className="btn-x" style={{ fontSize: 14 }}>✕</button>
       </div>
       <div style={{ display: 'flex', gap: 8 }}>
         <input value={note} onChange={e => setNote(e.target.value)} placeholder="Заметка: цена, условия, договорённости…"
@@ -1297,7 +1289,7 @@ function SupplierCard({ s, onChange, onRemove }) {
       {(s.notes || []).length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 220, overflowY: 'auto' }}>
           {s.notes.map((n, i) => (
-            <div key={i} style={{ fontSize: 12.5, color: 'var(--ink)', background: 'var(--fill)', borderRadius: 10, padding: '8px 10px', whiteSpace: 'pre-wrap' }}>
+            <div key={i} style={{ fontSize: 13, color: 'var(--ink)', background: 'var(--fill)', borderRadius: 10, padding: '8px 10px', whiteSpace: 'pre-wrap' }}>
               {n.text}
               <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 3 }}>{n.author} · {fmtTs(n.date)}</div>
             </div>
@@ -1417,7 +1409,7 @@ function CampaignBar({ campaigns, value, onChange, onAdd }) {
         <button key={c.id} onClick={() => onChange(c.id)} style={chip(value === c.id)}>
           <span title={c.running ? 'работает' : 'остановлено'} style={{ width: 7, height: 7, borderRadius: 99, background: c.running ? 'var(--fg-0e9f6e)' : 'var(--text-quaternary)' }} />
           {c.name}
-          <span style={{ fontSize: 12.5, color: 'var(--text-3)' }}>{KIND_LABEL[c.kind] || ''}</span>
+          <span style={{ fontSize: 13, color: 'var(--text-3)' }}>{KIND_LABEL[c.kind] || ''}</span>
           {c.replies_new > 0 && (
             <span style={{ minWidth: 16, height: 16, borderRadius: 99, background: 'var(--bg-0e9f6e)', color: '#fff', fontSize: 10, fontWeight: 800,
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>{c.replies_new}</span>

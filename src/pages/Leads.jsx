@@ -7,6 +7,7 @@ import AnalyticsView from '../components/leads/AnalyticsView'
 import ErrorBoundary from '../components/ErrorBoundary'
 import { SlidingTabs } from '../components/SlidingTabs'
 import Select from '../components/Select'
+import LeadEditModal from '../components/leads/LeadEditModal'
 
 const VIEWS = [
   { id: 'queue',     label: 'Очередь' },
@@ -20,6 +21,8 @@ export default function Leads() {
   const [industry, setIndustry] = useState(() => localStorage.getItem('leads_industry') || '')
   const [industries, setIndustries] = useState([])
   const [counts, setCounts] = useState({ overdue: 0, today: 0, hot: 0, new: 0 })
+  const [adding, setAdding] = useState(false)
+  const [rev, setRev] = useState(0)   // новый лид — виды перечитывают данные
 
   useEffect(() => { getIndustries().then(r => setIndustries(r.industries || [])).catch(() => {}) }, [])
   useEffect(() => { localStorage.setItem('leads_view', view) }, [view])
@@ -39,22 +42,26 @@ export default function Leads() {
           </Select>
         )}
 
+        <button onClick={() => setAdding(true)} className="btn-ghost">Новый лид</button>
+
         {view === 'queue' && (
           <div style={{ display: 'flex', gap: 18, marginLeft: 'auto', flexWrap: 'wrap', paddingRight: 4 }}>
             {[['Просрочено', counts.overdue, 'var(--fg-ff3b30)'], ['Сегодня', counts.today, 'var(--fg-1366f0)'], ['Горячих', counts.hot, 'var(--fg-d97706)'], ['Новых', counts.new, 'var(--text-3)']].map(([t, n, c]) => (
               <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 13, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
                 <span style={{ width: 7, height: 7, borderRadius: 99, background: c, opacity: n ? 1 : 0.35 }} />
-                {t} <b style={{ color: 'var(--ink)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{n}</b>
+                {t} <b style={{ color: 'var(--ink)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{n >= 500 ? '500+' : n}</b>
               </span>
             ))}
           </div>
         )}
       </div>
 
-      {view === 'queue'     && <ErrorBoundary><QueueView industry={industry} onCounts={setCounts} /></ErrorBoundary>}
-      {view === 'list'      && <ErrorBoundary><ListView industry={industry} /></ErrorBoundary>}
-      {view === 'kanban'    && <ErrorBoundary><KanbanView industry={industry} /></ErrorBoundary>}
+      {view === 'queue'     && <ErrorBoundary><QueueView key={rev} industry={industry} onCounts={setCounts} /></ErrorBoundary>}
+      {view === 'list'      && <ErrorBoundary><ListView key={rev} industry={industry} /></ErrorBoundary>}
+      {view === 'kanban'    && <ErrorBoundary><KanbanView key={rev} industry={industry} /></ErrorBoundary>}
       {view === 'analytics' && <ErrorBoundary><AnalyticsView /></ErrorBoundary>}
+
+      {adding && <LeadEditModal lead={{}} onClose={() => setAdding(false)} onSaved={() => setRev(r => r + 1)} />}
     </div>
   )
 }

@@ -88,8 +88,7 @@ function MissingPPRow({ order, onSaved }) {
       })}
       <button
         onClick={save}
-        disabled={saving}
-        style={{ padding: '6px 12px', borderRadius: 8, background: 'var(--bg-1366f0)', color: '#fff', border: 'none', fontSize: 12, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}
+        disabled={saving} className="btn-primary" style={{ opacity: saving ? 0.6 : 1 }}
       >
         {saving ? '...' : 'Сохранить'}
       </button>
@@ -259,22 +258,19 @@ function BookTab() {
         <button
           onClick={resync}
           disabled={resyncing}
-          title="Пересчитать книгу по всем заявкам (нал, «Акт б/н», группировка ПП). Ручные правки не трогает."
-          style={{ marginLeft: 'auto', padding: '9px 16px', borderRadius: 10, background: 'var(--surface)', color: 'var(--ink)', border: '1px solid var(--line)', fontSize: 13, fontWeight: 600, cursor: resyncing ? 'default' : 'pointer', opacity: resyncing ? 0.6 : 1, whiteSpace: 'nowrap' }}
+          title="Пересчитать книгу по всем заявкам (нал, «Акт б/н», группировка ПП). Ручные правки не трогает." className="btn-ghost" style={{ marginLeft: 'auto', opacity: resyncing ? 0.6 : 1, whiteSpace: 'nowrap' }}
         >
           {resyncing ? (resyncMsg || 'Пересчёт…') : 'Пересчитать'}
         </button>
         {resyncing && (
           <button
-            onClick={cancelResync}
-            style={{ padding: '9px 14px', borderRadius: 10, background: 'var(--surface)', color: 'var(--fg-e0473b)', border: '1px solid rgba(var(--rgb-224-71-59), 0.4)', fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
+            onClick={cancelResync} className="btn-ghost" style={{ color: 'var(--fg-e0473b)', whiteSpace: 'nowrap' }}
           >
             Остановить
           </button>
         )}
         <button
-          onClick={download}
-          style={{ padding: '9px 16px', borderRadius: 10, background: 'var(--bg-1366f0)', color: '#fff', border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+          onClick={download} className="btn-primary"
         >
           Скачать
         </button>
@@ -432,8 +428,7 @@ function EntryRow({ entry, onChanged }) {
           {locked && (
             <button
               onClick={revert}
-              title="Снять ручную правку — строка снова будет пересчитываться автоматически"
-              style={{ flexShrink: 0, border: 'none', background: 'transparent', color: 'var(--text-tertiary)', fontSize: 10, cursor: 'pointer', padding: '2px 4px', whiteSpace: 'nowrap' }}
+              title="Снять ручную правку — строка снова будет пересчитываться автоматически" className="btn-bare" style={{ flexShrink: 0, color: 'var(--text-tertiary)', fontSize: 10, padding: '2px 4px', whiteSpace: 'nowrap' }}
             >
               снять
             </button>

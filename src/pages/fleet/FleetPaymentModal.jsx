@@ -62,8 +62,8 @@ export default function FleetPaymentModal({ order, onClose, onSaved }) {
         <DateInput type="date" value={payDate} onChange={e => setPayDate(e.target.value)} style={{ ...fieldStyle, marginBottom: 22 }} />
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', fontSize: 14, color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
-          <button onClick={confirm} disabled={saving} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: 'var(--bg-1e9e5a)', color: '#FFFFFF', fontSize: 14, fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
+          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+          <button onClick={confirm} disabled={saving} className="btn-primary" style={{ flex: 2, background: 'var(--bg-1e9e5a)', opacity: saving ? 0.6 : 1, boxShadow: 'none', justifyContent: 'center' }}>
             <SwapText>{saving ? 'Сохраняю…' : 'Подтвердить оплату'}</SwapText>
           </button>
         </div>

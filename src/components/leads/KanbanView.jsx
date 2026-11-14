@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { getLeads, updateLead, logCall, claimLead, getAllUsers } from '../../api'
+import { getLeads, updateLead, claimLead, getAllUsers } from '../../api'
+import { saveCall, SAVE_ERROR } from './saveCall'
 import { useRealtime } from '../../hooks/useRealtime'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { STAGES, stageOf } from '../../constants/leads'
@@ -32,20 +33,19 @@ function LeadCard({ lead, users, ghost, lifted, onPointerDown, onClaim }) {
       }}
     >
       {lead.industry && (
-        <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 7, marginBottom: 7, fontSize: 10.5, fontWeight: 600, color: 'var(--fg-1366f0)', background: 'rgba(var(--rgb-19-102-240), 0.09)' }}>{lead.industry}</span>
+        <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 8, marginBottom: 7, fontSize: 11, fontWeight: 600, color: 'var(--fg-1366f0)', background: 'rgba(var(--rgb-19-102-240), 0.09)' }}>{lead.industry}</span>
       )}
-      <div style={{ fontSize: 13.5, fontWeight: 650, color: 'var(--ink)', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.name}</div>
+      <div style={{ fontSize: 14, fontWeight: 650, color: 'var(--ink)', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.name}</div>
       {lead.phone && <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-tertiary)', marginTop: 3 }}>{lead.phone}</div>}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
         {lead.assigned_to ? (
-          <span title={manager || 'Менеджер'} style={{ width: 22, height: 22, borderRadius: 11, flexShrink: 0, display: 'grid', placeItems: 'center', fontSize: 9.5, fontWeight: 700, color: '#fff', background: `linear-gradient(135deg, ${a}, ${b})` }}>
+          <span title={manager || 'Менеджер'} style={{ width: 22, height: 22, borderRadius: 12, flexShrink: 0, display: 'grid', placeItems: 'center', fontSize: 10, fontWeight: 700, color: '#fff', background: `linear-gradient(135deg, ${a}, ${b})` }}>
             {initials(manager || '?')}
           </span>
         ) : (
           <button
             onPointerDown={e => e.stopPropagation()}
-            onClick={e => { e.stopPropagation(); onClaim(lead.id) }}
-            style={{ padding: '4px 10px', borderRadius: 99, border: 'none', cursor: 'pointer', background: 'rgba(var(--rgb-19-102-240), 0.1)', color: 'var(--fg-1366f0)', fontSize: 11.5, fontWeight: 600 }}
+            onClick={e => { e.stopPropagation(); onClaim(lead.id) }} className="btn-ghost btn-sm" style={{ color: 'var(--fg-1366f0)' }}
           >Взять</button>
         )}
         {lead.next_call && (
@@ -80,7 +80,7 @@ function Column({ stage, items, users, drag, over, onCardDown, onClaim }) {
       transition: 'background .15s var(--ease), box-shadow .15s var(--ease)',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '2px 4px' }}>
-        <span style={{ width: 8, height: 8, borderRadius: 4, background: stage.color, flexShrink: 0 }} />
+        <span style={{ width: 8, height: 8, borderRadius: 6, background: stage.color, flexShrink: 0 }} />
         <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 13, color: 'var(--ink)' }}>{stage.label}</span>
         <span style={{ marginLeft: 2, minWidth: 20, padding: '1px 7px', borderRadius: 99, textAlign: 'center', fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)', background: 'rgba(var(--ink-rgb), 0.06)' }}>{sorted.length}</span>
       </div>
@@ -94,7 +94,7 @@ function Column({ stage, items, users, drag, over, onCardDown, onClaim }) {
         {visibleCount < sorted.length && (
           <div style={{ textAlign: 'center', padding: 8, fontSize: 11, color: 'var(--text-3)' }}>ещё {sorted.length - visibleCount}, докрутите вниз</div>
         )}
-        {!sorted.length && !isOver && <div style={{ textAlign: 'center', padding: '22px 0', fontSize: 11.5, color: 'var(--text-3)' }}>Пусто</div>}
+        {!sorted.length && !isOver && <div style={{ textAlign: 'center', padding: '22px 0', fontSize: 12, color: 'var(--text-3)' }}>Пусто</div>}
       </div>
     </div>
   )
@@ -113,7 +113,7 @@ export default function KanbanView({ industry }) {
   const [saving, setSaving] = useState(false)
   const press = useRef(null)
   const { celebrate } = useCelebration()
-  useEscapeKey(() => setActiveLead(null), !!activeLead)
+  useEscapeKey(() => setActiveLead(null), !!activeLead && !editLead)   // Esc закрывает верхнее окно, а не оба
 
   const loadLeads = (showLoading = true) => {
     if (showLoading) setLoading(true)
@@ -206,12 +206,15 @@ export default function KanbanView({ industry }) {
     if (!activeLead) return
     setSaving(true)
     try {
-      const res = await logCall(activeLead.id, data)
+      const res = await saveCall(activeLead, data, celebrate)
       setLeads(prev => prev.map(l => l.id === activeLead.id ? res.lead : l))
-      if (data.outcome === 'won') celebrate()
       setActiveLead(null)
-    } catch (e) { console.error(e) }
-    setSaving(false)
+    } catch (e) {
+      console.error(e)
+      return SAVE_ERROR
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (loading) return <Loader padding={40} />
@@ -226,7 +229,7 @@ export default function KanbanView({ industry }) {
         <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(var(--ink-rgb), 0.1)', flexShrink: 0 }} />
         {STAGES.filter(s => !s.active).map(col)}
       </div>
-      <div style={{ fontSize: 11.5, color: 'var(--text-3)', textAlign: 'center' }}>Перетаскивайте карточки между колонками · на телефоне — подержите карточку</div>
+      <div style={{ fontSize: 12, color: 'var(--text-3)', textAlign: 'center' }}>Перетаскивайте карточки между колонками · на телефоне — подержите карточку</div>
 
       {drag && draggedLead && (   // поднятая карточка: чуть повёрнута и с тенью, едет за курсором
         <div style={{ position: 'fixed', left: drag.x - drag.ox, top: drag.y - drag.oy, width: drag.w, zIndex: 1000, pointerEvents: 'none', transform: 'rotate(3deg) scale(1.03)', transformOrigin: `${drag.ox}px ${drag.oy}px` }}>
@@ -246,6 +249,7 @@ export default function KanbanView({ industry }) {
             setLeads(prev => prev.map(l => l.id === updated.id ? { ...l, ...updated } : l))
             setActiveLead(prev => prev && prev.id === updated.id ? { ...prev, ...updated } : prev)
           }}
+          onDeleted={(id) => { setLeads(prev => prev.filter(l => l.id !== id)); setActiveLead(null) }}
         />
       )}
     </div>

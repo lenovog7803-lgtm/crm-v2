@@ -110,7 +110,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
             топливо {money(d.fuel_cost)} · прочее {money(d.other_expenses)} · ЗП {money(d.driver_salary_total)}
           </div>
           {d.expenses_unpaid > 0.5 && (
-            <div style={{ marginTop: 4, fontSize: 11.5, color: 'var(--fg-e0473b)', fontWeight: 700 }}>не оплачено {money(d.expenses_unpaid)}</div>
+            <div style={{ marginTop: 4, fontSize: 12, color: 'var(--fg-e0473b)', fontWeight: 700 }}>не оплачено {money(d.expenses_unpaid)}</div>
           )}
         </div>
       </div>
@@ -130,7 +130,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
               fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, color: kpi.color,
               background: kpi.bg, borderRadius: 12, padding: '8px 14px', display: 'inline-block', lineHeight: 1,
             }}>{kpi.value != null ? <CountUp value={kpi.value} /> : kpi.raw}</div>
-            {kpi.sub && <div style={{ fontSize: 11.5, color: 'var(--text-3)', marginTop: 6 }}>{kpi.sub}</div>}
+            {kpi.sub && <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6 }}>{kpi.sub}</div>}
           </div>
         ))}
       </div>
@@ -139,7 +139,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
       <div className="card" style={{ padding: '18px 20px', overflow: 'hidden' }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 12 }}>По рейсам</div>
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr style={{ textAlign: 'left', color: 'var(--text-tertiary)' }}>
                 <th style={{ padding: '8px 10px', fontWeight: 600 }}>Рейс</th>
@@ -159,7 +159,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
                     {t.name || t.route || '—'}
                   </td>
                   <td style={{ padding: '9px 10px' }}>
-                    <span style={{ fontSize: 10.5, fontWeight: 700, color: stColor(t.status), background: `color-mix(in srgb, ${stColor(t.status)} 10%, transparent)`, borderRadius: 99, padding: '2px 8px' }}>{stLabel(t.status)}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: stColor(t.status), background: `color-mix(in srgb, ${stColor(t.status)} 10%, transparent)`, borderRadius: 99, padding: '2px 8px' }}>{stLabel(t.status)}</span>
                   </td>
                   <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'var(--font-mono)', color: 'var(--ink)' }}>{int(t.revenue)}</td>
                   <td style={{ padding: '9px 10px', textAlign: 'right', fontFamily: 'var(--font-mono)', color: 'var(--fg-e0473b)' }}>{int(t.expenses)}</td>
@@ -184,7 +184,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
               {d.overdue.map((o, i) => (
                 <div key={o.order_id || i}
                   onClick={() => o.client_id && onOpenClient?.(o.client_id)}
-                  style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '8px 0', borderBottom: i < d.overdue.length - 1 ? '1px solid var(--fill-2)' : 'none', fontSize: 12.5, cursor: o.client_id ? 'pointer' : 'default' }}>
+                  style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '8px 0', borderBottom: i < d.overdue.length - 1 ? '1px solid var(--fill-2)' : 'none', fontSize: 13, cursor: o.client_id ? 'pointer' : 'default' }}>
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--fg-1366f0)', marginRight: 6 }}>{o.order_number}</span>{o.client_name}
                   </span>
@@ -218,7 +218,7 @@ export default function FleetDashboard({ onOpenTrip, onOpenClient, onNav }) {
           <div key={title} className="card" style={{ padding: '18px 20px' }}>
             <div style={{ fontSize: 13, color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: 0, marginBottom: 10 }}>{title}</div>
             {(!items || items.length === 0) ? (
-              <div style={{ fontSize: 12.5, color: 'var(--text-3)' }}>нет</div>
+              <div style={{ fontSize: 13, color: 'var(--text-3)' }}>нет</div>
             ) : items.map((it, i) => (
               <div key={i}
                 onClick={() => it.id && onOpenClient?.(it.id)}

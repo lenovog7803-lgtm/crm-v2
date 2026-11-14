@@ -63,9 +63,9 @@ function ReconciliationModal({ clientId, clientName, onClose }) {
   }
 
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, display: 'grid', padding: 24 }}>
-      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 22, width: '100%', maxWidth: 380, padding: 24, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: 'var(--ink)', marginBottom: 14 }}>Акт сверки</div>
+    <div onClick={onClose} className="dash-modal-scrim">
+      <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 380, padding: 24 }}>
+        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 14 }}>Акт сверки</div>
         <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 12 }}>Период (можно оставить пустым — тогда за всё время)</div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 18 }}>
           <DateInput type="date" value={from} onChange={e => setFrom(e.target.value)} style={{ ...fld, flex: 1 }} />
@@ -73,7 +73,7 @@ function ReconciliationModal({ clientId, clientName, onClose }) {
           <DateInput type="date" value={to} onChange={e => setTo(e.target.value)} style={{ ...fld, flex: 1 }} />
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: 12, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
+          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button onClick={build} disabled={busy} className="btn-primary" style={{ flex: 2, padding: 12 }}>{busy ? 'Готовлю…' : 'Сформировать'}</button>
         </div>
       </div>
@@ -84,7 +84,7 @@ function ReconciliationModal({ clientId, clientName, onClose }) {
 function Row({ label, value }) {
   if (!value) return null
   return (
-    <div style={{ display: 'flex', gap: 10, fontSize: 12.5, padding: '5px 0' }}>
+    <div style={{ display: 'flex', gap: 10, fontSize: 13, padding: '5px 0' }}>
       <span style={{ color: 'var(--text-tertiary)', minWidth: 150, flexShrink: 0 }}>{label}</span>
       <span style={{ color: 'var(--ink)' }}>{value}</span>
     </div>
@@ -107,7 +107,7 @@ function OrderRow({ order, onOpen, onReload }) {
           {order.trip_name || 'Рейс'}
           <span style={{ color: 'var(--text-tertiary)', fontWeight: 400 }}> · {order.direction === 'backward' ? 'обратка' : 'прямой'}</span>
         </div>
-        <button onClick={remove} title="Удалить" style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 14, flexShrink: 0 }}>✕</button>
+        <button onClick={remove} title="Удалить" className="btn-x" style={{ fontSize: 14, flexShrink: 0 }}>✕</button>
       </div>
       {(order.loading_address || order.unloading_address) && (
         <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>{order.loading_address || '—'} → {order.unloading_address || '—'}</div>

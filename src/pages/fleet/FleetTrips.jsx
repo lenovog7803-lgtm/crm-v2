@@ -61,8 +61,8 @@ function CreateTripModal({ onClose, onCreated }) {
   }
 
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 460, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
+    <div onClick={onClose} className="dash-modal-scrim">
+      <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 460, padding: 26 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 18 }}>Новый рейс</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
           <input autoFocus value={form.name} onChange={e => set('name', e.target.value)} placeholder="Название рейса, напр. Минск–Москва" style={fieldStyle} />
@@ -83,8 +83,8 @@ function CreateTripModal({ onClose, onCreated }) {
           <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>Машина и водитель подставятся в каждый заказ этого рейса — в самом заказе можно поменять.</div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
-          <button onClick={save} disabled={saving || !form.name.trim()} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: form.name.trim() ? 'var(--fg-1366f0)' : 'var(--text-quaternary)', color: '#fff', fontWeight: 700, cursor: saving ? 'default' : 'pointer' }}>
+          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+          <button onClick={save} disabled={saving || !form.name.trim()} className="btn-primary" style={{ flex: 2, justifyContent: 'center' }}>
             {saving ? 'Создаю…' : 'Создать рейс'}
           </button>
         </div>
@@ -141,16 +141,16 @@ export default function FleetTrips({ onOpenTrip }) {
                         {t.name || 'Без названия'}
                       </div>
                       {(() => { const s = TRIP_STATUS.find(x => x.key === (t.status || 'active')) || TRIP_STATUS[0]; return (
-                        <span style={{ fontSize: 10.5, fontWeight: 700, color: s.color, background: `color-mix(in srgb, ${s.color} 10%, transparent)`, borderRadius: 99, padding: '2px 8px', flexShrink: 0 }}>{s.label}</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: s.color, background: `color-mix(in srgb, ${s.color} 10%, transparent)`, borderRadius: 99, padding: '2px 8px', flexShrink: 0 }}>{s.label}</span>
                       ) })()}
                     </div>
-                    <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 4 }}>
+                    <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 4 }}>
                       {(t.route_from || '—')} → {(t.route_to || '—')}
                     </div>
-                    <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginBottom: 12 }}>
+                    <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 12 }}>
                       {fmtDate(t.first_load_date)} – {fmtDate(t.last_unload_date)}
                     </div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 700, color: 'var(--fg-1366f0)' }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 17, fontWeight: 700, color: 'var(--fg-1366f0)' }}>
                       {(t.total_amount || 0).toLocaleString('ru-RU')} Br
                     </div>
                   </div>

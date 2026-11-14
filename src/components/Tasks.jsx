@@ -9,6 +9,7 @@ import CheckCircle from './CheckCircle'
 import Select from './Select'
 import { EmptyState } from './EmptyState'
 import { useChangeFlash } from '../hooks/useChangeFlash'
+import { iosError } from './IOSAlert'
 import DateInput from './DateInput'
 
 const TYPE_COLORS = { call: 'var(--fg-1366f0)', reminder: 'var(--fg-d97706)', payment: 'var(--fg-1e9e5a)', other: 'var(--text-3)' }
@@ -46,11 +47,15 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
     const newStatus = task.status === 'done' ? 'pending' : 'done'
     ownEdits.current.add(task.id)
     setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: newStatus } : t))
-    apiUpdate(task.id, { status: newStatus }).catch(console.error)
+    apiUpdate(task.id, { status: newStatus }).catch(err => {
+      console.error(err)
+      setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: task.status } : t))   // не сохранилось — возвращаем галочку
+      iosError('Задача не сохранилась. Проверьте интернет и попробуйте ещё раз.')
+    })
   }
 
   const handleDelete = async id => {
-    await apiDelete(id).catch(console.error)
+    try { await apiDelete(id) } catch (err) { console.error(err); iosError('Задача не удалена. Проверьте интернет и попробуйте ещё раз.'); return }
     setTasks(prev => prev.filter(t => t.id !== id))
   }
 
@@ -80,7 +85,7 @@ export default function Tasks({ onAdd, refreshKey, search = '' }) {
       })
       setTasks(prev => prev.map(t => t.id === editTask.id ? { ...t, ...editTask } : t))
       setEditTask(null)
-    } catch (e) { console.error(e) }
+    } catch (e) { console.error(e); iosError('Задача не сохранилась. Проверьте интернет и попробуйте ещё раз.') }
     setSaving(false)
   }
 

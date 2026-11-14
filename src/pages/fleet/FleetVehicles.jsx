@@ -64,8 +64,8 @@ function EntityModal({ title, sections, initial, onClose, onSave }) {
   }
 
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 480, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
+    <div onClick={onClose} className="dash-modal-scrim">
+      <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 480, padding: 26 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 18 }}>{title}</div>
 
         {sections.map((sec, si) => (
@@ -92,8 +92,8 @@ function EntityModal({ title, sections, initial, onClose, onSave }) {
         ))}
 
         <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
-          <button onClick={submit} disabled={saving} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: 'var(--bg-1366f0)', color: '#fff', fontWeight: 700, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.6 : 1 }}>
+          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+          <button onClick={submit} disabled={saving} className="btn-primary" style={{ flex: 2, opacity: saving ? 0.6 : 1, justifyContent: 'center' }}>
             <SwapText>{saving ? 'Сохраняю…' : initial ? 'Сохранить' : 'Добавить'}</SwapText>
           </button>
         </div>
@@ -167,7 +167,7 @@ export default function FleetVehicles() {
                 <div key={v.id} className="card" style={cardStyle} onClick={() => setModal({ kind: 'vehicle', item: v })} title="Нажмите, чтобы изменить">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
                     <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: 'var(--ink)' }}>{v.model || v.brand || '—'}</div>
-                    <button onClick={e => removeVehicle(e, v.id)} style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 14 }}>✕</button>
+                    <button onClick={e => removeVehicle(e, v.id)} className="btn-x" style={{ fontSize: 14 }}>✕</button>
                   </div>
                   {(v.plate || v.plate_truck) && <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>{v.plate || v.plate_truck}</div>}
                   {v.capacity_tons ? <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6 }}>{v.capacity_tons} т</div> : null}
@@ -186,7 +186,7 @@ export default function FleetVehicles() {
               <div key={d.id} className="card" style={cardStyle} onClick={() => setModal({ kind: 'driver', item: d })} title="Нажмите, чтобы изменить">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
                   <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: 'var(--ink)' }}>{d.name}</div>
-                  <button onClick={e => removeDriver(e, d.id)} style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 14 }}>✕</button>
+                  <button onClick={e => removeDriver(e, d.id)} className="btn-x" style={{ fontSize: 14 }}>✕</button>
                 </div>
                 {(d.phone_ru || d.phone_by || d.phone) && (
                   <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 6 }}>

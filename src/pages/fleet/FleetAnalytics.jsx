@@ -42,7 +42,7 @@ function PnlTable({ title, rows, cols }) {
     <div className="card" style={{ padding: '18px 20px', overflow: 'hidden' }}>
       <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 12 }}>{title}</div>
       <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
             <tr style={{ textAlign: 'left', color: 'var(--text-tertiary)' }}>
               {cols.map(c => <th key={c.key} style={{ padding: '8px 10px', fontWeight: 600, textAlign: c.right ? 'right' : 'left' }}>{c.label}</th>)}

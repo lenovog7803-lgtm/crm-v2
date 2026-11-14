@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import './index.css'
 
 import { AuthProvider, useAuth } from './AuthContext'
@@ -20,25 +20,25 @@ import ClientDetail from './components/ClientDetail'
 import Carriers from './components/Carriers'
 import CarrierDetail from './components/CarrierDetail'
 import Leads from './pages/Leads'
-import Trash from './components/Trash'
-import Backups from './pages/Backups'
-import Admin from './pages/Admin'
-import Kudir from './pages/Kudir'
-import Plan from './pages/Plan'
-import Reports from './pages/Reports'
-import Mailing from './pages/Mailing'
-import Chats from './pages/Chats'
+const Trash = lazy(() => import('./components/Trash'))
+const Backups = lazy(() => import('./pages/Backups'))
+const Admin = lazy(() => import('./pages/Admin'))
+const Kudir = lazy(() => import('./pages/Kudir'))
+const Plan = lazy(() => import('./pages/Plan'))
+const Reports = lazy(() => import('./pages/Reports'))
+const Mailing = lazy(() => import('./pages/Mailing'))
+const Chats = lazy(() => import('./pages/Chats'))
 import ManagerDashboard from './pages/ManagerDashboard'
 import ErrorBoundary from './components/ErrorBoundary'
-import FleetTrips from './pages/fleet/FleetTrips'
-import FleetTripDetail from './pages/fleet/FleetTripDetail'
-import FleetClients from './pages/fleet/FleetClients'
-import FleetClientDetail from './pages/fleet/FleetClientDetail'
-import FleetOrderDetail from './pages/fleet/FleetOrderDetail'
-import FleetDashboard from './pages/fleet/FleetDashboard'
-import FleetAnalytics from './pages/fleet/FleetAnalytics'
-import FleetPlan from './pages/fleet/FleetPlan'
-import FleetVehicles from './pages/fleet/FleetVehicles'
+const FleetTrips = lazy(() => import('./pages/fleet/FleetTrips'))
+const FleetTripDetail = lazy(() => import('./pages/fleet/FleetTripDetail'))
+const FleetClients = lazy(() => import('./pages/fleet/FleetClients'))
+const FleetClientDetail = lazy(() => import('./pages/fleet/FleetClientDetail'))
+const FleetOrderDetail = lazy(() => import('./pages/fleet/FleetOrderDetail'))
+const FleetDashboard = lazy(() => import('./pages/fleet/FleetDashboard'))
+const FleetAnalytics = lazy(() => import('./pages/fleet/FleetAnalytics'))
+const FleetPlan = lazy(() => import('./pages/fleet/FleetPlan'))
+const FleetVehicles = lazy(() => import('./pages/fleet/FleetVehicles'))
 
 import CreateOrderModal from './components/CreateOrderModal'
 import CreateTaskModal from './components/CreateTaskModal'
@@ -358,6 +358,8 @@ function MainApp() {
         <main className="app-main">
           <Topbar compact={scrolled} page={page} meta={detailMeta?.page === page ? detailMeta : null} onSignOut={signOut} period={page === 'finance' ? financePeriod : dashboardPeriod} onPeriodChange={page === 'finance' ? setFinancePeriod : setDashboardPeriod} availableMonths={availableMonths} search={search} onSearchChange={handleSearchChange} overdueItems={overdueItems} onOpenOrder={id => openOrder(id)} onNav={handleNav} onOpenPalette={() => setPaletteOpen(true)} />
           <div className={`scroll-area${motionRef.current.cls}`} key={page} onScroll={handleScrollParallax}>
+            {/* редкие разделы грузятся отдельными кусками при первом открытии */}
+            <Suspense fallback={<Loader padding={40} />}>
             {page === 'dashboard' && <Dashboard onNav={handleNav} onOpenOrder={id => openOrder(id)} period={dashboardPeriod} onMonthsLoaded={setAvailableMonths} preloadedOrders={allOrders} />}
             {page === 'my-dashboard' && <ErrorBoundary><ManagerDashboard /></ErrorBoundary>}
 
@@ -480,6 +482,7 @@ function MainApp() {
             {page === 'reports' && isDirector && <Reports />}
             {page === 'mailing' && isDirector && <ErrorBoundary><Mailing /></ErrorBoundary>}
             {page === 'chats' && isDirector && <ErrorBoundary><Chats /></ErrorBoundary>}
+            </Suspense>
           </div>
         </main>
       </div>

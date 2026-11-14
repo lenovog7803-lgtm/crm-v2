@@ -347,7 +347,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
           {!loading && loadError && (
             <div style={{ padding: 40, textAlign: 'center' }}>
               <div style={{ color: '#8E8E93', fontSize: 14, marginBottom: 12 }}>Не удалось загрузить заявки</div>
-              <button onClick={loadOrders} style={{ background: 'var(--bg-1366f0)', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Повторить</button>
+              <button onClick={loadOrders} className="btn-primary">Повторить</button>
             </div>
           )}
           {!loading && !loadError && filtered.length === 0 && (
@@ -396,7 +396,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                     {/* Selection checkbox — shown once select mode is on, or while actively swiping past the threshold */}
                     {(selectMode || dx > 60) && (
                       <div style={{
-                        width: 20, height: 20, borderRadius: 7, flexShrink: 0,
+                        width: 20, height: 20, borderRadius: 8, flexShrink: 0,
                         background: isSelected ? 'var(--fg-1366f0)' : 'var(--surface)',
                         border: `1.5px solid ${isSelected ? 'var(--fg-1366f0)' : 'var(--text-quaternary)'}`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -437,8 +437,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                           {margin.toLocaleString('ru-RU')}
                         </div>
                         <div style={{ display: 'flex', gap: 3, justifyContent: 'flex-end', marginTop: 3 }}>
-                          <span style={{ width: 18, height: 18, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, background: order.client_paid ? 'rgba(var(--rgb-30-158-90), 0.15)' : (hasUnreconciledPayment(order, 'client') ? 'rgba(var(--rgb-217-119-6), 0.18)' : 'rgba(var(--ink-rgb), 0.07)'), color: order.client_paid ? 'var(--fg-1e9e5a)' : (hasUnreconciledPayment(order, 'client') ? 'var(--fg-d97706)' : 'var(--text-quaternary)') }} title={hasUnreconciledPayment(order, 'client') ? 'Есть введённый ПП от клиента, но сумма не сошлась со ставкой' : undefined}>К</span>
-                          <span style={{ width: 18, height: 18, borderRadius: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, background: order.carrier_paid ? 'rgba(var(--rgb-124-58-237), 0.15)' : (hasUnreconciledPayment(order, 'carrier') ? 'rgba(var(--rgb-217-119-6), 0.18)' : 'rgba(var(--ink-rgb), 0.07)'), color: order.carrier_paid ? 'var(--fg-7c3aed)' : (hasUnreconciledPayment(order, 'carrier') ? 'var(--fg-d97706)' : 'var(--text-quaternary)') }} title={hasUnreconciledPayment(order, 'carrier') ? 'Есть введённый ПП перевозчику, но сумма не сошлась со ставкой' : undefined}>П</span>
+                          <span style={{ width: 18, height: 18, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, background: order.client_paid ? 'rgba(var(--rgb-30-158-90), 0.15)' : (hasUnreconciledPayment(order, 'client') ? 'rgba(var(--rgb-217-119-6), 0.18)' : 'rgba(var(--ink-rgb), 0.07)'), color: order.client_paid ? 'var(--fg-1e9e5a)' : (hasUnreconciledPayment(order, 'client') ? 'var(--fg-d97706)' : 'var(--text-quaternary)') }} title={hasUnreconciledPayment(order, 'client') ? 'Есть введённый ПП от клиента, но сумма не сошлась со ставкой' : undefined}>К</span>
+                          <span style={{ width: 18, height: 18, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, background: order.carrier_paid ? 'rgba(var(--rgb-124-58-237), 0.15)' : (hasUnreconciledPayment(order, 'carrier') ? 'rgba(var(--rgb-217-119-6), 0.18)' : 'rgba(var(--ink-rgb), 0.07)'), color: order.carrier_paid ? 'var(--fg-7c3aed)' : (hasUnreconciledPayment(order, 'carrier') ? 'var(--fg-d97706)' : 'var(--text-quaternary)') }} title={hasUnreconciledPayment(order, 'carrier') ? 'Есть введённый ПП перевозчику, но сумма не сошлась со ставкой' : undefined}>П</span>
                         </div>
                       </div>
                       <svg width="8" height="13" viewBox="0 0 8 13" fill="none">
@@ -523,14 +523,14 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
               <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '140px minmax(0, 0.75fr) minmax(0, 1.25fr) 110px 90px', alignItems: 'center' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, fontSize: 13.5, color: 'var(--fg-1366f0)' }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, fontSize: 14, color: 'var(--fg-1366f0)' }}>
                     {order.order_number || order.id}
                   </div>
-                  {missingClientPP && <span style={{ fontSize: 9.5, color: 'var(--fg-c81923)', fontWeight: 700 }}>Нет ПП клиента</span>}
-                  {missingCarrierPP && <span style={{ fontSize: 9.5, color: 'var(--fg-c81923)', fontWeight: 700 }}>Нет ПП перевозчика</span>}
-                  {missingClientDate && <span style={{ fontSize: 9.5, color: 'var(--fg-d97706)', fontWeight: 700 }}>Нет даты клиента</span>}
-                  {missingCarrierDate && <span style={{ fontSize: 9.5, color: 'var(--fg-d97706)', fontWeight: 700 }}>Нет даты перевозчика</span>}
-                  {unreconciled && <span style={{ fontSize: 9.5, color: 'var(--fg-d97706)', fontWeight: 700 }}>Проверьте оплату</span>}
+                  {missingClientPP && <span style={{ fontSize: 10, color: 'var(--fg-c81923)', fontWeight: 700 }}>Нет ПП клиента</span>}
+                  {missingCarrierPP && <span style={{ fontSize: 10, color: 'var(--fg-c81923)', fontWeight: 700 }}>Нет ПП перевозчика</span>}
+                  {missingClientDate && <span style={{ fontSize: 10, color: 'var(--fg-d97706)', fontWeight: 700 }}>Нет даты клиента</span>}
+                  {missingCarrierDate && <span style={{ fontSize: 10, color: 'var(--fg-d97706)', fontWeight: 700 }}>Нет даты перевозчика</span>}
+                  {unreconciled && <span style={{ fontSize: 10, color: 'var(--fg-d97706)', fontWeight: 700 }}>Проверьте оплату</span>}
                 </div>
                 {/* статус — цветная точка и слово (просроченная — красная) */}
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 4, fontSize: 12, fontWeight: 600, color: overdue ? 'var(--fg-c81923)' : statusColor(order.status) }}>
@@ -539,8 +539,8 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 </div>
               </div>
               <div>
-                <div style={{ fontWeight: 600, fontSize: 13.5, color: 'var(--ink)' }}>{route}</div>
-                <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginTop: 2 }}>
+                <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--ink)' }}>{route}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>
                   {fmtDate(order.load_date) || '—'}{order.weight_tons ? ` · ${order.weight_tons} т` : ''}
                 </div>
               </div>
@@ -557,7 +557,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                       {order.client_name}
                     </div>
                     <div style={{
-                      fontSize: 11.5, color: 'var(--text-tertiary)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       visibility: order.carrier_name ? 'visible' : 'hidden',
                     }}>
                       {order.carrier_name || '—'}
@@ -566,9 +566,9 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
                 </div>
               ) : <div style={{ color: 'var(--text-tertiary)', fontSize: 13 }}>—</div>}
               <div>
-                <div style={{ fontWeight: 700, fontSize: 13.5, color: 'var(--ink)' }}>{margin.toLocaleString('ru-RU')} BYN</div>
+                <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>{margin.toLocaleString('ru-RU')} BYN</div>
                 <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>{marginPct}%</div>
-                <div style={{ fontSize: 10.5, color: 'var(--text-quaternary)', marginTop: 2, lineHeight: 1.4 }}>
+                <div style={{ fontSize: 11, color: 'var(--text-quaternary)', marginTop: 2, lineHeight: 1.4 }}>
                   {order.client_rate ? order.client_rate.toLocaleString('ru-RU') : '—'} / {order.carrier_rate ? order.carrier_rate.toLocaleString('ru-RU') : '—'}
                 </div>
               </div>
@@ -593,7 +593,7 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
         {!loading && loadError && (
           <div style={{ padding: '40px', textAlign: 'center' }}>
             <div style={{ color: 'var(--text-tertiary)', fontSize: 14, marginBottom: 12 }}>Не удалось загрузить заявки</div>
-            <button onClick={loadOrders} style={{ background: 'var(--bg-1366f0)', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Повторить</button>
+            <button onClick={loadOrders} className="btn-primary">Повторить</button>
           </div>
         )}
         {!loading && !loadError && filtered.length === 0 && (
@@ -683,8 +683,8 @@ function CorrespondenceModal({ orderIds, onClose, onSaved }) {
   }
 
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 440, padding: 26 }}>
+    <div onClick={onClose} className="dash-modal-scrim">
+      <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 440, padding: 26 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 4 }}>
           Отметить корреспонденцию
         </div>
@@ -724,13 +724,12 @@ function CorrespondenceModal({ orderIds, onClose, onSaved }) {
         />
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>
             Отмена
           </button>
           <button
             onClick={save}
-            disabled={saving || !type}
-            style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: type ? 'var(--fg-1366f0)' : 'var(--line)', color: type ? '#FFFFFF' : 'var(--text-3)', fontWeight: 700, cursor: type ? 'pointer' : 'not-allowed' }}
+            disabled={saving || !type} className="btn-primary" style={{ flex: 2, justifyContent: 'center' }}
           >
             <SwapText>{saving ? 'Сохраняю…' : 'Отметить'}</SwapText>
           </button>

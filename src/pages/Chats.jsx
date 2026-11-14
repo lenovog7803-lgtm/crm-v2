@@ -117,7 +117,7 @@ function ChatView({ mailboxId, chat, onBack, onSent }) {
         {onBack && <button className="ios-sheet-close" onClick={onBack} aria-label="Назад" style={{ fontSize: 20 }}>‹</button>}
         <Avatar name={name} email={addr} size={36} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15.5, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 15, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
           <div style={{ fontSize: 12, color: 'var(--text-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {[addr !== name && addr, data?.subject || chat.subject].filter(Boolean).join(' · ')}
           </div>
@@ -134,7 +134,7 @@ function ChatView({ mailboxId, chat, onBack, onSent }) {
           return (
             <div key={m.id} style={{ display: 'flex', flexDirection: 'column', alignItems: m.from_me ? 'flex-end' : 'flex-start', marginTop: grouped ? 0 : 8 }}>
               {newDay && m.date && (
-                <div style={{ alignSelf: 'center', margin: '6px 0 10px', padding: '3px 10px', borderRadius: 99, fontSize: 11.5, fontWeight: 600,
+                <div style={{ alignSelf: 'center', margin: '6px 0 10px', padding: '3px 10px', borderRadius: 99, fontSize: 12, fontWeight: 600,
                   background: 'rgba(118,118,128,0.12)', color: 'var(--text-3)' }}>{dayLabel(m.date)}</div>
               )}
               <div className={`bubble ${m.from_me ? 'bubble--me' : 'bubble--them'}`}>
@@ -142,9 +142,7 @@ function ChatView({ mailboxId, chat, onBack, onSent }) {
                 {m.attachments?.length > 0 && (
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
                     {m.attachments.map(a => (
-                      <button key={a.index} onClick={() => download(m, a)}
-                        style={{ border: 'none', cursor: 'pointer', borderRadius: 12, padding: '6px 10px', fontSize: 12.5, fontWeight: 600, fontFamily: 'inherit',
-                          background: m.from_me ? 'rgba(255,255,255,0.2)' : 'rgba(var(--paper-rgb), 0.8)', color: m.from_me ? '#fff' : 'var(--fg-1366f0)' }}>
+                      <button key={a.index} onClick={() => download(m, a)} className="btn-chip" style={{ border: 'none', background: m.from_me ? 'rgba(255,255,255,0.2)' : 'rgba(var(--paper-rgb), 0.8)', color: m.from_me ? '#fff' : 'var(--fg-1366f0)' }}>
                         📎 {a.name} · {fmtSize(a.size)}
                       </button>
                     ))}
@@ -166,7 +164,7 @@ function NewChat({ mailboxId, onBack, onSent }) {
   const { show } = useToast()
   const [to, setTo] = useState('')
   const [subject, setSubject] = useState('')
-  const field = { border: 'none', outline: 'none', background: 'transparent', fontSize: 14.5, fontFamily: 'inherit', color: 'var(--ink)', flex: 1, minWidth: 0 }
+  const field = { border: 'none', outline: 'none', background: 'transparent', fontSize: 15, fontFamily: 'inherit', color: 'var(--ink)', flex: 1, minWidth: 0 }
   const row = { display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderBottom: '0.5px solid rgba(var(--sep-rgb), 0.18)' }
   const send = async (text) => {
     try {
@@ -181,7 +179,7 @@ function NewChat({ mailboxId, onBack, onSent }) {
   return (
     <div className="ios-widget" style={{ padding: 0, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden',
       height: onBack ? 'calc(100dvh - 150px)' : 'calc(100dvh - 190px)' }}>
-      <div style={{ ...row, fontWeight: 700, fontSize: 15.5, fontFamily: 'var(--font-sys)' }}>
+      <div style={{ ...row, fontWeight: 700, fontSize: 15, fontFamily: 'var(--font-sys)' }}>
         {onBack && <button className="ios-sheet-close" onClick={onBack} aria-label="Назад" style={{ fontSize: 20 }}>‹</button>}
         Новое письмо
       </div>
@@ -318,10 +316,10 @@ export default function Chats() {
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
                   <span style={{ fontWeight: c.unread ? 700 : 600, fontSize: 15, color: 'var(--ink)', flex: 1, minWidth: 0,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.peer_name || c.peer_email}</span>
-                  <span style={{ fontSize: 12.5, color: c.unread ? 'var(--fg-1366f0)' : 'var(--text-3)', fontWeight: c.unread ? 700 : 400, flexShrink: 0 }}>{whenShort(c.date)}</span>
+                  <span style={{ fontSize: 13, color: c.unread ? 'var(--fg-1366f0)' : 'var(--text-3)', fontWeight: c.unread ? 700 : 400, flexShrink: 0 }}>{whenShort(c.date)}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
-                  <span style={{ flex: 1, minWidth: 0, fontSize: 13.5, color: 'var(--text-2b)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span style={{ flex: 1, minWidth: 0, fontSize: 14, color: 'var(--text-2b)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {c.last_from_me && <span style={{ color: 'var(--text-3)' }}>Вы: </span>}
                     {c.snippet || c.subject}
                   </span>

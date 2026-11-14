@@ -69,7 +69,7 @@ export default function ScriptPanel({ stage }) {
           <textarea
             value={draft}
             onChange={e => setDraft(e.target.value)}
-            style={{ width: '100%', minHeight: 260, padding: 12, borderRadius: 12, border: '1px solid rgba(var(--ink-rgb), 0.12)', background: 'var(--fill)', fontFamily: 'var(--font-mono)', fontSize: 12.5, color: 'var(--ink)', resize: 'vertical', boxSizing: 'border-box', whiteSpace: 'pre-wrap' }}
+            style={{ width: '100%', minHeight: 260, padding: 12, borderRadius: 12, border: '1px solid rgba(var(--ink-rgb), 0.12)', background: 'var(--fill)', fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--ink)', resize: 'vertical', boxSizing: 'border-box', whiteSpace: 'pre-wrap' }}
           />
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={() => setEditing(false)} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>

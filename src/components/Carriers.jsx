@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getCarriers, deleteCarrier as apiDelete } from '../api'
 import { getGradient } from '../utils'
 import { SkeletonList } from './Skeleton'
+import { iosError } from './IOSAlert'
 import { mouseOnly } from '../motion'
 
 // Same cleanup as Clients.jsx — imported phone fields sometimes carry
@@ -35,7 +36,7 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
 
   const handleDelete = async (e, id) => {
     e.stopPropagation()
-    await apiDelete(id).catch(console.error)
+    try { await apiDelete(id) } catch (err) { console.error(err); iosError('Перевозчик не удалён. Проверьте интернет и попробуйте ещё раз.'); return }
     setCarriers(prev => prev.filter(c => c.id !== id))
   }
 

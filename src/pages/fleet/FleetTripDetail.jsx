@@ -41,7 +41,7 @@ function niceInput(props) {
 
 const stat = (label, value, color = 'var(--ink)') => (
   <div style={{ background: 'rgba(var(--ink-rgb), 0.03)', borderRadius: 12, padding: '10px 14px', minWidth: 0 }}>
-    <div style={{ fontSize: 10.5, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: 4 }}>{label}</div>
+    <div style={{ fontSize: 11, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: 4 }}>{label}</div>
     <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 15, color }}>{value}</div>
   </div>
 )
@@ -149,7 +149,7 @@ function TripInfoCard({ trip, revenue, finance, onSave, onReload }) {
           <polyline points="9 18 15 12 9 6" />
         </svg>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--ink)' }}>Информация о рейсе · финансы</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>Информация о рейсе · финансы</div>
           <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 1 }}>
             {km > 0 ? `${km.toLocaleString('ru-RU')} км · ` : ''}расходы {money(totalCost)} Br
             {expUnpaid > 0.5 ? ` · не оплачено ${money(expUnpaid)} Br` : ''}
@@ -184,8 +184,7 @@ function TripInfoCard({ trip, revenue, finance, onSave, onReload }) {
         <div>
           <div style={{ fontSize: 11, color: 'var(--text-3)', marginBottom: 4 }}>Топливо оплачено?</div>
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-            <button onClick={() => { const n = { ...f, fuel_paid: !f.fuel_paid }; setF(n); persist(n) }}
-              style={{ padding: '9px 12px', borderRadius: 10, border: '1px solid', borderColor: f.fuel_paid ? 'var(--fg-1e9e5a)' : 'var(--line)', background: f.fuel_paid ? 'rgba(var(--rgb-30-158-90), 0.1)' : 'var(--surface)', color: f.fuel_paid ? 'var(--fg-1e9e5a)' : 'var(--text-3)', fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            <button onClick={() => { const n = { ...f, fuel_paid: !f.fuel_paid }; setF(n); persist(n) }} className="btn-chip" style={{ border: '1px solid', borderColor: f.fuel_paid ? 'var(--fg-1e9e5a)' : 'var(--line)', background: f.fuel_paid ? 'rgba(var(--rgb-30-158-90), 0.1)' : 'var(--surface)', color: f.fuel_paid ? 'var(--fg-1e9e5a)' : 'var(--text-3)', whiteSpace: 'nowrap' }}>
               {f.fuel_paid ? '✓ оплачено' : 'не оплачено'}
             </button>
             <input value={f.fuel_paid_by} placeholder="кто платил" onChange={e => set('fuel_paid_by', e.target.value)} onBlur={() => dirty && persist()} style={{ ...fieldStyle, flex: 1, minWidth: 0 }} />
@@ -202,7 +201,7 @@ function TripInfoCard({ trip, revenue, finance, onSave, onReload }) {
       {/* Прочие расходы — с отметкой оплаты и чеком */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink)' }}>Расходы по рейсу</div>
-        <button onClick={addExpense} style={{ border: '1px solid var(--fg-1366f0)', background: 'transparent', color: 'var(--fg-1366f0)', borderRadius: 8, padding: '5px 10px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>+ расход</button>
+        <button onClick={addExpense} className="btn-ghost">+ расход</button>
       </div>
       {f.expenses.length === 0 && <div style={{ fontSize: 12, color: 'var(--text-tertiary)', padding: '4px 0 10px' }}>Платные дороги, суточные, штрафы, мойка, паром и т.д.</div>}
       {f.expenses.map(e => (
@@ -212,11 +211,10 @@ function TripInfoCard({ trip, revenue, finance, onSave, onReload }) {
               {EXPENSE_KINDS.map(k => <option key={k}>{k}</option>)}
             </Select>
             <input type="number" value={e.amount} placeholder="BYN" onChange={ev => setExpense(e.id, 'amount', ev.target.value)} onBlur={() => persist()} style={{ ...fieldStyle, width: 100 }} />
-            <button onClick={() => delExpense(e.id)} style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 14, flexShrink: 0 }}>✕</button>
+            <button onClick={() => delExpense(e.id)} className="btn-x" style={{ fontSize: 14, flexShrink: 0 }}>✕</button>
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-            <button onClick={() => toggleExpensePaid(e.id)}
-              style={{ padding: '7px 11px', borderRadius: 9, border: '1px solid', borderColor: e.paid ? 'var(--fg-1e9e5a)' : 'var(--line)', background: e.paid ? 'rgba(var(--rgb-30-158-90), 0.1)' : 'var(--surface)', color: e.paid ? 'var(--fg-1e9e5a)' : 'var(--text-3)', fontSize: 11.5, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            <button onClick={() => toggleExpensePaid(e.id)} className="btn-chip" style={{ border: '1px solid', borderColor: e.paid ? 'var(--fg-1e9e5a)' : 'var(--line)', background: e.paid ? 'rgba(var(--rgb-30-158-90), 0.1)' : 'var(--surface)', color: e.paid ? 'var(--fg-1e9e5a)' : 'var(--text-3)', whiteSpace: 'nowrap' }}>
               {e.paid ? '✓ оплачено' : 'не оплачено'}
             </button>
             <input value={e.paid_by || ''} placeholder="кто платил" onChange={ev => setExpense(e.id, 'paid_by', ev.target.value)} onBlur={() => persist()} style={{ ...fieldStyle, flex: '1 1 110px', minWidth: 0, padding: '7px 10px' }} />
@@ -252,8 +250,8 @@ function TripInfoCard({ trip, revenue, finance, onSave, onReload }) {
         </div>
 
         <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-          <button onClick={() => addPayout('advance')} style={{ border: '1px solid var(--line)', background: 'var(--surface)', color: 'var(--text-secondary)', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>+ аванс</button>
-          <button onClick={() => addPayout('payout')} style={{ border: '1px solid var(--fg-1e9e5a)', background: 'rgba(var(--rgb-30-158-90), 0.08)', color: 'var(--fg-1e9e5a)', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>+ выплата</button>
+          <button onClick={() => addPayout('advance')} className="btn-ghost">+ аванс</button>
+          <button onClick={() => addPayout('payout')} className="btn-ghost" style={{ color: 'var(--fg-1e9e5a)' }}>+ выплата</button>
         </div>
         {payouts.length > 0 && (
           <div style={{ marginTop: 8 }}>
@@ -262,7 +260,7 @@ function TripInfoCard({ trip, revenue, finance, onSave, onReload }) {
                 <span>{p.kind === 'advance' ? 'Аванс' : 'Выплата'} · {fmtDate(p.date)}</span>
                 <span style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                   <b style={{ fontFamily: 'var(--font-mono)', color: 'var(--ink)' }}>{money(p.amount)} Br</b>
-                  <button onClick={() => removePayout(p.id)} style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 13 }}>✕</button>
+                  <button onClick={() => removePayout(p.id)} className="btn-x" style={{ fontSize: 13 }}>✕</button>
                 </span>
               </div>
             ))}
@@ -302,10 +300,10 @@ function CommentsCard({ entity, id, comments, onReload }) {
     <div className="card" style={{ padding: 16 }}>
       <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink)', marginBottom: 10 }}>Комментарии</div>
       {list.map(c => (
-        <div key={c.id} style={{ padding: '7px 0', borderBottom: '1px solid var(--fill)', fontSize: 12.5, color: '#3A424E' }}>
+        <div key={c.id} style={{ padding: '7px 0', borderBottom: '1px solid var(--fill)', fontSize: 13, color: '#3A424E' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
             <span style={{ color: 'var(--text-3)', fontSize: 11 }}>{c.author || '—'} · {fmtDate(c.created_at)}</span>
-            <button onClick={() => del(c.id)} style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 12 }}>✕</button>
+            <button onClick={() => del(c.id)} className="btn-x" style={{ fontSize: 12 }}>✕</button>
           </div>
           <div style={{ marginTop: 2, whiteSpace: 'pre-wrap' }}>{c.text}</div>
         </div>
@@ -351,8 +349,8 @@ function EditTripModal({ trip, onClose, onSaved }) {
   }
 
   return (
-    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, overflowY: 'auto', display: 'grid', padding: 24 }}>
-      <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 460, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
+    <div onClick={onClose} className="dash-modal-scrim">
+      <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 460, padding: 26 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 18 }}>Изменить рейс</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
           <input autoFocus value={form.name} onChange={e => set('name', e.target.value)} placeholder="Название рейса" style={{ ...fieldStyle, width: '100%' }} />
@@ -372,8 +370,8 @@ function EditTripModal({ trip, onClose, onSaved }) {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', color: 'var(--text-secondary)', cursor: 'pointer' }}>Отмена</button>
-          <button onClick={save} disabled={saving || !form.name.trim()} style={{ flex: 2, padding: 13, borderRadius: 12, border: 'none', background: form.name.trim() ? 'var(--fg-1366f0)' : 'var(--text-quaternary)', color: '#fff', fontWeight: 700, cursor: saving ? 'default' : 'pointer' }}>
+          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+          <button onClick={save} disabled={saving || !form.name.trim()} className="btn-primary" style={{ flex: 2, justifyContent: 'center' }}>
             <SwapText>{saving ? 'Сохраняю…' : 'Сохранить'}</SwapText>
           </button>
         </div>
@@ -416,8 +414,8 @@ function FleetOrderCard({ order, onReload, onOpen }) {
           {order.client_name || 'Клиент не указан'}
         </div>
         <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-          <button onClick={dup} title="Дублировать" style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 13, lineHeight: 1 }}>⧉</button>
-          <button onClick={remove} title="Удалить" style={{ border: 'none', background: 'transparent', color: 'var(--text-quaternary)', cursor: 'pointer', fontSize: 14, lineHeight: 1 }}>✕</button>
+          <button onClick={dup} title="Дублировать" className="btn-x" style={{ fontSize: 13 }}>⧉</button>
+          <button onClick={remove} title="Удалить" className="btn-x" style={{ fontSize: 14 }}>✕</button>
         </div>
       </div>
       {(order.loading_address || order.unloading_address) && (
@@ -431,7 +429,7 @@ function FleetOrderCard({ order, onReload, onOpen }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
         <span style={{ fontSize: 11, color: 'var(--text-3)' }}>{fmtDate(order.load_date)} → {fmtDate(order.unload_date)}</span>
         <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <span style={{ fontSize: 10.5, fontWeight: 700, color: payState.c, background: payState.bg, borderRadius: 6, padding: '2px 7px' }}>{payState.t}</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: payState.c, background: payState.bg, borderRadius: 6, padding: '2px 7px' }}>{payState.t}</span>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: 'var(--fg-1366f0)' }}>{rate.toLocaleString('ru-RU')} Br</span>
         </span>
       </div>
@@ -445,7 +443,7 @@ function DirectionSection({ title, orders, onAdd, onReload, onOpen }) {
     <div className="card" style={{ padding: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>{title}</div>
-        <button onClick={onAdd} style={{ width: 26, height: 26, borderRadius: 8, border: '1px solid var(--fg-1366f0)', background: 'transparent', color: 'var(--fg-1366f0)', fontSize: 15, fontWeight: 700, cursor: 'pointer', lineHeight: 1 }}>+</button>
+        <button onClick={onAdd} className="btn-icon" style={{ width: 26, height: 26, color: 'var(--fg-1366f0)', fontSize: 15, fontWeight: 700 }}>+</button>
       </div>
       {orders.map(o => <FleetOrderCard key={o.id} order={o} onReload={onReload} onOpen={onOpen} />)}
       {orders.length === 0 && <div style={{ fontSize: 12, color: 'var(--text-tertiary)', textAlign: 'center', padding: 20 }}>Заказов пока нет</div>}

@@ -1,9 +1,9 @@
-// Кнопки-действия в стиле карточки заявки экспедирования (OrderDetail).
+// Кнопки-действия автопарка: общая серая кнопка CRM (.btn-ghost), вариант задаёт только цвет текста.
 const VARIANTS = {
-  edit: { bg: 'rgba(var(--rgb-19-102-240), 0.08)', color: 'var(--fg-1366f0)' },
-  neutral: { bg: 'rgba(var(--ink-rgb), 0.06)', color: 'var(--text-secondary)' },
-  delete: { bg: 'rgba(var(--rgb-200-25-35), 0.1)', color: 'var(--fg-c81923)' },
-  green: { bg: 'rgba(var(--rgb-30-158-90), 0.1)', color: 'var(--fg-1e9e5a)' },
+  edit: { color: 'var(--fg-1366f0)' },
+  neutral: { color: 'var(--text-secondary)' },
+  delete: { color: 'var(--fg-c81923)' },
+  green: { color: 'var(--fg-1e9e5a)' },
 }
 
 const I = (p) => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">{p}</svg>
@@ -18,11 +18,8 @@ const ICONS = {
 export function PillBtn({ variant = 'neutral', icon, onClick, disabled, style, children }) {
   const v = VARIANTS[variant] || VARIANTS.neutral
   return (
-    <button onClick={onClick} disabled={disabled} style={{
-      padding: '9px 16px', borderRadius: 12, border: 'none', cursor: disabled ? 'default' : 'pointer',
-      flexShrink: 0, background: v.bg, color: v.color, fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13,
-      display: 'inline-flex', alignItems: 'center', gap: 6, opacity: disabled ? 0.6 : 1, ...style,
-    }}>
+    <button onClick={onClick} disabled={disabled} className="btn-ghost"
+      style={{ flexShrink: 0, color: variant === 'neutral' ? undefined : v.color, opacity: disabled ? 0.6 : 1, ...style }}>
       {icon && ICONS[icon]}{children}
     </button>
   )

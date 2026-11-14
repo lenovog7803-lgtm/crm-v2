@@ -278,7 +278,7 @@ function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
                 <span style={{ fontSize: 30, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.03em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{total.toLocaleString('ru-RU')}</span>
                 <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-tertiary)' }}>BYN</span>
               </div>
-              <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 6 }}>
+              <div style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 6 }}>
                 {orders.length} заявок · {groups.length} {party === 'carrier' ? 'перевозчиков' : 'клиентов'}
               </div>
             </div>
@@ -295,8 +295,8 @@ function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
                     <div className="ios-row" onClick={() => setOpen(isOpen ? null : g.name)} aria-expanded={isOpen}>
                       <span style={{ width: 38, height: 38, borderRadius: 99, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 13, fontWeight: 700, '--av-hue': b, background: `linear-gradient(135deg, ${a}, ${b})` }}>{initials(g.name)}</span>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{g.name}</div>
-                        <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>
+                        <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{g.name}</div>
+                        <div style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 2 }}>
                           {g.orders.length} {g.orders.length === 1 ? 'заявка' : g.orders.length < 5 ? 'заявки' : 'заявок'}
                           {g.oldest > 0 && <> · <span style={{ color: g.oldest > 30 ? 'var(--fg-c81923)' : 'inherit' }}>до {g.oldest} дн.</span></>}
                         </div>
@@ -314,14 +314,14 @@ function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
                           return (
                             <div key={o.id} className="debt-order" onClick={() => { onOpenOrder && onOpenOrder(o.id); onClose() }}>
                               <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: 13.5, fontWeight: 500, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                   {(o.route_from && o.route_to) ? `${o.route_from} → ${o.route_to}` : '—'}
                                 </div>
                                 <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 1 }}>
                                   {o.order_number || `#${o.id}`}{days !== null && <> · <span style={{ color: days > 30 ? 'var(--fg-c81923)' : 'inherit' }}>{days} дн.</span></>}
                                 </div>
                               </div>
-                              <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{(o.client_rate || 0).toLocaleString('ru-RU')}</span>
+                              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{(o.client_rate || 0).toLocaleString('ru-RU')}</span>
                               <svg width="7" height="12" viewBox="0 0 8 13" fill="none" stroke="var(--text-quaternary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1.5 1.5l5 5-5 5"/></svg>
                             </div>
                           )
@@ -357,7 +357,7 @@ function FullListModal({ title, subtitle, items, valueOf, color, bg, onClose }) 
         <div style={{ padding: 26 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
             <div>
-              <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>{title}</div>
+              <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)' }}>{title}</div>
               <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{subtitle}</div>
             </div>
             <button onClick={onClose} className="ios-sheet-close" aria-label="Закрыть"><svg width="12" height="12" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
@@ -390,7 +390,7 @@ function GoalEditModal({ goalKey, value, onChange, onClose, onSave }) {
     <div className="dash-modal-scrim" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div className="dash-modal" style={{ maxWidth: 340 }}>
         <div style={{ padding: 24 }}>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 16, color: 'var(--ink)', marginBottom: 4 }}>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 4 }}>
             План: {meta.label}
           </div>
           <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 16 }}>Действует только для текущего месяца</div>
@@ -403,7 +403,7 @@ function GoalEditModal({ goalKey, value, onChange, onClose, onSave }) {
               onChange={e => onChange(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') onSave() }}
               className="form-input"
-              style={{ width: '100%', fontSize: 16, fontWeight: 700, paddingRight: 48 }}
+              style={{ width: '100%', fontSize: 17, fontWeight: 700, paddingRight: 48 }}
             />
             <span style={{ position: 'absolute', right: 13, top: '50%', transform: 'translateY(-50%)', fontSize: 12, color: 'var(--text-tertiary)', fontWeight: 600 }}>{meta.unit}</span>
           </div>
@@ -544,7 +544,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             background: 'radial-gradient(120% 80% at 10% -20%, rgba(255,255,255,0.3), transparent 50%), linear-gradient(150deg, #6E9CEB 0%, #5585DC 55%, #4A74C9 100%)',
             backdropFilter: 'blur(28px) saturate(180%)', WebkitBackdropFilter: 'blur(28px) saturate(180%)',
             border: '1px solid rgba(255,255,255,calc(0.35 * var(--rim-k)))',
-            borderRadius: 26, padding: isMobile ? '16px 18px' : '22px 24px', color: '#fff',
+            borderRadius: 24, padding: isMobile ? '16px 18px' : '22px 24px', color: '#fff',
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.4 * var(--rim-k))), 0 18px 44px -22px rgba(40,90,190,0.45)',
             transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
             position: 'relative', overflow: 'hidden', isolation: 'isolate',
@@ -556,7 +556,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
           <WidgetHead label="Маржа" color="rgba(255,255,255,0.24)" labelColor="rgba(255,255,255,0.92)"
             right={marginDiff !== null && (
               <div style={{
-                display: 'flex', alignItems: 'center', gap: 3, padding: '3px 9px', borderRadius: 999,
+                display: 'flex', alignItems: 'center', gap: 3, padding: '3px 9px', borderRadius: 99,
                 background: 'rgba(255,255,255,0.2)',
                 fontSize: 12, fontWeight: 600, color: marginUp ? '#C8FFE0' : '#FFD6DB',
               }}>

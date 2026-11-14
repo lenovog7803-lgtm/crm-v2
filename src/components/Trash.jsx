@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getTrash, restoreTrash, purgeTrash } from '../api'
 import { mouseOnly } from '../motion'
 import { Loader } from './Loader'
+import { iosError } from './IOSAlert'
 import { EmptyState } from './EmptyState'
 
 const TYPE_LABELS = {
@@ -59,7 +60,7 @@ export default function Trash() {
     try {
       await restoreTrash(item.collection, item.id)
       setItems(prev => prev.filter(i => i.id !== item.id))
-    } catch (e) { console.error(e) }
+    } catch (e) { console.error(e); iosError('Не восстановилось. Проверьте интернет и попробуйте ещё раз.') }
     setRestoring(null)
   }
 
@@ -71,7 +72,7 @@ export default function Trash() {
       setItems([])
       setPurgeOpen(false)
       setPurgeWord('')
-    } catch (e) { console.error(e) }
+    } catch (e) { console.error(e); iosError('Корзина не очищена. Проверьте интернет и попробуйте ещё раз.') }
     setPurging(false)
   }
 
@@ -80,7 +81,7 @@ export default function Trash() {
 
   const chipStyle = (k) => ({
     padding: '6px 14px', borderRadius: 99, border: 'none', cursor: 'pointer',
-    fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600,
+    fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600,
     background: filter === k ? 'var(--chip-strong)' : 'rgba(var(--ink-rgb), 0.06)',
     color: filter === k ? '#fff' : 'var(--text-secondary)',
   })
@@ -102,12 +103,7 @@ export default function Trash() {
         </div>
         {items.length > 0 && (
           <button
-            onClick={() => setPurgeOpen(true)}
-            style={{
-              padding: '9px 16px', borderRadius: 10, border: '1px solid rgba(var(--rgb-200-25-35), 0.25)',
-              background: 'rgba(var(--rgb-200-25-35), 0.06)', color: 'var(--fg-c81923)',
-              fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer',
-            }}
+            onClick={() => setPurgeOpen(true)} className="btn-ghost" style={{ color: 'var(--fg-c81923)' }}
           >
             Очистить корзину
           </button>
@@ -117,9 +113,9 @@ export default function Trash() {
       {purgeOpen && (
         <div
           onClick={() => !purging && setPurgeOpen(false)}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(var(--ink-rgb), 0.55)', backdropFilter: 'blur(6px)', zIndex: 1000, display: 'grid', padding: 24 }}
+          className="dash-modal-scrim"
         >
-          <div onClick={e => e.stopPropagation()} style={{ margin: 'auto', background: 'var(--surface)', borderRadius: 24, width: '100%', maxWidth: 420, padding: 26, boxShadow: '0 40px 80px rgba(20,30,55,0.28)' }}>
+          <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 420, padding: 26 }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--fg-c81923)', marginBottom: 6 }}>
               Необратимое действие
             </div>
@@ -134,18 +130,12 @@ export default function Trash() {
               style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--fill)', fontSize: 14, color: 'var(--ink)', boxSizing: 'border-box', marginBottom: 22 }}
             />
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => { setPurgeOpen(false); setPurgeWord('') }} style={{ flex: 1, padding: 13, borderRadius: 12, background: 'var(--fill)', border: '1px solid var(--line)', fontSize: 14, color: 'var(--text-secondary)', cursor: 'pointer' }}>
+              <button onClick={() => { setPurgeOpen(false); setPurgeWord('') }} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>
                 Отмена
               </button>
               <button
                 onClick={handlePurge}
-                disabled={purging || purgeWord.trim().toUpperCase() !== 'УДАЛИТЬ'}
-                style={{
-                  flex: 2, padding: 13, borderRadius: 12, border: 'none',
-                  background: purgeWord.trim().toUpperCase() === 'УДАЛИТЬ' ? 'var(--fg-c81923)' : 'var(--text-quaternary)',
-                  color: '#FFFFFF', fontSize: 14, fontWeight: 700,
-                  cursor: purgeWord.trim().toUpperCase() === 'УДАЛИТЬ' && !purging ? 'pointer' : 'default',
-                }}
+                disabled={purging || purgeWord.trim().toUpperCase() !== 'УДАЛИТЬ'} className="btn-primary" style={{ flex: 2, background: purgeWord.trim().toUpperCase() === 'УДАЛИТЬ' ? 'var(--fg-c81923)' : 'var(--text-quaternary)', boxShadow: 'none', justifyContent: 'center' }}
               >
                 {purging ? 'Удаляю…' : 'Удалить навсегда'}
               </button>
@@ -177,23 +167,23 @@ export default function Trash() {
               borderBottom: i < filtered.length - 1 ? '1px solid rgba(var(--ink-rgb), 0.05)' : 'none',
             }}>
               <div style={{
-                width: 36, height: 36, borderRadius: 11, flexShrink: 0,
+                width: 36, height: 36, borderRadius: 12, flexShrink: 0,
                 background: 'rgba(var(--rgb-200-25-35), 0.08)', color: 'var(--fg-c81923)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 {TYPE_ICONS[item.collection] || TYPE_ICONS.tasks}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {item.label || item.id}
                 </div>
-                <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginTop: 2 }}>
+                <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>
                   {TYPE_LABELS[item.collection] || item.collection}
                   {item.deleted_at && ` · Удалено ${new Date(item.deleted_at).toLocaleDateString('ru-RU')}`}
                 </div>
               </div>
               <div style={{
-                fontSize: 11.5, fontWeight: 600, padding: '4px 10px', borderRadius: 8,
+                fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 8,
                 background: urgent ? 'rgba(var(--rgb-200-25-35), 0.1)' : 'rgba(var(--ink-rgb), 0.05)',
                 color: urgent ? 'var(--fg-c81923)' : 'var(--text-3)', flexShrink: 0,
               }}>
@@ -201,13 +191,7 @@ export default function Trash() {
               </div>
               <button
                 onClick={() => handleRestore(item)}
-                disabled={restoring === item.id}
-                style={{
-                  padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(var(--rgb-19-102-240), 0.25)',
-                  background: 'rgba(var(--rgb-19-102-240), 0.06)', color: 'var(--fg-1366f0)',
-                  fontFamily: 'var(--font-sys)', fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
-                  flexShrink: 0, transition: 'all 0.15s',
-                }}
+                disabled={restoring === item.id} className="btn-ghost" style={{ color: 'var(--fg-1366f0)', flexShrink: 0 }}
                 onPointerEnter={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.12)')}
                 onPointerLeave={mouseOnly(e => e.currentTarget.style.background = 'rgba(var(--rgb-19-102-240), 0.06)')}
               >

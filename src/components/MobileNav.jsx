@@ -207,13 +207,13 @@ function MoreSheet({ page, counts, onNav, onClose }) {
                 <button key={it.key} className="ios-row" onClick={() => { onNav(it.key); onClose() }}
                   style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 14, minHeight: 52, padding: '0 14px 0 14px',
                     border: 'none', background: 'var(--surface)', fontFamily: SYS_FONT, textAlign: 'left', cursor: 'pointer' }}>
-                  <span style={{ width: 30, height: 30, borderRadius: 7, background: it.color, flexShrink: 0,
+                  <span style={{ width: 30, height: 30, borderRadius: 8, background: it.color, flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{ICONS[it.icon]}</span>
                   {/* разделитель начинается от текста, а не от края — как в iOS */}
                   <span style={{ flex: 1, alignSelf: 'stretch', display: 'flex', alignItems: 'center', gap: 8,
                     borderTop: idx ? '0.5px solid rgba(var(--sep-rgb), 0.29)' : 'none' }}>
                     <span style={{ flex: 1, fontSize: 17, color: '#000', fontWeight: active ? 600 : 400, letterSpacing: '-0.02em' }}>{it.label}</span>
-                    {n > 0 && <span style={{ minWidth: 22, height: 22, borderRadius: 11, background: 'var(--bg-ff3b30)', color: '#fff', fontSize: 13, fontWeight: 600,
+                    {n > 0 && <span style={{ minWidth: 22, height: 22, borderRadius: 12, background: 'var(--bg-ff3b30)', color: '#fff', fontSize: 13, fontWeight: 600,
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 7px' }}>{n > 99 ? '99+' : n}</span>}
                     {active && <span style={{ color: 'var(--fg-007aff)', fontSize: 15, fontWeight: 600 }}>✓</span>}
                     <svg width="8" height="14" viewBox="0 0 8 14" fill="none" stroke="#C4C4C7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 1l6 6-6 6"/></svg>
@@ -248,7 +248,7 @@ export default function MobileNav({ page, onNav, counts, isManager }) {
           {badgeVal > 0 && (
             <span className="t-badge-pop" style={{
               position: 'absolute', top: -4, right: -8, minWidth: 15, height: 15, borderRadius: 99,
-              background: 'var(--bg-ff3b30)', color: '#fff', fontSize: 8, fontWeight: 800,
+              background: 'var(--bg-ff3b30)', color: '#fff', fontSize: 10, fontWeight: 800,
               display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px', lineHeight: 1,
             }}><PopNumber value={badgeVal > 99 ? '99+' : badgeVal} /></span>
           )}

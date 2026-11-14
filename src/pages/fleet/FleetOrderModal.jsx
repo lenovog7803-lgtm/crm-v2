@@ -21,7 +21,7 @@ export function fmtDate(v) {
 const Field = ({ label, children }) => <div><label style={labelSt}>{label}</label>{children}</div>
 const Grid2 = ({ children }) => <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 12 }}>{children}</div>
 const SectionTitle = ({ title }) => (
-  <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.01em' }}>{title}</div>
+  <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.01em' }}>{title}</div>
 )
 const vehLabel = v => [v?.model, v?.plate || v?.plate_truck].filter(Boolean).join(', ')
 

@@ -105,8 +105,9 @@ export const getLead = (id) => req(`/leads/${id}`);
 export const createLead = (data) => req('/leads', { method: 'POST', body: JSON.stringify(data) });
 export const updateLead = (id, data) => req(`/leads/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const deleteLead = (id) => req(`/leads/${id}`, { method: 'DELETE' });
-export const getCallQueue = (industry) =>
-  req('/leads/queue' + (industry ? `?industry=${encodeURIComponent(industry)}` : ''));
+// limit 500: сервер по умолчанию отдаёт 50 — очередь «кончалась», а счётчики упирались в 50
+export const getCallQueue = (industry, limit = 500) =>
+  req(`/leads/queue?limit=${limit}` + (industry ? `&industry=${encodeURIComponent(industry)}` : ''));
 export const logCall = (leadId, data) =>
   req(`/leads/${leadId}/call`, { method: 'POST', body: JSON.stringify(data) });
 export const getCallHistory = (leadId) => req(`/leads/${leadId}/calls`);

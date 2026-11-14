@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { getLeads } from '../../api'
-import { STAGES, stageById } from '../../constants/leads'
+import { STAGES, stageById, stageOf } from '../../constants/leads'
 import LeadEditModal from './LeadEditModal'
-import { logCall, claimLead } from '../../api'
+import { claimLead } from '../../api'
+import { saveCall, SAVE_ERROR } from './saveCall'
 import { SkeletonList } from '../Skeleton'
 import { EmptyState } from '../EmptyState'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
@@ -14,6 +15,7 @@ import Select from '../Select'
 import Switch from '../Switch'
 
 const FILTERS_KEY = 'leads_list_filters'
+const PAGE = 40
 
 function loadFilters() {
   try { return JSON.parse(localStorage.getItem(FILTERS_KEY)) || {} } catch { return {} }
@@ -26,10 +28,10 @@ export default function ListView({ industry }) {
   const [loading, setLoading] = useState(true)
   const [filters, setFilters] = useState(() => ({ search: '', stage: '', overdueOnly: false, ...loadFilters() }))
   const [activeLead, setActiveLead] = useState(null)
-  useEscapeKey(() => setActiveLead(null), !!activeLead)
   const [editLead, setEditLead] = useState(null)
+  useEscapeKey(() => setActiveLead(null), !!activeLead && !editLead)   // Esc закрывает верхнее окно, а не оба
   const [saving, setSaving] = useState(false)
-  const [visibleCount, setVisibleCount] = useState(10)
+  const [visibleCount, setVisibleCount] = useState(PAGE)
   const scrollRef = useRef(null)
   const { celebrate } = useCelebration()
 
@@ -45,7 +47,7 @@ export default function ListView({ industry }) {
   const now = new Date().toISOString()
   const filtered = leads.filter(l => {
     if (industry && l.industry !== industry) return false
-    if (filters.stage && l.stage !== filters.stage) return false
+    if (filters.stage && stageOf(l) !== filters.stage) return false
     if (filters.overdueOnly && !(l.next_call && l.next_call < now)) return false
     if (filters.search) {
       const q = filters.search.toLowerCase()
@@ -55,7 +57,7 @@ export default function ListView({ industry }) {
     return true
   })
 
-  useEffect(() => { setVisibleCount(10) }, [filters, industry])
+  useEffect(() => { setVisibleCount(PAGE) }, [filters, industry])
 
   const visible = filtered.slice(0, visibleCount)
 
@@ -63,7 +65,7 @@ export default function ListView({ industry }) {
     const el = scrollRef.current
     if (!el) return
     if (el.scrollTop + el.clientHeight >= el.scrollHeight - 60) {
-      setVisibleCount(prev => Math.min(prev + 10, filtered.length))
+      setVisibleCount(prev => Math.min(prev + PAGE, filtered.length))
     }
   }
 
@@ -71,12 +73,15 @@ export default function ListView({ industry }) {
     if (!activeLead) return
     setSaving(true)
     try {
-      const res = await logCall(activeLead.id, data)
+      const res = await saveCall(activeLead, data, celebrate)
       setLeads(prev => prev.map(l => l.id === activeLead.id ? res.lead : l))
-      if (data.outcome === 'won') celebrate()
       setActiveLead(null)
-    } catch (e) { console.error(e) }
-    setSaving(false)
+    } catch (e) {
+      console.error(e)
+      return SAVE_ERROR
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleClaim = async (leadId, e) => {
@@ -106,7 +111,7 @@ export default function ListView({ industry }) {
           <option value="">Все стадии</option>
           {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
         </Select>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: 'var(--text-secondary)', cursor: 'pointer' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)', cursor: 'pointer' }}>
           <Switch size="sm" checked={filters.overdueOnly} onChange={e => set('overdueOnly')(e.target.checked)} />
           Только просроченные
         </label>
@@ -144,12 +149,12 @@ export default function ListView({ industry }) {
                         <div style={{ fontSize: 13, color: overdue ? 'var(--fg-ff3b30)' : 'var(--ink)', fontWeight: overdue ? 600 : 500, fontVariantNumeric: 'tabular-nums' }}>
                           {new Date(l.next_call).toLocaleDateString('ru-RU')}
                         </div>
-                        {(l.call_attempts || 0) > 0 && <div style={{ fontSize: 11.5, color: 'var(--text-tertiary)', marginTop: 1 }}>{l.call_attempts} попыт.</div>}
+                        {(l.call_attempts || 0) > 0 && <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 1 }}>{l.call_attempts} попыт.</div>}
                       </>
                     ) : <span style={{ fontSize: 13, color: 'var(--text-quaternary)' }}>—</span>}
                   </div>
                   {!l.assigned_to ? (
-                    <button onClick={e => handleClaim(l.id, e)} style={{ padding: '6px 16px', borderRadius: 99, border: 'none', cursor: 'pointer', background: 'rgba(118,118,128,0.12)', color: 'var(--fg-1366f0)', fontSize: 13, fontWeight: 700, fontFamily: 'var(--font-sys)', flexShrink: 0 }}>Взять</button>
+                    <button onClick={e => handleClaim(l.id, e)} className="btn-ghost btn-sm" style={{ color: 'var(--fg-1366f0)', flexShrink: 0 }}>Взять</button>
                   ) : (
                     <svg className="ios-row-chevron" width="8" height="13" viewBox="0 0 8 13" fill="none">
                       <path d="M1 1.5L6.5 7L1 12.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -180,6 +185,7 @@ export default function ListView({ industry }) {
             setLeads(prev => prev.map(l => l.id === updated.id ? { ...l, ...updated } : l))
             setActiveLead(prev => prev && prev.id === updated.id ? { ...prev, ...updated } : prev)
           }}
+          onDeleted={(id) => { setLeads(prev => prev.filter(l => l.id !== id)); setActiveLead(null) }}
         />
       )}
     </div>
