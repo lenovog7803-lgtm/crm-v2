@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { ModalOverlay, ModalHeader } from './Modal'
-import { createCarrier } from '../api'
+import { createCarrier, findDuplicates } from '../api'
 import Select from './Select'
-import { iosConfirm } from './IOSAlert'
+import { iosConfirm, confirmNoDuplicates } from './IOSAlert'
 
 const sectionLabel = {
   fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', color: 'var(--ink)',
@@ -32,6 +32,7 @@ export default function AddCarrierModal({ onClose, onSuccess }) {
     if (!form.company_name) return
     setLoading(true)
     setError('')
+    if (!(await confirmNoDuplicates(() => findDuplicates('carriers', { phone: form.phone, name: form.company_name, unp: form.unp }), 'такой перевозчик'))) { setLoading(false); return }
     try {
       await createCarrier({
         ...form,

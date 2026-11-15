@@ -105,6 +105,8 @@ export const getLead = (id) => req(`/leads/${id}`);
 export const createLead = (data) => req('/leads', { method: 'POST', body: JSON.stringify(data) });
 export const updateLead = (id, data) => req(`/leads/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const deleteLead = (id) => req(`/leads/${id}`, { method: 'DELETE' });
+// похожие записи по телефону, названию, УНП; kind — 'leads' | 'carriers'
+export const findDuplicates = (kind, fields) => req(`/${kind}/duplicates?` + new URLSearchParams(fields));
 // limit 500: сервер по умолчанию отдаёт 50 — очередь «кончалась», а счётчики упирались в 50
 export const getCallQueue = (industry, limit = 500) =>
   req(`/leads/queue?limit=${limit}` + (industry ? `&industry=${encodeURIComponent(industry)}` : ''));

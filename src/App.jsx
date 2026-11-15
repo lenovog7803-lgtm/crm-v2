@@ -100,8 +100,11 @@ function MainApp() {
   const MANAGER_PAGES = ['my-dashboard', 'tasks', 'leads', 'order-detail', 'client-detail', 'carrier-detail']
 
   const fleetMode = (() => { try { return localStorage.getItem('crm_mode') === 'fleet' } catch { return false } })()
+  // ссылка из Telegram-бота: /?p=orders открывает сразу нужный раздел
+  const linked = new URLSearchParams(window.location.search).get('p')
   const [page, setPage] = useState(() =>
-    isManager ? 'my-dashboard' : (fleetMode && isDirector ? 'fleet-trips' : 'dashboard')
+    ['orders', 'finance', 'tasks', 'leads'].includes(linked) && (!isManager || MANAGER_PAGES.includes(linked)) ? linked
+      : isManager ? 'my-dashboard' : (fleetMode && isDirector ? 'fleet-trips' : 'dashboard')
   )
   // направление перехода: в карточку — сдвиг вперёд, из карточки обратно — назад
   const motionRef = useRef({ page: null, cls: '' })

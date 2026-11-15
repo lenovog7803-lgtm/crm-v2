@@ -47,4 +47,12 @@ export function iosConfirm(message, opts = {}) {
 }
 
 // Сообщение об ошибке с одной кнопкой: «Не удалось удалить. Проверьте интернет…»
+// Перед созданием: показать похожие записи и спросить. Проверка не прошла — не мешаем создавать.
+export async function confirmNoDuplicates(find, what) {
+  const dups = await find().catch(() => [])
+  if (!dups.length) return true
+  const list = dups.map(d => `• ${d.name}${d.phone ? ` — ${d.phone}` : ''}`).join('\n')
+  return iosConfirm(`Похоже, ${what} уже есть в базе.\n${list}\n\nВсё равно создать?`, { okLabel: 'Создать', destructive: false })
+}
+
 export const iosError = (message) => iosConfirm(message, { okLabel: 'Понятно', cancelLabel: null, destructive: false })

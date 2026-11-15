@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { createLead, updateLead, deleteLead } from '../../api'
+import { createLead, updateLead, deleteLead, findDuplicates } from '../../api'
 import { STAGES } from '../../constants/leads'
 import { ModalOverlay, ModalHeader } from '../Modal'
-import { iosConfirm } from '../IOSAlert'
+import { iosConfirm, confirmNoDuplicates } from '../IOSAlert'
 import { SwapText } from '../Transitions'
 import Select from '../Select'
 
@@ -28,6 +28,7 @@ export default function LeadEditModal({ lead, onClose, onSaved, onDeleted }) {
     if (!form.name?.trim() || !form.phone?.trim()) { setError('Укажите название и телефон'); return }
     setSaving(true)
     setError('')
+    if (isNew && !(await confirmNoDuplicates(() => findDuplicates('leads', { phone: form.phone, name: form.name }), 'такой лид'))) { setSaving(false); return }
     try {
       const data = Object.fromEntries([...FIELDS.map(([k]) => k), 'stage', 'notes'].map(k => [k, form[k] ?? '']))
       const saved = isNew ? await createLead(data) : await updateLead(lead.id, data)
