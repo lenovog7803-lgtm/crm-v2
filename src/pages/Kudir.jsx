@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { getMissingPP, getKudirEntries, updateKudirEntry, unlockKudirEntry, exportKudirUrl, updateOrder, resyncKudir, resyncKudirStatus, resyncKudirCancel } from '../api'
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
-import { fmtMoney, fmtDate } from '../utils'
+import { fmtMoney } from '../utils'
 import { Loader } from '../components/Loader'
 import DateInput from '../components/DateInput'
 

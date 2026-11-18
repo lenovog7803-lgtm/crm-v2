@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getCarrier, deleteCarrier as apiDelete, updateCarrier, getOrders } from '../api'
-import { fmtMoney, statusLabel, statusColor, statusBg, getGradient } from '../utils'
+import { statusLabel, statusColor, statusBg, getGradient } from '../utils'
 import { mouseOnly } from '../motion'
 import { Loader } from './Loader'
 import { StatusOrb } from './StatusOrb'

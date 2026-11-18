@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getFleetAnalytics } from '../../api'
 import { useToast } from '../../components/Toast'
-import { CountUp } from '../../components/CountUp'
 import { PillBtn } from './fleetUi'
 import { Loader } from '../../components/Loader'
 import DateInput from '../../components/DateInput'

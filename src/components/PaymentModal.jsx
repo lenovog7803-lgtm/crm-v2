@@ -40,7 +40,7 @@ export default function PaymentModal({ defaultKind, onClose, onSuccess }) {
       }
       onSuccess()
     } catch (e) {
-      setError('Ошибка при сохранении платежа')
+      setError(e?.message || 'Ошибка при сохранении платежа')
     }
     setLoading(false)
   }

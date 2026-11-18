@@ -34,7 +34,7 @@ export default function CreateTaskModal({ onClose, onSuccess }) {
       await createTask({ ...form, status: 'pending', assigned_user_id: form.assigned_user_id || null })
       onSuccess()
     } catch (e) {
-      setError('Ошибка при создании задачи')
+      setError(e?.message || 'Ошибка при создании задачи')
     }
     setLoading(false)
   }

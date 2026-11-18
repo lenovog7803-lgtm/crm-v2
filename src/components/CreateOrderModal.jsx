@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ModalOverlay, ModalHeader } from './Modal'
-import { createOrder, updateOrder, getClients, getCarriers, getToken, syncToSheets, getOrders } from '../api'
+import { createOrder, updateOrder, getClients, getCarriers, syncToSheets, getOrders } from '../api'
 import { mouseOnly } from '../motion'
 import { iosConfirm } from './IOSAlert'
 import DateInput from './DateInput'
@@ -257,7 +257,7 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
       setIsDirty(false)
       onSuccess()
     } catch (e) {
-      setError(isEdit ? 'Ошибка при сохранении' : 'Ошибка при создании заявки')
+      setError(e?.message || (isEdit ? 'Ошибка при сохранении' : 'Ошибка при создании заявки'))
       console.error(e)
     }
     setLoading(false)

@@ -37,7 +37,7 @@ export default function AddClientModal({ onClose, onSuccess }) {
       setIsDirty(false)
       onSuccess()
     } catch (e) {
-      setError('Ошибка при сохранении')
+      setError(e?.message || 'Ошибка при сохранении')
     }
     setLoading(false)
   }

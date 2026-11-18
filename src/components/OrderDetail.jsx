@@ -121,11 +121,45 @@ function FieldLabel({ children }) {
 
 const LONG_PRESS_MS = 2000
 
+function getPaymentDueBadge(order) {
+  const baseDateStr = order.unload_date || order.load_date || order.created_at
+  if (!baseDateStr) return null
+  const base = new Date(baseDateStr)
+  if (isNaN(base.getTime())) return null
+  const days = Number(order.payment_days) || 20
+  const dueDate = new Date(base.getTime() + days * 86400000)
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const dueDay = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate())
+  const diffDays = Math.round((dueDay - today) / 86400000)
+
+  if (diffDays < 0) {
+    return {
+      text: `Просрочено на ${Math.abs(diffDays)} дн.`,
+      color: 'var(--fg-ff3b30)',
+      bg: 'rgba(var(--rgb-200-25-35), 0.12)',
+    }
+  }
+  if (diffDays === 0) {
+    return {
+      text: 'Срок сегодня',
+      color: 'var(--fg-d97706)',
+      bg: 'rgba(var(--rgb-217-119-6), 0.14)',
+    }
+  }
+  return {
+    text: `Осталось ${diffDays} дн.`,
+    color: 'var(--fg-0a84ff)',
+    bg: 'rgba(var(--rgb-10-132-255), 0.10)',
+  }
+}
+
 function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
   const isCarrier = type === 'carrier'
   const isPaid = isCarrier ? order.carrier_paid : order.client_paid
   const isCash = isCarrier ? order.carrier_cash : order.client_cash
   const ppNumber = isCarrier ? order.carrier_pp_number : order.client_pp_number
+  const dueBadge = !isPaid ? getPaymentDueBadge(order) : null
   // Снимок для возврата после случайного снятия оплаты (пишется сервером).
   const undo = order.payment_undo?.[type]
   const undoPP = undo && (undo[`${type}_pp_number`] || (undo[`${type}_payments`] || [])[0]?.pp_number)
@@ -240,8 +274,18 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
               {' — сумма не сходится'}
             </div>
           ) : (
-            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 2 }}>
-              {isCarrier ? 'Сумма к перечислению — нажмите чтобы отметить' : 'Нажмите чтобы отметить'}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
+                {isCarrier ? 'К перечислению' : 'К получению'}
+              </span>
+              {dueBadge && (
+                <span style={{
+                  fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 6,
+                  background: dueBadge.bg, color: dueBadge.color, letterSpacing: '-0.01em',
+                }}>
+                  {dueBadge.text}
+                </span>
+              )}
             </div>
           )}
           {!isPaid && undo && (
