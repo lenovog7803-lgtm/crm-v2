@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { createFleetClient, updateFleetClient } from '../../api'
 import { useToast } from '../../components/Toast'
 import { SwapText } from '../../components/Transitions'
+import { findBankByAccount, findBankByBik, formatPhone, formatIBAN } from '../../utils'
 
 const fieldStyle = { padding: '10px 12px', borderRadius: 10, border: '1px solid var(--line)', fontSize: 13, background: 'var(--surface)', boxSizing: 'border-box', width: '100%' }
 
@@ -17,9 +18,9 @@ export const MAIN_FIELDS = [
 ]
 
 export const BANK_FIELDS = [
-  { key: 'bank', label: 'Банк', full: true },
+  { key: 'rs', label: 'Расчётный счёт (IBAN)' },
   { key: 'bik', label: 'БИК' },
-  { key: 'rs', label: 'Расчётный счёт' },
+  { key: 'bank', label: 'Банк', full: true },
 ]
 
 const ALL = [...MAIN_FIELDS, ...BANK_FIELDS]
@@ -29,7 +30,17 @@ export function FleetClientModal({ initial, onClose, onSaved }) {
   const editing = !!initial
   const [form, setForm] = useState(() => Object.fromEntries(ALL.map(f => [f.key, initial?.[f.key] ?? ''])))
   const [saving, setSaving] = useState(false)
-  const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
+  const set = (k, v) => setForm(p => {
+    const next = { ...p, [k]: v }
+    if (k === 'rs') {
+      const d = findBankByAccount(v)
+      if (d) { next.bik = d.bik; next.bank = d.bank }
+    } else if (k === 'bik') {
+      const d = findBankByBik(v)
+      if (d) { next.bank = d.bank }
+    }
+    return next
+  })
 
   const save = async () => {
     if (!form.name.trim() || saving) return
@@ -44,6 +55,11 @@ export function FleetClientModal({ initial, onClose, onSaved }) {
     }
   }
 
+  const handleBlur = (k) => {
+    if (k === 'rs') set('rs', formatIBAN(form.rs))
+    if (k === 'phone') set('phone', formatPhone(form.phone))
+  }
+
   const grid = (fields) => (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
       {fields.map(f => (
@@ -51,6 +67,7 @@ export function FleetClientModal({ initial, onClose, onSaved }) {
           key={f.key}
           value={form[f.key]}
           onChange={e => set(f.key, e.target.value)}
+          onBlur={() => handleBlur(f.key)}
           placeholder={f.label}
           autoFocus={f.key === 'name'}
           style={{ ...fieldStyle, gridColumn: f.full ? '1 / -1' : 'auto' }}

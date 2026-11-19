@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { getClient, deleteClient as apiDelete, updateClient, getOrders } from '../api'
-import { initials, statusLabel, statusColor, statusBg, getGradient } from '../utils'
+import { getClient, deleteClient as apiDelete, updateClient, getOrders, lookupCompany } from '../api'
+import { initials, statusLabel, statusColor, statusBg, getGradient, findBankByAccount, findBankByBik, formatPhone, formatIBAN } from '../utils'
 import { mouseOnly } from '../motion'
 import { Loader } from './Loader'
 import { StatusOrb } from './StatusOrb'
@@ -23,7 +23,7 @@ const iStyle = {
   fontFamily: 'var(--font-sys)', color: 'var(--ink)', outline: 'none', boxSizing: 'border-box',
 }
 
-function EditField({ label, value, onChange, mono, type = 'text' }) {
+function EditField({ label, value, onChange, onBlur, mono, type = 'text' }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '6px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
       <span style={{ fontSize: 12, color: 'var(--text-tertiary)', fontWeight: 500, flexShrink: 0, minWidth: 90 }}>{label}</span>
@@ -31,6 +31,7 @@ function EditField({ label, value, onChange, mono, type = 'text' }) {
         type={type}
         value={value || ''}
         onChange={e => onChange(e.target.value)}
+        onBlur={onBlur}
         style={{ ...iStyle, fontFamily: mono ? 'var(--font-mono)' : 'var(--font-sys)', fontSize: mono ? 12 : 13 }}
       />
     </div>
@@ -60,6 +61,35 @@ export default function ClientDetail({ clientId, onMeta, onBack, onDelete, onOpe
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({})
   const [saving, setSaving] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const [unpVerification, setUnpVerification] = useState(null)
+
+  useEffect(() => {
+    const unp = client?.unp || client?.inn
+    if (!unp) return
+    const clean = String(unp).replace(/\D/g, '')
+    if (clean.length === 9 || clean.length === 10) {
+      lookupCompany(clean).then(res => {
+        if (res?.ok) setUnpVerification(res)
+      }).catch(() => {})
+    }
+  }, [client?.unp, client?.inn])
+
+  const handleCopyRequisites = () => {
+    if (!client) return
+    const parts = [
+      client.name,
+      client.unp ? `УНП: ${client.unp}` : '',
+      client.bank_account ? `Р/С: ${client.bank_account}` : '',
+      client.bank_bik ? `БИК: ${client.bank_bik}${client.bank_name ? ` (${client.bank_name})` : ''}` : '',
+      client.legal_address ? `Юр. адрес: ${client.legal_address}` : '',
+      client.phone ? `Тел: ${client.phone}` : '',
+      client.email ? `Email: ${client.email}` : '',
+    ].filter(Boolean)
+    navigator.clipboard?.writeText(parts.join('\n'))
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   useEffect(() => {
     if (!clientId) return
@@ -111,7 +141,17 @@ export default function ClientDetail({ clientId, onMeta, onBack, onDelete, onOpe
     setSaving(false)
   }
 
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+  const set = (k, v) => setForm(f => {
+    const next = { ...f, [k]: v }
+    if (k === 'bank_account') {
+      const d = findBankByAccount(v)
+      if (d) { next.bank_bik = d.bik; next.bank_name = d.bank }
+    } else if (k === 'bank_bik') {
+      const d = findBankByBik(v)
+      if (d) { next.bank_name = d.bank }
+    }
+    return next
+  })
 
   const handleDelete = async () => {
     try { await apiDelete(client.id) } catch (err) { console.error(err); iosError('Клиент не удалён. Проверьте интернет и попробуйте ещё раз.'); return }
@@ -157,6 +197,20 @@ export default function ClientDetail({ clientId, onMeta, onBack, onDelete, onOpe
         )}
       </div>
 
+      {unpVerification?.risk_level === 'critical' && (
+        <div style={{
+          marginBottom: 16, padding: '12px 16px', borderRadius: 14,
+          background: 'rgba(255, 69, 58, 0.12)', border: '1px solid rgba(255, 69, 58, 0.3)',
+          color: '#FF453A', display: 'flex', alignItems: 'center', gap: 10,
+        }}>
+          <span style={{ fontSize: 20 }}>⚠️</span>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 13 }}>Внимание: контрагент в стадии ликвидации или банкротства!</div>
+            <div style={{ fontSize: 12, opacity: 0.9, marginTop: 2 }}>{unpVerification.risk_message}</div>
+          </div>
+        </div>
+      )}
+
       <div className="card" style={{ padding: '32px', textAlign: 'center' }}>
         <div style={{
           width: 72, height: 72, borderRadius: 22, margin: '0 auto 16px',
@@ -169,7 +223,13 @@ export default function ClientDetail({ clientId, onMeta, onBack, onDelete, onOpe
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 360, margin: '0 auto' }}>
             <input value={form.name} onChange={e => set('name', e.target.value)} placeholder="Наименование" style={{ ...iStyle, textAlign: 'center', fontWeight: 700, fontSize: 17 }} />
             <input value={form.contact_person} onChange={e => set('contact_person', e.target.value)} placeholder="Контактное лицо" style={{ ...iStyle, textAlign: 'center' }} />
-            <input value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="Телефон" style={{ ...iStyle, textAlign: 'center' }} />
+            <input
+              value={form.phone}
+              onChange={e => set('phone', e.target.value)}
+              onBlur={() => set('phone', formatPhone(form.phone))}
+              placeholder="Телефон"
+              style={{ ...iStyle, textAlign: 'center' }}
+            />
           </div>
         ) : (
           <>
@@ -197,7 +257,24 @@ export default function ClientDetail({ clientId, onMeta, onBack, onDelete, onOpe
             </>
           ) : (
             <>
-              <Row label="УНП" value={client.unp || client.inn} mono />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, padding: '8px 0', borderBottom: '1px solid rgba(var(--ink-rgb), 0.05)' }}>
+                <span style={{ fontSize: 12, color: 'var(--text-tertiary)', fontWeight: 500, flexShrink: 0 }}>УНП</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', fontFamily: 'var(--font-mono)' }}>{client.unp || client.inn || '—'}</span>
+                  {unpVerification?.ok && (
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 4,
+                      padding: '1.5px 7px', borderRadius: 9999, fontSize: 10.5, fontWeight: 600,
+                      background: unpVerification.risk_level === 'critical' ? 'rgba(255, 69, 58, 0.12)' : unpVerification.risk_level === 'warning' ? 'rgba(255, 159, 10, 0.12)' : 'rgba(48, 209, 88, 0.12)',
+                      color: unpVerification.risk_level === 'critical' ? '#FF453A' : unpVerification.risk_level === 'warning' ? '#FF9F0A' : '#30D158',
+                      border: `0.5px solid ${unpVerification.risk_level === 'critical' ? 'rgba(255, 69, 58, 0.28)' : unpVerification.risk_level === 'warning' ? 'rgba(255, 159, 10, 0.28)' : 'rgba(48, 209, 88, 0.28)'}`,
+                    }} title={unpVerification.risk_message}>
+                      <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'currentColor' }} />
+                      {unpVerification.risk_badge}
+                    </span>
+                  )}
+                </div>
+              </div>
               {client.director && <Row label="Директор" value={client.director} />}
               {client.basis && <Row label="Основание" value={client.basis} />}
               <Row label="Юр. адрес" value={client.legal_address} />
@@ -208,12 +285,52 @@ export default function ClientDetail({ clientId, onMeta, onBack, onDelete, onOpe
         </div>
 
         <div className="card" style={{ padding: '20px 22px' }}>
-          <div className="section-label" style={{ marginBottom: 10 }}>БАНКОВСКИЕ РЕКВИЗИТЫ</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <div className="section-label">БАНКОВСКИЕ РЕКВИЗИТЫ</div>
+            {!editing && (
+              <button
+                type="button"
+                onClick={handleCopyRequisites}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  padding: '3px 9px',
+                  borderRadius: 9999,
+                  background: copied ? 'rgba(48, 209, 88, 0.12)' : 'rgba(var(--rgb-19-102-240), 0.08)',
+                  color: copied ? '#30D158' : 'var(--fg-1366f0)',
+                  border: copied ? '0.5px solid rgba(48, 209, 88, 0.28)' : '0.5px solid rgba(var(--rgb-19-102-240), 0.2)',
+                  cursor: 'pointer',
+                  transition: 'all 0.16s cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+              >
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  {copied ? (
+                    <polyline points="20 6 9 17 4 12" />
+                  ) : (
+                    <>
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </>
+                  )}
+                </svg>
+                <span>{copied ? 'Скопировано' : 'Скопировать'}</span>
+              </button>
+            )}
+          </div>
           {editing ? (
             <>
-              <EditField label="Банк" value={form.bank_name} onChange={v => set('bank_name', v)} />
-              <EditField label="Р/С" value={form.bank_account} onChange={v => set('bank_account', v)} mono />
+              <EditField
+                label="Р/С (IBAN)"
+                value={form.bank_account}
+                onChange={v => set('bank_account', v)}
+                onBlur={() => set('bank_account', formatIBAN(form.bank_account))}
+                mono
+              />
               <EditField label="БИК" value={form.bank_bik} onChange={v => set('bank_bik', v)} mono />
+              <EditField label="Банк" value={form.bank_name} onChange={v => set('bank_name', v)} />
             </>
           ) : (
             <>

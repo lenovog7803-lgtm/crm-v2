@@ -203,7 +203,12 @@ export default function CreateOrderModal({ onClose, onSuccess, initialData, edit
   const upd = (k, v) => { setIsDirty(true); setForm(p => ({ ...p, [k]: v })) }
 
   const handleCarrierSelect = carrier => {
-    const vehicleInfo = [carrier.plate, carrier.vehicle_type, carrier.driver_name, carrier.phone].filter(Boolean).join(', ')
+    let vehicleInfo = carrier.vehicle_type || ''
+    if (!vehicleInfo) {
+      vehicleInfo = [carrier.plate, carrier.contact_person || carrier.driver_name, carrier.phone].filter(Boolean).join(', ')
+    } else if (carrier.plate && !vehicleInfo.includes(carrier.plate)) {
+      vehicleInfo = `${carrier.plate}, ${vehicleInfo}`
+    }
     setForm(p => ({
       ...p,
       carrier_id: carrier.id,

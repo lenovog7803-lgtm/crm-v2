@@ -121,8 +121,34 @@ function FieldLabel({ children }) {
 
 const LONG_PRESS_MS = 2000
 
-function getPaymentDueBadge(order) {
-  const baseDateStr = order.unload_date || order.load_date || order.created_at
+function getPaymentDueBadge(order, isCarrier) {
+  let baseDateStr = null
+  let waitingDocs = false
+
+  if (isCarrier) {
+    // Для перевозчика срок оплаты считается строго с момента получения документов
+    if (!order.docs_from_carrier_received || !order.docs_from_carrier_date) {
+      waitingDocs = true
+    } else {
+      baseDateStr = order.docs_from_carrier_date
+    }
+  } else {
+    // Для клиента — с момента выгрузки (или погрузки / создания)
+    baseDateStr = order.unload_date || order.load_date || order.created_at
+  }
+
+  if (waitingDocs) {
+    return {
+      text: 'Ждём документы',
+      sub: null,
+      color: 'var(--text-secondary)',
+      dotColor: 'var(--text-tertiary)',
+      bg: 'rgba(var(--ink-rgb), 0.05)',
+      border: '1px solid rgba(var(--ink-rgb), 0.08)',
+      title: 'Срок оплаты перевозчику начинается только после получения оригиналов документов',
+    }
+  }
+
   if (!baseDateStr) return null
   const base = new Date(baseDateStr)
   if (isNaN(base.getTime())) return null
@@ -133,24 +159,45 @@ function getPaymentDueBadge(order) {
   const dueDay = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate())
   const diffDays = Math.round((dueDay - today) / 86400000)
 
+  const dateFmt = dueDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
+
   if (diffDays < 0) {
     return {
       text: `Просрочено на ${Math.abs(diffDays)} дн.`,
+      sub: `до ${dateFmt}`,
       color: 'var(--fg-ff3b30)',
+      dotColor: 'var(--fg-ff3b30)',
       bg: 'rgba(var(--rgb-200-25-35), 0.12)',
+      border: '1px solid rgba(var(--rgb-200-25-35), 0.25)',
     }
   }
   if (diffDays === 0) {
     return {
       text: 'Срок сегодня',
+      sub: dateFmt,
       color: 'var(--fg-d97706)',
+      dotColor: 'var(--fg-d97706)',
       bg: 'rgba(var(--rgb-217-119-6), 0.14)',
+      border: '1px solid rgba(var(--rgb-217-119-6), 0.28)',
+    }
+  }
+  if (diffDays <= 3) {
+    return {
+      text: `Осталось ${diffDays} дн.`,
+      sub: `до ${dateFmt}`,
+      color: 'var(--fg-d97706)',
+      dotColor: 'var(--fg-d97706)',
+      bg: 'rgba(var(--rgb-217-119-6), 0.10)',
+      border: '1px solid rgba(var(--rgb-217-119-6), 0.20)',
     }
   }
   return {
     text: `Осталось ${diffDays} дн.`,
-    color: 'var(--fg-0a84ff)',
-    bg: 'rgba(var(--rgb-10-132-255), 0.10)',
+    sub: `до ${dateFmt}`,
+    color: 'var(--text-secondary)',
+    dotColor: 'var(--text-tertiary)',
+    bg: 'rgba(var(--ink-rgb), 0.05)',
+    border: '1px solid rgba(var(--ink-rgb), 0.08)',
   }
 }
 
@@ -159,7 +206,7 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
   const isPaid = isCarrier ? order.carrier_paid : order.client_paid
   const isCash = isCarrier ? order.carrier_cash : order.client_cash
   const ppNumber = isCarrier ? order.carrier_pp_number : order.client_pp_number
-  const dueBadge = !isPaid ? getPaymentDueBadge(order) : null
+  const dueBadge = !isPaid ? getPaymentDueBadge(order, isCarrier) : null
   // Снимок для возврата после случайного снятия оплаты (пишется сервером).
   const undo = order.payment_undo?.[type]
   const undoPP = undo && (undo[`${type}_pp_number`] || (undo[`${type}_payments`] || [])[0]?.pp_number)
@@ -184,7 +231,6 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
   // untouched order, hiding a real payment and inviting a duplicate transfer.
   const enteredTotal = payments.reduce((s, p) => s + (Number(p.amount) || 0), 0)
   const hasUnmatchedPayment = hasUnreconciledPayment(order, type)
-  const accent = isPaid ? 'var(--fg-1e9e5a)' : hasUnmatchedPayment ? 'var(--fg-d97706)' : (isCarrier ? 'var(--fg-e0473b)' : 'var(--ink)')
 
   // Long press (2s) opens the PP editor regardless of paid state; a plain
   // tap keeps its existing meaning (mark / unmark). longPressFired guards
@@ -212,6 +258,24 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
     onClick()
   }
 
+  const bgDefault = isPaid
+    ? 'rgba(var(--rgb-30-158-90), 0.06)'
+    : hasUnmatchedPayment
+      ? 'rgba(var(--rgb-217-119-6), 0.06)'
+      : 'rgba(var(--ink-rgb), 0.03)'
+
+  const bgHover = isPaid
+    ? 'rgba(var(--rgb-30-158-90), 0.10)'
+    : hasUnmatchedPayment
+      ? 'rgba(var(--rgb-217-119-6), 0.10)'
+      : 'rgba(var(--ink-rgb), 0.06)'
+
+  const borderColor = isPaid
+    ? 'rgba(var(--rgb-30-158-90), 0.22)'
+    : hasUnmatchedPayment
+      ? 'rgba(var(--rgb-217-119-6), 0.3)'
+      : 'rgba(var(--ink-rgb), 0.07)'
+
   return (
     <div
       className="no-callout"
@@ -228,19 +292,15 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
       }
       style={{
         flex: 1, padding: '14px 18px', borderRadius: 14, cursor: 'pointer',
-        background: isPaid ? 'rgba(var(--rgb-30-158-90), 0.08)' : hasUnmatchedPayment ? 'rgba(var(--rgb-217-119-6), 0.08)' : (isCarrier ? 'rgba(var(--rgb-224-71-59), 0.05)' : 'rgba(var(--ink-rgb), 0.04)'),
-        border: isPaid
-          ? (isCarrier ? '2px solid rgba(var(--rgb-30-158-90), 0.28)' : '1px solid rgba(var(--rgb-30-158-90), 0.25)')
-          : hasUnmatchedPayment
-            ? '2px solid rgba(var(--rgb-217-119-6), 0.4)'
-            : (isCarrier ? '2px solid rgba(var(--rgb-224-71-59), 0.35)' : '1px solid rgba(var(--ink-rgb), 0.08)'),
+        background: bgDefault,
+        border: `1px solid ${borderColor}`,
         transition: 'all 0.2s',
         userSelect: 'none', WebkitUserSelect: 'none',
       }}
-      onPointerEnter={mouseOnly(e => { if (!isPaid && !hasUnmatchedPayment) e.currentTarget.style.background = isCarrier ? 'rgba(var(--rgb-224-71-59), 0.09)' : 'rgba(var(--ink-rgb), 0.07)' })}
-      onPointerLeave={mouseOnly(e => { cancelPress(); if (!isPaid && !hasUnmatchedPayment) e.currentTarget.style.background = isCarrier ? 'rgba(var(--rgb-224-71-59), 0.05)' : 'rgba(var(--ink-rgb), 0.04)' })}
+      onPointerEnter={mouseOnly(e => { e.currentTarget.style.background = bgHover })}
+      onPointerLeave={mouseOnly(e => { cancelPress(); e.currentTarget.style.background = bgDefault })}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{
           width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
           background: isPaid ? 'var(--fg-1e9e5a)' : 'transparent',
@@ -251,10 +311,10 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
           <SuccessCheck show={isPaid} size={11} strokeWidth={3.5} />
           {hasUnmatchedPayment && <span style={{ color: 'var(--fg-d97706)', fontSize: 13, fontWeight: 700, lineHeight: 1 }}>!</span>}
         </div>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 13, color: accent }}>{isCarrier ? '↑' : '↓'}</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: isPaid ? 'var(--fg-1e9e5a)' : accent }}>{label}</span>
+            <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>{isCarrier ? '↑' : '↓'}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: isPaid ? 'var(--fg-1e9e5a)' : 'var(--ink)' }}>{label}</span>
           </div>
           {isPaid ? (
             <div style={{ fontSize: 11, color: 'var(--fg-1e9e5a)', marginTop: 2 }}>
@@ -274,16 +334,29 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
               {' — сумма не сходится'}
             </div>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
               <span style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
                 {isCarrier ? 'К перечислению' : 'К получению'}
               </span>
               {dueBadge && (
-                <span style={{
-                  fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 6,
-                  background: dueBadge.bg, color: dueBadge.color, letterSpacing: '-0.01em',
-                }}>
-                  {dueBadge.text}
+                <span
+                  title={dueBadge.title || (dueBadge.sub ? `Крайний срок: ${dueBadge.sub}` : '')}
+                  style={{
+                    fontSize: 11, fontWeight: 500, padding: '2px 8px', borderRadius: 9999,
+                    background: dueBadge.bg, color: dueBadge.color,
+                    border: dueBadge.border || '1px solid rgba(var(--ink-rgb), 0.08)',
+                    display: 'inline-flex', alignItems: 'center', gap: 5,
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  <span style={{
+                    width: 5, height: 5, borderRadius: '50%',
+                    background: dueBadge.dotColor || dueBadge.color,
+                    flexShrink: 0,
+                    boxShadow: dueBadge.dotColor && dueBadge.dotColor !== 'var(--text-tertiary)' ? `0 0 6px ${dueBadge.dotColor}` : 'none'
+                  }} />
+                  <span>{dueBadge.text}</span>
+                  {dueBadge.sub && <span style={{ opacity: 0.65, fontWeight: 400 }}>({dueBadge.sub})</span>}
                 </span>
               )}
             </div>
@@ -299,7 +372,11 @@ function PaymentButton({ type, order, onClick, onLongPress, onRestore }) {
             </button>
           )}
         </div>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: isCarrier ? 18 : 16, fontWeight: 700, color: isPaid ? 'var(--fg-1e9e5a)' : accent, flexShrink: 0 }}>
+        <div style={{
+          fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 700,
+          color: isPaid ? 'var(--fg-1e9e5a)' : 'var(--ink)',
+          flexShrink: 0, letterSpacing: '-0.02em',
+        }}>
           {isCarrier ? '' : '+'}{amount.toLocaleString('ru-RU')} Br
         </div>
       </div>

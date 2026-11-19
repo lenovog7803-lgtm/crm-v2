@@ -100,16 +100,19 @@ function MainApp() {
   const MANAGER_PAGES = ['my-dashboard', 'tasks', 'leads', 'order-detail', 'client-detail', 'carrier-detail']
 
   const fleetMode = (() => { try { return localStorage.getItem('crm_mode') === 'fleet' } catch { return false } })()
-  // ссылка из Telegram-бота: /?p=orders открывает сразу нужный раздел
-  const linked = new URLSearchParams(window.location.search).get('p')
+  // ссылка из Telegram-бота: /?p=orders открывает сразу нужный раздел, /?order=123 открывает конкретную заявку
+  const urlParams = new URLSearchParams(window.location.search)
+  const linked = urlParams.get('p')
+  const linkedOrder = urlParams.get('order')
   const [page, setPage] = useState(() =>
-    ['orders', 'finance', 'tasks', 'leads'].includes(linked) && (!isManager || MANAGER_PAGES.includes(linked)) ? linked
+    linkedOrder ? 'order-detail'
+      : ['orders', 'finance', 'tasks', 'leads'].includes(linked) && (!isManager || MANAGER_PAGES.includes(linked)) ? linked
       : isManager ? 'my-dashboard' : (fleetMode && isDirector ? 'fleet-trips' : 'dashboard')
   )
   // направление перехода: в карточку — сдвиг вперёд, из карточки обратно — назад
   const motionRef = useRef({ page: null, cls: '' })
   if (motionRef.current.page !== page) motionRef.current = { page, cls: pageMotion(page, motionRef.current.page) }
-  const [selectedOrderId, setSelectedOrderId] = useState(null)
+  const [selectedOrderId, setSelectedOrderId] = useState(linkedOrder || null)
   const [selectedClientId, setSelectedClientId] = useState(null)
   const [selectedCarrierId, setSelectedCarrierId] = useState(null)
   // заголовок шапки от открытой карточки; привязан к странице, чтобы не «прилипал» к другим разделам

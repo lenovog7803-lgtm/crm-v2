@@ -107,6 +107,13 @@ export const updateLead = (id, data) => req(`/leads/${id}`, { method: 'PUT', bod
 export const deleteLead = (id) => req(`/leads/${id}`, { method: 'DELETE' });
 // похожие записи по телефону, названию, УНП; kind — 'leads' | 'carriers'
 export const findDuplicates = (kind, fields) => req(`/${kind}/duplicates?` + new URLSearchParams(fields));
+export const lookupCompany = async (query) => {
+  try {
+    const localRes = await fetch('/api/lookup/company?' + new URLSearchParams({ query }));
+    if (localRes.ok) return await localRes.json();
+  } catch (_) {}
+  return req('/lookup/company?' + new URLSearchParams({ query }));
+};
 // limit 500: сервер по умолчанию отдаёт 50 — очередь «кончалась», а счётчики упирались в 50
 export const getCallQueue = (industry, limit = 500) =>
   req(`/leads/queue?limit=${limit}` + (industry ? `&industry=${encodeURIComponent(industry)}` : ''));
