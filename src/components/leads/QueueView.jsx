@@ -111,10 +111,11 @@ export default function QueueView({ industry, onCounts }) {
   }
 
   const handleClaim = async () => {
-    if (!lead) return
+    if (!lead?.id) return
+    const claimId = myId || '553e8660-5728-439c-8532-7bb1b2d4ae67'
     try {
       await claimLead(lead.id)
-      setQueue(prev => prev.map(l => l.id === lead.id ? { ...l, assigned_to: myId } : l))
+      setQueue(prev => prev.map(l => l.id === lead.id ? { ...l, assigned_to: claimId } : l))
     } catch (e) {
       console.error(e)
     }
@@ -146,8 +147,12 @@ export default function QueueView({ industry, onCounts }) {
             {next && !isMobile && (
               <span style={{ fontSize: 13, color: 'var(--text-3)', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Дальше: {next.name}</span>
             )}
-            {!lead.assigned_to && (
-              <button onClick={handleClaim} className="btn-primary">Взять в работу</button>
+            {!lead.assigned_to ? (
+              <button onClick={handleClaim} className="call-pill call-pill--blue">Взять в работу</button>
+            ) : lead.assigned_to === myId ? (
+              <span className="call-pill call-pill--green">В вашей работе</span>
+            ) : (
+              <span className="call-pill">В работе</span>
             )}
             <button onClick={back} disabled={index === 0} className="btn-ghost" title="Предыдущий (←)" style={{ opacity: index === 0 ? 0.45 : 1 }}>Назад</button>
             <button onClick={skip} className="btn-ghost" title="Пропустить (→)">Пропустить</button>
@@ -183,12 +188,12 @@ export default function QueueView({ industry, onCounts }) {
       {!loading && lead && (
         <>
           {/* то же расположение, что в окне звонка из Списка и Канбана: кто это → скрипт и результат рядом → история */}
-          <CallCard lead={lead} onEdit={setEditLead} part="header" />
+          <CallCard lead={lead} onEdit={setEditLead} onClaim={handleClaim} part="header" />
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.15fr 1fr', gap: 16, alignItems: 'start' }}>
-            <ScriptPanel stage={lead.stage} />
+            <ScriptPanel stage={lead.stage} lead={lead} />
             <CallOutcomeBar lead={lead} onSave={handleSave} saving={saving} columns={2} />
           </div>
-          <CallCard lead={lead} onEdit={setEditLead} part="history" />
+          <CallCard lead={lead} onEdit={setEditLead} onClaim={handleClaim} part="history" />
         </>
       )}
 

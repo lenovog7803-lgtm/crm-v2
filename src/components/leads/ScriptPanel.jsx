@@ -3,7 +3,7 @@ import { getScripts, saveScripts } from '../../api'
 import { stageById } from '../../constants/leads'
 import { SwapText } from '../Transitions'
 
-export default function ScriptPanel({ stage }) {
+export default function ScriptPanel({ stage, lead }) {
   const [scripts, setScripts] = useState({})
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem('leads_script_collapsed') === '1')
   const [editing, setEditing] = useState(false)
@@ -30,9 +30,6 @@ export default function ScriptPanel({ stage }) {
   }
 
   if (collapsed) {
-    // Fills the same grid column the expanded card would rather than
-    // shrinking to a narrow vertical pill — a tiny button floating in an
-    // otherwise-empty wide column looked broken, not "collapsed".
     return (
       <button onClick={() => setCollapsed(false)} className="card" style={{
         border: 'none', cursor: 'pointer', width: '100%', minHeight: 120,
@@ -48,9 +45,50 @@ export default function ScriptPanel({ stage }) {
 
   return (
     <div className="card call-sheet" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, fontWeight: 600, fontSize: 15, color: 'var(--ink)', letterSpacing: '-0.01em' }}>
-          Скрипт <span style={{ fontSize: 13, fontWeight: 400, color: 'var(--text-3)' }}>{st.label}</span>
+      {lead?.selection_reason && (
+        <div style={{
+          padding: '12px 14px', borderRadius: 14,
+          background: 'rgba(48, 209, 88, 0.07)',
+          border: '0.5px solid rgba(48, 209, 88, 0.24)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-1e9e5a)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Почему взят этот клиент
+            </span>
+            <a
+              href={lead.source_url || `https://2gis.by/minsk/search/${encodeURIComponent(lead.company || lead.name || '')}`}
+              target="_blank"
+              rel="noreferrer"
+              style={{ fontSize: 11, fontWeight: 600, color: 'var(--fg-1366f0)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 3 }}
+              title="Открыть источник компании"
+            >
+              Источник: {lead.source || '2ГИС Минск'} ↗
+            </a>
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--ink)', lineHeight: 1.48, fontWeight: 500 }}>
+            {lead.selection_reason}
+          </div>
+        </div>
+      )}
+
+      {lead?.pitch_script && (
+        <div style={{
+          padding: '12px 14px', borderRadius: 14,
+          background: 'rgba(10, 132, 255, 0.07)',
+          border: '0.5px solid rgba(10, 132, 255, 0.24)',
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-1366f0)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>
+            Скрипт звонка
+          </div>
+          <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--ink)', lineHeight: 1.5 }}>
+            "{lead.pitch_script}"
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, fontWeight: 600, fontSize: 14, color: 'var(--ink)', letterSpacing: '-0.01em' }}>
+          Общий скрипт стадии <span style={{ fontSize: 12, fontWeight: 400, color: 'var(--text-3)' }}>({st.label})</span>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
           {!editing && (

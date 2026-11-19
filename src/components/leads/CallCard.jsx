@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { getCallHistory } from '../../api'
+import { getCallHistory, claimLead } from '../../api'
 import { stageById, outcomeById } from '../../constants/leads'
 import { initials, getGradient } from '../../utils'
+import { useAuth } from '../../AuthContext'
 import { OutcomeIcon } from './OutcomeIcon'
 
 function NoteIcon(p) {
@@ -14,9 +15,32 @@ function NoteIcon(p) {
 }
 
 // part: 'header' — шапка (без истории), 'history' — описание и история, по умолчанию — всё
-export default function CallCard({ lead, onEdit, part }) {
+export default function CallCard({ lead, onEdit, onClaim, part }) {
+  const { user } = useAuth()
+  const myId = user?.user?.id
   const [history, setHistory] = useState([])
   const [copied, setCopied] = useState(false)
+  const [assigned, setAssigned] = useState(lead?.assigned_to || '')
+
+  useEffect(() => {
+    setAssigned(lead?.assigned_to || '')
+  }, [lead?.assigned_to])
+
+  const handleClaimLead = async () => {
+    if (!lead?.id) return
+    const claimId = myId || '553e8660-5728-439c-8532-7bb1b2d4ae67'
+    if (onClaim) {
+      onClaim(lead.id)
+      setAssigned(claimId)
+      return
+    }
+    try {
+      await claimLead(lead.id)
+      setAssigned(claimId)
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   useEffect(() => {
     if (!lead?.id || part === 'header') return
@@ -70,15 +94,42 @@ export default function CallCard({ lead, onEdit, part }) {
             ) : <div style={{ fontSize: 13, color: 'var(--text-tertiary)', marginTop: 4 }}>нет телефона</div>}
           </div>
         </div>
-        <button onClick={() => onEdit(lead)} className="call-pill" style={{ flexShrink: 0 }}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
-          Изменить
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          {!assigned ? (
+            <button
+              onClick={handleClaimLead}
+              className="call-pill call-pill--blue"
+              title="Назначить этот лид на себя"
+            >
+              Взять в работу
+            </button>
+          ) : assigned === myId ? (
+            <span className="call-pill call-pill--green">
+              В вашей работе
+            </span>
+          ) : (
+            <span className="call-pill">
+              В работе
+            </span>
+          )}
+
+          <button onClick={() => onEdit(lead)} className="call-pill" style={{ flexShrink: 0 }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
+            Изменить
+          </button>
+        </div>
       </div>
 
       <div className="lead-meta">
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--ink)', fontWeight: 500 }}>
           <span style={{ width: 7, height: 7, borderRadius: 99, background: stage.color }} />{stage.label}
+        </span>
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', gap: 5,
+          color: !assigned ? 'var(--fg-1366f0)' : (assigned === myId ? 'var(--fg-1e9e5a)' : 'var(--text-secondary)'),
+          fontWeight: 600
+        }}>
+          {!assigned ? 'Свободен для звонка' : (assigned === myId ? 'Назначен на вас' : 'Закреплен за менеджером')}
         </span>
         {[cadenceStep > 0 && `шаг каденции ${cadenceStep} из 5`, lead.industry, lead.city, lead.region, attempts > 0 && `попыток дозвона: ${attempts}`]
           .filter(Boolean).map(t => <span key={t}>{t}</span>)}
@@ -96,23 +147,52 @@ export default function CallCard({ lead, onEdit, part }) {
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', fontSize: 14 }}>
-        {lead.website && (
-          <a href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`} target="_blank" rel="noreferrer" style={{ color: 'var(--fg-1366f0)', textDecoration: 'none' }}>
-            {lead.website}
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center', fontSize: 13, marginTop: 4 }}>
+        {lead.website && lead.website.trim() && !['нет сайта', 'нету', 'нет'].includes(lead.website.trim().toLowerCase()) ? (
+          <a
+            href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`}
+            target="_blank"
+            rel="noreferrer"
+            className="call-pill"
+            style={{ color: 'var(--fg-1366f0)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 5 }}
+            title="Открыть сайт компании"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            {lead.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+          </a>
+        ) : (
+          <span className="call-pill" style={{ color: 'var(--text-3)', opacity: 0.75, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+            Нет сайта
+          </span>
+        )}
+
+        {lead.email && (
+          <a href={`mailto:${lead.email}`} className="call-pill" style={{ color: 'var(--fg-1366f0)', textDecoration: 'none' }}>
+            {lead.email}
           </a>
         )}
-        {lead.email && (
-          <a href={`mailto:${lead.email}`} style={{ color: 'var(--fg-1366f0)', textDecoration: 'none' }}>{lead.email}</a>
-        )}
+
+        <a
+          href={lead.source_url || `https://2gis.by/minsk/search/${encodeURIComponent(lead.company || lead.name || '')}`}
+          target="_blank"
+          rel="noreferrer"
+          className="call-pill"
+          style={{ color: 'var(--text-secondary)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 5 }}
+          title="Открыть первоисточник компании"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Источник: {lead.source || '2ГИС Минск'}
+        </a>
       </div>
 
     </>
   )
   const historyEl = (
-    <>      {lead.notes && (
-        <div style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-          {lead.notes}
+    <>
+      {lead.notes && (
+        <div style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.55, whiteSpace: 'pre-wrap', marginBottom: 14 }}>
+          {lead.notes.replace(/[💡🎯🔥⚡🌐📦🏭👤✓]/g, '').trim()}
         </div>
       )}
 

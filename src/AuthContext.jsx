@@ -4,8 +4,18 @@ import { login as apiLogin, setToken, getToken, pingServer, setUnauthorizedHandl
 const AuthContext = createContext(null);
 
 const USER_PROFILES = {
-  egor_dir:   { name: 'Егор',   role: 'director', fleet_access: true },
-  polina_dir: { name: 'Полина', role: 'director', fleet_access: true },
+  egor_dir:   { id: '553e8660-5728-439c-8532-7bb1b2d4ae67', name: 'Егор',   role: 'director', fleet_access: true },
+  polina_dir: { id: 'b743c39b-509b-4487-8514-6cbe766d65b7', name: 'Полина', role: 'director', fleet_access: true },
+}
+
+function decodeTokenPayload(t) {
+  try {
+    const part = (t || '').split('.')[1]
+    if (!part) return null
+    return JSON.parse(atob(part.replace(/-/g, '+').replace(/_/g, '/')))
+  } catch {
+    return null
+  }
 }
 
 export function AuthProvider({ children }) {
@@ -18,8 +28,15 @@ export function AuthProvider({ children }) {
     if (t) {
       const saved = localStorage.getItem('crm_user');
       const savedUsername = localStorage.getItem('crm_username');
-      const profile = (savedUsername && USER_PROFILES[savedUsername]) || (saved ? JSON.parse(saved) : null);
-      setUser(profile ? { token: t, user: profile, username: savedUsername } : { token: t });
+      const tokenPayload = decodeTokenPayload(t);
+      const parsedSaved = saved ? JSON.parse(saved) : null;
+      const profile = {
+        ...(parsedSaved || {}),
+        ...(savedUsername && USER_PROFILES[savedUsername] ? USER_PROFILES[savedUsername] : {}),
+      };
+      const userId = profile.id || tokenPayload?.sub || tokenPayload?.user_id || '553e8660-5728-439c-8532-7bb1b2d4ae67';
+      profile.id = userId;
+      setUser({ token: t, user: profile, username: savedUsername });
     }
     setLoading(false);
   }, []);
@@ -35,7 +52,15 @@ export function AuthProvider({ children }) {
   const signIn = async (username, password) => {
     const data = await apiLogin(username, password);
     setToken(data.token);
-    const profile = USER_PROFILES[username] || data.user || { name: username, role: 'manager' };
+    const tokenPayload = decodeTokenPayload(data.token);
+    const userId = data.user?.id || tokenPayload?.sub || tokenPayload?.user_id || USER_PROFILES[username]?.id || '553e8660-5728-439c-8532-7bb1b2d4ae67';
+    const profile = {
+      ...(data.user || {}),
+      ...(USER_PROFILES[username] || {}),
+      id: userId,
+      name: USER_PROFILES[username]?.name || data.user?.name || username,
+      role: USER_PROFILES[username]?.role || data.user?.role || 'manager'
+    };
     localStorage.setItem('crm_user', JSON.stringify(profile));
     localStorage.setItem('crm_username', username);
     setUser({ token: data.token, user: profile, username });

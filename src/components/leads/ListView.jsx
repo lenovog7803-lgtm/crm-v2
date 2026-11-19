@@ -154,7 +154,9 @@ export default function ListView({ industry }) {
                     ) : <span style={{ fontSize: 13, color: 'var(--text-quaternary)' }}>—</span>}
                   </div>
                   {!l.assigned_to ? (
-                    <button onClick={e => handleClaim(l.id, e)} className="btn-ghost btn-sm" style={{ color: 'var(--fg-1366f0)', flexShrink: 0 }}>Взять</button>
+                    <button onClick={e => handleClaim(l.id, e)} className="btn-ghost btn-sm" style={{ color: 'var(--fg-1366f0)', fontWeight: 600, flexShrink: 0 }}>Взять в работу</button>
+                  ) : l.assigned_to === myId ? (
+                    <span style={{ fontSize: 12, color: 'var(--fg-1e9e5a)', fontWeight: 600, flexShrink: 0 }}>У вас</span>
                   ) : (
                     <svg className="ios-row-chevron" width="8" height="13" viewBox="0 0 8 13" fill="none">
                       <path d="M1 1.5L6.5 7L1 12.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
