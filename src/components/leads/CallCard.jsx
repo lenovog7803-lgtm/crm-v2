@@ -4,6 +4,9 @@ import { stageById, outcomeById } from '../../constants/leads'
 import { initials, getGradient } from '../../utils'
 import { useAuth } from '../../AuthContext'
 import { OutcomeIcon } from './OutcomeIcon'
+import { getProposalText, getFollowUpText, isFollowUpNeeded, getWhatsAppKpUrl, getTelegramKpUrl } from './commercialProposal'
+import QuickCallQrModal from './QuickCallQrModal'
+import SendProposalModal from './SendProposalModal'
 
 function NoteIcon(p) {
   return (
@@ -15,11 +18,13 @@ function NoteIcon(p) {
 }
 
 // part: 'header' — шапка (без истории), 'history' — описание и история, по умолчанию — всё
-export default function CallCard({ lead, onEdit, onClaim, part }) {
+export default function CallCard({ lead, onEdit, onClaim, onSave, part }) {
   const { user } = useAuth()
   const myId = user?.user?.id
   const [history, setHistory] = useState([])
   const [copied, setCopied] = useState(false)
+  const [showQr, setShowQr] = useState(false)
+  const [showKpModal, setShowKpModal] = useState(false)
   const [assigned, setAssigned] = useState(lead?.assigned_to || '')
 
   useEffect(() => {
@@ -50,6 +55,7 @@ export default function CallCard({ lead, onEdit, onClaim, part }) {
   if (!lead) return null
 
   const stage = stageById(lead.stage)
+  const followUp = isFollowUpNeeded(lead)
   const attempts = lead.call_attempts || 0
   const cadenceStep = lead.cadence_step || 0
   const [avA, avB] = getGradient(lead.name || '')
@@ -90,6 +96,31 @@ export default function CallCard({ lead, onEdit, onClaim, part }) {
                 <a href={`viber://chat?number=%2B${intl}`} className="call-pill" title="Написать в Viber">Viber</a>
                 <a href={`https://t.me/+${intl}`} target="_blank" rel="noreferrer" className="call-pill" title="Написать в Telegram">Telegram</a>
                 <a href={`https://wa.me/${intl}`} target="_blank" rel="noreferrer" className="call-pill" title="Написать в WhatsApp">WhatsApp</a>
+                <button
+                  type="button"
+                  onClick={() => setShowKpModal(true)}
+                  className="call-pill call-pill--blue"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                  title="Открыть окно отправки КП (WhatsApp, Telegram или Почта)"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                  </svg>
+                  Отправить КП
+                </button>
+                <button
+                  onClick={() => setShowQr(true)}
+                  className="call-pill"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}
+                  title="Открыть QR-код: наведите камеру телефона для мгновенного звонка без сохранения номера"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" />
+                    <rect x="14" y="14" width="4" height="4" /><line x1="21" y1="14" x2="21" y2="14.01" /><line x1="14" y1="21" x2="14" y2="21.01" />
+                  </svg>
+                  QR звонок
+                </button>
               </div>
             ) : <div style={{ fontSize: 13, color: 'var(--text-tertiary)', marginTop: 4 }}>нет телефона</div>}
           </div>
@@ -119,6 +150,49 @@ export default function CallCard({ lead, onEdit, onClaim, part }) {
           </button>
         </div>
       </div>
+
+      {followUp.needed && (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10,
+          padding: '11px 14px', borderRadius: 14,
+          background: 'rgba(var(--rgb-19-102-240), 0.08)',
+          border: '1px solid rgba(var(--rgb-19-102-240), 0.22)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ width: 8, height: 8, borderRadius: 4, background: 'var(--fg-1366f0)', flexShrink: 0 }} />
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>
+              Пора дожать (КП отправлено {followUp.daysAgo} {followUp.daysAgo === 1 ? 'день' : followUp.daysAgo < 5 ? 'дня' : 'дней'} назад)
+            </span>
+          </div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {lead.phone && (
+              <a
+                href={getWhatsAppKpUrl(lead.phone, getFollowUpText(lead))}
+                target="_blank"
+                rel="noreferrer"
+                className="call-pill call-pill--blue"
+                style={{ textDecoration: 'none', padding: '6px 12px' }}
+                title="Открыть WhatsApp с готовым сообщением дожима"
+              >
+                Дожать в WhatsApp
+              </a>
+            )}
+            {lead.phone && (
+              <a
+                href={getTelegramKpUrl(lead.phone)}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => navigator.clipboard?.writeText(getFollowUpText(lead))}
+                className="call-pill"
+                style={{ textDecoration: 'none', padding: '6px 12px' }}
+                title="Скопировать текст дожима и открыть Telegram"
+              >
+                Дожать в Telegram
+              </a>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="lead-meta">
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--ink)', fontWeight: 500 }}>
@@ -243,9 +317,13 @@ export default function CallCard({ lead, onEdit, onClaim, part }) {
     </>
   )
   return (
-    <div className="card call-sheet" style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {part !== 'history' && headerEl}
-      {part !== 'header' && historyEl}
-    </div>
+    <>
+      <div className="card call-sheet" style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {part !== 'history' && headerEl}
+        {part !== 'header' && historyEl}
+      </div>
+      {showQr && <QuickCallQrModal lead={lead} onClose={() => setShowQr(false)} />}
+      {showKpModal && <SendProposalModal lead={lead} onClose={() => setShowKpModal(false)} onSave={onSave} />}
+    </>
   )
 }

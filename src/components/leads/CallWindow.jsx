@@ -31,7 +31,7 @@ export default function CallWindow({ lead, onClose, onClaim, onEdit, onSave, sav
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: isMobile ? '4px 10px 12px' : '6px 18px 18px' }}>
           {/* 1 — кто это: шапка во всю ширину */}
-          <CallCard lead={lead} onEdit={onEdit} part="header" />
+          <CallCard lead={lead} onEdit={onEdit} onSave={onSave} part="header" />
           {/* 2 — во время разговора: скрипт слева, результат справа — на одном уровне глаз */}
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.15fr 1fr', gap: 14, alignItems: 'start' }}>
             <ScriptPanel stage={lead?.stage} lead={lead} />
