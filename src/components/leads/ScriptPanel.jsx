@@ -17,6 +17,16 @@ export default function ScriptPanel({ stage, lead }) {
   const st = stageById(stage)
   const text = scripts[stage] || ''
 
+  // Достаём обоснование и скрипт либо из полей лида, либо парсим из заметок (если поле отсеялось)
+  const reason = lead?.selection_reason ||
+    lead?.notes?.match(/💡 Почему взят:\s*([^\n]+)/)?.[1] ||
+    lead?.notes?.match(/Почему взят:\s*([^\n]+)/)?.[1] ||
+    (lead?.niche ? `Целевая коммерческая компания из Минска (${lead.niche}), регулярные поставки в РФ.` : '')
+
+  const pitch = lead?.pitch_script ||
+    lead?.notes?.match(/🎯 Скрипт:\s*([^\n]+)/)?.[1] ||
+    lead?.notes?.match(/Скрипт:\s*([^\n]+)/)?.[1]
+
   const startEdit = () => { setDraft(text); setEditing(true) }
   const save = async () => {
     setSaving(true)
@@ -45,7 +55,7 @@ export default function ScriptPanel({ stage, lead }) {
 
   return (
     <div className="card call-sheet" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {lead?.selection_reason && (
+      {reason && (
         <div style={{
           padding: '12px 14px', borderRadius: 14,
           background: 'rgba(48, 209, 88, 0.07)',
@@ -56,22 +66,22 @@ export default function ScriptPanel({ stage, lead }) {
               Почему взят этот клиент
             </span>
             <a
-              href={lead.source_url || `https://2gis.by/minsk/search/${encodeURIComponent(lead.company || lead.name || '')}`}
+              href={lead?.source_url || `https://2gis.by/minsk/search/${encodeURIComponent(lead?.company || lead?.name || '')}`}
               target="_blank"
               rel="noreferrer"
               style={{ fontSize: 11, fontWeight: 600, color: 'var(--fg-1366f0)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 3 }}
               title="Открыть источник компании"
             >
-              Источник: {lead.source || '2ГИС Минск'} ↗
+              Источник: {lead?.source || '2ГИС Минск'} ↗
             </a>
           </div>
           <div style={{ fontSize: 13, color: 'var(--ink)', lineHeight: 1.48, fontWeight: 500 }}>
-            {lead.selection_reason}
+            {reason}
           </div>
         </div>
       )}
 
-      {lead?.pitch_script && (
+      {pitch && (
         <div style={{
           padding: '12px 14px', borderRadius: 14,
           background: 'rgba(10, 132, 255, 0.07)',
@@ -81,7 +91,7 @@ export default function ScriptPanel({ stage, lead }) {
             Скрипт звонка
           </div>
           <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--ink)', lineHeight: 1.5 }}>
-            "{lead.pitch_script}"
+            "{pitch}"
           </div>
         </div>
       )}
