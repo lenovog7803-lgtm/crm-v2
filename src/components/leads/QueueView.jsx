@@ -1,14 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { getCallQueue, getLeadsAnalytics, claimLead } from '../../api'
 import { DAILY_GOAL } from '../../constants/leads'
-import CallCard from './CallCard'
-import CallOutcomeBar from './CallOutcomeBar'
-import ScriptPanel from './ScriptPanel'
+import CallDesk from './CallDesk'
 import LeadEditModal from './LeadEditModal'
 import { saveCall, SAVE_ERROR } from './saveCall'
 import { useCelebration } from '../Celebration'
 import { useAuth } from '../../AuthContext'
-import { useIsMobile } from '../../hooks/useIsMobile'
 import { Loader } from '../Loader'
 import { CircularProgress } from '../CircularProgress'
 
@@ -20,15 +17,15 @@ const REASONS = {
   new: ['Новый', 'var(--text-3)'],
 }
 
-export default function QueueView({ industry, onCounts }) {
+export default function QueueView({ industry }) {
   const { user } = useAuth()
   const myId = user?.user?.id
-  const isMobile = useIsMobile()
   const [queue, setQueue] = useState([])
   const [index, setIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [editLead, setEditLead] = useState(null)
+  const [counts, setCounts] = useState({})
   const [todayCalls, setTodayCalls] = useState(0)
   const [skippedCount, setSkippedCount] = useState(0)
   // пройденные за этот заход: обзвоненные и пропущенные — при дозагрузке очереди не показываем их снова
@@ -42,11 +39,11 @@ export default function QueueView({ industry, onCounts }) {
         const { done, skipped } = passed.current
         setQueue((r.queue || []).filter(l => !done.has(l.id) && !skipped.has(l.id)))
         setIndex(0)
-        onCounts?.(r.counts || { overdue: 0, today: 0, hot: 0, new: 0 })
+        setCounts(r.counts || { overdue: 0, today: 0, hot: 0, new: 0 })
       })
       .catch(console.error)
       .finally(() => setLoading(false))
-  }, [industry, onCounts])
+  }, [industry])
 
   useEffect(() => { load() }, [load])
 
@@ -65,15 +62,15 @@ export default function QueueView({ industry, onCounts }) {
   }, [])
 
   const lead = queue[index]
-  const next = queue[index + 1]
+
 
   const skip = () => {
-    if (!lead) return
+    if (!lead || saving || loading) return
     passed.current.skipped.add(lead.id)
     setSkippedCount(passed.current.skipped.size)
     setIndex(i => i + 1)
   }
-  const back = () => setIndex(i => Math.max(0, i - 1))
+  const back = () => { if (!saving && !loading) setIndex(i => Math.max(0, i - 1)) }
   const showSkipped = () => {
     passed.current.skipped.clear()
     setSkippedCount(0)
@@ -85,7 +82,7 @@ export default function QueueView({ industry, onCounts }) {
   nav.current = { skip, back }
   useEffect(() => {
     const onKey = (e) => {
-      if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest?.('input, textarea, select, [contenteditable]')) return
+      if (e.metaKey || e.ctrlKey || e.altKey || e.target.closest?.('input, textarea, select, [contenteditable], [role=tablist], [role=radiogroup], .lg-segmented')) return
       if (document.querySelector('.ios-alert, .modal-overlay')) return
       if (e.key === 'ArrowRight') nav.current.skip()
       if (e.key === 'ArrowLeft') nav.current.back()
@@ -127,37 +124,29 @@ export default function QueueView({ industry, onCounts }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div className="card leads-queue-toolbar">
-        <div style={{ position: 'relative', flexShrink: 0 }}>
-          <CircularProgress pct={pct} color={ringColor} size={40} stroke={5} track="rgba(var(--ink-rgb), 0.08)" />
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{pct}%</div>
+      <header className="order-detail-toolbar lead-queue-bar">
+        {!loading && lead && <div className="lead-queue-position">
+          <strong>Контакт {index + 1} из {queue.length}</strong>
+          {reason && <small>{reason[0]}</small>}
+        </div>}
+        <details className="queue-day">
+          <summary>Сегодня · {todayCalls} из {DAILY_GOAL} звонков</summary>
+          <section aria-label="Сводка обзвона" className="leads-summary">
+        <div className="leads-goal">
+          <CircularProgress pct={pct} color={ringColor} size={38} stroke={4} track="var(--line)" />
+          <div><small>Звонки сегодня</small><strong>{todayCalls} <em>из {DAILY_GOAL}</em></strong></div>
         </div>
-        <div style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
-          <b style={{ fontSize: 17, fontWeight: 600, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{todayCalls}</b> из {DAILY_GOAL} звонков сегодня
-        </div>
-        {!loading && lead && <>
-          <span className="leads-queue-position">{index + 1} из {queue.length} в очереди</span>
-          {reason && (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)' }}>
-              <span style={{ width: 7, height: 7, borderRadius: 99, background: reason[1] }} />{reason[0]}
-            </span>
-          )}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto', minWidth: 0 }}>
-            {next && !isMobile && (
-              <span style={{ fontSize: 13, color: 'var(--text-3)', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Дальше: {next.name}</span>
-            )}
-            {!lead.assigned_to ? (
-              <button onClick={handleClaim} className="call-pill call-pill--blue">Взять в работу</button>
-            ) : lead.assigned_to === myId ? (
-              <span className="call-pill call-pill--green">В вашей работе</span>
-            ) : (
-              <span className="call-pill">В работе</span>
-            )}
-            <button onClick={back} disabled={index === 0} className="btn-ghost" title="Предыдущий (←)" style={{ opacity: index === 0 ? 0.45 : 1 }}>Назад</button>
-            <button onClick={skip} className="btn-ghost" title="Пропустить (→)">Пропустить</button>
-          </div>
-        </>}
-      </div>
+        <dl>{[['overdue', 'Просрочено'], ['today', 'На сегодня'], ['hot', 'В работе'], ['new', 'Новые']].map(([key, title]) =>
+          <div key={key}><dt>{title}</dt><dd className={key === 'overdue' && counts[key] ? 'lead-overdue' : ''}>
+            {loading ? '…' : counts[key] >= 500 ? '500+' : counts[key] ?? 0}
+          </dd></div>)}</dl>
+      </section>
+        </details>
+        {!loading && lead && <div className="order-detail-actions">
+          <button onClick={back} disabled={index === 0 || saving} className="btn-ghost order-detail-back">‹ Назад</button>
+          <button onClick={skip} disabled={saving} className="btn-ghost order-detail-edit">Пропустить</button>
+        </div>}
+      </header>
 
       {loading && <Loader padding={40} state="searching" label="Загрузка очереди…" />}
 
@@ -185,15 +174,7 @@ export default function QueueView({ industry, onCounts }) {
       )}
 
       {!loading && lead && (
-        <>
-          {/* то же расположение, что в окне звонка из Списка и Канбана: кто это → скрипт и результат рядом → история */}
-          <CallCard lead={lead} onEdit={setEditLead} onClaim={handleClaim} part="header" />
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.15fr 1fr', gap: 16, alignItems: 'start' }}>
-            <ScriptPanel stage={lead.stage} lead={lead} />
-            <CallOutcomeBar lead={lead} onSave={handleSave} saving={saving} columns={2} />
-          </div>
-          <CallCard lead={lead} onEdit={setEditLead} onClaim={handleClaim} part="history" />
-        </>
+        <CallDesk key={lead.id} lead={lead} onEdit={setEditLead} onClaim={handleClaim} onSave={handleSave} saving={saving} />
       )}
 
       {editLead && (

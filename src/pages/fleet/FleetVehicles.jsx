@@ -1,3 +1,4 @@
+import ModalScrim from '../../components/ModalScrim'
 import GlassDialog from '../../components/GlassDialog'
 import { useState, useEffect } from 'react'
 import {
@@ -65,7 +66,7 @@ function EntityModal({ title, sections, initial, onClose, onSave }) {
   }
 
   return (
-    <div onClick={onClose} className="dash-modal-scrim">
+    <ModalScrim onClick={onClose} className="dash-modal-scrim">
       <GlassDialog label={title} onDismiss={onClose} onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 480, padding: 26 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 18 }}>{title}</div>
 
@@ -99,7 +100,7 @@ function EntityModal({ title, sections, initial, onClose, onSave }) {
           </button>
         </div>
       </GlassDialog>
-    </div>
+    </ModalScrim>
   )
 }
 

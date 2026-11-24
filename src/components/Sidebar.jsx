@@ -8,7 +8,6 @@ import { useSpringPill } from '../hooks/useSpringPill'
 import GlassBg from './GlassBg'
 import { PopNumber } from './Transitions'
 
-const HIDDEN_MENU_WIDTH = 200
 
 const NAV = [
   {
@@ -200,51 +199,10 @@ const MANAGER_DASHBOARD_ITEM = {
 // opens to any director account, gated by role rather than username since
 // both director logins need to reach the accounting journal.
 const HIDDEN_NAV = [
-  {
-    key: 'admin',
-    label: 'Администрирование',
-    egorOnly: true,
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-      </svg>
-    )
-  },
-  {
-    key: 'backups',
-    label: 'Резервные копии',
-    egorOnly: true,
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <ellipse cx="12" cy="5" rx="9" ry="3"/>
-        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
-        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
-      </svg>
-    )
-  },
-  {
-    key: 'kudir',
-    label: 'КУДиР',
-    directorOnly: true,
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-      </svg>
-    )
-  },
-  {
-    key: 'reports',
-    label: 'Отчёты',
-    directorOnly: true,
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="18" y1="20" x2="18" y2="10"/>
-        <line x1="12" y1="20" x2="12" y2="4"/>
-        <line x1="6" y1="20" x2="6" y2="14"/>
-      </svg>
-    )
-  },
+  { key: 'admin', label: 'Администрирование', egorOnly: true },
+  { key: 'backups', label: 'Резервные копии', egorOnly: true },
+  { key: 'kudir', label: 'КУДиР', directorOnly: true },
+  { key: 'reports', label: 'Отчёты', directorOnly: true },
 ]
 
 function roleLabel(role, position) {
@@ -388,26 +346,30 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
 
   const isDirector = profile.role === 'director' || profile.role === 'admin'
 
-  const startLongPress = () => {
-    // Egor's own call for admin/backups; any director account can reach the
-    // menu too, since KUDiR needs to be open to both director logins.
-    if (!isEgorDir && !isDirector) return
-    // Only reachable with the sidebar expanded — collapsed, the avatar sits
-    // too close to the screen edge for a 200px popup to sit near it without
-    // overlapping content awkwardly either way.
-    if (!expanded) return
-    longPressTimer.current = setTimeout(() => {
-      const sidebarRect = avatarRef.current?.closest('.desktop-sidebar')?.getBoundingClientRect()
-      const avatarRect = avatarRef.current?.getBoundingClientRect()
-      if (sidebarRect && avatarRect) {
-        setHiddenMenuPos({
-          left: sidebarRect.left + sidebarRect.width / 2,
-          bottom: window.innerHeight - avatarRect.top + 8,
-        })
-      }
-      setHiddenMenuOpen(true)
-    }, 550)
+  const canOpenProfileMenu = expanded && (isEgorDir || isDirector)
+  const openProfileMenu = () => {
+    if (!canOpenProfileMenu) return
+    const rect = avatarRef.current?.getBoundingClientRect()
+    if (!rect) return
+    setHiddenMenuPos({ left: rect.left, bottom: window.innerHeight - rect.top + 8 })
+    setHiddenMenuOpen(true)
   }
+  const startLongPress = () => {
+    if (!canOpenProfileMenu) return
+    clearTimeout(longPressTimer.current)
+    longPressTimer.current = setTimeout(openProfileMenu, 550)
+  }
+  useEffect(() => {
+    if (!hiddenMenuOpen) return
+    const close = () => setHiddenMenuOpen(false)
+    const escape = event => { if (event.key === 'Escape') close() }
+    window.addEventListener('keydown', escape)
+    window.addEventListener('resize', close)
+    return () => {
+      window.removeEventListener('keydown', escape)
+      window.removeEventListener('resize', close)
+    }
+  }, [hiddenMenuOpen])
   const cancelLongPress = () => {
     if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null }
   }
@@ -437,11 +399,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
         }}>
-          <img
-            src="/logo-mark.svg"
-            alt="AV2"
-            style={{ height: 30, objectFit: 'contain' }}
-          />
+          <span className="sidebar-brand-mark" role="img" aria-label="A2 Group" />
         </div>
         {expanded && (
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -599,37 +557,13 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
         // to the (narrow, overflow:hidden) sidebar box instead of the
         // viewport and getting clipped when the sidebar was collapsed.
         <div onClick={() => setHiddenMenuOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 1000 }}>
-          <div
-            onClick={e => e.stopPropagation()}
-            style={{
-              position: 'fixed', left: hiddenMenuPos.left, bottom: hiddenMenuPos.bottom, transform: 'translateX(-50%)',
-              width: HIDDEN_MENU_WIDTH, borderRadius: 16, padding: 8,
-              background: 'rgba(var(--paper-rgb), 0.72)',
-              backdropFilter: 'blur(24px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-              border: '1px solid rgba(255,255,255,calc(0.7 * var(--rim-k)))',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), 0 14px 40px -22px rgba(20,30,55,0.35)',
-            }}
-          >
-            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-tertiary)', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '6px 10px 4px' }}>
-              Скрытые функции
-            </div>
-            {HIDDEN_NAV.filter(item => (item.egorOnly ? isEgorDir : true) && (item.directorOnly ? isDirector : true)).map(item => (
-              <button
-                key={item.key}
-                onClick={() => { onNav(item.key); setHiddenMenuOpen(false) }}
-                style={{
-                  width: '100%', height: 38, borderRadius: 10, border: 'none', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', gap: 10, padding: '0 10px',
-                  background: page === item.key ? 'rgba(var(--rgb-19-102-240), 0.1)' : 'transparent',
-                  color: page === item.key ? 'var(--fg-1366f0)' : 'var(--text-secondary)',
-                  fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13,
-                }}
-                onPointerEnter={mouseOnly(e => { if (page !== item.key) e.currentTarget.style.background = 'rgba(var(--ink-rgb), 0.05)' })}
-                onPointerLeave={mouseOnly(e => { if (page !== item.key) e.currentTarget.style.background = 'transparent' })}
-              >
-                <span style={{ flexShrink: 0, width: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{item.icon}</span>
-                <span>{item.label}</span>
+          <div className="topbar-menu profile-shortcuts" role="group" aria-label="Разделы профиля"
+            style={{ left: hiddenMenuPos.left, bottom: hiddenMenuPos.bottom }}
+            onClick={event => event.stopPropagation()}>
+            {HIDDEN_NAV.filter(item => (!item.egorOnly || isEgorDir) && (!item.directorOnly || isDirector)).map(item => (
+              <button key={item.key} type="button" aria-current={page === item.key ? 'page' : undefined}
+                onClick={() => { onNav(item.key); setHiddenMenuOpen(false) }}>
+                {item.label}
               </button>
             ))}
           </div>

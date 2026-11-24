@@ -106,6 +106,7 @@ function MainApp() {
   const linkedOrder = urlParams.get('order')
   const [page, setPage] = useState(() =>
     linkedOrder ? 'order-detail'
+      : linked === 'mailing' && isDirector ? 'mailing'
       : ['orders', 'finance', 'tasks', 'leads'].includes(linked) && (!isManager || MANAGER_PAGES.includes(linked)) ? linked
       : isManager ? 'my-dashboard' : (fleetMode && isDirector ? 'fleet-trips' : 'dashboard')
   )
@@ -135,7 +136,7 @@ function MainApp() {
   const [paymentModalKind, setPaymentModalKind] = useState('income')
   const [paletteOpen, setPaletteOpen] = useState(false)
 
-  const [search, setSearch] = useState(() => loadPageSearch('dashboard'))
+  const [search, setSearch] = useState(() => loadPageSearch(page))
   const [overdueItems, setOverdueItems] = useState([])
 
   // Refresh triggers — increment to tell the component to re-fetch
@@ -345,7 +346,7 @@ function MainApp() {
   }
 
   return (
-    <div className="app-root">
+    <div id="crm-app" className="app-root">
       <div className="aurora-bg">
         <div ref={orbARef} className="aurora-orb-a" />
         <div ref={orbBRef} className="aurora-orb-b" />
@@ -479,7 +480,7 @@ function MainApp() {
             {page === 'fleet-analytics' && <ErrorBoundary><FleetAnalytics onBack={() => handleNav('fleet-dashboard')} /></ErrorBoundary>}
             {page === 'fleet-plan' && <ErrorBoundary><FleetPlan /></ErrorBoundary>}
 
-            {page === 'leads' && <Leads />}
+            {page === 'leads' && <Leads search={search} onClearSearch={() => handleSearchChange('')} />}
             {page === 'trash' && <Trash />}
             {page === 'backups' && <Backups />}
             {page === 'admin' && isEgorDir && <Admin />}

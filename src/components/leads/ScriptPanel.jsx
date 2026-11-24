@@ -41,8 +41,8 @@ export default function ScriptPanel({ stage, lead }) {
 
   if (collapsed) {
     return (
-      <button onClick={() => setCollapsed(false)} className="card" style={{
-        border: 'none', cursor: 'pointer', width: '100%', minHeight: 120,
+      <button onClick={() => setCollapsed(false)} className="btn-ghost" style={{
+        border: 'none', cursor: 'pointer', width: '100%', minHeight: 36,
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
       }}>
         <span style={{ fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 13, color: 'var(--text-secondary)' }}>Показать скрипт</span>
@@ -54,16 +54,12 @@ export default function ScriptPanel({ stage, lead }) {
   }
 
   return (
-    <div className="card call-sheet" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       {reason && (
-        <div style={{
-          padding: '12px 14px', borderRadius: 14,
-          background: 'rgba(48, 209, 88, 0.07)',
-          border: '0.5px solid rgba(48, 209, 88, 0.24)',
-        }}>
+        <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-1e9e5a)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Почему взят этот клиент
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>
+              О компании
             </span>
             <a
               href={lead?.source_url || `https://2gis.by/minsk/search/${encodeURIComponent(lead?.company || lead?.name || '')}`}
@@ -83,11 +79,9 @@ export default function ScriptPanel({ stage, lead }) {
 
       {pitch && (
         <div style={{
-          padding: '12px 14px', borderRadius: 14,
-          background: 'rgba(10, 132, 255, 0.07)',
-          border: '0.5px solid rgba(10, 132, 255, 0.24)',
+          paddingTop: 10, borderTop: '1px solid var(--line)',
         }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg-1366f0)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>
             Скрипт звонка
           </div>
           <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--ink)', lineHeight: 1.5 }}>

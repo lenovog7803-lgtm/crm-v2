@@ -1,3 +1,4 @@
+import ModalScrim from '../../components/ModalScrim'
 import GlassDialog from '../../components/GlassDialog'
 import { useState, useEffect, useCallback } from 'react'
 import { getFleetClient, getFleetClientOrders, deleteFleetOrder, getFleetReconciliation } from '../../api'
@@ -64,7 +65,7 @@ function ReconciliationModal({ clientId, clientName, onClose }) {
   }
 
   return (
-    <div onClick={onClose} className="dash-modal-scrim">
+    <ModalScrim onClick={onClose} className="dash-modal-scrim">
       <GlassDialog label="Акт сверки" onDismiss={onClose} onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 380, padding: 24 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 14 }}>Акт сверки</div>
         <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 12 }}>Период (можно оставить пустым — тогда за всё время)</div>
@@ -78,7 +79,7 @@ function ReconciliationModal({ clientId, clientName, onClose }) {
           <button onClick={build} disabled={busy} className="btn-primary" style={{ flex: 2, padding: 12 }}>{busy ? 'Готовлю…' : 'Сформировать'}</button>
         </div>
       </GlassDialog>
-    </div>
+    </ModalScrim>
   )
 }
 

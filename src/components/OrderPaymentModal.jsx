@@ -1,3 +1,4 @@
+import ModalScrim from './ModalScrim'
 import GlassDialog from './GlassDialog'
 import { useState } from 'react'
 import { addPayment, deletePayment, getOrder, updateOrder } from '../api'
@@ -188,7 +189,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
   }
 
   return (
-    <div className="dash-modal-scrim">
+    <ModalScrim className="dash-modal-scrim">
       <GlassDialog label="Оплата заявки" onDismiss={onClose} className="dash-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 460, padding: 26 }}>
         <div style={{
           fontSize: 13, fontWeight: 600,
@@ -358,6 +359,6 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
           </button>
         </div>
       </GlassDialog>
-    </div>
+    </ModalScrim>
   )
 }

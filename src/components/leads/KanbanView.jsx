@@ -8,7 +8,6 @@ import LeadEditModal from './LeadEditModal'
 import { useCelebration } from '../Celebration'
 import { useAuth } from '../../AuthContext'
 import { Loader } from '../Loader'
-import { initials, getGradient } from '../../utils'
 import CallWindow from './CallWindow'
 
 const PAGE_SIZE = 10
@@ -19,7 +18,6 @@ const dayLabel = (iso) => new Date(iso).toLocaleDateString('ru-RU', { day: 'nume
 // Карточка лида. Сама не двигается: при перетаскивании её копия едет за курсором (Board), а здесь — бледный след
 function LeadCard({ lead, users, ghost, lifted, onPointerDown, onClaim }) {
   const manager = users[lead.assigned_to]
-  const [a, b] = getGradient(manager || lead.assigned_to || '')
   const overdue = lead.next_call && new Date(lead.next_call) < new Date()
   return (
     <div
@@ -32,16 +30,12 @@ function LeadCard({ lead, users, ghost, lifted, onPointerDown, onClaim }) {
         transition: lifted ? 'none' : 'opacity .15s var(--ease), box-shadow .15s var(--ease)',
       }}
     >
-      {lead.industry && (
-        <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 8, marginBottom: 7, fontSize: 11, fontWeight: 600, color: 'var(--fg-1366f0)', background: 'rgba(var(--rgb-19-102-240), 0.09)' }}>{lead.industry}</span>
-      )}
       <div style={{ fontSize: 14, fontWeight: 650, color: 'var(--ink)', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.name}</div>
+      {lead.industry && <small className="lead-industry">{lead.industry}</small>}
       {lead.phone && <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-tertiary)', marginTop: 3 }}>{lead.phone}</div>}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
         {lead.assigned_to ? (
-          <span title={manager || 'Менеджер'} style={{ width: 22, height: 22, borderRadius: 12, flexShrink: 0, display: 'grid', placeItems: 'center', fontSize: 10, fontWeight: 700, color: '#fff', background: `linear-gradient(135deg, ${a}, ${b})` }}>
-            {initials(manager || '?')}
-          </span>
+          <span className="lead-owner">{manager || 'Назначен менеджер'}</span>
         ) : (
           <button
             onPointerDown={e => e.stopPropagation()}

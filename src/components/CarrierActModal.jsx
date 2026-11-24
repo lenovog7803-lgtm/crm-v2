@@ -1,3 +1,4 @@
+import ModalScrim from './ModalScrim'
 import GlassDialog from './GlassDialog'
 import { useState } from 'react'
 import { SwapText } from './Transitions'
@@ -18,7 +19,7 @@ export default function CarrierActModal({ initialValue, initialDate, onClose, on
   }
 
   return (
-    <div className="dash-modal-scrim" onClick={onClose}>
+    <ModalScrim className="dash-modal-scrim" onClick={onClose}>
       <GlassDialog label="Акт перевозчика" onDismiss={onClose} className="dash-modal dash-form" onClick={e => e.stopPropagation()} style={{ maxWidth: 380, padding: 26 }}>
         <div style={{
           fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
@@ -78,6 +79,6 @@ export default function CarrierActModal({ initialValue, initialDate, onClose, on
           </button>
         </div>
       </GlassDialog>
-    </div>
+    </ModalScrim>
   )
 }

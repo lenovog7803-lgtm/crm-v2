@@ -1,3 +1,4 @@
+import ModalScrim from './ModalScrim'
 import GlassDialog from './GlassDialog'
 import { useState, useEffect, useRef } from 'react'
 import { getDashboard, getOrders, getGoals, saveGoals } from '../api'
@@ -266,7 +267,7 @@ function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
   }, {})).sort((a, b) => b.sum - a.sum)
 
   return (
-    <div className="dash-modal-scrim" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+    <ModalScrim className="dash-modal-scrim" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <GlassDialog label={title} onDismiss={onClose} className="dash-modal" style={{ maxWidth: 560 }}>
         <div style={{ padding: '24px 24px 20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
@@ -333,7 +334,7 @@ function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
           )}
         </div>
       </GlassDialog>
-    </div>
+    </ModalScrim>
   )
 }
 
@@ -349,7 +350,7 @@ function TopRow({ rank, name, value }) {
 
 function FullListModal({ title, subtitle, items, valueOf, color, bg, onClose }) {
   return (
-    <div className="dash-modal-scrim" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+    <ModalScrim className="dash-modal-scrim" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <GlassDialog label={title} onDismiss={onClose} className="dash-modal" style={{ maxWidth: 520 }}>
         <div style={{ padding: 26 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
@@ -368,7 +369,7 @@ function FullListModal({ title, subtitle, items, valueOf, color, bg, onClose }) 
           )}
         </div>
       </GlassDialog>
-    </div>
+    </ModalScrim>
   )
 }
 
@@ -383,7 +384,7 @@ function GoalEditModal({ goalKey, value, onChange, onClose, onSave }) {
   const meta = GOAL_META[goalKey]
   const [saving, setSaving] = useState(false)
   return (
-    <div className="dash-modal-scrim" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+    <ModalScrim className="dash-modal-scrim" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <GlassDialog label={'План: ' + meta.label} onDismiss={onClose} className="dash-modal" style={{ maxWidth: 340 }}>
         <div style={{ padding: 24 }}>
           <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 4 }}>
@@ -414,7 +415,7 @@ function GoalEditModal({ goalKey, value, onChange, onClose, onSave }) {
           </div>
         </div>
       </GlassDialog>
-    </div>
+    </ModalScrim>
   )
 }
 

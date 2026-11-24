@@ -1,3 +1,4 @@
+import ModalScrim from './ModalScrim'
 import GlassDialog from './GlassDialog'
 import { useState, useEffect } from 'react'
 import { getOrders, getClients, getCarriers, getPaymentsIn, getPaymentsOut, createPaymentIn, createPaymentOut, deletePaymentIn, deletePaymentOut, generateReconciliation, getReconciliationHistory, getClientPPLedger, addClientPPEntry, deleteClientPPEntry, getCarrierPPLedger, addCarrierPPEntry, deleteCarrierPPEntry } from '../api'
@@ -430,7 +431,7 @@ export default function Finance({ refreshKey, period = 'all' }) {
 
       {/* Модалка — детали поступлений */}
       {showInModal && (
-        <div className="dash-modal-scrim">
+        <ModalScrim className="dash-modal-scrim">
           <GlassDialog label="Поступления от клиентов" onDismiss={() => setShowInModal(false)} className="dash-modal dash-form" onClick={e => e.stopPropagation()} style={{ maxWidth: 560 }}>
             <div style={{ padding: 28 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
@@ -466,12 +467,12 @@ export default function Finance({ refreshKey, period = 'all' }) {
               })}
             </div>
           </GlassDialog>
-        </div>
+        </ModalScrim>
       )}
 
       {/* Модалка — детали списаний */}
       {showOutModal && (
-        <div className="dash-modal-scrim">
+        <ModalScrim className="dash-modal-scrim">
           <GlassDialog label="Оплачено перевозчикам" onDismiss={() => setShowOutModal(false)} className="dash-modal dash-form" onClick={e => e.stopPropagation()} style={{ maxWidth: 560 }}>
             <div style={{ padding: 28 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
@@ -507,7 +508,7 @@ export default function Finance({ refreshKey, period = 'all' }) {
               })}
             </div>
           </GlassDialog>
-        </div>
+        </ModalScrim>
       )}
 
       {/* Журнал платежей клиента/перевозчику для акта сверки */}
@@ -597,7 +598,7 @@ function PPLedgerModal({ type, entityId, entityName, onClose }) {
   }
 
   return (
-    <div onClick={onClose} className="dash-modal-scrim">
+    <ModalScrim onClick={onClose} className="dash-modal-scrim">
       <GlassDialog label="Реестр платёжных поручений" onDismiss={onClose} onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 520, padding: 26 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
           <div>
@@ -631,6 +632,6 @@ function PPLedgerModal({ type, entityId, entityName, onClose }) {
           ))}
         </div>
       </GlassDialog>
-    </div>
+    </ModalScrim>
   )
 }

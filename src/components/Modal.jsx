@@ -1,3 +1,4 @@
+import ModalScrim from './ModalScrim'
 import React, { createContext, useContext, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { useDialogFocus } from './GlassDialog'
 import { useIsMobile } from '../hooks/useIsMobile'
@@ -152,14 +153,13 @@ export function ModalOverlay({ onClose, children, panelStyle, bodyStyle }) {
 
   return (
     <SheetCtx.Provider value={{ requestClose, dragHandlers, titleId }}>
-      <div
+      <ModalScrim
         ref={overlayRef}
         className="modal-overlay"
         data-closing={closing}
         onClick={e => { if (e.target === e.currentTarget) requestClose() }}
         style={isMobile ? {
-          // телефон: без размытия (тяжело для GPU на каждом кадре) и без прокрутки подложки,
-          // пока шторка за экраном — иначе слой «дёргается» при выезде
+          // Шторка движется поверх статичной подложки.
           position: 'fixed', inset: 0, zIndex: 1000, overflow: 'hidden', display: 'grid', padding: 0,
         } : {
           position: 'fixed', inset: 0,
@@ -205,7 +205,7 @@ export function ModalOverlay({ onClose, children, panelStyle, bodyStyle }) {
             {children}
           </div>
         </div>
-      </div>
+      </ModalScrim>
     </SheetCtx.Provider>
   )
 }

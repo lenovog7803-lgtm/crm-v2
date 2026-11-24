@@ -1,3 +1,4 @@
+import ModalScrim from '../../components/ModalScrim'
 import GlassDialog from '../../components/GlassDialog'
 import { useState, useEffect, useCallback } from 'react'
 import {
@@ -350,7 +351,7 @@ function EditTripModal({ trip, onClose, onSaved }) {
   }
 
   return (
-    <div onClick={onClose} className="dash-modal-scrim">
+    <ModalScrim onClick={onClose} className="dash-modal-scrim">
       <GlassDialog label="Редактирование рейса" onDismiss={onClose} onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 460, padding: 26 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 18 }}>Изменить рейс</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
@@ -377,7 +378,7 @@ function EditTripModal({ trip, onClose, onSaved }) {
           </button>
         </div>
       </GlassDialog>
-    </div>
+    </ModalScrim>
   )
 }
 

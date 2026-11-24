@@ -1,3 +1,4 @@
+import ModalScrim from './ModalScrim'
 import GlassDialog from './GlassDialog'
 import { useState, useEffect } from 'react'
 import { getTrash, restoreTrash, purgeTrash } from '../api'
@@ -112,7 +113,7 @@ export default function Trash() {
       </div>
 
       {purgeOpen && (
-        <div
+        <ModalScrim
           onClick={() => !purging && setPurgeOpen(false)}
           className="dash-modal-scrim"
         >
@@ -142,7 +143,7 @@ export default function Trash() {
               </button>
             </div>
           </GlassDialog>
-        </div>
+        </ModalScrim>
       )}
 
       <div className="card" style={{ padding: '14px 16px', display: 'flex', gap: 8, flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>

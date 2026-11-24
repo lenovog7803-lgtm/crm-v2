@@ -1,3 +1,4 @@
+import ModalScrim from '../components/ModalScrim'
 import GlassDialog from '../components/GlassDialog'
 import { useState, useEffect } from 'react'
 import { getBackups, restoreBackup, createBackupNow, getImportPreview, applyImportFromSheets } from '../api'
@@ -16,7 +17,7 @@ function ImportPreviewModal({ preview, onClose, onConfirm, applying }) {
   const orders = preview.orders || {}
   const hasDeletes = (orders.would_delete || []).length > 0
   return (
-    <div className="dash-modal-scrim">
+    <ModalScrim className="dash-modal-scrim">
       <GlassDialog label="Предпросмотр импорта" onDismiss={() => !applying && onClose()} className="dash-modal dash-form" style={{ maxWidth: 640, padding: 26, maxHeight: '86vh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 4 }}>Что изменится при импорте из Таблицы</div>
         <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 16 }}>Ничего ещё не применено — только предпросмотр</div>
@@ -99,7 +100,7 @@ function ImportPreviewModal({ preview, onClose, onConfirm, applying }) {
           </button>
         </div>
       </GlassDialog>
-    </div>
+    </ModalScrim>
   )
 }
 
@@ -255,7 +256,7 @@ export default function Backups() {
       ))}
 
       {restoreTarget && (
-        <div className="dash-modal-scrim">
+        <ModalScrim className="dash-modal-scrim">
           <GlassDialog label="Восстановление резервной копии" onDismiss={() => setRestoreTarget(null)} className="dash-modal dash-form" style={{ maxWidth: 440, padding: 26 }}>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--fg-e0473b)', marginBottom: 8 }}>Восстановить из бэкапа?</div>
             <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 18, lineHeight: 1.5 }}>
@@ -282,7 +283,7 @@ export default function Backups() {
               </button>
             </div>
           </GlassDialog>
-        </div>
+        </ModalScrim>
       )}
     </div>
   )

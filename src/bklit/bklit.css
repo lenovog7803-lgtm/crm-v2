@@ -33,8 +33,8 @@
   --chart-grid: rgba(14, 23, 38, 0.08);
   --chart-brush-border: var(--chart-grid);
   --chart-tooltip-background: transparent;  /* стекло — ниже */
-  --chart-tooltip-foreground: #0E1726;
-  --chart-tooltip-muted: #5A6573;
+  --chart-tooltip-foreground: var(--ink);
+  --chart-tooltip-muted: var(--text-secondary);
   --chart-marker-background: oklch(0.97 0.005 260);
   --chart-marker-border: oklch(0.85 0.01 260);
   --chart-marker-foreground: oklch(0.3 0.01 260);
@@ -48,14 +48,19 @@
    (Bklit по умолчанию рисует их тёмными: bg-chart-tooltip-background и bg-zinc-900) */
 .bklit .bg-chart-tooltip-background,
 .bklit .bg-zinc-900 {
-  background:
-    radial-gradient(120% 90% at 15% -30%, rgba(var(--paper-rgb), 0.55) 0%, rgba(var(--paper-rgb), 0) 50%),
-    linear-gradient(180deg, rgba(var(--paper-rgb), 0.62) 0%, rgba(var(--paper-rgb), 0.42) 100%) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(220%) brightness(1.06);
-  backdrop-filter: blur(18px) saturate(220%) brightness(1.06);
-  color: var(--ink);
-  box-shadow: inset 0 1.5px 0 rgba(255,255,255,calc(0.9 * var(--rim-k))), inset 0 -1px 0 rgba(255,255,255,calc(0.35 * var(--rim-k))),
-    inset 0 0 0 0.5px rgba(255,255,255,calc(0.6 * var(--rim-k))), 0 14px 34px -12px rgba(20,30,55,0.3), 0 2px 6px rgba(20,30,55,0.06) !important;
+  background: rgba(var(--dialog-tint), 0.96) !important;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  color: var(--chart-tooltip-foreground);
+  box-shadow: inset 0 1px 0 var(--dialog-rim), inset 0 0 0 1px var(--workspace-card-rim), var(--workspace-popover-shadow) !important;
 }
 .bklit .bg-chart-tooltip-background { border-radius: 16px; }
 .bklit .bg-zinc-900 .text-white, .bklit .bg-zinc-900.text-white { color: var(--ink); }
+
+@media (prefers-reduced-transparency: reduce) {
+  .bklit :is(.bg-chart-tooltip-background, .bg-zinc-900) {
+    background: var(--surface) !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}

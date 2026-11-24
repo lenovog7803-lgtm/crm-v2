@@ -1,3 +1,4 @@
+import ModalScrim from '../../components/ModalScrim'
 import GlassDialog from '../../components/GlassDialog'
 import { useState } from 'react'
 import { createFleetClient, updateFleetClient } from '../../api'
@@ -78,7 +79,7 @@ export function FleetClientModal({ initial, onClose, onSaved }) {
   )
 
   return (
-    <div onClick={onClose} className="dash-modal-scrim">
+    <ModalScrim onClick={onClose} className="dash-modal-scrim">
       <GlassDialog label="Клиент автопарка" onDismiss={onClose} onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 560, padding: 26 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 18 }}>
           {editing ? 'Изменить клиента' : 'Новый клиент автопарка'}
@@ -100,6 +101,6 @@ export function FleetClientModal({ initial, onClose, onSaved }) {
           </button>
         </div>
       </GlassDialog>
-    </div>
+    </ModalScrim>
   )
 }

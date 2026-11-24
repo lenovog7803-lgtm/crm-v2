@@ -1,3 +1,4 @@
+import ModalScrim from '../ModalScrim'
 import GlassDialog from '../GlassDialog'
 import { useState, useEffect } from 'react'
 import { getLeadsAnalytics, getCallsByDay } from '../../api'
@@ -98,7 +99,7 @@ function DayCallsModal({ date, onClose }) {
   }, [date])
 
   return (
-    <div className="dash-modal-scrim">
+    <ModalScrim className="dash-modal-scrim">
       <GlassDialog label="Звонки за день" onDismiss={onClose} className="dash-modal dash-form" style={{ maxWidth: 520, padding: 26 }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 }}>
           <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)' }}>
@@ -122,7 +123,7 @@ function DayCallsModal({ date, onClose }) {
           ))}
         </div>
       </GlassDialog>
-    </div>
+    </ModalScrim>
   )
 }
 
@@ -149,7 +150,7 @@ export default function AnalyticsView() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <div className="card" style={{ padding: '10px 12px' }}>
+      <div className="leads-report-period">
         <SlidingTabs options={PERIODS.map(p => ({ key: p.id, label: p.label }))} value={period} onChange={setPeriod} />
       </div>
 
@@ -189,7 +190,7 @@ export default function AnalyticsView() {
         <FunnelChart funnel={data.funnel} />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 20 }}>
+      <div className="leads-report-grid">
         {/* 3. Причины отказов */}
         <div className="card" style={{ padding: 20 }}>
           <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 14 }}>Причины отказов</div>

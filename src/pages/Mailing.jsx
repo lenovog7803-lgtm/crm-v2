@@ -11,16 +11,14 @@ import {
 } from '../api'
 import { useToast } from '../components/Toast'
 import { SlidingTabs } from '../components/SlidingTabs'
-import { CircularProgress } from '../components/CircularProgress'
 import { useIsMobile } from '../hooks/useIsMobile'
-import { ThinkingOrb } from 'thinking-orbs'
 import { Loader } from '../components/Loader'
-import { IconSwap, PopNumber, SwapText } from '../components/Transitions'
+import { SwapText } from '../components/Transitions'
 import Select from '../components/Select'
 import Switch from '../components/Switch'
 import { EmptyState } from '../components/EmptyState'
 import { iosConfirm } from '../components/IOSAlert'
-import CardGradient from '../components/CardGradient'
+import { ModalOverlay, ModalHeader } from '../components/Modal'
 import SearchField from '../components/SearchField'
 
 // «Рассылка» — холодные письма по базе. Вся логика (лимиты, рабочие часы,
@@ -48,8 +46,6 @@ const tabsWith = (newReplies, withSuppliers) => [
   ...(withSuppliers ? [{ key: 'suppliers', label: 'Поставщики' }] : []),
   { key: 'settings', label: 'Настройки' },
 ]
-
-const KIND_LABEL = { sale: 'продажа', clients: 'поиск клиентов', purchase: 'закупка' }
 
 // Быстрые фильтры контактов — счётчики приходят из /mailing/state (groups)
 const GROUPS = [
@@ -83,21 +79,9 @@ const nextWorkdayLabel = () => {
   return ['в воскресенье', 'в понедельник', 'во вторник', 'в среду', 'в четверг', 'в пятницу', 'в субботу'][d.getDay()] + ' утром'
 }
 
-// ---------------- Обзор ----------------
-// В стиле дашборда CRM: hero-карточки с градиентом, KPI-полоса, кольцевой прогресс, CountUp.
-const RAMP_STEPS = [{ until: 3, lim: 5 }, { until: 7, lim: 10 }, { until: 12, lim: 15 }, { until: Infinity, lim: 20 }]
-
-const heroBase = {
-  borderRadius: 22, position: 'relative', overflow: 'clip',
-  transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
-}
-const bigNum = (color, size) => ({ fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: size, letterSpacing: '-0.03em', lineHeight: 1, color })
-
-function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoContacts, replies }) {
+function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoContacts }) {
   const { show } = useToast()
-  const isMobile = useIsMobile()
   const [busy, setBusy] = useState(false)
-  const [logOpen, setLogOpen] = useState(false)
 
   const toggle = async () => {
     setBusy(true)
@@ -125,292 +109,64 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
     setBusy(false)
   }
 
-  const counts = state.counts || {}
   const groups = state.groups || {}
-  const h = state.health || {}
-  const boxes = state.mailboxes || []
-  const multi = boxes.length > 1
-  // здоровье по всем почтам: возвраты суммой, статус — худший из почт
-  const sent7 = multi ? boxes.reduce((n, m) => n + (m.health?.sent_7d || 0), 0) : (h.sent_7d ?? 0)
-  const bounced7 = multi ? boxes.reduce((n, m) => n + (m.health?.bounced_7d || 0), 0) : (h.bounced_7d ?? 0)
-  const bounceRate = multi ? (sent7 ? Math.round((bounced7 / sent7) * 1000) / 10 : 0) : (h.bounce_rate ?? 0)
-  const shortLogin = (m) => (m.login || m.name || '').split('@')[0]
-  const sentTotal = Math.max(0, (state.total || 0) - (counts.new || 0) - (counts.skip || 0))
-  const answered = groups.answered || 0
-  const replyPct = sentTotal ? Math.round((answered / sentTotal) * 100) : 0
-  const todayPct = state.limit ? Math.min(100, (state.sent_today / state.limit) * 100) : 0
-  const healthTone = h.status === 'stop' ? 'red' : (h.status === 'slow' || h.status === 'paused') ? 'amber' : 'ok'
-  const healthCard = {
-    ok: { tone: 'blue', label: 'Норма' },
-    amber: { tone: 'orange', label: h.status === 'paused' ? 'Пауза' : 'Тише' },
-    red: { tone: 'red', label: 'Остановка' },
-  }[healthTone]
-  const healthColor = { blue: 'var(--fg-1366f0)', orange: 'var(--fg-d97706)', red: 'var(--fg-e0473b)' }[healthCard.tone]
-
-  const funnel = [
-    { label: 'Отправлено', value: sentTotal, color: 'var(--fg-1366f0)' },
-    { label: 'Ответили', value: answered, color: 'var(--fg-1366f0)' },
-    { label: 'Интерес', value: (counts.interested || 0) + (counts.deal || 0), color: 'var(--fg-1366f0)' },
-    { label: 'Сделка', value: counts.deal || 0, color: 'var(--fg-1366f0)' },
-  ]
-  const kpis = [
-    { label: 'В очереди', value: state.queue_new || 0, hint: state.queue_follow ? `+${state.queue_follow} напоминаний` : 'новых адресов', color: 'var(--fg-1366f0)', bg: 'rgba(var(--rgb-19-102-240), 0.08)', group: '' },
-    { label: 'Ждём ответа', value: groups.waiting || 0, hint: 'письмо дошло', color: 'var(--fg-7c3aed)', bg: 'rgba(var(--rgb-124-58-237), 0.08)', group: 'waiting' },
-    { label: 'Молчат', value: groups.silent || 0, hint: 'после напоминания', color: 'var(--text-3)', bg: 'rgba(var(--ink-rgb), 0.05)', group: 'silent' },
-    { label: 'Не дошло', value: groups.failed || 0, hint: 'возвраты и ошибки', color: 'var(--fg-e0473b)', bg: 'rgba(var(--rgb-224-71-59), 0.08)', group: 'failed' },
-  ]
-  const log = state.log || []
-  const rampIdx = RAMP_STEPS.findIndex(st => (h.day || 1) <= st.until)
+  const mailboxes = state.mailboxes || []
+  const health = state.health || {}
+  const sent = state.sent_today ?? 0
+  const limit = state.limit ?? 0
+  const activity = state.log || []
+  const status = state.running ? 'Рассылка работает' : 'Рассылка остановлена'
+  const next = state.running && limit > 0 && sent >= limit
+    ? `Следующая отправка ${nextWorkdayLabel()}`
+    : [state.state, state.next_at && `Следующая отправка в ${state.next_at}`].filter(Boolean).join(' · ')
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {!state.configured && (
-        <div className="ios-widget" style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-          <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Почта {state.mailboxes?.length === 1 ? `«${state.mailboxes[0].name}» ` : ''}ещё не подключена — без неё рассылку не запустить.</div>
-          <button className="btn-ghost" onClick={onGoSettings}>Подключить почту →</button>
+    <div className="mailing-overview">
+      <section className="card mailing-send">
+        <div className="mailing-status">
+          <span className="activity-status-dot" style={{ color: state.running ? 'var(--fg-0e9f6e)' : 'var(--text-secondary)' }} />
+          <h2>{status}</h2>
         </div>
-      )}
-
-      {/* Hero */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.3fr 1fr 1fr', gap: 16 }}>
-        {/* Статус и запуск */}
-        <div className="grad-card grad-blue" style={{ ...heroBase, padding: isMobile ? '18px' : '26px 28px' }}>
-          <CardGradient tone="blue" />
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              {/* вместо точки статуса — маленькая сфера: работает — зелёная и крутится, стоит — замерла и потускнела */}
-              <ThinkingOrb state="searching" size={20} dotSize={1.7} color={state.running ? '#C8FFE0' : 'rgba(255,255,255,0.6)'}
-                paused={!state.running} aria-label={state.running ? 'Рассылка работает' : 'Рассылка остановлена'} />
-              <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.92)' }}>
-                {state.running ? 'Работает' : 'Остановлено'}{state.campaign ? ` · ${state.campaign.name}` : ' · все направления'}
-              </span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <span style={bigNum('#fff', isMobile ? 34 : 42)}><PopNumber value={state.sent_today} /></span>
-              <span style={{ fontSize: 17, color: 'rgba(255,255,255,0.75)', fontWeight: 600 }}>/ {state.limit} писем сегодня</span>
-            </div>
-            <div style={{ height: 6, borderRadius: 99, background: 'rgba(255,255,255,0.25)', marginTop: 14, overflow: 'hidden' }}>
-              <div style={{ width: `${todayPct}%`, height: '100%', borderRadius: 99, background: 'linear-gradient(90deg, #5BE89B, #2FC7A0)', transition: 'width 0.6s var(--ease)' }} />
-            </div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', marginTop: 10, minHeight: 16 }}>
-              {state.running && state.limit > 0 && state.sent_today >= state.limit
-                ? `Лимит на сегодня выполнен — продолжу ${nextWorkdayLabel()}`
-                : <>{state.state}{state.next_at ? ` · дальше в ${state.next_at}` : ''}</>}
-            </div>
-            {multi && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px', marginTop: 8, fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
-                {boxes.map(m => (
-                  <span key={m.id}>{shortLogin(m)}: <b style={{ color: '#fff' }}><PopNumber value={m.sent_today ?? 0} /></b>/{m.health?.limit ?? 0}</span>
-                ))}
-              </div>
-            )}
-            <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
-              <button onClick={toggle} disabled={busy || (!state.running && !state.configured)}
-                style={{ padding: '10px 18px', borderRadius: 99, border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 14, fontWeight: 700,
-                  background: state.running ? 'rgba(255,255,255,0.22)' : 'var(--surface)', color: state.running ? '#fff' : '#3A62B8',
-                  opacity: (!state.running && !state.configured) ? 0.5 : 1 }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                  <IconSwap on={state.running} a="▶" b="■" />
-                  <SwapText>{state.running ? 'Остановить' : 'Запустить'}</SwapText>
-                </span>
+        <div className="mailing-tally"><strong>{sent}</strong><span>из {limit} писем сегодня</span></div>
+        {limit > 0 && <progress max={limit} value={Math.min(sent, limit)} aria-label="Использование дневного лимита" />}
+        {next && <p>{next}</p>}
+        {!state.configured && <p>Подключите почту, чтобы запустить рассылку.</p>}
+        <div className="mailing-actions">
+          {state.configured || state.running
+            ? <button className={state.running ? 'btn-ghost' : 'btn-primary'} onClick={toggle} disabled={busy}>
+                {state.running ? 'Остановить' : 'Запустить рассылку'}
               </button>
-              <button onClick={checkInbox} disabled={busy}
-                style={{ padding: '10px 16px', borderRadius: 99, border: '1px solid rgba(255,255,255,calc(0.4 * var(--rim-k)))', background: 'transparent',
-                  color: '#fff', cursor: 'pointer', fontFamily: 'var(--font-sys)', fontSize: 13, fontWeight: 600 }}>
-                Проверить входящие
-              </button>
-            </div>
-          </div>
+            : <button className="btn-primary" onClick={onGoSettings}>Подключить почту</button>}
+          {state.configured && <button className="btn-ghost" onClick={checkInbox} disabled={busy}>Проверить входящие</button>}
         </div>
+      </section>
 
-        {/* Ответили */}
-        <div onClick={onGoReplies} className="ios-widget" style={{ ...heroBase, cursor: 'pointer', padding: isMobile ? '16px 18px' : '26px 24px' }}>
-          <div className="grad-kicker" style={{ color: 'var(--fg-1e9e5a)' }}>Ответили</div>
-          <div style={bigNum('var(--ink)', isMobile ? 28 : 34)}><PopNumber value={answered} /></div>
-          <div style={{ fontSize: 12, color: 'var(--fg-1e9e5a)', marginTop: 6 }}>{replyPct}% от отправленных</div>
-          <div style={{ marginTop: 14, fontSize: 14, color: 'var(--fg-1366f0)', fontWeight: 500 }}>
-            {state.replies_new ? `${state.replies_new} новых — разобрать` : 'Все ответы'}
-          </div>
-        </div>
+      <section className="card mailing-summary" aria-label="Сводка рассылки">
+        <button className="party-row" onClick={onGoReplies}><span>Новые ответы</span><strong>{state.replies_new ?? 0}</strong></button>
+        <button className="party-row" onClick={() => onGoContacts('waiting')}><span>Ждём ответа</span><strong>{groups.waiting ?? 0}</strong></button>
+        <button className="party-row" onClick={() => onGoContacts('failed')}><span>Не доставлено</span><strong>{groups.failed ?? 0}</strong></button>
+        <div className="party-row"><span>В очереди</span><strong>{state.queue_new ?? 0}</strong></div>
+      </section>
 
-        {/* Здоровье ящика */}
-        <div className="ios-widget" style={{ ...heroBase, padding: isMobile ? '16px 18px' : '26px 24px' }}>
-          <div className="grad-kicker" style={{ color: healthColor }}>{multi ? `Здоровье почт · ${boxes.length}` : `Здоровье ящика${boxes[0]?.login ? ` · ${boxes[0].login}` : ''}`}</div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-            <span style={bigNum('var(--ink)', isMobile ? 28 : 34)}>{bounceRate}%</span>
-            <span style={{ fontSize: 12, color: 'var(--text-2b)', fontWeight: 600 }}>возвратов</span>
-          </div>
-          <div style={{ fontSize: 12, color: 'var(--text-2b)', marginTop: 6 }}>{bounced7} из {sent7} за 7 дней · норма до 4%</div>
-          {multi && (
-            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 4, marginTop: 10 }}>
-              {boxes.map(m => {
-                const mh = m.health || {}
-                const st = mh.status || 'ok'
-                // меньше 10 писем — процент ещё ничего не значит (1 из 4 = 25%), защита судит с 10-го
-                const early = st === 'ok' && (mh.sent_7d || 0) < 10 && (mh.bounced_7d || 0) > 0
-                const dot = st === 'stop' ? 'var(--fg-e0473b)' : st === 'ok' && !early ? 'var(--fg-0e9f6e)' : 'var(--fg-d97706)'
-                return (
-                  <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--ink)' }}
-                    title={early ? 'Мало писем для выводов — защита оценивает почту с 10 отправленных' : undefined}>
-                    <span style={{ width: 8, height: 8, borderRadius: 99, background: dot, boxShadow: '0 0 0 1.5px #fff', flexShrink: 0 }} />
-                    <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.login || m.name}</span>
-                    <span style={{ opacity: 0.7 }}>{mh.bounced_7d ?? 0} из {mh.sent_7d ?? 0}</span>
-                    <b style={{ minWidth: 34, textAlign: 'right' }}>{mh.bounce_rate ?? 0}%</b>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-          <div style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 500, color: 'var(--ink)' }}>
-            <span style={{ width: 7, height: 7, borderRadius: 99, background: healthColor }} />
-            {healthTone === 'ok' && bounceRate > 4 ? 'Норма · мало писем для выводов' : healthCard.label}
-          </div>
-          {h.reason && <div style={{ fontSize: 12, color: 'var(--text-2b)', marginTop: 8, lineHeight: 1.4 }}>{h.reason}</div>}
-          {!h.reason && healthTone === 'ok' && bounceRate > 4 && (
-            <div style={{ fontSize: 12, color: 'var(--text-2b)', marginTop: 8, lineHeight: 1.4 }}>
-              Защита оценивает каждую почту с 10 отправленных: больше 4% — темп вдвое ниже, больше 8% (от 20 писем) — остановка.
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* KPI */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 12 }}>
-        {kpis.map(k => (
-          <div key={k.label} className="ios-widget" onClick={() => onGoContacts(k.group)}
-            style={{ padding: isMobile ? '12px 14px' : '18px 20px', cursor: 'pointer' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, color: 'var(--text-secondary)', marginBottom: 8 }}>
-              <span style={{ width: 7, height: 7, borderRadius: 99, background: k.color }} />{k.label}
-            </div>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: isMobile ? 24 : 30, color: 'var(--ink)', lineHeight: 1, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
-              <PopNumber value={k.value} />
-            </div>
-            <div style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 8 }}>{k.hint}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Разгон + воронка */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16 }}>
-        <div className="ios-widget" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18 }}>
-            <div style={{ position: 'relative', flexShrink: 0 }}>
-              <CircularProgress pct={multi ? Math.min(100, (state.limit / Math.max(1, boxes.reduce((n, m) => n + (m.health?.cap || 0), 0))) * 100)
-                : h.auto ? Math.min(100, ((h.day || 1) / 13) * 100) : 100} color="var(--fg-1366f0)" size={56} />
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: 'var(--fg-1366f0)' }}>
-                {multi ? state.limit : h.auto ? `д.${h.day || 1}` : '—'}
-              </div>
-            </div>
-            <div>
-              <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>{multi ? `Разгон почт · ${boxes.length}` : 'Разгон ящика'}</div>
-              <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>
-                {multi ? `сегодня всего ${state.limit} писем · потолок ${boxes.reduce((n, m) => n + (m.health?.cap || 0), 0)}`
-                  : h.auto ? `лимит растёт сам · потолок ${h.cap}` : 'выключен — фиксированный лимит из настроек'}
-              </div>
-            </div>
-          </div>
-          {multi && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {boxes.map(m => {
-                const mh = m.health || {}
-                const idx = RAMP_STEPS.findIndex(st => (mh.day || 1) <= st.until)
-                return (
-                  <div key={m.id}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 13, marginBottom: 6 }}>
-                      <span style={{ fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.login || m.name}</span>
-                      <span style={{ color: 'var(--text-3)', flexShrink: 0 }}>
-                        {mh.auto ? `день ${mh.day || 1} · ${mh.limit ?? 0} в день` : `${mh.limit ?? 0} в день`}
-                      </span>
-                    </div>
-                    {mh.auto && (
-                      <div style={{ display: 'flex', gap: 4 }}>
-                        {RAMP_STEPS.map((st, i) => (
-                          <div key={i} style={{ flex: 1, height: 5, borderRadius: 99, opacity: st.lim > (mh.cap || 0) ? 0.35 : 1,
-                            background: i === idx ? 'var(--fg-1366f0)' : i < idx ? 'rgba(var(--rgb-19-102-240), 0.45)' : 'rgba(var(--ink-rgb), 0.08)' }} />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          )}
-          {!multi && h.auto && (
-            <div style={{ display: 'flex', gap: 6 }}>
-              {RAMP_STEPS.map((st, i) => {
-                const capped = st.lim > (h.cap || 0)
-                const active = i === rampIdx
-                const done = i < rampIdx
-                return (
-                  <div key={i} style={{ flex: 1, textAlign: 'center', opacity: capped ? 0.35 : 1 }}>
-                    <div style={{ height: 6, borderRadius: 99, background: active ? 'var(--fg-1366f0)' : done ? 'rgba(var(--rgb-19-102-240), 0.45)' : 'rgba(var(--ink-rgb), 0.08)' }} />
-                    <div style={{ fontSize: 12, fontWeight: active ? 800 : 600, color: active ? 'var(--fg-1366f0)' : 'var(--text-3)', marginTop: 6 }}>{st.lim}</div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </div>
-
-        <div className="ios-widget" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>Воронка</div>
-          <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2, marginBottom: 14 }}>за всё время</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-            {funnel.map(f => (
-              <div key={f.label} style={{ display: 'grid', gridTemplateColumns: '92px 1fr 44px', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>{f.label}</span>
-                <div style={{ height: 10, borderRadius: 99, background: 'rgba(var(--ink-rgb), 0.05)', overflow: 'hidden' }}>
-                  <div style={{ width: `${sentTotal ? Math.max(f.value ? 3 : 0, (f.value / sentTotal) * 100) : 0}%`, height: '100%', borderRadius: 99,
-                    background: f.color, transition: 'width 0.6s var(--ease)' }} />
-                </div>
-                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)', textAlign: 'right' }}>{f.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Новые ответы */}
-      {replies.length > 0 && (
-        <div className="ios-widget" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>Новые ответы</div>
-            <button className="btn-ghost" onClick={onGoReplies}>Разобрать →</button>
-          </div>
-          {replies.slice(0, 4).map(c => (
-            <div key={c.id} onClick={onGoReplies} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 0', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)', cursor: 'pointer' }}>
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>{c.company || c.email}</div>
-                <div style={{ fontSize: 13, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {c.reply_snippet || 'ответ без текста'}
-                </div>
-              </div>
-              <span style={{ fontSize: 12, color: 'var(--text-tertiary)', flexShrink: 0 }}>{fmtTs(c.replied_at).slice(5)}</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Журнал */}
-      <div className="ios-widget" style={{ padding: isMobile ? '16px 14px' : '20px 24px' }}>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', marginBottom: 10 }}>Журнал</div>
-        {log.length === 0 && <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>Пока пусто</div>}
-        {(logOpen ? log : log.slice(0, 8)).map(l => (
-          <div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderTop: '1px solid rgba(var(--ink-rgb), 0.05)', fontSize: 13 }}>
-            <span style={{ width: 7, height: 7, borderRadius: 99, flexShrink: 0, background: l.ok ? 'rgba(var(--ink-rgb), 0.2)' : 'var(--fg-ff3b30)' }} />
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <span style={{ fontWeight: 500, color: 'var(--ink)' }}>{l.company || l.email || l.kind}</span>
-              <span style={{ color: 'var(--text-3)' }}> · {l.kind}{l.detail ? ` — ${l.detail}` : ''}</span>
-            </div>
-            <span style={{ color: 'var(--text-tertiary)', flexShrink: 0 }}>{fmtTs(l.ts).slice(5)}</span>
-          </div>
-        ))}
-        {log.length > 8 && (
-          <button className="btn-ghost" style={{ marginTop: 10 }} onClick={() => setLogOpen(o => !o)}>
-            {logOpen ? 'Свернуть' : `Показать всё (${log.length})`}
-          </button>
-        )}
-      </div>
+      <section className="card mailing-secondary" aria-label="Диагностика рассылки">
+        <details>
+          <summary>Состояние почты</summary>
+          {health.reason && <p>{health.reason}</p>}
+          {mailboxes.length === 0 && !health.reason && <p>Нет данных о почте.</p>}
+          {mailboxes.map(m => <div className="mailing-log-row" key={m.id}>
+            <span>{m.login || m.name}</span>
+            <span>{m.sent_today ?? 0} из {m.health?.limit ?? 0} сегодня · {m.health?.bounced_7d ?? 0} возвратов за 7 дней</span>
+          </div>)}
+        </details>
+        <details>
+          <summary>Журнал отправки</summary>
+          {activity.length === 0 && <p>Записей пока нет.</p>}
+          {activity.map(entry => <div className="mailing-log-row" key={entry.id}>
+            <span>{[entry.company || entry.email, entry.kind, entry.detail].filter(Boolean).join(' · ')}</span>
+            <time>{fmtTs(entry.ts).slice(5)}</time>
+          </div>)}
+        </details>
+      </section>
     </div>
   )
 }
@@ -719,20 +475,15 @@ function Contacts({ campaignId, campaignName, onChanged, groups = {}, loginFor, 
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        {GROUPS.map(g => {
-          const active = group === g.key
-          const n = g.key ? groups[g.key] : undefined
-          return (
-            <button key={g.key} onClick={() => { setGroup(g.key); setStatus('') }} style={chip(active)}>
-              {g.label}{n !== undefined ? ` · ${n}` : ''}
-            </button>
-          )
-        })}
-      </div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-        <SearchField value={q} onChange={setQ} placeholder="Компания, email, город" style={{ width: 260 }} />
-        <Select value={status} onChange={e => setStatus(e.target.value)} style={{ ...inputStyle, width: 170 }}>
+      <div className="orders-toolbar orders-filters mailing-contact-tools">
+        <SearchField value={q} onChange={setQ} placeholder="Компания, email, город" style={{ width: 'min(260px, 100%)' }} />
+        <Select fit value={group} onChange={e => { setGroup(e.target.value); setStatus('') }}
+          className={`orders-pill${group ? ' is-on' : ''}`} aria-label="Группа контактов">
+          {GROUPS.map(g => <option key={g.key} value={g.key}>
+            {g.key && groups[g.key] !== undefined ? `${g.label} · ${groups[g.key]}` : g.label}
+          </option>)}
+        </Select>
+        <Select fit value={status} onChange={e => setStatus(e.target.value)} className={`orders-pill${status ? ' is-on' : ''}`}>
           <option value="">Все статусы</option>
           {Object.entries(STATUS).map(([k, s]) => <option key={k} value={k}>{s.label}</option>)}
         </Select>
@@ -1374,7 +1125,7 @@ function NewCampaignForm({ mailboxes, onCreated, onCancel }) {
   }
 
   return (
-    <div className="ios-widget" style={{ padding: 16, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10, alignItems: 'end' }}>
+    <div className="mailing-campaign-form">
       <div>
         <div style={labelStyle}>Название</div>
         <input autoFocus value={f.name} onChange={e => setF(x => ({ ...x, name: e.target.value }))} placeholder="Краска — закупка" style={inputStyle} />
@@ -1403,20 +1154,13 @@ function NewCampaignForm({ mailboxes, onCreated, onCancel }) {
 
 function CampaignBar({ campaigns, value, onChange, onAdd }) {
   return (
-    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginBottom: 16 }}>
-      <button onClick={() => onChange('')} style={chip(!value)}>Все направления</button>
-      {campaigns.map(c => (
-        <button key={c.id} onClick={() => onChange(c.id)} style={chip(value === c.id)}>
-          <span title={c.running ? 'работает' : 'остановлено'} style={{ width: 7, height: 7, borderRadius: 99, background: c.running ? 'var(--fg-0e9f6e)' : 'var(--text-quaternary)' }} />
-          {c.name}
-          <span style={{ fontSize: 13, color: 'var(--text-3)' }}>{KIND_LABEL[c.kind] || ''}</span>
-          {c.replies_new > 0 && (
-            <span style={{ minWidth: 16, height: 16, borderRadius: 99, background: 'var(--bg-0e9f6e)', color: '#fff', fontSize: 10, fontWeight: 800,
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>{c.replies_new}</span>
-          )}
-        </button>
-      ))}
-      <button onClick={onAdd} style={{ ...chip(false), background: 'transparent', color: 'var(--fg-1366f0)' }}>+ Направление</button>
+    <div className="orders-filters mailing-actions">
+      <Select fit value={value} onChange={e => onChange(e.target.value)}
+        className={`orders-pill${value ? ' is-on' : ''}`} aria-label="Направление рассылки">
+        <option value="">Все направления</option>
+        {campaigns.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+      </Select>
+      <button className="btn-ghost" onClick={onAdd}>Новое направление</button>
     </div>
   )
 }
@@ -1470,7 +1214,6 @@ export default function Mailing() {
   const [mailboxes, setMailboxes] = useState(null)
   const [campaignId, setCampaignIdRaw] = useState(() => { try { return localStorage.getItem(CAMPAIGN_KEY) || '' } catch { return '' } })
   const [state, setState] = useState(null)
-  const [newReplies, setNewReplies] = useState([])
   const [contactsGroup, setContactsGroup] = useState('')
   const [adding, setAdding] = useState(false)
 
@@ -1486,7 +1229,6 @@ export default function Mailing() {
   }).catch(e => show('Ошибка загрузки направлений: ' + e.message, { type: 'error' }))
   const loadMailboxes = () => getMailboxes().then(setMailboxes).catch(e => show('Ошибка загрузки почты: ' + e.message, { type: 'error' }))
   const loadState = () => {
-    getMailingReplies(true, campaignId).then(r => setNewReplies(Array.isArray(r) ? r : [])).catch(() => {})
     // те же данные — шапке (сводка рассылки): своего долгого запроса к почте она не делает
     return getMailingState(campaignId).then(s => { setState(s); window.dispatchEvent(new CustomEvent('crm:mailing-state', { detail: s })) }).catch(e => show('Ошибка загрузки рассылки: ' + e.message, { type: 'error' }))
   }
@@ -1520,21 +1262,23 @@ export default function Mailing() {
   const ready = state && campaigns && mailboxes
 
   return (
-    <div>
-      <div style={{ marginBottom: 14, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <SlidingTabs options={tabsWith(state?.replies_new, hasPurchase)} value={tab} onChange={t => { setContactsGroup(''); setTab(t) }} />
+    <div className="mailing-page">
+      <div className="orders-toolbar mailing-toolbar">
+        <div className="mailing-tabs">
+          <SlidingTabs fill options={tabsWith(state?.replies_new, hasPurchase)} value={tab} onChange={t => { setContactsGroup(''); setTab(t) }} />
+        </div>
+        {campaigns && <CampaignBar campaigns={campaigns} value={campaignId}
+          onChange={id => setCampaignId(id)} onAdd={() => setAdding(true)} />}
       </div>
 
       <ExpiredMailboxes mailboxes={mailboxes} />
 
-      {campaigns && (
-        <CampaignBar campaigns={campaigns} value={campaignId} onChange={id => { setCampaignId(id); setAdding(false) }} onAdd={() => setAdding(a => !a)} />
-      )}
       {adding && mailboxes && (
-        <div style={{ marginBottom: 16 }}>
+        <ModalOverlay onClose={() => setAdding(false)}>
+          <ModalHeader title="Новое направление" onClose={() => setAdding(false)} />
           <NewCampaignForm mailboxes={mailboxes} onCancel={() => setAdding(false)}
             onCreated={c => { setAdding(false); loadCampaigns(); setCampaignId(c.id); setTab('settings') }} />
-        </div>
+        </ModalOverlay>
       )}
 
       {!ready && <Loader padding={40} />}
@@ -1542,7 +1286,7 @@ export default function Mailing() {
         <>
           {tab === 'overview' && <Overview state={state} campaignId={campaignId} reload={() => { loadState(); loadCampaigns() }}
             onGoSettings={() => setTab('settings')} onGoReplies={() => setTab('replies')}
-            onGoContacts={g => { setContactsGroup(g); setTab('contacts') }} replies={newReplies} />}
+            onGoContacts={g => { setContactsGroup(g); setTab('contacts') }} />}
           {tab === 'replies' && <Replies key={campaignId} campaignId={campaignId} loginFor={loginFor} onChanged={() => { loadState(); loadCampaigns() }} />}
           {tab === 'contacts' && <Contacts key={campaignId + contactsGroup} campaignId={campaignId} campaignName={campaign?.name}
             onChanged={loadState} groups={state.groups} loginFor={loginFor} initialGroup={contactsGroup} />}

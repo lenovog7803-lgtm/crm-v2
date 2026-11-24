@@ -9,24 +9,29 @@ import { EmptyState } from '../EmptyState'
 import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { useCelebration } from '../Celebration'
 import { useAuth } from '../../AuthContext'
-import { initials, getGradient } from '../../utils'
 import CallWindow from './CallWindow'
 import Select from '../Select'
-import Switch from '../Switch'
 
 const FILTERS_KEY = 'leads_list_filters'
 const PAGE = 40
 
 function loadFilters() {
-  try { return JSON.parse(localStorage.getItem(FILTERS_KEY)) || {} } catch { return {} }
+  try {
+    const { stage = '', overdueOnly = false } = JSON.parse(localStorage.getItem(FILTERS_KEY)) || {}
+    return { stage, overdueOnly }
+  } catch {
+    return { stage: '', overdueOnly: false }
+  }
 }
 
-export default function ListView({ industry }) {
+export default function ListView({ industry, industryFilter, search }) {
   const { user } = useAuth()
   const myId = user?.user?.id
   const [leads, setLeads] = useState([])
   const [loading, setLoading] = useState(true)
-  const [filters, setFilters] = useState(() => ({ search: '', stage: '', overdueOnly: false, ...loadFilters() }))
+  const [filters, setFilters] = useState(loadFilters)
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const activeFilters = [industry, filters.stage, filters.overdueOnly].filter(Boolean).length
   const [activeLead, setActiveLead] = useState(null)
   const [editLead, setEditLead] = useState(null)
   useEscapeKey(() => setActiveLead(null), !!activeLead && !editLead)   // Esc закрывает верхнее окно, а не оба
@@ -45,19 +50,19 @@ export default function ListView({ industry }) {
   const set = (k) => (v) => setFilters(p => ({ ...p, [k]: v }))
 
   const now = new Date().toISOString()
+  const query = search.trim().toLowerCase()
   const filtered = leads.filter(l => {
     if (industry && l.industry !== industry) return false
     if (filters.stage && stageOf(l) !== filters.stage) return false
     if (filters.overdueOnly && !(l.next_call && l.next_call < now)) return false
-    if (filters.search) {
-      const q = filters.search.toLowerCase()
-      const hit = [l.name, l.company, l.phone, l.contact_person, l.industry].filter(Boolean).some(v => v.toLowerCase().includes(q))
+    if (query) {
+      const hit = [l.name, l.company, l.phone, l.contact_person, l.industry].filter(Boolean).some(v => v.toLowerCase().includes(query))
       if (!hit) return false
     }
     return true
   })
 
-  useEffect(() => { setVisibleCount(PAGE) }, [filters, industry])
+  useEffect(() => { setVisibleCount(PAGE) }, [filters, industry, query])
 
   const visible = filtered.slice(0, visibleCount)
 
@@ -85,7 +90,7 @@ export default function ListView({ industry }) {
   }
 
   const handleClaim = async (leadId, e) => {
-    e.stopPropagation()
+    e?.stopPropagation()
     try {
       await claimLead(leadId)
       setLeads(prev => {
@@ -98,23 +103,24 @@ export default function ListView({ industry }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div className="card" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-        <input
-          value={filters.search}
-          onChange={e => set('search')(e.target.value)}
-          placeholder="Поиск по названию, телефону, контакту…"
-          className="form-input"
-          style={{ flex: 1, minWidth: 180 }}
-        />
-        <Select value={filters.stage} onChange={e => set('stage')(e.target.value)} className="form-input" style={{ minWidth: 150 }}>
-          <option value="">Все стадии</option>
-          {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
-        </Select>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)', cursor: 'pointer' }}>
-          <Switch size="sm" aria-label="Только просроченные" checked={filters.overdueOnly} onChange={e => set('overdueOnly')(e.target.checked)} />
-          Только просроченные
-        </label>
+    <>
+      <section className="card lead-directory" aria-label="Контакты базы обзвона">
+      <div className="lead-directory-tools">
+        <button type="button" className="lead-filter-toggle" aria-expanded={filtersOpen} aria-controls="lead-filter-options" onClick={() => setFiltersOpen(open => !open)}>
+          Фильтры{activeFilters > 0 && <span>{activeFilters}</span>}
+        </button>
+      </div>
+      <div id="lead-filter-options" hidden={!filtersOpen}>
+        <div className="orders-filters">
+          {industryFilter}
+          <Select fit value={filters.stage} onChange={e => set('stage')(e.target.value)}
+            className={`orders-pill${filters.stage ? ' is-on' : ''}`} triggerLabel={filters.stage ? stageById(filters.stage).label : 'Стадия'}>
+            <option value="">Все стадии</option>
+            {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+          </Select>
+          <button type="button" className={`orders-pill-btn orders-pill lead-overdue-filter${filters.overdueOnly ? ' is-on' : ''}`}
+            aria-pressed={filters.overdueOnly} onClick={() => set('overdueOnly')(!filters.overdueOnly)}>Просроченные</button>
+        </div>
       </div>
 
       {loading && (
@@ -122,46 +128,34 @@ export default function ListView({ industry }) {
       )}
 
       {!loading && filtered.length === 0 && (
-        <div className="ios-list">
+        <div className="lead-directory-results">
           <EmptyState title="Нет лидов по фильтрам" subtitle="Попробуйте изменить стадию или поисковый запрос" />
         </div>
       )}
 
       {!loading && filtered.length > 0 && (
-        <div className="ios-list">
+        <div className="lead-directory-results">
+          <div className="lead-directory-columns" aria-hidden="true">
+            <span>Компания</span><span>Телефон</span><span>Стадия</span><span>Звонок</span>
+          </div>
           <div ref={scrollRef} onScroll={handleScroll} style={{ maxHeight: 640, overflowY: 'auto' }}>
             {visible.map(l => {
               const st = stageById(l.stage)
-              const [avA, avB] = getGradient(l.name || '')
               const overdue = l.next_call && l.next_call < now
-              const sub = [l.contact_person, l.phone, l.industry, l.city].filter(Boolean).join(' · ')
+              const sub = [l.contact_person, l.city].filter(Boolean).join(' · ')
               return (
-                <div key={l.id} className="ios-row" onClick={() => setActiveLead(l)}>
-                  <div className="ios-row-avatar" style={{ '--av-hue': avB, background: `linear-gradient(135deg, ${avA} 0%, ${avB} 100%)` }}>{initials(l.name)}</div>
+                <div key={l.id} className="ios-row lead-directory-row" onClick={() => setActiveLead(l)}>
                   <div className="ios-row-text">
-                    <div className="ios-row-title">{l.name}</div>
-                    {sub && <div className="ios-row-sub">{sub}</div>}
+                    <button className="lead-name" title={l.name} onClick={e => { e.stopPropagation(); setActiveLead(l) }}>{l.name?.replace(/^Индивидуальный предприниматель\s+/i, 'ИП ')}</button>
+                    {sub && <div className="ios-row-sub lead-desktop-meta">{sub}</div>}
+                    <div className="ios-row-sub lead-compact-meta">{[st.label, l.phone, sub].filter(Boolean).join(' · ')}</div>
                   </div>
-                  <span style={{ padding: '3px 10px', borderRadius: 99, background: st.bg, color: st.color, fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap', flexShrink: 0 }}>{st.label}</span>
-                  <div className="ios-row-hide-sm" style={{ width: 86, textAlign: 'right', flexShrink: 0 }}>
-                    {l.next_call ? (
-                      <>
-                        <div style={{ fontSize: 13, color: overdue ? 'var(--fg-ff3b30)' : 'var(--ink)', fontWeight: overdue ? 600 : 500, fontVariantNumeric: 'tabular-nums' }}>
-                          {new Date(l.next_call).toLocaleDateString('ru-RU')}
-                        </div>
-                        {(l.call_attempts || 0) > 0 && <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 1 }}>{l.call_attempts} попыт.</div>}
-                      </>
-                    ) : <span style={{ fontSize: 13, color: 'var(--text-quaternary)' }}>—</span>}
-                  </div>
-                  {!l.assigned_to ? (
-                    <button onClick={e => handleClaim(l.id, e)} className="btn-ghost btn-sm" style={{ color: 'var(--fg-1366f0)', fontWeight: 600, flexShrink: 0 }}>Взять в работу</button>
-                  ) : l.assigned_to === myId ? (
-                    <span style={{ fontSize: 12, color: 'var(--fg-1e9e5a)', fontWeight: 600, flexShrink: 0 }}>У вас</span>
-                  ) : (
-                    <svg className="ios-row-chevron" width="8" height="13" viewBox="0 0 8 13" fill="none">
-                      <path d="M1 1.5L6.5 7L1 12.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  )}
+                  <span className="lead-directory-phone">{l.phone}</span>
+                  <span className="lead-directory-stage">{st.label}</span>
+                  {l.next_call && <time dateTime={l.next_call} className={overdue ? 'lead-due is-late' : 'lead-due'}
+                    title={overdue ? 'Звонок просрочен' : 'Следующий звонок'}>
+                    {new Date(l.next_call).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', ...(new Date(l.next_call).getFullYear() !== new Date().getFullYear() ? { year: 'numeric' } : {}) })}
+                  </time>}
                 </div>
               )
             })}
@@ -173,6 +167,8 @@ export default function ListView({ industry }) {
           </div>
         </div>
       )}
+
+      </section>
 
       {activeLead && (
         <CallWindow lead={activeLead} onClose={() => setActiveLead(null)} onClaim={(id, e) => handleClaim(id, e)}
@@ -190,6 +186,6 @@ export default function ListView({ industry }) {
           onDeleted={(id) => { setLeads(prev => prev.filter(l => l.id !== id)); setActiveLead(null) }}
         />
       )}
-    </div>
+    </>
   )
 }

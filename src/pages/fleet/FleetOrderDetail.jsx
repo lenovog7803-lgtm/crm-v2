@@ -1,3 +1,4 @@
+import ModalScrim from '../../components/ModalScrim'
 import GlassDialog from '../../components/GlassDialog'
 import { useState, useEffect, useCallback } from 'react'
 import { getFleetOrder, updateFleetOrder, generateFleetDoc, addFleetOrderPayment, deleteFleetOrderPayment, duplicateFleetOrder, addFleetComment, deleteFleetComment } from '../../api'
@@ -57,7 +58,7 @@ function StepModal({ title, fields, onClose, onConfirm }) {
   const set = (k, v) => setVals(p => ({ ...p, [k]: v }))
   const go = async () => { setSaving(true); try { await onConfirm(vals) } catch { setSaving(false) } }
   return (
-    <div onClick={onClose} className="dash-modal-scrim">
+    <ModalScrim onClick={onClose} className="dash-modal-scrim">
       <GlassDialog label={title} onDismiss={onClose} onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 400, padding: 26 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 18 }}>{title}</div>
         {fields.map((f, i) => (
@@ -74,7 +75,7 @@ function StepModal({ title, fields, onClose, onConfirm }) {
           </button>
         </div>
       </GlassDialog>
-    </div>
+    </ModalScrim>
   )
 }
 

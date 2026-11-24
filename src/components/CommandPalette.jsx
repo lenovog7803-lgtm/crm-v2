@@ -1,3 +1,4 @@
+import ModalScrim from './ModalScrim'
 import GlassDialog from './GlassDialog'
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { globalSearch } from '../api'
@@ -96,7 +97,7 @@ export default function CommandPalette({ open, onClose, onOpenOrder, onOpenClien
   )
 
   return (
-    <div className="spotlight-scrim search-dialog-overlay" data-closing={closing} onMouseDown={close}>
+    <ModalScrim className="spotlight-scrim search-dialog-overlay" data-closing={closing} onMouseDown={close}>
       <GlassDialog label="Поиск в CRM" onDismiss={close} onMouseDown={e => e.stopPropagation()} className="spotlight">
         <div className="search-dialog-header">
           <svg width="20" height="20" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
@@ -139,6 +140,6 @@ export default function CommandPalette({ open, onClose, onOpenOrder, onOpenClien
         </div>
 
       </GlassDialog>
-    </div>
+    </ModalScrim>
   )
 }

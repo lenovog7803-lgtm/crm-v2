@@ -1,3 +1,4 @@
+import ModalScrim from '../../components/ModalScrim'
 import GlassDialog from '../../components/GlassDialog'
 import { useState } from 'react'
 import { updateFleetOrder } from '../../api'
@@ -40,7 +41,7 @@ export default function FleetPaymentModal({ order, onClose, onSaved }) {
   }
 
   return (
-    <div className="dash-modal-scrim" onClick={onClose}>
+    <ModalScrim className="dash-modal-scrim" onClick={onClose}>
       <GlassDialog label="Оплата рейса" onDismiss={onClose} className="dash-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 400, padding: 26 }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg-1e9e5a)', marginBottom: 6 }}>Оплата от клиента</div>
         <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 20 }}>{order.client_name || '—'} · {(order.rate || 0).toLocaleString('ru-RU')} Br</div>
@@ -67,6 +68,6 @@ export default function FleetPaymentModal({ order, onClose, onSaved }) {
           </button>
         </div>
       </GlassDialog>
-    </div>
+    </ModalScrim>
   )
 }
