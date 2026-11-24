@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { useEscapeKey } from '../hooks/useEscapeKey'
+import React, { createContext, useContext, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import { useDialogFocus } from './GlassDialog'
 import { useIsMobile } from '../hooks/useIsMobile'
 import { spring, project, rubberband, velocityTracker, prefersReducedMotion } from '../motion'
 
@@ -15,6 +15,7 @@ export function ModalOverlay({ onClose, children, panelStyle, bodyStyle }) {
   const overlayRef = useRef(null)
   const scrimRef = useRef(null)
   const panelRef = useRef(null)
+  const titleId = useId()
   const y = useRef(0)
   const anim = useRef(null)
   const drag = useRef(null)
@@ -65,7 +66,7 @@ export function ModalOverlay({ onClose, children, panelStyle, bodyStyle }) {
       setTimeout(finish, prefersReducedMotion() ? 0 : 150)
     }
   }
-  useEscapeKey(() => requestClose())
+  useDialogFocus(panelRef, requestClose)
 
   // палец отпущен: бросок/дотянуто — закрыть, иначе вернуть с той же скоростью
   const release = () => {
@@ -150,10 +151,12 @@ export function ModalOverlay({ onClose, children, panelStyle, bodyStyle }) {
   } : null
 
   return (
-    <SheetCtx.Provider value={{ requestClose, dragHandlers }}>
+    <SheetCtx.Provider value={{ requestClose, dragHandlers, titleId }}>
       <div
         ref={overlayRef}
         className="modal-overlay"
+        data-closing={closing}
+        onClick={e => { if (e.target === e.currentTarget) requestClose() }}
         style={isMobile ? {
           // телефон: без размытия (тяжело для GPU на каждом кадре) и без прокрутки подложки,
           // пока шторка за экраном — иначе слой «дёргается» при выезде
@@ -174,7 +177,8 @@ export function ModalOverlay({ onClose, children, panelStyle, bodyStyle }) {
           <div ref={scrimRef} onClick={() => requestClose()}
             style={{ position: 'absolute', inset: 0, background: 'rgba(var(--ink-rgb), 0.3)', opacity: 0, willChange: 'opacity' }} />
         )}
-        <div ref={panelRef} className="modal-panel ios-sheet" style={{
+        <div ref={panelRef} className="modal-panel ios-sheet glass-dialog" role="dialog" aria-modal="true"
+          aria-labelledby={titleId} aria-label="Окно CRM" tabIndex={-1} style={{
           margin: 'auto',
           background: isMobile ? 'var(--surface)' : 'rgba(var(--paper-rgb), 0.97)',
           backdropFilter: isMobile ? 'none' : 'blur(24px) saturate(180%)',
@@ -222,7 +226,7 @@ export function ModalHeader({ title, onClose }) {
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>
-      <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 17, letterSpacing: '-0.02em', color: 'var(--ink)', textAlign: 'center',
+      <div id={sheet?.titleId} style={{ fontFamily: 'var(--font-sys)', fontWeight: 600, fontSize: 17, letterSpacing: '-0.02em', color: 'var(--ink)', textAlign: 'center',
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</div>
       <span />
     </div>

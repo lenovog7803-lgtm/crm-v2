@@ -117,7 +117,7 @@ function UserDetailModal({ user, onClose, onSaved }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {PERMISSION_OPTIONS.map(p => (
               <label key={p.key} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 10, cursor: 'pointer', fontSize: 13, color: 'var(--ink)', background: perms[p.key] ? 'rgba(var(--rgb-19-102-240), 0.06)' : 'transparent' }}>
-                <Switch size="sm" checked={!!perms[p.key]} onChange={() => togglePerm(p.key)} style={{ width: 15, height: 15, accentColor: 'var(--fg-1366f0)' }} />
+                <Switch size="sm" aria-label={p.label} checked={!!perms[p.key]} onChange={() => togglePerm(p.key)} style={{ width: 15, height: 15, accentColor: 'var(--fg-1366f0)' }} />
                 {p.label}
               </label>
             ))}

@@ -1,7 +1,7 @@
+import GlassDialog from '../../components/GlassDialog'
 import { useState, useEffect, useCallback } from 'react'
 import { getFleetOrder, updateFleetOrder, generateFleetDoc, addFleetOrderPayment, deleteFleetOrderPayment, duplicateFleetOrder, addFleetComment, deleteFleetComment } from '../../api'
 import { useToast } from '../../components/Toast'
-import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { initials, getGradient } from '../../utils'
 import { FleetOrderModal, fmtDate } from './FleetOrderModal'
 import { TRIP_STATUS } from './FleetTripDetail'
@@ -52,14 +52,13 @@ function Step({ done, label, sub, onToggle }) {
 }
 
 function StepModal({ title, fields, onClose, onConfirm }) {
-  useEscapeKey(onClose)
   const [vals, setVals] = useState(() => Object.fromEntries(fields.map(f => [f.key, f.default ?? ''])))
   const [saving, setSaving] = useState(false)
   const set = (k, v) => setVals(p => ({ ...p, [k]: v }))
   const go = async () => { setSaving(true); try { await onConfirm(vals) } catch { setSaving(false) } }
   return (
     <div onClick={onClose} className="dash-modal-scrim">
-      <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 400, padding: 26 }}>
+      <GlassDialog label={title} onDismiss={onClose} onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 400, padding: 26 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 18 }}>{title}</div>
         {fields.map((f, i) => (
           <div key={f.key} style={{ marginBottom: 14 }}>
@@ -69,12 +68,12 @@ function StepModal({ title, fields, onClose, onConfirm }) {
           </div>
         ))}
         <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
-          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+          <button data-dialog-dismiss onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button onClick={go} disabled={saving} className="btn-primary" style={{ flex: 2, background: 'var(--bg-1e9e5a)', opacity: saving ? 0.6 : 1, boxShadow: 'none', justifyContent: 'center' }}>
             <SwapText>{saving ? 'Сохраняю…' : 'Подтвердить'}</SwapText>
           </button>
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }
@@ -185,7 +184,7 @@ function PaymentsCard({ order, cur, onReload, onFull }) {
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <DateInput type="date" value={date} onChange={e => setDate(e.target.value)} style={{ ...iStyle, flex: 1 }} />
             <label style={{ display: 'flex', gap: 6, alignItems: 'center', fontSize: 12, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
-              <Switch size="sm" checked={cash} onChange={e => setCash(e.target.checked)} /> наличными
+              <Switch size="sm" aria-label="Оплата наличными" checked={cash} onChange={e => setCash(e.target.checked)} /> наличными
             </label>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>

@@ -14,6 +14,48 @@ import { iosConfirm } from './IOSAlert'
 import CardGradient from './CardGradient'
 import { SlidingTabs } from './SlidingTabs'
 
+function OrderActions({ duplicating, onDuplicate, onDelete }) {
+  const [open, setOpen] = useState(false)
+  const area = useRef(null)
+  const trigger = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    const closeOutside = event => { if (!area.current?.contains(event.target)) setOpen(false) }
+    document.addEventListener('pointerdown', closeOutside)
+    return () => document.removeEventListener('pointerdown', closeOutside)
+  }, [open])
+
+  const run = action => {
+    setOpen(false)
+    trigger.current?.focus()
+    action()
+  }
+
+  return (
+    <div ref={area} className="order-detail-more" onKeyDown={event => {
+      if (event.key !== 'Escape' || !open) return
+      event.stopPropagation()
+      setOpen(false)
+      trigger.current?.focus()
+    }} onBlur={event => {
+      if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false)
+    }}>
+      <button ref={trigger} type="button" className="btn-ghost" aria-label="Ещё действия с заявкой" aria-expanded={open}
+        onClick={() => setOpen(value => !value)}>
+        <span aria-hidden="true">···</span>
+      </button>
+      {open && (
+        <div className="topbar-menu t-dropdown-in" role="group" aria-label="Дополнительные действия">
+          <button type="button" disabled={duplicating} onClick={() => run(onDuplicate)}>{duplicating ? 'Дублирование…' : 'Дублировать'}</button>
+          <div className="topbar-menu-sep" />
+          <button type="button" className="is-danger" onClick={() => run(onDelete)}>Удалить</button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 const STATUSES = [
   { id: 'new', label: 'Новая', color: 'var(--fg-7c3aed)', bg: 'rgba(var(--rgb-124-58-237), 0.1)' },
   { id: 'in_progress', label: 'В работе', color: 'var(--fg-1366f0)', bg: 'rgba(var(--rgb-19-102-240), 0.1)' },
@@ -799,106 +841,27 @@ export default function OrderDetail({ orderId, onMeta, onBack, onDelete, onOpenC
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      {/* Top bar */}
-      {isMobile ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {/* Row 1: back + order info + save */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button onClick={onBack} className="btn-icon" style={{ width: 36, height: 36, flexShrink: 0 }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
+      <div className="order-detail-toolbar" role="group" aria-label="Действия с заявкой">
+        <button type="button" className="btn-ghost order-detail-back" onClick={onBack}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          Назад
+        </button>
+        <span className="order-detail-status" style={{ background: curStatus.bg, color: curStatus.color }}>{curStatus.label}</span>
+        <div className="order-detail-actions">
+          {saveErr && <span className="order-detail-error" role="status">Ошибка сохранения</span>}
+          {savedOk && !isDirty && <span className="order-detail-status" role="status">Сохранено</span>}
+          {isDirty || saving ? (
+            <button type="button" className="btn-primary" onClick={handleSave} disabled={saving}>
+              {saving ? 'Сохраняю…' : 'Сохранить'}
             </button>
-            <span style={{
-              padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
-              background: curStatus.bg, color: curStatus.color,
-            }}>{curStatus.label}</span>
-            <div style={{ flex: 1 }} />
-            {saveErr && <span style={{ fontSize: 11, color: 'var(--fg-c81923)', fontWeight: 700 }}>Ошибка</span>}
-            <button onClick={handleSave} disabled={!isDirty || saving} style={{
-              minWidth: 36, height: 36, borderRadius: 12, cursor: isDirty ? 'pointer' : 'default',
-              border: `1px solid ${savedOk ? 'rgba(var(--rgb-30-158-90), 0.4)' : isDirty ? 'rgba(var(--rgb-19-102-240), 0.4)' : 'rgba(var(--ink-rgb), 0.1)'}`,
-              background: savedOk ? 'rgba(var(--rgb-30-158-90), 0.12)' : isDirty ? 'rgba(var(--rgb-19-102-240), 0.12)' : 'rgba(var(--paper-rgb), 0.5)',
-              color: savedOk ? 'var(--fg-1e9e5a)' : isDirty ? 'var(--fg-1366f0)' : 'var(--text-quaternary)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 13, flexShrink: 0,
-              padding: isDirty ? '0 14px' : '0 10px',
-              transition: 'all 0.2s',
-            }}>
-              {savedOk
-                ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              }
-              {isDirty && <span>{saving ? 'Сохр...' : savedOk ? 'OK' : 'Сохранить'}</span>}
-            </button>
-          </div>
-          {/* Row 2: secondary actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {isDirty && <span style={{ fontSize: 12, color: 'var(--fg-d97706)', fontWeight: 600 }}>Есть изменения</span>}
-            <div style={{ flex: 1 }} />
-            {onEdit && (
-              <button onClick={() => onEdit(order)} className="btn-ghost" style={{ height: 34, color: 'var(--fg-1366f0)', display: 'flex', alignItems: 'center', gap: 5 }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-                Ред.
-              </button>
-            )}
-            <button onClick={handleDuplicate} disabled={duplicating} className="btn-icon" style={{ width: 34, height: 34 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-              </svg>
-            </button>
-            <button onClick={handleDelete} className="btn-icon" style={{ width: 34, height: 34, background: 'rgba(var(--rgb-200-25-35), 0.08)', color: 'var(--fg-c81923)' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button className="btn-ghost" onClick={onBack} style={{ flexShrink: 0 }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-            Назад
-          </button>
-          <span style={{ padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, flexShrink: 0, background: curStatus.bg, color: curStatus.color }}>{curStatus.label}</span>
-          {isDirty && <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--fg-d97706)', padding: '3px 10px', borderRadius: 8, background: 'rgba(var(--rgb-217-119-6), 0.1)' }}>Есть изменения</span>}
-          <div style={{ flex: 1 }} />
-          {saveErr && <span style={{ fontSize: 12, color: 'var(--fg-c81923)', fontWeight: 600, flexShrink: 0 }}>Ошибка</span>}
-          <button onClick={handleSave} disabled={!isDirty || saving} style={{
-            padding: '11px 26px', borderRadius: 12, cursor: isDirty ? 'pointer' : 'default',
-            border: `1px solid ${savedOk ? 'rgba(var(--rgb-30-158-90), 0.35)' : isDirty ? 'rgba(var(--rgb-19-102-240), 0.35)' : 'rgba(255,255,255,calc(0.2 * var(--rim-k)))'}`,
-            background: savedOk ? 'rgba(var(--rgb-30-158-90), 0.15)' : isDirty ? 'rgba(var(--rgb-19-102-240), 0.15)' : 'rgba(var(--paper-rgb), 0.07)',
-            backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-            color: savedOk ? 'var(--fg-1e9e5a)' : isDirty ? 'var(--fg-1366f0)' : 'var(--text-tertiary)',
-            fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14,
-            display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0, transition: 'all 0.25s',
-          }}>
-            {savedOk
-              ? <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-              : <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            }
-            {saving ? 'Сохранение...' : savedOk ? 'Сохранено' : 'Сохранить'}
-          </button>
-          {onEdit && (
-            <button onClick={() => onEdit(order)} className="btn-ghost" style={{ flexShrink: 0, color: 'var(--fg-1366f0)', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              Редактировать
-            </button>
+          ) : onEdit && (
+            <button type="button" className="btn-ghost order-detail-edit" onClick={() => onEdit(order)}>Редактировать</button>
           )}
-          <button onClick={handleDuplicate} disabled={duplicating} className="btn-ghost" style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            {duplicating ? '...' : 'Дублировать'}
-          </button>
-          <button onClick={handleDelete} className="btn-ghost" style={{ flexShrink: 0, color: 'var(--fg-c81923)', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /></svg>
-            Удалить
-          </button>
+          <OrderActions duplicating={duplicating} onDuplicate={handleDuplicate} onDelete={handleDelete} />
         </div>
-      )}
+      </div>
 
       <div className="detail-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.6fr) minmax(0, 1fr)', gap: 16, alignItems: 'start' }}>
         {/* LEFT COLUMN */}

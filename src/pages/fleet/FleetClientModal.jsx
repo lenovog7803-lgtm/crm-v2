@@ -1,3 +1,4 @@
+import GlassDialog from '../../components/GlassDialog'
 import { useState } from 'react'
 import { createFleetClient, updateFleetClient } from '../../api'
 import { useToast } from '../../components/Toast'
@@ -78,7 +79,7 @@ export function FleetClientModal({ initial, onClose, onSaved }) {
 
   return (
     <div onClick={onClose} className="dash-modal-scrim">
-      <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 560, padding: 26 }}>
+      <GlassDialog label="Клиент автопарка" onDismiss={onClose} onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 560, padding: 26 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 18 }}>
           {editing ? 'Изменить клиента' : 'Новый клиент автопарка'}
         </div>
@@ -93,12 +94,12 @@ export function FleetClientModal({ initial, onClose, onSaved }) {
         </div>
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+          <button data-dialog-dismiss onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button onClick={save} disabled={saving || !form.name.trim()} className="btn-primary" style={{ flex: 2, justifyContent: 'center' }}>
             <SwapText>{saving ? 'Сохраняю…' : editing ? 'Сохранить' : 'Добавить'}</SwapText>
           </button>
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }

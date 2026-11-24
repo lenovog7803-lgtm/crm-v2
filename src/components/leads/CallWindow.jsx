@@ -1,3 +1,4 @@
+import GlassDialog from '../GlassDialog'
 import CallCard from './CallCard'
 import ScriptPanel from './ScriptPanel'
 import CallOutcomeBar from './CallOutcomeBar'
@@ -14,7 +15,7 @@ export default function CallWindow({ lead, onClose, onClaim, onEdit, onSave, sav
     <div className="call-window-scrim" style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'grid', overflowY: 'auto',
       padding: isMobile ? 10 : 24, background: 'rgba(var(--ink-rgb), 0.22)',
       backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', animation: 'pageIn 0.18s ease-out' }}>
-      <div className="leads-call-modal call-window" style={{ width: '100%', maxWidth: 1040, margin: 'auto', borderRadius: 24, overflow: 'hidden' }}>
+      <GlassDialog label="Звонок" onDismiss={onClose} className="leads-call-modal call-window" style={{ width: '100%', maxWidth: 1040, margin: 'auto', borderRadius: 24, overflow: 'hidden' }}>
         {/* панель окна: заголовок слева, действия справа — как тулбар macOS */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: isMobile ? '12px 14px' : '14px 18px 4px 22px' }}>
           <div style={{ flex: 1, fontSize: 13, fontWeight: 600, color: 'var(--text-3)', letterSpacing: '-0.01em' }}>Звонок</div>
@@ -25,7 +26,7 @@ export default function CallWindow({ lead, onClose, onClaim, onEdit, onSave, sav
           ) : lead.assigned_to ? (
             <span className="call-pill">В работе</span>
           ) : null}
-          <button onClick={onClose} aria-label="Закрыть" title="Закрыть" className="call-close">
+          <button data-dialog-dismiss onClick={onClose} aria-label="Закрыть" title="Закрыть" className="call-close">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
         </div>
@@ -40,7 +41,7 @@ export default function CallWindow({ lead, onClose, onClaim, onEdit, onSave, sav
           {/* 3 — справка: описание компании и история звонков */}
           <CallCard lead={lead} onEdit={onEdit} part="history" />
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }

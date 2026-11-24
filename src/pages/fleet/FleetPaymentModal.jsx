@@ -1,7 +1,7 @@
+import GlassDialog from '../../components/GlassDialog'
 import { useState } from 'react'
 import { updateFleetOrder } from '../../api'
 import { useToast } from '../../components/Toast'
-import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { SwapText } from '../../components/Transitions'
 import Switch from '../../components/Switch'
 import DateInput from '../../components/DateInput'
@@ -17,7 +17,6 @@ const lbl = { fontSize: 13, fontWeight: 600, color: 'var(--text-3)', marginBotto
 // либо «наличными» без номера. Записывает paid / pp_number / payment_date.
 export default function FleetPaymentModal({ order, onClose, onSaved }) {
   const { show } = useToast()
-  useEscapeKey(onClose)
   const [ppNumber, setPpNumber] = useState(order.pp_number || '')
   const [payDate, setPayDate] = useState((order.payment_date || '').slice(0, 10) || today())
   const [isCash, setIsCash] = useState(!!order.paid_cash)
@@ -42,12 +41,12 @@ export default function FleetPaymentModal({ order, onClose, onSaved }) {
 
   return (
     <div className="dash-modal-scrim" onClick={onClose}>
-      <div className="dash-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 400, padding: 26 }}>
+      <GlassDialog label="Оплата рейса" onDismiss={onClose} className="dash-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 400, padding: 26 }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fg-1e9e5a)', marginBottom: 6 }}>Оплата от клиента</div>
         <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 20 }}>{order.client_name || '—'} · {(order.rate || 0).toLocaleString('ru-RU')} Br</div>
 
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, cursor: 'pointer', fontSize: 13, color: 'var(--ink)' }}>
-          <Switch size="sm" checked={isCash} onChange={e => setIsCash(e.target.checked)} />
+          <Switch size="sm" aria-label="Оплата наличными" checked={isCash} onChange={e => setIsCash(e.target.checked)} />
           Оплачено наличными (без ПП)
         </label>
 
@@ -62,12 +61,12 @@ export default function FleetPaymentModal({ order, onClose, onSaved }) {
         <DateInput type="date" value={payDate} onChange={e => setPayDate(e.target.value)} style={{ ...fieldStyle, marginBottom: 22 }} />
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+          <button data-dialog-dismiss onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button onClick={confirm} disabled={saving} className="btn-primary" style={{ flex: 2, background: 'var(--bg-1e9e5a)', opacity: saving ? 0.6 : 1, boxShadow: 'none', justifyContent: 'center' }}>
             <SwapText>{saving ? 'Сохраняю…' : 'Подтвердить оплату'}</SwapText>
           </button>
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }

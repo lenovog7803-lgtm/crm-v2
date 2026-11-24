@@ -1,3 +1,4 @@
+import GlassDialog from '../../components/GlassDialog'
 import { useState, useEffect, useCallback } from 'react'
 import { getFleetClient, getFleetClientOrders, deleteFleetOrder, getFleetReconciliation } from '../../api'
 import { useToast } from '../../components/Toast'
@@ -64,7 +65,7 @@ function ReconciliationModal({ clientId, clientName, onClose }) {
 
   return (
     <div onClick={onClose} className="dash-modal-scrim">
-      <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 380, padding: 24 }}>
+      <GlassDialog label="Акт сверки" onDismiss={onClose} onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 380, padding: 24 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 14 }}>Акт сверки</div>
         <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 12 }}>Период (можно оставить пустым — тогда за всё время)</div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 18 }}>
@@ -73,10 +74,10 @@ function ReconciliationModal({ clientId, clientName, onClose }) {
           <DateInput type="date" value={to} onChange={e => setTo(e.target.value)} style={{ ...fld, flex: 1 }} />
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+          <button data-dialog-dismiss onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button onClick={build} disabled={busy} className="btn-primary" style={{ flex: 2, padding: 12 }}>{busy ? 'Готовлю…' : 'Сформировать'}</button>
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }

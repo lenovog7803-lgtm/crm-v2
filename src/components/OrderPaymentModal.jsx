@@ -1,7 +1,7 @@
+import GlassDialog from './GlassDialog'
 import { useState } from 'react'
 import { addPayment, deletePayment, getOrder, updateOrder } from '../api'
 import { useToast } from './Toast'
-import { useEscapeKey } from '../hooks/useEscapeKey'
 import { SwapText } from './Transitions'
 import Switch from './Switch'
 import DateInput from './DateInput'
@@ -10,7 +10,6 @@ const today = () => new Date().toISOString().slice(0, 10)
 
 export default function OrderPaymentModal({ order, side, onClose, onSaved, onBeforeSave }) {
   const { show } = useToast()
-  useEscapeKey(onClose)
 
   const isCarrier = side === 'carrier'
   const expected = (isCarrier ? order.carrier_rate : order.client_rate) || 0
@@ -190,7 +189,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
 
   return (
     <div className="dash-modal-scrim">
-      <div className="dash-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 460, padding: 26 }}>
+      <GlassDialog label="Оплата заявки" onDismiss={onClose} className="dash-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 460, padding: 26 }}>
         <div style={{
           fontSize: 13, fontWeight: 600,
           color: isCarrier ? 'var(--fg-e0473b)' : 'var(--fg-1e9e5a)', marginBottom: 6,
@@ -211,7 +210,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
           border: `1px solid ${isCash ? '#F0B84D' : 'var(--line)'}`,
         }}>
           <Switch size="sm"
-            checked={isCash}
+            aria-label="Оплачено наличными" checked={isCash}
             onChange={e => setIsCash(e.target.checked)}
             style={{ width: 16, height: 16, accentColor: 'var(--fg-d97706)', cursor: 'pointer' }}
           />
@@ -348,7 +347,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
         {error && <div style={{ fontSize: 12, color: 'var(--fg-c81923)', textAlign: 'center', marginBottom: 16 }}>{error}</div>}
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>
+          <button data-dialog-dismiss onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>
             Отмена
           </button>
           <button
@@ -358,7 +357,7 @@ export default function OrderPaymentModal({ order, side, onClose, onSaved, onBef
             <SwapText>{saving ? 'Сохраняю…' : isCash ? 'Подтвердить оплату наличными' : matches ? 'Подтвердить оплату' : 'Сохранить (суммы не совпадают)'}</SwapText>
           </button>
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }

@@ -1,7 +1,7 @@
+import GlassDialog from '../components/GlassDialog'
 import { useState, useEffect } from 'react'
 import { getBackups, restoreBackup, createBackupNow, getImportPreview, applyImportFromSheets } from '../api'
 import { useToast } from '../components/Toast'
-import { useEscapeKey } from '../hooks/useEscapeKey'
 import { Loader } from '../components/Loader'
 import { EmptyState } from '../components/EmptyState'
 
@@ -13,12 +13,11 @@ function fieldVal(v) {
 }
 
 function ImportPreviewModal({ preview, onClose, onConfirm, applying }) {
-  useEscapeKey(onClose, true)
   const orders = preview.orders || {}
   const hasDeletes = (orders.would_delete || []).length > 0
   return (
     <div className="dash-modal-scrim">
-      <div className="dash-modal dash-form" style={{ maxWidth: 640, padding: 26, maxHeight: '86vh', display: 'flex', flexDirection: 'column' }}>
+      <GlassDialog label="Предпросмотр импорта" onDismiss={() => !applying && onClose()} className="dash-modal dash-form" style={{ maxWidth: 640, padding: 26, maxHeight: '86vh', display: 'flex', flexDirection: 'column' }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 4 }}>Что изменится при импорте из Таблицы</div>
         <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 16 }}>Ничего ещё не применено — только предпросмотр</div>
 
@@ -91,7 +90,7 @@ function ImportPreviewModal({ preview, onClose, onConfirm, applying }) {
         </div>
 
         <div style={{ display: 'flex', gap: 10, marginTop: 18, flexShrink: 0 }}>
-          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+          <button data-dialog-dismiss onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button
             onClick={onConfirm}
             disabled={applying} className="btn-primary" style={{ flex: 2, justifyContent: 'center' }}
@@ -99,7 +98,7 @@ function ImportPreviewModal({ preview, onClose, onConfirm, applying }) {
             {applying ? 'Применяю…' : 'Применить изменения'}
           </button>
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }
@@ -118,7 +117,6 @@ export default function Backups() {
   const [loading, setLoading] = useState(true)
   const [forbidden, setForbidden] = useState(false)
   const [restoreTarget, setRestoreTarget] = useState(null)
-  useEscapeKey(() => setRestoreTarget(null), !!restoreTarget)
   const [confirmWord, setConfirmWord] = useState('')
   const [restoring, setRestoring] = useState(false)
   const [creating, setCreating] = useState(false)
@@ -258,7 +256,7 @@ export default function Backups() {
 
       {restoreTarget && (
         <div className="dash-modal-scrim">
-          <div className="dash-modal dash-form" style={{ maxWidth: 440, padding: 26 }}>
+          <GlassDialog label="Восстановление резервной копии" onDismiss={() => setRestoreTarget(null)} className="dash-modal dash-form" style={{ maxWidth: 440, padding: 26 }}>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--fg-e0473b)', marginBottom: 8 }}>Восстановить из бэкапа?</div>
             <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 18, lineHeight: 1.5 }}>
               Это заменит текущие данные снимком от{' '}
@@ -275,7 +273,7 @@ export default function Backups() {
               style={{ width: '100%', padding: '11px 14px', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--fill)', fontSize: 14, boxSizing: 'border-box', marginBottom: 18 }}
             />
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setRestoreTarget(null)} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+              <button data-dialog-dismiss onClick={() => setRestoreTarget(null)} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
               <button
                 onClick={doRestore}
                 disabled={confirmWord.trim().toUpperCase() !== 'ВОССТАНОВИТЬ' || restoring} className="btn-primary" style={{ flex: 2, background: confirmWord.trim().toUpperCase() === 'ВОССТАНОВИТЬ' ? 'var(--fg-e0473b)' : 'var(--line)', color: confirmWord.trim().toUpperCase() === 'ВОССТАНОВИТЬ' ? '#FFFFFF' : 'var(--text-3)', boxShadow: 'none', justifyContent: 'center' }}
@@ -283,7 +281,7 @@ export default function Backups() {
                 {restoring ? 'Восстанавливаю…' : 'Подтвердить восстановление'}
               </button>
             </div>
-          </div>
+          </GlassDialog>
         </div>
       )}
     </div>

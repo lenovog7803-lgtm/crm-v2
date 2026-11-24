@@ -1,3 +1,4 @@
+import GlassDialog from '../../components/GlassDialog'
 import { useState, useEffect, useCallback } from 'react'
 import {
   getFleetTrip, updateFleetTrip, deleteFleetTrip, deleteFleetOrder,
@@ -350,7 +351,7 @@ function EditTripModal({ trip, onClose, onSaved }) {
 
   return (
     <div onClick={onClose} className="dash-modal-scrim">
-      <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 460, padding: 26 }}>
+      <GlassDialog label="Редактирование рейса" onDismiss={onClose} onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 460, padding: 26 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 18 }}>Изменить рейс</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
           <input autoFocus value={form.name} onChange={e => set('name', e.target.value)} placeholder="Название рейса" style={{ ...fieldStyle, width: '100%' }} />
@@ -370,12 +371,12 @@ function EditTripModal({ trip, onClose, onSaved }) {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+          <button data-dialog-dismiss onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button onClick={save} disabled={saving || !form.name.trim()} className="btn-primary" style={{ flex: 2, justifyContent: 'center' }}>
             <SwapText>{saving ? 'Сохраняю…' : 'Сохранить'}</SwapText>
           </button>
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }

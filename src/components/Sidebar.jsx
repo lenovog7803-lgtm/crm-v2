@@ -449,7 +449,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
           </div>
         )}
         {expanded && (
-          <button onClick={onToggle} className="btn-bare" style={{ color: 'var(--text-tertiary)', padding: 4, display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+          <button onClick={onToggle} aria-label={expanded ? "Свернуть боковое меню" : "Развернуть боковое меню"} className="btn-bare" style={{ color: 'var(--text-tertiary)', padding: 4, display: 'flex', alignItems: 'center', flexShrink: 0 }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6"/>
             </svg>
@@ -458,7 +458,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
       </div>
 
       {!expanded && (
-        <button onClick={onToggle} className="btn-bare" style={{ color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 0', marginBottom: 8 }}>
+        <button onClick={onToggle} aria-label={expanded ? "Свернуть боковое меню" : "Развернуть боковое меню"} className="btn-bare" style={{ color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 0', marginBottom: 8 }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="9 18 15 12 9 6"/>
           </svg>
@@ -466,9 +466,9 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
       )}
 
       {/* Nav */}
-      <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4, position: 'relative' }}>
+      <nav aria-label="Разделы CRM" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4, position: 'relative' }}>
         {pillRect && (
-          <div ref={pillRef} style={{
+          <div ref={pillRef} className="sidebar-selection" aria-hidden="true" style={{
             position: 'absolute', left: 0, right: 0, top: 0,  // место и высоту ставит пружина (useSpringPill)
             borderRadius: 12, background: 'rgba(var(--rgb-19-102-240), 0.1)',  // тонированная заливка без тени — как выделение в боковой панели iPad/Mac
             opacity: drag ? 0 : 1,  // во время перетаскивания подсветка не мешает
@@ -491,6 +491,7 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
               onPointerCancel={navPointerUp}
               onContextMenu={e => { if (drag || press.current) e.preventDefault() }}
               title={expanded ? 'Зажмите и перетащите, чтобы поменять порядок' : item.label}
+              aria-current={active ? "page" : undefined}
               className={active ? 'sidebar-nav-btn active' : 'sidebar-nav-btn'}
               style={{
                 height: 44, borderRadius: 12, border: 'none', cursor: 'pointer',
@@ -529,12 +530,12 @@ export default function Sidebar({ page, expanded, onNav, onToggle, counts, onSig
 
       {/* Переключатель режима — только для директора / аккаунта с fleet_access */}
       {canFleet && expanded && (
-        <div style={{ paddingTop: 12, borderTop: '1px solid rgba(var(--ink-rgb), 0.08)', marginBottom: 12 }}>
+        <div className="sidebar-mode-switch" style={{ paddingTop: 12, borderTop: '1px solid rgba(var(--ink-rgb), 0.08)', marginBottom: 12 }}>
           <SlidingTabs
             options={[{ key: 'forwarding', label: 'Экспедиция' }, { key: 'fleet', label: 'Автопарк' }]}
             value={mode}
             onChange={switchMode}
-            fontSize={12}
+            fill
           />
         </div>
       )}

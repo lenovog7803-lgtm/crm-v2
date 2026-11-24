@@ -127,7 +127,7 @@ export default function QueueView({ industry, onCounts }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div className="card" style={{ padding: '12px 16px 12px 14px', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+      <div className="card leads-queue-toolbar">
         <div style={{ position: 'relative', flexShrink: 0 }}>
           <CircularProgress pct={pct} color={ringColor} size={40} stroke={5} track="rgba(var(--ink-rgb), 0.08)" />
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{pct}%</div>
@@ -136,8 +136,7 @@ export default function QueueView({ industry, onCounts }) {
           <b style={{ fontSize: 17, fontWeight: 600, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{todayCalls}</b> из {DAILY_GOAL} звонков сегодня
         </div>
         {!loading && lead && <>
-          <div style={{ width: 1, height: 22, background: 'rgba(var(--ink-rgb), 0.1)' }} />
-          <span style={{ fontSize: 14, color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{index + 1} из {queue.length} в очереди</span>
+          <span className="leads-queue-position">{index + 1} из {queue.length} в очереди</span>
           {reason && (
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)' }}>
               <span style={{ width: 7, height: 7, borderRadius: 99, background: reason[1] }} />{reason[0]}

@@ -936,7 +936,7 @@ function CampaignSettings({ campaign, mailboxes, onSaved, onDeleted }) {
         </div>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', fontSize: 13, color: 'var(--ink)' }}>
           <label style={{ display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer' }}>
-            <Switch size="sm" checked={!!c.followup_enabled} onChange={e => set('followup_enabled', e.target.checked)} /> Отправлять напоминание через
+            <Switch size="sm" aria-label="Отправлять напоминание" checked={!!c.followup_enabled} onChange={e => set('followup_enabled', e.target.checked)} /> Отправлять напоминание через
           </label>
           <input type="number" min={1} value={c.followup_days ?? 4} onChange={e => set('followup_days', e.target.value)} style={{ ...inputStyle, width: 70 }} />
           <span>дней</span>
@@ -1152,10 +1152,10 @@ function MailboxSettings({ mailbox, onSaved, onDeleted }) {
         ))}
         <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', fontSize: 13, color: 'var(--ink)' }}>
           <label style={{ display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer' }}>
-            <Switch size="sm" checked={!!s.auto_limit} onChange={e => set('auto_limit', e.target.checked)} /> Автоматический разгон и защита от бана
+            <Switch size="sm" aria-label="Автоматический лимит писем" checked={!!s.auto_limit} onChange={e => set('auto_limit', e.target.checked)} /> Автоматический разгон и защита от бана
           </label>
           <label style={{ display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer' }}>
-            <Switch size="sm" checked={!!s.weekdays_only} onChange={e => set('weekdays_only', e.target.checked)} /> Только будни
+            <Switch size="sm" aria-label="Только будни" checked={!!s.weekdays_only} onChange={e => set('weekdays_only', e.target.checked)} /> Только будни
           </label>
         </div>
         <div style={{ fontSize: 12, color: 'var(--text-3)', lineHeight: 1.6 }}>
@@ -1428,6 +1428,7 @@ const CAMPAIGN_KEY = 'mailing_campaign'
 // нажатие открывает вход Google; по возвращении во вкладку CRM ящики перепроверяются.
 export function ExpiredMailboxes({ mailboxes }) {
   const { show } = useToast()
+  const [expanded, setExpanded] = useState(false)
   const expired = (mailboxes || []).filter(m => m.login_expired)
   if (!expired.length) return null
   const relogin = async (m) => {
@@ -1439,17 +1440,26 @@ export function ExpiredMailboxes({ mailboxes }) {
     }
   }
   return (
-    <div className="card" style={{ marginBottom: 14, padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-      <span style={{ width: 8, height: 8, borderRadius: 99, background: 'var(--fg-ff3b30)', flexShrink: 0 }} />
-      <div style={{ fontSize: 14, color: 'var(--ink)', flex: 1, minWidth: 220 }}>
-        Gmail вышел из аккаунта — письма с {expired.length > 1 ? 'этих почт' : 'этой почты'} не уходят и ответы не проверяются
+    <section className="card mailbox-notice" aria-label="Почта отключена">
+      <span className="mailbox-notice-dot" aria-hidden="true" />
+      <div className="mailbox-notice-copy">
+        <strong>Почта отключена</strong>
+        <span>Отправка и проверка ответов с этих ящиков приостановлены.</span>
       </div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        {expired.map(m => (
-          <button key={m.id} onClick={() => relogin(m)} className="btn-primary">Войти в {m.login || m.name}</button>
-        ))}
-      </div>
-    </div>
+      <button type="button" className="btn-primary" aria-expanded={expanded}
+        onClick={() => setExpanded(value => !value)}>
+        Переподключить
+      </button>
+      {expanded && (
+        <div className="mailbox-notice-accounts">
+          {expired.map(m => (
+            <button key={m.id} type="button" onClick={() => relogin(m)} className="btn-ghost" aria-label={`Войти в ${m.login || m.name}`}>
+              {m.login || m.name}
+            </button>
+          ))}
+        </div>
+      )}
+    </section>
   )
 }
 

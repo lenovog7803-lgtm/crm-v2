@@ -1,7 +1,7 @@
+import GlassDialog from './GlassDialog'
 import { useState, useEffect, useRef } from 'react'
 import { getDashboard, getOrders, getGoals, saveGoals } from '../api'
 import { useIsMobile } from '../hooks/useIsMobile'
-import { useEscapeKey } from '../hooks/useEscapeKey'
 import { CountUp } from './CountUp'
 import MarginChart from './MarginChart'
 import GoalsRings from './GoalsRings'
@@ -9,7 +9,6 @@ import { Gauge } from '../bklit/charts/gauge'
 import { mouseOnly } from '../motion'
 import { inPeriod, initials, getGradient } from '../utils'
 import { SwapText } from './Transitions'
-import GradientLayer from './GradientLayer'
 
 const MONTH_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
 const MONTH_RU_SHORT = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек']
@@ -255,7 +254,6 @@ const daysWaiting = o => {
 // Долги по контрагентам: сверху итог, ниже кто сколько должен / кому сколько платить;
 // клик по контрагенту раскрывает его заявки.
 function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
-  useEscapeKey(onClose)
   const [open, setOpen] = useState(null)
   const total = orders.reduce((sum, o) => sum + (o.client_rate || 0), 0)
   const groups = Object.values(orders.reduce((acc, o) => {
@@ -269,7 +267,7 @@ function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
 
   return (
     <div className="dash-modal-scrim" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="dash-modal" style={{ maxWidth: 560 }}>
+      <GlassDialog label={title} onDismiss={onClose} className="dash-modal" style={{ maxWidth: 560 }}>
         <div style={{ padding: '24px 24px 20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
             <div>
@@ -282,7 +280,7 @@ function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
                 {orders.length} заявок · {groups.length} {party === 'carrier' ? 'перевозчиков' : 'клиентов'}
               </div>
             </div>
-            <button onClick={onClose} className="ios-sheet-close" aria-label="Закрыть"><svg width="12" height="12" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
+            <button data-dialog-dismiss onClick={onClose} className="ios-sheet-close" aria-label="Закрыть"><svg width="12" height="12" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
           </div>
           {orders.length === 0 && <div style={{ color: 'var(--text-tertiary)', fontSize: 13, textAlign: 'center', padding: '20px 0' }}>Нет неоплаченных заявок</div>}
           {groups.length > 0 && (
@@ -292,7 +290,7 @@ function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
                 const isOpen = open === g.name
                 return (
                   <div key={g.name} className="debt-group">
-                    <div className="ios-row" onClick={() => setOpen(isOpen ? null : g.name)} aria-expanded={isOpen}>
+                    <button type="button" className="ios-row" onClick={() => setOpen(isOpen ? null : g.name)} aria-expanded={isOpen}>
                       <span style={{ width: 38, height: 38, borderRadius: 99, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 13, fontWeight: 700, '--av-hue': b, background: `linear-gradient(135deg, ${a}, ${b})` }}>{initials(g.name)}</span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{g.name}</div>
@@ -306,13 +304,13 @@ function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
                       </div>
                       <svg width="13" height="8" viewBox="0 0 13 8" fill="none" stroke="var(--text-quaternary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                         style={{ flexShrink: 0, transition: 'transform 0.2s var(--ease)', transform: isOpen ? 'rotate(180deg)' : 'none' }}><path d="M1.5 1.5l5 5 5-5"/></svg>
-                    </div>
+                    </button>
                     {isOpen && (
                       <div className="debt-orders">
                         {g.orders.map(o => {
                           const days = daysWaiting(o)
                           return (
-                            <div key={o.id} className="debt-order" onClick={() => { onOpenOrder && onOpenOrder(o.id); onClose() }}>
+                            <button type="button" key={o.id} className="debt-order" onClick={() => { onOpenOrder?.(o.id); onClose() }}>
                               <div style={{ flex: 1, minWidth: 0 }}>
                                 <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                   {(o.route_from && o.route_to) ? `${o.route_from} → ${o.route_to}` : '—'}
@@ -323,7 +321,7 @@ function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
                               </div>
                               <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{(o.client_rate || 0).toLocaleString('ru-RU')}</span>
                               <svg width="7" height="12" viewBox="0 0 8 13" fill="none" stroke="var(--text-quaternary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1.5 1.5l5 5-5 5"/></svg>
-                            </div>
+                            </button>
                           )
                         })}
                       </div>
@@ -334,7 +332,7 @@ function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
             </div>
           )}
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }
@@ -350,17 +348,16 @@ function TopRow({ rank, name, value }) {
 }
 
 function FullListModal({ title, subtitle, items, valueOf, color, bg, onClose }) {
-  useEscapeKey(onClose)
   return (
     <div className="dash-modal-scrim" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="dash-modal" style={{ maxWidth: 520 }}>
+      <GlassDialog label={title} onDismiss={onClose} className="dash-modal" style={{ maxWidth: 520 }}>
         <div style={{ padding: 26 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
             <div>
               <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)' }}>{title}</div>
               <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{subtitle}</div>
             </div>
-            <button onClick={onClose} className="ios-sheet-close" aria-label="Закрыть"><svg width="12" height="12" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
+            <button data-dialog-dismiss onClick={onClose} className="ios-sheet-close" aria-label="Закрыть"><svg width="12" height="12" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
           </div>
           {items.length === 0 ? (
             <div style={{ textAlign: 'center', padding: 30, fontSize: 13, color: 'var(--text-3)' }}>Нет данных</div>
@@ -370,7 +367,7 @@ function FullListModal({ title, subtitle, items, valueOf, color, bg, onClose }) 
             ))
           )}
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }
@@ -385,10 +382,9 @@ const GOAL_META = {
 function GoalEditModal({ goalKey, value, onChange, onClose, onSave }) {
   const meta = GOAL_META[goalKey]
   const [saving, setSaving] = useState(false)
-  useEscapeKey(onClose)
   return (
     <div className="dash-modal-scrim" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="dash-modal" style={{ maxWidth: 340 }}>
+      <GlassDialog label={'План: ' + meta.label} onDismiss={onClose} className="dash-modal" style={{ maxWidth: 340 }}>
         <div style={{ padding: 24 }}>
           <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 4 }}>
             План: {meta.label}
@@ -408,7 +404,7 @@ function GoalEditModal({ goalKey, value, onChange, onClose, onSave }) {
             <span style={{ position: 'absolute', right: 13, top: '50%', transform: 'translateY(-50%)', fontSize: 12, color: 'var(--text-tertiary)', fontWeight: 600 }}>{meta.unit}</span>
           </div>
           <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
-            <button className="btn-ghost" onClick={onClose} style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+            <button data-dialog-dismiss className="btn-ghost" onClick={onClose} style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
             <button
               className="btn-primary"
               disabled={saving}
@@ -417,7 +413,7 @@ function GoalEditModal({ goalKey, value, onChange, onClose, onSave }) {
             ><SwapText>{saving ? 'Сохранение…' : 'Сохранить'}</SwapText></button>
           </div>
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }
@@ -549,10 +545,6 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             transition: 'transform 0.2s var(--ease), box-shadow 0.2s var(--ease)',
             position: 'relative', overflow: 'hidden', isolation: 'isolate',
           }}>
-          {/* свой живой градиент в мягких синих тонах; без WebGL / на телефоне — статичная заливка выше */}
-          <div style={{ position: 'absolute', inset: 0, zIndex: -1, borderRadius: 'inherit', overflow: 'hidden', pointerEvents: 'none' }}>
-            <GradientLayer colors={['#5B8BE0', '#8AB0F2', '#4269BF']} speed={0.16} />
-          </div>
           <WidgetHead label="Маржа" color="rgba(255,255,255,0.24)" labelColor="rgba(255,255,255,0.92)"
             right={marginDiff !== null && (
               <div style={{
@@ -561,7 +553,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
                 fontSize: 12, fontWeight: 600, color: marginUp ? '#C8FFE0' : '#FFD6DB',
               }}>
                 {marginUp ? '▲' : '▼'} {Math.abs(marginDiff)}%
-                <span style={{ fontWeight: 400, opacity: 0.7, fontSize: 11 }}>vs пред.</span>
+                <span style={{ fontWeight: 400, opacity: 0.7, fontSize: 11 }}>к прошлому периоду</span>
               </div>
             )} />
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
@@ -571,11 +563,17 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             <span style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.72)' }}>BYN</span>
           </div>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.72)', marginTop: 6 }}>
-            ставка клиента − ставка перевозчика{chart.prev && chart.prev.length > 0 && chart.prev.some(v => v > 0) && ' · сплошная — этот период, бледная — прошлый'}
+            <span>Ставка клиента − ставка перевозчика</span>
+            {chart.prev?.some(value => value > 0) && (
+              <span className="dashboard-chart-legend">
+                <span>Текущий период</span>
+                <span>Прошлый период</span>
+              </span>
+            )}
           </div>
           {/* график маржи прямо в главной карточке — белые линии на градиенте */}
           <div className="hero-chart" style={{ margin: isMobile ? '12px -6px 0' : '16px -8px 0' }}>
-            <MarginChart dates={chart.dates} current={chart.current} prev={chart.prev} labels={chart.mode === 'months' ? chart.labels : undefined} height={isMobile ? 170 : 230} />
+            <MarginChart dates={chart.dates} current={chart.current} prev={chart.prev} labels={chart.mode === 'months' ? chart.labels : undefined} height={isMobile ? 170 : 190} />
           </div>
           <div style={{ display: 'flex', gap: isMobile ? 16 : 28, marginTop: isMobile ? 14 : 20, paddingTop: isMobile ? 12 : 14, borderTop: '1px solid rgba(255,255,255,calc(0.25 * var(--rim-k)))' }}>
             <div>

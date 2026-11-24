@@ -30,7 +30,7 @@ const Chevrons = () => (
 )
 
 // fit — на телефоне ширина по выбранной подписи, а не по самому длинному пункту (фильтры заявок)
-export default function Select({ value, onChange, onBlur, children, style, className = '', disabled, fit, ...rest }) {
+export default function Select({ value, onChange, onBlur, children, style, className = '', disabled, fit, triggerLabel, ...rest }) {
   const isMobile = useIsMobile()
   const options = collectOptions(children)
   const current = options.find(o => o.value === String(value ?? '')) || options.find(o => !o.disabled) || { label: '' }
@@ -125,7 +125,7 @@ export default function Select({ value, onChange, onBlur, children, style, class
   if (isMobile && fit) {
     return (
       <span className={`apple-select-native select-fit ${className}`} style={style}>
-        {current.label}
+        <span className="apple-select-label">{triggerLabel ?? current.label}</span>
         <select value={value} onChange={onChange} onBlur={onBlur} disabled={disabled} aria-label={current.label} {...rest}>{children}</select>
       </span>
     )
@@ -142,8 +142,8 @@ export default function Select({ value, onChange, onBlur, children, style, class
     <>
       <button type="button" ref={btnRef} disabled={disabled} aria-haspopup="listbox" aria-expanded={open}
         onClick={() => (open ? close() : openMenu())} onKeyDown={onKeyDown} onBlur={onBlur}
-        className={`apple-select ${className}${open ? ' is-open' : ''}`} style={style} title={current.label}>
-        <span className="apple-select-label">{current.label}</span>
+        className={`apple-select ${className}${open ? ' is-open' : ''}`} style={style} title={current.label} aria-label={triggerLabel ? current.label : undefined}>
+        <span className="apple-select-label">{triggerLabel ?? current.label}</span>
         <Chevrons />
       </button>
       {open && pos && createPortal(

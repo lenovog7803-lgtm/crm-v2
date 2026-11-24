@@ -1,3 +1,4 @@
+import GlassDialog from '../../components/GlassDialog'
 import { useState, useEffect } from 'react'
 import { getFleetTrips, createFleetTrip, getFleetVehicles, getFleetDrivers } from '../../api'
 import { useToast } from '../../components/Toast'
@@ -62,7 +63,7 @@ function CreateTripModal({ onClose, onCreated }) {
 
   return (
     <div onClick={onClose} className="dash-modal-scrim">
-      <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 460, padding: 26 }}>
+      <GlassDialog label="Новый рейс" onDismiss={onClose} onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 460, padding: 26 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 18 }}>Новый рейс</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
           <input autoFocus value={form.name} onChange={e => set('name', e.target.value)} placeholder="Название рейса, напр. Минск–Москва" style={fieldStyle} />
@@ -83,12 +84,12 @@ function CreateTripModal({ onClose, onCreated }) {
           <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>Машина и водитель подставятся в каждый заказ этого рейса — в самом заказе можно поменять.</div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+          <button data-dialog-dismiss onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button onClick={save} disabled={saving || !form.name.trim()} className="btn-primary" style={{ flex: 2, justifyContent: 'center' }}>
             {saving ? 'Создаю…' : 'Создать рейс'}
           </button>
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }

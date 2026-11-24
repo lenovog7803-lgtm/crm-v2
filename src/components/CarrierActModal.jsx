@@ -1,12 +1,11 @@
+import GlassDialog from './GlassDialog'
 import { useState } from 'react'
-import { useEscapeKey } from '../hooks/useEscapeKey'
 import { SwapText } from './Transitions'
 import DateInput from './DateInput'
 
 // Gates "получено от перевозчика" behind the act number — the checkbox only
 // ticks once the number is entered and confirmed here, not on a plain click.
 export default function CarrierActModal({ initialValue, initialDate, onClose, onConfirm }) {
-  useEscapeKey(onClose)
   const [value, setValue] = useState(initialValue || '')
   const [date, setDate] = useState(initialDate || new Date().toISOString().slice(0, 10))
   const [saving, setSaving] = useState(false)
@@ -20,7 +19,7 @@ export default function CarrierActModal({ initialValue, initialDate, onClose, on
 
   return (
     <div className="dash-modal-scrim" onClick={onClose}>
-      <div className="dash-modal dash-form" onClick={e => e.stopPropagation()} style={{ maxWidth: 380, padding: 26 }}>
+      <GlassDialog label="Акт перевозчика" onDismiss={onClose} className="dash-modal dash-form" onClick={e => e.stopPropagation()} style={{ maxWidth: 380, padding: 26 }}>
         <div style={{
           fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
           color: 'var(--fg-1e9e5a)', marginBottom: 6,
@@ -68,7 +67,7 @@ export default function CarrierActModal({ initialValue, initialDate, onClose, on
         />
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>
+          <button data-dialog-dismiss onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>
             Отмена
           </button>
           <button
@@ -78,7 +77,7 @@ export default function CarrierActModal({ initialValue, initialDate, onClose, on
             <SwapText>{saving ? 'Сохраняю…' : 'Подтвердить'}</SwapText>
           </button>
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }

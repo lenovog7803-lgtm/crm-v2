@@ -1,6 +1,6 @@
+import GlassDialog from '../GlassDialog'
 import { useState, useEffect } from 'react'
 import { getLeadsAnalytics, getCallsByDay } from '../../api'
-import { useEscapeKey } from '../../hooks/useEscapeKey'
 import { SlidingTabs } from '../SlidingTabs'
 import { Loader, InlineLoader } from '../Loader'
 import { FunnelChart as BklitFunnel } from '../../bklit/charts/funnel-chart'
@@ -91,7 +91,6 @@ export function FunnelChart({ funnel }) {
 function DayCallsModal({ date, onClose }) {
   const [calls, setCalls] = useState([])
   const [loading, setLoading] = useState(true)
-  useEscapeKey(onClose)
 
   useEffect(() => {
     setLoading(true)
@@ -100,12 +99,12 @@ function DayCallsModal({ date, onClose }) {
 
   return (
     <div className="dash-modal-scrim">
-      <div className="dash-modal dash-form" style={{ maxWidth: 520, padding: 26 }}>
+      <GlassDialog label="Звонки за день" onDismiss={onClose} className="dash-modal dash-form" style={{ maxWidth: 520, padding: 26 }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 }}>
           <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)' }}>
             Звонки за {new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
           </div>
-          <button onClick={onClose} className="btn-icon" style={{ width: 32, height: 32, fontSize: 17, flexShrink: 0 }}>×</button>
+          <button data-dialog-dismiss aria-label="Закрыть" onClick={onClose} className="btn-icon" style={{ width: 32, height: 32, fontSize: 17, flexShrink: 0 }}>×</button>
         </div>
         <div style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 16 }}>{loading ? <InlineLoader state="composing" /> : `${calls.length} звонков`}</div>
         <div style={{ maxHeight: '55vh', overflowY: 'auto' }}>
@@ -122,7 +121,7 @@ function DayCallsModal({ date, onClose }) {
             </div>
           ))}
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }

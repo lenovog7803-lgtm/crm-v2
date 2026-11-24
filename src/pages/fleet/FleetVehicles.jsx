@@ -1,3 +1,4 @@
+import GlassDialog from '../../components/GlassDialog'
 import { useState, useEffect } from 'react'
 import {
   getFleetVehicles, createFleetVehicle, updateFleetVehicle, deleteFleetVehicle,
@@ -65,7 +66,7 @@ function EntityModal({ title, sections, initial, onClose, onSave }) {
 
   return (
     <div onClick={onClose} className="dash-modal-scrim">
-      <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 480, padding: 26 }}>
+      <GlassDialog label={title} onDismiss={onClose} onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 480, padding: 26 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 18 }}>{title}</div>
 
         {sections.map((sec, si) => (
@@ -92,12 +93,12 @@ function EntityModal({ title, sections, initial, onClose, onSave }) {
         ))}
 
         <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
-          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
+          <button data-dialog-dismiss onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>Отмена</button>
           <button onClick={submit} disabled={saving} className="btn-primary" style={{ flex: 2, opacity: saving ? 0.6 : 1, justifyContent: 'center' }}>
             <SwapText>{saving ? 'Сохраняю…' : initial ? 'Сохранить' : 'Добавить'}</SwapText>
           </button>
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }

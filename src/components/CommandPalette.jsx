@@ -1,39 +1,6 @@
+import GlassDialog from './GlassDialog'
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import { ThinkingOrb } from 'thinking-orbs'
 import { globalSearch } from '../api'
-import { useIsMobile } from '../hooks/useIsMobile'
-
-// Быстрый поиск ⌘K в духе Spotlight: стеклянная панель без тёмной подложки, крупная строка,
-// высота по содержимому; пустой запрос — быстрые переходы в разделы (⌘1…⌘5).
-
-const SYS = 'var(--font-sys)'
-
-// Цветные «иконки приложений» — квадрат со скруглением и градиентом, как в Spotlight
-const ICON_PATHS = {
-  order: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="8" y1="13" x2="16" y2="13" /><line x1="8" y1="17" x2="13" y2="17" /></>,
-  client: <><path d="M3 21V7l9-4 9 4v14" /><path d="M9 21v-6h6v6" /></>,
-  carrier: <><rect x="1" y="6" width="14" height="11" rx="1.5" /><path d="M15 10h4l3 3v4h-7" /><circle cx="6" cy="18.5" r="1.8" /><circle cx="18" cy="18.5" r="1.8" /></>,
-  lead: <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z" />,
-  task: <><rect x="3" y="3" width="18" height="18" rx="4" /><polyline points="8 12 11 15 16 9" /></>,
-  dashboard: <><rect x="3" y="3" width="7" height="9" rx="1.5" /><rect x="14" y="3" width="7" height="5" rx="1.5" /><rect x="14" y="12" width="7" height="9" rx="1.5" /><rect x="3" y="16" width="7" height="5" rx="1.5" /></>,
-  mailing: <><rect x="2" y="4" width="20" height="16" rx="3" /><polyline points="22 6 12 13 2 6" /></>,
-}
-const GRADIENT = {
-  order: ['#4F8BFF', 'var(--fg-1366f0)'], client: ['#34C77B', 'var(--fg-1e9e5a)'], carrier: ['#A673FF', 'var(--fg-7c3aed)'],
-  lead: ['#FFB547', 'var(--fg-e08600)'], task: ['#FF8A5B', '#F2542D'], dashboard: ['#5AC8FA', 'var(--fg-0a84ff)'], mailing: ['#7D7AFF', 'var(--fg-5856d6)'],
-}
-function AppIcon({ kind, size = 36 }) {
-  const [a, b] = GRADIENT[kind] || GRADIENT.order
-  return (
-    <span style={{ width: size, height: size, borderRadius: size * 0.26, flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-      background: `linear-gradient(160deg, ${a}, ${b})`, boxShadow: `0 2px 6px -1px color-mix(in srgb, ${b} 40%, transparent), inset 0 1px 0 rgba(255,255,255,0.35)` }}>
-      <svg width={size * 0.52} height={size * 0.52} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        {ICON_PATHS[kind] || ICON_PATHS.order}
-      </svg>
-    </span>
-  )
-}
-
 const GROUP = { order: 'Заявки', client: 'Клиенты', carrier: 'Перевозчики', lead: 'Лиды', task: 'Задачи' }
 // сначала сами клиенты и перевозчики, потом их заявки — при поиске по названию нужная карточка сверху
 const GROUP_ORDER = ['client', 'carrier', 'order', 'lead', 'task']
@@ -45,17 +12,7 @@ const QUICK = [
   { kind: 'mailing', key: 'mailing', title: 'Рассылка', sub: 'Письма и ответы' },
 ]
 
-function Kbd({ children }) {
-  return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 22, height: 22, padding: '0 6px', borderRadius: 6,
-      background: 'rgba(var(--ink-rgb), 0.06)', border: '1px solid rgba(var(--ink-rgb), 0.08)', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', fontFamily: SYS }}>
-      {children}
-    </span>
-  )
-}
-
 export default function CommandPalette({ open, onClose, onOpenOrder, onOpenClient, onOpenCarrier, onNav }) {
-  const isMobile = useIsMobile()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
@@ -118,20 +75,18 @@ export default function CommandPalette({ open, onClose, onOpenOrder, onOpenClien
   if (!open) return null
 
   let idx = -1
-  const row = (item, title, sub, kind, trailing) => {
+  const row = (item, title, sub) => {
     idx += 1
     const i = idx
     const active = i === activeIdx
     return (
       <div key={(item.type || item.key) + (item.id || '')} data-active={active} onClick={() => select(item)} onMouseMove={() => setActiveIdx(i)}
-        style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '9px 12px', borderRadius: 12, cursor: 'default',
+        style={{ display: 'flex', alignItems: 'center', padding: '8px 12px', borderRadius: 10, cursor: 'pointer',
           background: active ? 'rgba(var(--rgb-10-132-255), 0.14)' : 'transparent', transition: 'background 80ms' }}>
-        <AppIcon kind={kind} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.01em' }}>{title}</div>
-          {sub && <div style={{ fontSize: 13, color: '#6B7380', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sub}</div>}
+          {sub && <div style={{ fontSize: 13, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{sub}</div>}
         </div>
-        {trailing}
       </div>
     )
   }
@@ -141,43 +96,35 @@ export default function CommandPalette({ open, onClose, onOpenOrder, onOpenClien
   )
 
   return (
-    <div onMouseDown={close} style={{ position: 'fixed', inset: 0, zIndex: 2100, background: 'rgba(var(--ink-rgb), 0.06)',
-      animation: closing ? 'fadeOut 0.14s ease-in both' : 'pageIn 0.18s ease-out' }}>
-      <div onMouseDown={e => e.stopPropagation()} className="spotlight liquid-glass"
-        style={{
-          position: 'absolute', left: '50%', top: isMobile ? '8vh' : '16vh', transform: 'translateX(-50%)',
-          width: isMobile ? 'calc(100% - 24px)' : 680, maxHeight: isMobile ? '78vh' : '64vh',
-          display: 'flex', flexDirection: 'column', overflow: 'hidden', fontFamily: SYS,
-          borderRadius: 24, background: 'rgba(var(--paper-rgb), 0.72)',
-          backdropFilter: 'blur(40px) saturate(190%)', WebkitBackdropFilter: 'blur(40px) saturate(190%)',
-          border: '1px solid rgba(255,255,255,calc(0.65 * var(--rim-k)))',
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,calc(0.8 * var(--rim-k))), 0 0 0 0.5px rgba(14,23,38,0.12), 0 30px 80px -20px rgba(14,23,38,0.45)',
-          animation: closing ? 'spotlightOut 0.14s ease-in both' : 'spotlightIn 0.26s cubic-bezier(0.22, 1, 0.36, 1) both',
-        }}>
-        {/* строка поиска */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: isMobile ? '14px 16px' : '18px 22px' }}>
-          <svg width={isMobile ? 22 : 28} height={isMobile ? 22 : 28} viewBox="0 0 24 24" fill="none" stroke="#7A828E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+    <div className="spotlight-scrim search-dialog-overlay" data-closing={closing} onMouseDown={close}>
+      <GlassDialog label="Поиск в CRM" onDismiss={close} onMouseDown={e => e.stopPropagation()} className="spotlight">
+        <div className="search-dialog-header">
+          <svg width="20" height="20" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
             <circle cx="11" cy="11" r="7.5" /><line x1="21" y1="21" x2="16.4" y2="16.4" />
           </svg>
           <input
+            data-dialog-initial
             ref={inputRef}
             value={query}
             onChange={e => setQuery(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder="Поиск в CRM"
             aria-label="Поиск в CRM"
-            style={{ flex: 1, minWidth: 0, border: 'none', outline: 'none', background: 'transparent', fontFamily: SYS,
-              fontSize: isMobile ? 20 : 28, fontWeight: 400, letterSpacing: '-0.02em', color: 'var(--ink)' }}
+            data-plain
           />
-          {loading && <ThinkingOrb state="searching" size={20} theme="light" aria-label="Ищу…" />}
+          {loading && <span role="status" className="search-dialog-loading">Поиск…</span>}
+          <button type="button" className="ios-sheet-close" aria-label="Закрыть" onClick={close}>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true">
+              <path d="m2.5 2.5 7 7m0-7-7 7" />
+            </svg>
+          </button>
         </div>
 
         <div ref={listRef} style={{ overflowY: 'auto', borderTop: '1px solid rgba(var(--ink-rgb), 0.08)', padding: '6px 10px 10px' }}>
           {!searching && (
             <>
               {sectionTitle('Перейти')}
-              {QUICK.map((q, n) => row(q, q.title, q.sub, q.kind,
-                !isMobile && <span style={{ display: 'flex', gap: 4 }}><Kbd>⌘</Kbd><Kbd>{n + 1}</Kbd></span>))}
+              {QUICK.map(q => row(q, q.title))}
             </>
           )}
           {searching && !loading && results.length === 0 && (
@@ -186,19 +133,12 @@ export default function CommandPalette({ open, onClose, onOpenOrder, onOpenClien
           {searching && groups.map(g => (
             <div key={g.type}>
               {sectionTitle(GROUP[g.type])}
-              {g.items.map(r => row(r, r.title, r.subtitle, r.type))}
+              {g.items.map(r => row(r, r.title, r.subtitle))}
             </div>
           ))}
         </div>
 
-        {!isMobile && (
-          <div style={{ display: 'flex', gap: 16, alignItems: 'center', padding: '10px 22px', borderTop: '1px solid rgba(var(--ink-rgb), 0.06)', fontSize: 12, color: 'var(--text-3)' }}>
-            <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Kbd>↑</Kbd><Kbd>↓</Kbd> выбор</span>
-            <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Kbd>↵</Kbd> открыть</span>
-            <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Kbd>esc</Kbd> закрыть</span>
-          </div>
-        )}
-      </div>
+      </GlassDialog>
     </div>
   )
 }

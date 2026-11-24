@@ -1,3 +1,4 @@
+import GlassDialog from './GlassDialog'
 import { useState, useEffect } from 'react'
 import { getTrash, restoreTrash, purgeTrash } from '../api'
 import { mouseOnly } from '../motion'
@@ -115,7 +116,7 @@ export default function Trash() {
           onClick={() => !purging && setPurgeOpen(false)}
           className="dash-modal-scrim"
         >
-          <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 420, padding: 26 }}>
+          <GlassDialog label="Очистка корзины" onDismiss={() => !purging && setPurgeOpen(false)} onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 420, padding: 26 }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--fg-c81923)', marginBottom: 6 }}>
               Необратимое действие
             </div>
@@ -140,7 +141,7 @@ export default function Trash() {
                 {purging ? 'Удаляю…' : 'Удалить навсегда'}
               </button>
             </div>
-          </div>
+          </GlassDialog>
         </div>
       )}
 

@@ -1,3 +1,4 @@
+import GlassDialog from './GlassDialog'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { deleteOrder as apiDelete, updateOrder, restoreOrder } from '../api'
 import { getOrdersFromCache, getCachedOrdersSnapshot, invalidateOrdersCache, subscribeOrders } from '../store/ordersStore'
@@ -306,16 +307,13 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      {/* Filter bar */}
-      <div className="card" style={{ padding: isMobile ? '10px 12px' : '14px 16px' }}>
-        {/* Scrollable filter row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
-          {/* статус — выпадающий список, как «Оплата» и «Документы» */}
-          <Select fit className={`orders-pill${statusFilter !== 'all' ? ' is-on' : ''}`} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+      <div className="orders-toolbar">
+        <div className="orders-filters" role="group" aria-label="Фильтры заявок">
+          <Select fit triggerLabel={statusFilter === 'active' ? 'Активные' : statusFilter === 'all' ? 'Статус' : undefined} className={`orders-pill${statusFilter !== 'all' ? ' is-on' : ''}`} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
             {statusChips.map(c => <option key={c.key} value={c.key}>{c.key === 'all' ? 'Статус: все' : c.label}</option>)}
           </Select>
           {/* оплата — один выпадающий выбор вместо трёх кнопок */}
-          <Select fit className={`orders-pill${payFilter ? ' is-on' : ''}`} value={payFilter || ''} onChange={e => setPayFilter(e.target.value || null)}>
+          <Select fit triggerLabel={payFilter ? 'Оплата · 1' : 'Оплата'} className={`orders-pill${payFilter ? ' is-on' : ''}`} value={payFilter || ''} onChange={e => setPayFilter(e.target.value || null)}>
             <option value="">Оплата: все</option>
             <option value="clientUnpaid">Не оплачено клиентом</option>
             <option value="carrierUnpaid">Не оплачено перевозчику</option>
@@ -325,15 +323,12 @@ export default function Orders({ onOpenOrder, onAddOrder, refreshKey, search = '
             items={DOC_FILTER_OPTIONS.map(f => ({ key: f.key, label: f.label }))} group={2}
             selected={docFilters} onToggle={toggleDocFilter} onClear={() => setDocFilters([])}>
             Документы{docFilters.length > 0 && ` · ${docFilters.length}`}
-            <svg width="10" height="14" viewBox="0 0 10 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ opacity: 0.6 }}><polyline points="2 5 5 2 8 5" /><polyline points="2 9 5 12 8 9" /></svg>
           </MultiMenu>
-          <span style={{ flex: 1 }} />
-          <button className="btn-primary" onClick={onAddOrder} style={{ flexShrink: 0 }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-            Новая заявка
-          </button>
         </div>
-
+        <button type="button" className="btn-primary orders-create" onClick={onAddOrder}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+          Новая заявка
+        </button>
       </div>
 
       {/* Mobile: iOS-style grouped list */}
@@ -684,7 +679,7 @@ function CorrespondenceModal({ orderIds, onClose, onSaved }) {
 
   return (
     <div onClick={onClose} className="dash-modal-scrim">
-      <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 440, padding: 26 }}>
+      <GlassDialog label="Корреспонденция" onDismiss={onClose} onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 440, padding: 26 }}>
         <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)', marginBottom: 4 }}>
           Отметить корреспонденцию
         </div>
@@ -724,7 +719,7 @@ function CorrespondenceModal({ orderIds, onClose, onSaved }) {
         />
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>
+          <button data-dialog-dismiss onClick={onClose} className="btn-ghost" style={{ flex: 1, justifyContent: 'center' }}>
             Отмена
           </button>
           <button
@@ -734,7 +729,7 @@ function CorrespondenceModal({ orderIds, onClose, onSaved }) {
             <SwapText>{saving ? 'Сохраняю…' : 'Отметить'}</SwapText>
           </button>
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }

@@ -162,7 +162,7 @@ export default function Topbar({ compact = false, page, onSignOut, period = 'mon
         <>
       <div style={{ flex: 1, minWidth: 0 }}>
         {/* большой заголовок iOS: крупный вверху страницы, сжимается при прокрутке */}
-        <div className="ios-title" style={{ fontSize: compact ? (isMobile ? 17 : 18) : (isMobile ? 24 : 26) }}>{meta.title}</div>
+        <h1 className="ios-title" style={{ fontSize: compact ? (isMobile ? 17 : 18) : (isMobile ? 24 : 26) }}>{meta.title}</h1>
         {!isMobile && (
           <div className="ios-subtitle" style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 2 }}>{meta.subtitle}</div>
         )}

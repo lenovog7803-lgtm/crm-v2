@@ -1,8 +1,9 @@
+import GlassDialog from './GlassDialog'
 import { useState, useEffect } from 'react'
 import { getOrders, getClients, getCarriers, getPaymentsIn, getPaymentsOut, createPaymentIn, createPaymentOut, deletePaymentIn, deletePaymentOut, generateReconciliation, getReconciliationHistory, getClientPPLedger, addClientPPEntry, deleteClientPPEntry, getCarrierPPLedger, addCarrierPPEntry, deleteCarrierPPEntry } from '../api'
-import { fmtMoney, initials, getGradient, fmtDate, inPeriod } from '../utils'
+import { initials, getGradient, fmtDate, inPeriod } from '../utils'
 import { useIsMobile } from '../hooks/useIsMobile'
-import { SkeletonRow } from './Skeleton'
+import { SkeletonCard, SkeletonRow } from './Skeleton'
 import { useToast } from './Toast'
 import { SlidingTabs } from './SlidingTabs'
 import { mouseOnly } from '../motion'
@@ -20,6 +21,8 @@ export default function Finance({ refreshKey, period = 'all' }) {
   const [paymentsIn, setPaymentsIn] = useState([])
   const [paymentsOut, setPaymentsOut] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
+  const [retry, setRetry] = useState(0)
   const [typeFilter, setTypeFilter] = useState('all')
   const [showAll, setShowAll] = useState(false)
   const [showInModal, setShowInModal] = useState(false)
@@ -55,21 +58,29 @@ export default function Finance({ refreshKey, period = 'all' }) {
   })
 
   useEffect(() => {
+    let active = true
     setLoading(true)
+    setLoadError(false)
     Promise.all([
-      getOrders({ limit: 2000, light: true }).catch(() => []),
-      getClients().catch(() => []),
-      getCarriers().catch(() => []),
-      getPaymentsIn().catch(() => []),
-      getPaymentsOut().catch(() => []),
+      getOrders({ limit: 2000, light: true }),
+      getClients(),
+      getCarriers(),
+      getPaymentsIn(),
+      getPaymentsOut(),
     ]).then(([ords, cls, cars, ins, outs]) => {
+      if (!active) return
       setOrders(Array.isArray(ords) ? ords : [])
       setClients(Array.isArray(cls) ? cls : [])
       setCarriers(Array.isArray(cars) ? cars : [])
       setPaymentsIn(Array.isArray(ins) ? ins : [])
       setPaymentsOut(Array.isArray(outs) ? outs : [])
-    }).finally(() => setLoading(false))
-  }, [refreshKey])
+    }).catch(() => {
+      if (active) setLoadError(true)
+    }).finally(() => {
+      if (active) setLoading(false)
+    })
+    return () => { active = false }
+  }, [refreshKey, retry])
 
   // История актов сверки скопирована к конкретному контрагенту — бэкенд
   // возвращает [] без counterparty_id, поэтому подгружаем при выборе.
@@ -170,100 +181,51 @@ export default function Finance({ refreshKey, period = 'all' }) {
   const recLabelKey = recType === 'client' ? 'name' : 'company_name'
   const iStyle = { height: 36, padding: '0 10px', fontSize: 13, borderRadius: 10, border: '1px solid rgba(var(--ink-rgb), 0.14)', background: 'rgba(var(--paper-rgb), 0.8)', fontFamily: 'var(--font-sys)', color: 'var(--ink)', outline: 'none' }
 
+  if (loading) return (
+    <div className="finance-summary" role="status" aria-label="Загрузка финансов">
+      <SkeletonCard /><SkeletonCard /><SkeletonCard />
+    </div>
+  )
+  if (loadError) return (
+    <div className="card finance-load-error">
+      <div role="alert">Не удалось загрузить финансовые данные</div>
+      <button type="button" className="btn-ghost" onClick={() => setRetry(value => value + 1)}>Повторить</button>
+    </div>
+  )
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 10 : 16 }}>
 
-      {/* Summary — 3 равных колонки на десктопе */}
-      {isMobile ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div className="grad-card grad-blue" style={{ padding: '18px 18px', color: '#fff' }}>
-            <CardGradient tone="blue" />
-            <div className="grad-kicker">Чистая прибыль</div>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 30, letterSpacing: '-0.03em', lineHeight: 1 }}>{netProfit.toLocaleString('ru-RU')}</div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>BYN</div>
-            <div style={{ display: 'flex', gap: 20, marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,calc(0.25 * var(--rim-k)))' }}>
-              <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>Поступления</div>
-                <div style={{ fontWeight: 700, fontSize: 13 }}>{totalIncome.toLocaleString('ru-RU')} BYN</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>Списания</div>
-                <div style={{ fontWeight: 700, fontSize: 13 }}>{totalExpense.toLocaleString('ru-RU')} BYN</div>
-              </div>
-            </div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 10 }}>
-            <div onClick={() => setShowInModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '14px 14px', color: 'var(--ink)' }}>
-              <div className="grad-kicker" style={{ color: 'var(--fg-1e9e5a)' }}>Поступления</div>
-              <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
-              <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-3)', fontWeight: 600 }}>{periodClientPaid.length} заявок оплачено</div>
-            </div>
-            <div onClick={() => setShowOutModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '14px 14px', color: 'var(--ink)' }}>
-              <div className="grad-kicker" style={{ color: 'var(--fg-7c3aed)' }}>Списания</div>
-              <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 20, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
-              <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-3)', fontWeight: 600 }}>{periodCarrierPaid.length} заявок оплачено</div>
-            </div>
-          </div>
+      <section className="finance-summary" aria-label="Сводка по дате перевозки">
+        <div className="grad-card grad-blue finance-metric finance-metric-primary">
+          <CardGradient tone="blue" />
+          <span className="finance-metric-label">Чистая прибыль</span>
+          <span className="finance-metric-value">{netProfit.toLocaleString('ru-RU')} <small>BYN</small></span>
+          <span className="finance-metric-note">Маржа {marginPct}% · по дате перевозки</span>
         </div>
-      ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: 16 }}>
-          <div className="grad-card grad-blue" style={{ padding: '26px 28px', color: '#fff' }}>
-            <CardGradient tone="blue" />
-            <div className="grad-kicker">Чистая прибыль</div>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 38, letterSpacing: '-0.03em', lineHeight: 1 }}>{netProfit.toLocaleString('ru-RU')}</div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 2 }}>BYN</div>
-            <div style={{ display: 'flex', gap: 24, marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,calc(0.25 * var(--rim-k)))' }}>
-              <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>Поступления</div>
-                <div style={{ fontWeight: 700, fontSize: 15 }}>{totalIncome.toLocaleString('ru-RU')} BYN</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)', marginBottom: 2 }}>Списания</div>
-                <div style={{ fontWeight: 700, fontSize: 15 }}>{totalExpense.toLocaleString('ru-RU')} BYN</div>
-              </div>
-            </div>
-          </div>
-          <div onClick={() => setShowInModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '26px 24px', color: 'var(--ink)' }}>
-            <div className="grad-kicker" style={{ color: 'var(--fg-1e9e5a)' }}>Поступления</div>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalIncome.toLocaleString('ru-RU')}</div>
-            <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
-            <div style={{ marginTop: 14, fontSize: 12, color: 'var(--text-3)', fontWeight: 600 }}>{periodClientPaid.length} заявок оплачено</div>
-          </div>
-          <div onClick={() => setShowOutModal(true)} className="ios-widget" style={{ cursor: 'pointer', padding: '26px 24px', color: 'var(--ink)' }}>
-            <div className="grad-kicker" style={{ color: 'var(--fg-7c3aed)' }}>Списания</div>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: 32, letterSpacing: '-0.02em' }}>{totalExpense.toLocaleString('ru-RU')}</div>
-            <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>BYN</div>
-            <div style={{ marginTop: 14, fontSize: 12, color: 'var(--text-3)', fontWeight: 600 }}>{periodCarrierPaid.length} заявок оплачено</div>
-          </div>
-        </div>
-      )}
-
-      {/* KPI */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr 1fr' : 'repeat(3,1fr)', gap: isMobile ? 8 : 12 }}>
         {[
-          { label: 'Выручка', val: fmtMoney(totalIncome), color: 'var(--fg-1e9e5a)' },
-          { label: 'Перевозчики', val: fmtMoney(totalExpense), color: 'var(--fg-1366f0)' },
-          { label: 'Маржа', val: marginPct + '%', color: 'var(--fg-d97706)' },
-        ].map(k => (
-          <div key={k.label} className="card" style={{ padding: isMobile ? '10px 12px' : '16px 18px' }}>
-            <div style={{ fontSize: isMobile ? 10 : 11, color: 'var(--text-tertiary)', fontWeight: 600, marginBottom: isMobile ? 4 : 6 }}>{k.label}</div>
-            <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 800, fontSize: isMobile ? 14 : 18, color: k.color }}>{k.val}</div>
-          </div>
+          { label: 'Поступления', amount: totalIncome, count: periodClientPaid.length, open: setShowInModal },
+          { label: 'Списания', amount: totalExpense, count: periodCarrierPaid.length, open: setShowOutModal },
+        ].map(({ label, amount, count, open }) => (
+          <button key={label} type="button" className="ios-widget finance-metric finance-metric-action" onClick={() => open(true)}>
+            <span className="finance-metric-label">{label}</span>
+            <span className="finance-metric-value">{amount.toLocaleString('ru-RU')} <small>BYN</small></span>
+            <span className="finance-metric-note">Оплачено заявок: {count}</span>
+            <span className="finance-metric-arrow" aria-hidden="true">›</span>
+          </button>
         ))}
-      </div>
+      </section>
 
       {/* Payments — ручные записи с ПП и датой */}
       <div className="card" style={{ padding: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: showAdd ? 12 : 14, flexWrap: 'wrap' }}>
-          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', flex: 1 }}>Платежи</div>
+          <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)', flex: 1 }}>Платежи <span className="finance-payment-note">по дате платежа</span></div>
           <SlidingTabs
             options={[{ key: 'all', label: 'Все' }, { key: 'income', label: 'Поступления' }, { key: 'expense', label: 'Списания' }]}
             value={typeFilter}
             onChange={k => { setTypeFilter(k); setShowAll(false) }}
           />
-          <button onClick={() => setShowAdd(v => !v)} className="btn-icon" style={{ width: 32, height: 32, background: showAdd ? 'rgba(var(--rgb-200-25-35), 0.1)' : 'rgba(var(--rgb-19-102-240), 0.12)', color: showAdd ? 'var(--fg-c81923)' : 'var(--fg-1366f0)' }}>
+          <button aria-label={showAdd ? "Закрыть форму платежа" : "Добавить платёж"} aria-expanded={showAdd} onClick={() => setShowAdd(v => !v)} className="btn-icon" style={{ width: 32, height: 32, background: showAdd ? 'rgba(var(--rgb-200-25-35), 0.1)' : 'rgba(var(--rgb-19-102-240), 0.12)', color: showAdd ? 'var(--fg-c81923)' : 'var(--fg-1366f0)' }}>
             {showAdd
               ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -469,14 +431,14 @@ export default function Finance({ refreshKey, period = 'all' }) {
       {/* Модалка — детали поступлений */}
       {showInModal && (
         <div className="dash-modal-scrim">
-          <div className="dash-modal dash-form" onClick={e => e.stopPropagation()} style={{ maxWidth: 560 }}>
+          <GlassDialog label="Поступления от клиентов" onDismiss={() => setShowInModal(false)} className="dash-modal dash-form" onClick={e => e.stopPropagation()} style={{ maxWidth: 560 }}>
             <div style={{ padding: 28 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
                   <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)' }}>Поступления от клиентов</div>
                   <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>Итого: {totalIncome.toLocaleString('ru-RU')} BYN · {periodClientPaid.length} заявок</div>
                 </div>
-                <button onClick={() => setShowInModal(false)} className="btn-icon" style={{ width: 32, height: 32, fontSize: 17 }}>×</button>
+                <button data-dialog-dismiss aria-label="Закрыть" onClick={() => setShowInModal(false)} className="btn-icon" style={{ width: 32, height: 32, fontSize: 17 }}>×</button>
               </div>
               {periodClientPaid.length === 0 ? (
                 <div style={{ textAlign: 'center', color: 'var(--text-tertiary)', padding: 40 }}>Нет оплаченных заявок</div>
@@ -503,21 +465,21 @@ export default function Finance({ refreshKey, period = 'all' }) {
                 )
               })}
             </div>
-          </div>
+          </GlassDialog>
         </div>
       )}
 
       {/* Модалка — детали списаний */}
       {showOutModal && (
         <div className="dash-modal-scrim">
-          <div className="dash-modal dash-form" onClick={e => e.stopPropagation()} style={{ maxWidth: 560 }}>
+          <GlassDialog label="Оплачено перевозчикам" onDismiss={() => setShowOutModal(false)} className="dash-modal dash-form" onClick={e => e.stopPropagation()} style={{ maxWidth: 560 }}>
             <div style={{ padding: 28 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <div>
                   <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)' }}>Оплачено перевозчикам</div>
                   <div style={{ fontSize: 12, color: 'var(--fg-e0473b)', fontWeight: 600, marginTop: 2 }}>Итого: -{totalExpense.toLocaleString('ru-RU')} BYN · {periodCarrierPaid.length} заявок</div>
                 </div>
-                <button onClick={() => setShowOutModal(false)} className="btn-icon" style={{ width: 32, height: 32, fontSize: 17 }}>×</button>
+                <button data-dialog-dismiss aria-label="Закрыть" onClick={() => setShowOutModal(false)} className="btn-icon" style={{ width: 32, height: 32, fontSize: 17 }}>×</button>
               </div>
               {periodCarrierPaid.length === 0 ? (
                 <div style={{ textAlign: 'center', color: 'var(--text-tertiary)', padding: 40 }}>Нет оплаченных заявок</div>
@@ -544,7 +506,7 @@ export default function Finance({ refreshKey, period = 'all' }) {
                 )
               })}
             </div>
-          </div>
+          </GlassDialog>
         </div>
       )}
 
@@ -636,13 +598,13 @@ function PPLedgerModal({ type, entityId, entityName, onClose }) {
 
   return (
     <div onClick={onClose} className="dash-modal-scrim">
-      <div onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 520, padding: 26 }}>
+      <GlassDialog label="Реестр платёжных поручений" onDismiss={onClose} onClick={e => e.stopPropagation()} className="dash-modal dash-form" style={{ maxWidth: 520, padding: 26 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
           <div>
             <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 17, color: 'var(--ink)' }}>{type === 'client' ? 'Платежи клиента' : 'Платежи перевозчику'}</div>
             <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{entityName} · всего {total.toLocaleString('ru-RU')} Br</div>
           </div>
-          <button onClick={onClose} className="btn-icon" style={{ width: 32, height: 32, fontSize: 17 }}>×</button>
+          <button data-dialog-dismiss aria-label="Закрыть" onClick={onClose} className="btn-icon" style={{ width: 32, height: 32, fontSize: 17 }}>×</button>
         </div>
 
         <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
@@ -664,11 +626,11 @@ function PPLedgerModal({ type, entityId, entityName, onClose }) {
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: accentColor }}>
                 {Number(e.amount).toLocaleString('ru-RU')} Br
               </div>
-              <button onClick={() => remove(e.id)} className="btn-bare" style={{ color: 'var(--fg-e0473b)', fontSize: 15 }}>×</button>
+              <button aria-label="Закрыть" onClick={() => remove(e.id)} className="btn-bare" style={{ color: 'var(--fg-e0473b)', fontSize: 15 }}>×</button>
             </div>
           ))}
         </div>
-      </div>
+      </GlassDialog>
     </div>
   )
 }

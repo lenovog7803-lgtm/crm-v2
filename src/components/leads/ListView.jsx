@@ -112,7 +112,7 @@ export default function ListView({ industry }) {
           {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
         </Select>
         <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)', cursor: 'pointer' }}>
-          <Switch size="sm" checked={filters.overdueOnly} onChange={e => set('overdueOnly')(e.target.checked)} />
+          <Switch size="sm" aria-label="Только просроченные" checked={filters.overdueOnly} onChange={e => set('overdueOnly')(e.target.checked)} />
           Только просроченные
         </label>
       </div>
