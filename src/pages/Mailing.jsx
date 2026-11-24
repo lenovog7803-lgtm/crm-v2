@@ -79,7 +79,83 @@ const nextWorkdayLabel = () => {
   return ['в воскресенье', 'в понедельник', 'во вторник', 'в среду', 'в четверг', 'в пятницу', 'в субботу'][d.getDay()] + ' утром'
 }
 
-function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoContacts }) {
+const MAILBOX_HEALTH = {
+  ok: { label: 'В норме', tone: 'ready' },
+  slow: { label: 'Темп снижен', tone: 'warning' },
+  paused: { label: 'На паузе', tone: 'warning' },
+  stop: { label: 'Отправка остановлена', tone: 'error' },
+}
+
+function MailingDisclosure({ title, children, className = '' }) {
+  return (
+    <details className={`card mailing-disclosure ${className}`}>
+      <summary>
+        {title}
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="m4 6 4 4 4-4" />
+        </svg>
+      </summary>
+      <div className="mailing-disclosure-body">{children}</div>
+    </details>
+  )
+}
+
+function MailboxHealth({ mailbox, account }) {
+  const { health, sent_today: sent = 0 } = mailbox
+  const expired = account?.login_expired ?? mailbox.login_expired
+  const status = expired
+    ? { label: 'Нужно переподключить Gmail', tone: 'error' }
+    : account?.configured === false
+      ? { label: 'Почта не подключена', tone: 'warning' }
+      : MAILBOX_HEALTH[health?.status]
+  const limit = health?.limit ?? 0
+
+  return (
+    <article className="mailing-health-item">
+      <h3>{mailbox.login || mailbox.name}</h3>
+      {status && <div className="mailing-health-status" data-tone={status.tone}>
+        <span className="activity-status-dot" aria-hidden="true" />{status.label}
+      </div>}
+      <div className="mailing-health-metrics">
+        <div><small>Сегодня</small><strong>{sent}{limit > 0 && <span> / {limit}</span>}</strong></div>
+        <div><small>Возвраты за 7 дней</small><strong>{health?.bounced_7d ?? '—'}{health?.sent_7d > 0 && <span> / {health.sent_7d}</span>}</strong></div>
+      </div>
+      {limit > 0 && <progress max={limit} value={Math.min(sent, limit)} aria-label="Использование дневного лимита" />}
+      {health?.reason && <p>{health.reason}</p>}
+    </article>
+  )
+}
+
+function MailingLog({ entries }) {
+  if (entries.length === 0) return <p>Записей пока нет.</p>
+  return (
+    <ul className="mailing-log">
+      {entries.map(entry => {
+        const gmailExpired = /invalid_grant|token has been expired or revoked/i.test(entry.detail || '')
+        return (
+          <li className="mailing-log-row" key={entry.id}>
+            <span className="activity-status-dot" aria-hidden="true" data-error={entry.ok === false || gmailExpired} />
+            <div className="mailing-log-message">
+              <div className="mailing-log-heading">
+                <strong>{entry.company || entry.email || entry.kind}</strong>
+                {(entry.company || entry.email) && entry.kind && <span>{entry.kind}</span>}
+              </div>
+              {gmailExpired ? (
+                <details className="mailing-log-error">
+                  <summary>Gmail требует переподключения</summary>
+                  <p>{entry.detail}</p>
+                </details>
+              ) : entry.detail && <p>{entry.detail}</p>}
+            </div>
+            {entry.ts && <time dateTime={entry.ts}>{fmtTs(entry.ts).slice(5)}</time>}
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+function Overview({ state, accounts, campaignId, reload, onGoSettings, onGoReplies, onGoContacts }) {
   const { show } = useToast()
   const [busy, setBusy] = useState(false)
 
@@ -148,25 +224,17 @@ function Overview({ state, campaignId, reload, onGoSettings, onGoReplies, onGoCo
         <div className="party-row"><span>В очереди</span><strong>{state.queue_new ?? 0}</strong></div>
       </section>
 
-      <section className="card mailing-secondary" aria-label="Диагностика рассылки">
-        <details>
-          <summary>Состояние почты</summary>
-          {health.reason && <p>{health.reason}</p>}
-          {mailboxes.length === 0 && !health.reason && <p>Нет данных о почте.</p>}
-          {mailboxes.map(m => <div className="mailing-log-row" key={m.id}>
-            <span>{m.login || m.name}</span>
-            <span>{m.sent_today ?? 0} из {m.health?.limit ?? 0} сегодня · {m.health?.bounced_7d ?? 0} возвратов за 7 дней</span>
-          </div>)}
-        </details>
-        <details>
-          <summary>Журнал отправки</summary>
-          {activity.length === 0 && <p>Записей пока нет.</p>}
-          {activity.map(entry => <div className="mailing-log-row" key={entry.id}>
-            <span>{[entry.company || entry.email, entry.kind, entry.detail].filter(Boolean).join(' · ')}</span>
-            <time>{fmtTs(entry.ts).slice(5)}</time>
-          </div>)}
-        </details>
-      </section>
+      <MailingDisclosure title="Состояние почты" className="mailing-health">
+        {health.reason && <p>{health.reason}</p>}
+        {mailboxes.length === 0 && !health.reason && <p>Нет данных о почте.</p>}
+        {mailboxes.length > 0 && <div className="mailing-health-grid">
+          {mailboxes.map(mailbox => <MailboxHealth key={mailbox.id} mailbox={mailbox}
+            account={accounts.find(account => account.id === mailbox.id)} />)}
+        </div>}
+      </MailingDisclosure>
+      <MailingDisclosure title="Журнал отправки">
+        <MailingLog entries={activity} />
+      </MailingDisclosure>
     </div>
   )
 }
@@ -1265,7 +1333,7 @@ export default function Mailing() {
     <div className="mailing-page">
       <div className="orders-toolbar mailing-toolbar">
         <div className="mailing-tabs">
-          <SlidingTabs fill options={tabsWith(state?.replies_new, hasPurchase)} value={tab} onChange={t => { setContactsGroup(''); setTab(t) }} />
+          <SlidingTabs options={tabsWith(state?.replies_new, hasPurchase)} value={tab} onChange={t => { setContactsGroup(''); setTab(t) }} />
         </div>
         {campaigns && <CampaignBar campaigns={campaigns} value={campaignId}
           onChange={id => setCampaignId(id)} onAdd={() => setAdding(true)} />}
@@ -1284,7 +1352,7 @@ export default function Mailing() {
       {!ready && <Loader padding={40} />}
       {ready && (
         <>
-          {tab === 'overview' && <Overview state={state} campaignId={campaignId} reload={() => { loadState(); loadCampaigns() }}
+          {tab === 'overview' && <Overview state={state} accounts={mailboxes} campaignId={campaignId} reload={() => { loadState(); loadCampaigns() }}
             onGoSettings={() => setTab('settings')} onGoReplies={() => setTab('replies')}
             onGoContacts={g => { setContactsGroup(g); setTab('contacts') }} />}
           {tab === 'replies' && <Replies key={campaignId} campaignId={campaignId} loginFor={loginFor} onChanged={() => { loadState(); loadCampaigns() }} />}

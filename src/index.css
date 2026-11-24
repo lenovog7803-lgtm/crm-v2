@@ -2154,8 +2154,17 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   mask: url('/logo-mark.svg') center / contain no-repeat;
 }
 .mailing-page { display: grid; gap: 14px; min-width: 0; container-type: inline-size; }
-.mailing-toolbar { justify-content: space-between; gap: 10px 16px; }
-.mailing-tabs { width: min(100%, 410px); }
+.mailing-toolbar { min-width: 0; justify-content: space-between; gap: 10px 16px; }
+.mailing-tabs {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  padding-block: 4px;
+  scrollbar-width: thin;
+}
+.mailing-tabs .lg-segmented { width: max-content; --lg-tab-height: 38px; }
+@container (min-width: 671px) { .mailing-tabs { overflow: visible; } }
+.mailing-tabs .lg-segmented :is(.lg-tab, .lg-tab-copy) { font-size: 14px; }
 .mailing-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .mailing-toolbar .apple-select-label { max-width: min(32ch, 52vw); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mailing-overview { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 14px; align-items: start; }
@@ -2164,8 +2173,8 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .mailing-status h2 { margin: 0; font-size: 14px; font-weight: 600; }
 .mailing-tally { display: flex; align-items: baseline; flex-wrap: wrap; gap: 7px; margin: 10px 0; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
 .mailing-tally strong { font-size: 36px; line-height: 1; color: var(--ink); letter-spacing: -.04em; }
-.mailing-send progress { width: 100%; height: 6px; accent-color: var(--fg-1366f0); }
-.mailing-send p, .mailing-secondary p { margin: 8px 0; color: var(--text-secondary); font-size: 13px; }
+.mailing-send progress, .mailing-health-item progress { width: 100%; height: 6px; accent-color: var(--fg-1366f0); }
+.mailing-send p, .mailing-disclosure p { margin: 8px 0; color: var(--text-secondary); font-size: 13px; }
 .mailing-send .mailing-actions { margin-top: 14px; }
 .mailing-summary { padding: 4px 0; }
 .mailing-summary .party-row {
@@ -2175,11 +2184,44 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .mailing-summary .party-row + .party-row { border-top: 1px solid var(--line); }
 .mailing-summary button:hover { background: var(--workspace-selection); }
 .mailing-summary strong { font-variant-numeric: tabular-nums; }
-.mailing-secondary { grid-column: 1 / -1; padding: 4px 16px; }
-.mailing-secondary details + details { border-top: 1px solid var(--line); }
-.mailing-secondary summary { padding-block: 10px; cursor: pointer; color: var(--text-secondary); font-size: 13px; }
-.mailing-log-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 5px 12px; padding: 8px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; font-size: 13px; }
-.mailing-log-row :last-child { color: var(--text-secondary); }
+.mailing-disclosure { grid-column: 1 / -1; padding: 0; min-width: 0; }
+.mailing-disclosure > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 13px 16px; list-style: none; cursor: pointer; border-radius: inherit;
+  color: var(--ink); font-size: 14px; font-weight: 600;
+}
+.mailing-disclosure > summary::-webkit-details-marker { display: none; }
+.mailing-disclosure > summary svg { flex-shrink: 0; color: var(--text-secondary); transition: transform 160ms var(--ease); }
+.mailing-disclosure[open] > summary svg { transform: rotate(180deg); }
+.mailing-disclosure > summary:focus-visible { outline: 2px solid var(--fg-1366f0); outline-offset: -3px; }
+.mailing-disclosure-body { padding: 0 16px 14px; }
+.mailing-health-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(245px, 100%), 1fr)); gap: 10px; }
+.mailing-health-item { padding: 13px; min-width: 0; border-radius: 13px; background: rgba(var(--ink-rgb), .04); }
+.mailing-health-item h3 { margin: 0; font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+.mailing-health-status { display: flex; align-items: center; gap: 6px; margin-top: 5px; font-size: 12px; }
+.mailing-health-status[data-tone="ready"] { color: var(--fg-0e9f6e); }
+.mailing-health-status[data-tone="warning"] { color: var(--fg-d97706); }
+.mailing-health-status[data-tone="error"] { color: var(--fg-e0473b); }
+.mailing-health-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 11px 0 4px; }
+.mailing-health-metrics small, .mailing-health-metrics strong { display: block; font-variant-numeric: tabular-nums; }
+.mailing-health-metrics small, .mailing-health-metrics strong span { color: var(--text-secondary); font-size: 12px; font-weight: 500; }
+.mailing-health-metrics strong { margin-top: 2px; font-size: 18px; }
+.mailing-log { list-style: none; margin: 0; padding: 0; }
+.mailing-log-row {
+  display: grid; grid-template-columns: 7px minmax(0, 1fr) auto; gap: 9px;
+  align-items: start; padding: 9px 0; border-top: 1px solid var(--line); font-size: 13px;
+}
+.mailing-log-row > .activity-status-dot { margin-top: 5px; color: var(--text-tertiary); }
+.mailing-log-row > .activity-status-dot[data-error="true"] { color: var(--fg-e0473b); }
+.mailing-log-message { min-width: 0; overflow-wrap: anywhere; }
+.mailing-log-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 8px; }
+.mailing-log-heading span, .mailing-log-row time { color: var(--text-secondary); font-size: 12px; }
+.mailing-log-row time { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.mailing-log-message p, .mailing-log-error { margin: 3px 0 0; }
+.mailing-log-error summary { cursor: pointer; color: var(--fg-e0473b); }
+@media (prefers-reduced-motion: reduce) {
+  .mailing-disclosure > summary svg { transition: none; }
+}
 .mailing-campaign-form { display: grid; gap: 14px; }
 .mailing-contact-tools { justify-content: flex-start; }
 @container (max-width: 670px) {
