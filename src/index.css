@@ -2185,15 +2185,15 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .mailing-summary button:hover { background: var(--workspace-selection); }
 .mailing-summary strong { font-variant-numeric: tabular-nums; }
 .mailing-disclosure { grid-column: 1 / -1; padding: 0; min-width: 0; }
-.mailing-disclosure > summary {
+:is(.mailing-disclosure, .lead-selection-reason) > summary {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   padding: 13px 16px; list-style: none; cursor: pointer; border-radius: inherit;
   color: var(--ink); font-size: 14px; font-weight: 600;
 }
-.mailing-disclosure > summary::-webkit-details-marker { display: none; }
-.mailing-disclosure > summary svg { flex-shrink: 0; color: var(--text-secondary); transition: transform 160ms var(--ease); }
-.mailing-disclosure[open] > summary svg { transform: rotate(180deg); }
-.mailing-disclosure > summary:focus-visible { outline: 2px solid var(--fg-1366f0); outline-offset: -3px; }
+:is(.mailing-disclosure, .lead-selection-reason) > summary::-webkit-details-marker { display: none; }
+:is(.mailing-disclosure, .lead-selection-reason) > summary svg { flex-shrink: 0; color: var(--text-secondary); transition: transform 160ms var(--ease); }
+:is(.mailing-disclosure, .lead-selection-reason)[open] > summary svg { transform: rotate(180deg); }
+:is(.mailing-disclosure, .lead-selection-reason) > summary:focus-visible { outline: 2px solid var(--fg-1366f0); outline-offset: -3px; }
 .mailing-disclosure-body { padding: 0 16px 14px; }
 .mailing-health-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(245px, 100%), 1fr)); gap: 10px; }
 .mailing-health-item { padding: 13px; min-width: 0; border-radius: 13px; background: rgba(var(--ink-rgb), .04); }
@@ -2220,11 +2220,18 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .mailing-log-message p, .mailing-log-error { margin: 3px 0 0; }
 .mailing-log-error summary { cursor: pointer; color: var(--fg-e0473b); }
 @media (prefers-reduced-motion: reduce) {
-  .mailing-disclosure > summary svg { transition: none; }
+  :is(.mailing-disclosure, .lead-selection-reason) > summary svg { transition: none; }
 }
 .mailing-campaign-form { display: grid; gap: 14px; }
 .mailing-contact-tools { justify-content: flex-start; }
 @container (max-width: 670px) {
   .mailing-overview { grid-template-columns: minmax(0, 1fr); }
   .mailing-tabs { width: 100%; }
+}
+
+.lead-selection-reason { border-top: 1px solid var(--line); }
+.lead-selection-reason > summary { padding: 10px 0 2px; }
+.lead-selection-reason p {
+  margin: 8px 0 0; color: var(--text-secondary); font-size: 13px; line-height: 1.55;
+  white-space: pre-wrap; overflow-wrap: anywhere;
 }

@@ -61,6 +61,9 @@ export default function CallCard({ lead, onEdit, onClaim, part }) {
   const timeline = [...callEntries, ...legacyNotes].sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
 
   const contact = [lead.contact_person, lead.contact_position].filter(Boolean).join(' · ')
+  const legacyReasonPattern = /^[ 	]*(?:💡[ 	]*)?Почему взят:[ 	]*([^\r\n]+)$/mu
+  const legacyReason = lead.notes?.match(legacyReasonPattern)?.[1]?.trim()
+  const selectionReason = lead.selection_reason?.trim() || legacyReason
   const headerEl = (
     <div className="card lead-contact-card">
       <div className="lead-contact-header">
@@ -78,12 +81,26 @@ export default function CallCard({ lead, onEdit, onClaim, part }) {
           ? <span className="lead-assignment">{assigned === myId ? 'В вашей работе' : 'В работе'}</span>
           : <button type="button" onClick={handleClaimLead} className="btn-ghost">Взять в работу</button>}
       </div>
+      {selectionReason && (
+        <details className="lead-selection-reason">
+          <summary>
+            Почему взят клиент
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m4 6 4 4 4-4" />
+            </svg>
+          </summary>
+          <p>{selectionReason}</p>
+        </details>
+      )}
       {attempts >= 3 && <div className="lead-contact-warning">
         Неудачных попыток дозвона: {attempts}. После пятой лид перейдёт в «Отказ».
       </div>}
     </div>
   )
-  const notes = lead.notes?.replace(/^\s*(?:🎯\s*)?Скрипт:[^\n]*$/gmu, '').replace(/[💡🎯🔥⚡🌐📦🏭👤✓]/gu, '').trim()
+  const historyNotes = legacyReason && legacyReason === selectionReason
+    ? lead.notes.replace(legacyReasonPattern, '')
+    : lead.notes
+  const notes = historyNotes?.replace(/^\s*(?:🎯\s*)?Скрипт:[^\n]*$/gmu, '').replace(/[💡🎯🔥⚡🌐📦🏭👤✓]/gu, '').trim()
   const historyEl = (
     <>
       {notes && (
