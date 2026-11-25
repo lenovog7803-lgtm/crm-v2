@@ -155,37 +155,44 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div className="card carrier-filters">
-        <div className="orders-toolbar">
-          <strong aria-live="polite">{pending || (usesHistory && !history) ? 'Перевозчики' : hasFilters || search
-            ? `Найдено: ${visible.length} из ${carriers.length}`
-            : `Всего перевозчиков: ${carriers.length}`}</strong>
-          <button className="btn-primary orders-create" onClick={onAdd}>
+        <div className="carrier-filter-header">
+          <div className="carrier-result" aria-live="polite">
+            {pending ? 'Загрузка списка…' : usesHistory && !history ? 'Перевозчики' : hasFilters || search
+              ? <>Найдено <strong>{visible.length}</strong> из {carriers.length}</>
+              : <>Всего перевозчиков <strong>{carriers.length}</strong></>}
+          </div>
+          <button type="button" className="btn-primary carrier-add" aria-label="Добавить перевозчика" onClick={onAdd}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
-            Добавить перевозчика
+            <span>Добавить<span className="carrier-add-object"> перевозчика</span></span>
           </button>
         </div>
-        <div className="orders-filters" role="group" aria-label="Города по завершённым заявкам">
-          {ROUTES.map(([value, label]) => (
-            <button key={value} type="button" className={`orders-pill-btn orders-pill carrier-filter-chip${area === value ? ' is-on' : ''}`}
-              aria-pressed={area === value} onClick={() => updateFilters({ ...filters, area: value })}>
-              {label}
-            </button>
-          ))}
+        <div className="carrier-route-group" role="group" aria-labelledby="carrier-route-label">
+          <div className="carrier-filter-header">
+            <span id="carrier-route-label" className="carrier-route-label">Направления</span>
+            {hasFilters && <button type="button" className="carrier-filter-reset" onClick={() => updateFilters(EMPTY_FILTERS)}>Сбросить</button>}
+          </div>
+          <div className="carrier-route-choices">
+            {ROUTES.map(([value, label]) => (
+              <button key={value} type="button" className="carrier-control carrier-route"
+                aria-pressed={area === value} onClick={() => updateFilters({ ...filters, area: value })}>
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="orders-filters" role="group" aria-label="Фильтры перевозчиков">
+        <div className="carrier-criteria" role="group" aria-label="Фильтры перевозчиков">
           {SELECTS.map(([key, options]) => (
-            <Select key={key} fit className={`orders-pill${filters[key] ? ' is-on' : ''}`} value={filters[key]}
+            <Select key={key} fit className={`carrier-control carrier-select${filters[key] ? ' is-on' : ''}`} value={filters[key]}
               onChange={e => updateFilters({ ...filters, [key]: e.target.value })}>
               {options.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
             </Select>
           ))}
-          <button type="button" className={`orders-pill-btn orders-pill carrier-filter-chip${phoneOnly ? ' is-on' : ''}`}
+          <button type="button" className="carrier-control carrier-phone"
             aria-pressed={phoneOnly} onClick={() => updateFilters({ ...filters, phone: !phoneOnly })}>
             С телефоном
           </button>
-          {hasFilters && <button type="button" className="btn-ghost carrier-filter-reset" onClick={() => updateFilters(EMPTY_FILTERS)}>Сбросить</button>}
         </div>
         {body && <p className="carrier-filter-note">Кузов из заявки или из карточки, если в заявке он не указан.</p>}
         {historyError && (
@@ -198,7 +205,7 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
 
       {pending && <SkeletonList />}
       {!pending && !(usesHistory && !history) && !visible.length && (
-        <div className="card carrier-filters">По выбранным условиям перевозчики не найдены.</div>
+        <div className="card carrier-filter-empty">По выбранным условиям перевозчики не найдены.</div>
       )}
       {!pending && visible.length > 0 && (
       // iOS 26: список как в «Контактах» — одна группа-лист, строки с разделителями и › справа
