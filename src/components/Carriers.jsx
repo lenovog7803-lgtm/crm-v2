@@ -158,18 +158,20 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div className="carrier-toolbar">
-        <Select fit className={`carrier-control carrier-city${area ? ' is-on' : ''}`}
-          value={area} onChange={e => updateFilters({ ...filters, area: e.target.value })}
-          triggerLabel={area ? undefined : 'Город'} aria-label={area ? cityLabel : 'Город'}>
-          {ROUTES.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-        </Select>
-        <button type="button" className={`carrier-control${extraCount ? ' is-on' : ''}`}
-          aria-haspopup="dialog" aria-expanded={draft !== null}
-          aria-label={extraCount ? `Фильтры, выбрано ${extraCount}` : 'Фильтры'}
-          onClick={() => setDraft(filters)}>
-          Фильтры{extraCount > 0 && <span className="carrier-filter-count" aria-hidden="true">{extraCount}</span>}
-        </button>
+      <div className="orders-toolbar carrier-toolbar">
+        <div className="orders-filters" role="group" aria-label="Фильтры перевозчиков">
+          <Select fit className={`orders-pill${area ? ' is-on' : ''}`}
+            value={area} onChange={e => updateFilters({ ...filters, area: e.target.value })}
+            triggerLabel={area ? undefined : 'Город'} aria-label={area ? cityLabel : 'Город'}>
+            {ROUTES.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          </Select>
+          <button type="button" className={`orders-pill orders-pill-btn${extraCount ? ' is-on' : ''}${draft ? ' is-open' : ''}`}
+            aria-haspopup="dialog" aria-expanded={draft !== null}
+            aria-label={extraCount ? `Фильтры, выбрано ${extraCount}` : 'Фильтры'}
+            onClick={() => setDraft(filters)}>
+            {extraCount ? `Фильтры · ${extraCount}` : 'Фильтры'}
+          </button>
+        </div>
         <div className="carrier-result" aria-live="polite">
           {pending ? 'Загрузка списка…' : usesHistory && !history ? 'Перевозчики' : hasFilters || search
             ? <>Найдено <strong>{visible.length}</strong> из {carriers.length}</>

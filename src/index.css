@@ -1780,55 +1780,14 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   outline-offset: 2px;
 }
 .orders-toolbar .orders-create { flex-shrink: 0; min-height: 36px; margin-inline-start: auto; }
-.carrier-toolbar { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.app-root .carrier-toolbar .carrier-control {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  min-width: 0;
-  min-height: 36px;
-  padding: 0 11px;
-  border: 1px solid var(--workspace-card-rim) !important;
-  border-radius: var(--radius-sm) !important;
-  background: var(--surface) !important;
-  box-shadow: none !important;
-  color: var(--ink);
-  cursor: pointer;
-  font: 600 13px var(--font-sys);
-  white-space: nowrap;
-}
-.app-root .carrier-toolbar .carrier-control:is(.is-on, .is-open, [aria-expanded="true"]) {
-  background: var(--workspace-selection) !important;
-  border-color: rgba(var(--rgb-19-102-240), 0.3) !important;
+.orders-toolbar.carrier-toolbar, .carrier-toolbar .orders-filters { flex-wrap: nowrap; }
+.app-root .carrier-toolbar .orders-filters .orders-pill:is(.is-on, .is-open) {
   color: var(--fg-1366f0);
+  background: rgba(var(--rgb-19-102-240), 0.13) !important;
 }
-.carrier-toolbar .carrier-city > svg { display: none; }
-.carrier-toolbar .carrier-city::after {
-  content: "";
-  width: 6px;
-  height: 6px;
-  flex: none;
-  border: solid currentColor;
-  border-width: 0 1.4px 1.4px 0;
-  transform: translateY(-1.5px) rotate(45deg);
-}
-.app-root .carrier-toolbar .carrier-control:focus-visible,
-.app-root .carrier-toolbar .carrier-city:has(select:focus-visible) {
-  outline: 2px solid var(--fg-1366f0);
-  outline-offset: 2px;
-}
-.carrier-filter-count {
-  display: grid;
-  place-items: center;
-  min-width: 18px;
-  height: 18px;
-  border-radius: 8px;
-  background: rgba(var(--rgb-19-102-240), 0.12);
-  font-size: 11px;
-}
-.carrier-result { color: var(--text-secondary); font-size: 13px; white-space: nowrap; margin-inline: 4px; }
+.carrier-result { color: var(--text-secondary); font-size: 13px; white-space: nowrap; margin-inline-start: auto; }
 .carrier-result strong { color: var(--ink); font-weight: 650; }
-.carrier-toolbar .carrier-add { margin-inline-start: auto; color: var(--fg-1366f0); }
+.carrier-toolbar .carrier-add { color: var(--fg-1366f0); }
 .carrier-filter-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .carrier-filter-fields label { display: grid; gap: 5px; font: 550 13px var(--font-sys); }
 .carrier-filter-fields select {
@@ -1850,8 +1809,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .carrier-filter-empty { padding: 14px 16px; color: var(--ink); font-size: 14px; }
 @media (max-width: 540px) {
   .carrier-result { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-  .app-root .carrier-toolbar .carrier-control { min-height: 44px; }
-  .carrier-toolbar .carrier-add { width: 44px; height: 44px; }
+  .carrier-toolbar .carrier-add { width: 44px; height: 44px; margin-inline-start: auto; }
 }
 @media (max-width: 420px) {
   .carrier-filter-fields { grid-template-columns: 1fr; gap: 10px; }
