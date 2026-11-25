@@ -8,15 +8,21 @@ import ErrorBoundary from '../components/ErrorBoundary'
 import { SlidingTabs } from '../components/SlidingTabs'
 import Select from '../components/Select'
 import LeadEditModal from '../components/leads/LeadEditModal'
+import { ReactivationView } from '../components/leads/GrowthWidgets'
+import { useAuth } from '../AuthContext'
 
 const VIEWS = [
   { id: 'queue',     label: 'Очередь' },
   { id: 'list',      label: 'Контакты' },
-  { id: 'kanban',    label: 'По стадиям' },
+  { id: 'kanban',    label: 'Стадии' },
+  { id: 'reactivation', label: 'Возврат', director: true },
   { id: 'analytics', label: 'Отчёты' },
 ]
 
 export default function Leads({ search = '', onClearSearch }) {
+  const { user } = useAuth()
+  const director = ['director', 'admin'].includes(user?.user?.role)
+  const visibleViews = VIEWS.filter(item => director || !item.director)
   const [savedView, setView] = useState(() => {
     const requested = new URLSearchParams(window.location.search).get('view')
     return VIEWS.some(v => v.id === requested) ? requested : localStorage.getItem('leads_view') || 'queue'
@@ -30,9 +36,9 @@ export default function Leads({ search = '', onClearSearch }) {
   useEffect(() => { localStorage.setItem('leads_view', savedView) }, [savedView])
   useEffect(() => { localStorage.setItem('leads_industry', industry) }, [industry])
 
-  const view = search.trim() ? 'list' : savedView
+  const view = search.trim() ? 'list' : visibleViews.some(item => item.id === savedView) ? savedView : 'queue'
   const changeView = next => {
-    if (next !== 'list') onClearSearch()
+    if (next !== 'list') onClearSearch?.()
     setView(next)
   }
 
@@ -48,9 +54,9 @@ export default function Leads({ search = '', onClearSearch }) {
   return (
     <div className="leads-workspace">
       <div className="leads-navigation">
-        <div className="leads-views"><SlidingTabs fill options={VIEWS.map(v => ({ key: v.id, label: v.label }))} value={view} onChange={changeView} /></div>
+        <div className="leads-views"><SlidingTabs fill options={visibleViews.map(v => ({ key: v.id, label: v.label }))} value={view} onChange={changeView} /></div>
         <div className="leads-tools orders-filters">
-          {view !== 'analytics' && view !== 'list' && industryFilter}
+          {(view === 'queue' || view === 'kanban') && industryFilter}
           <button onClick={() => setAdding(true)} className="btn-primary">Новый лид</button>
         </div>
       </div>
@@ -58,7 +64,8 @@ export default function Leads({ search = '', onClearSearch }) {
       {view === 'queue'     && <ErrorBoundary><QueueView key={rev} industry={industry} /></ErrorBoundary>}
       {view === 'list'      && <ErrorBoundary><ListView key={rev} industry={industry} industryFilter={industryFilter} search={search} /></ErrorBoundary>}
       {view === 'kanban'    && <ErrorBoundary><KanbanView key={rev} industry={industry} /></ErrorBoundary>}
-      {view === 'analytics' && <ErrorBoundary><AnalyticsView /></ErrorBoundary>}
+      {view === 'reactivation' && <ErrorBoundary><ReactivationView /></ErrorBoundary>}
+      {view === 'analytics' && <ErrorBoundary><AnalyticsView director={director} /></ErrorBoundary>}
 
       {adding && <LeadEditModal lead={{}} onClose={() => setAdding(false)} onSaved={() => setRev(r => r + 1)} />}
     </div>

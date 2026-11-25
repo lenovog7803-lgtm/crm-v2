@@ -8,6 +8,7 @@ import { useCelebration } from '../Celebration'
 import { useAuth } from '../../AuthContext'
 import { Loader } from '../Loader'
 import { CircularProgress } from '../CircularProgress'
+import { DailyPriorities } from './GrowthWidgets'
 
 // почему лид в очереди — сервер присылает queue_reason
 const REASONS = {
@@ -28,6 +29,8 @@ export default function QueueView({ industry }) {
   const [counts, setCounts] = useState({})
   const [todayCalls, setTodayCalls] = useState(0)
   const [skippedCount, setSkippedCount] = useState(0)
+  const [priorityRevision, setPriorityRevision] = useState(0)
+  const desk = useRef(null)
   // пройденные за этот заход: обзвоненные и пропущенные — при дозагрузке очереди не показываем их снова
   const passed = useRef({ done: new Set(), skipped: new Set() })
   const { celebrate } = useCelebration()
@@ -63,6 +66,17 @@ export default function QueueView({ industry }) {
 
   const lead = queue[index]
 
+  const isAvailable = candidate => !passed.current.done.has(candidate.id) && !passed.current.skipped.has(candidate.id)
+  const openPriority = selected => {
+    const position = queue.findIndex(item => item.id === selected.id)
+    if (position >= 0) setIndex(position)
+    else {
+      const target = Math.min(index, queue.length)
+      setQueue(items => [...items.slice(0, target), selected, ...items.slice(target)])
+      setIndex(target)
+    }
+    window.requestAnimationFrame(() => desk.current?.scrollIntoView({ block: 'start' }))
+  }
 
   const skip = () => {
     if (!lead || saving || loading) return
@@ -98,6 +112,7 @@ export default function QueueView({ industry }) {
       await saveCall(lead, data, celebrate)
       passed.current.done.add(lead.id)
       setTodayCalls(c => c + 1)
+      setPriorityRevision(r => r + 1)
       setIndex(i => i + 1)
     } catch (e) {
       console.error(e)
@@ -124,6 +139,8 @@ export default function QueueView({ industry }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <DailyPriorities industry={industry} revision={priorityRevision} isAvailable={isAvailable}
+        onOpen={openPriority} disabled={loading || saving} activeId={lead?.id} />
       <header className="order-detail-toolbar lead-queue-bar">
         {!loading && lead && <div className="lead-queue-position">
           <strong>Контакт {index + 1} из {queue.length}</strong>
@@ -174,7 +191,9 @@ export default function QueueView({ industry }) {
       )}
 
       {!loading && lead && (
-        <CallDesk key={lead.id} lead={lead} onEdit={setEditLead} onClaim={handleClaim} onSave={handleSave} saving={saving} />
+        <div ref={desk} className="lead-growth-desk">
+          <CallDesk key={lead.id} lead={lead} onEdit={setEditLead} onClaim={handleClaim} onSave={handleSave} saving={saving} />
+        </div>
       )}
 
       {editLead && (

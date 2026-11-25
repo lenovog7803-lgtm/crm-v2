@@ -126,6 +126,14 @@ export const getScripts = () => req('/leads/scripts');
 export const saveScripts = (scripts) =>
   req('/leads/scripts', { method: 'PUT', body: JSON.stringify({ scripts }) });
 export const getLeadsAnalytics = (period) => req(`/leads/analytics?period=${period || 'month'}`);
+export const getLeadPriorities = (industry) =>
+  req('/leads/priorities' + (industry ? '?' + new URLSearchParams({ industry }) : ''));
+export const saveLeadQualification = (id, data) =>
+  req(`/leads/${encodeURIComponent(id)}/qualification`, { method: 'PUT', body: JSON.stringify(data) });
+export const getLeadPaidConversion = (period) => req('/leads/paid-conversion?' + new URLSearchParams({ period }));
+export const getLeadReactivation = () => req('/leads/reactivation');
+export const completeLeadReactivation = (id) =>
+  req(`/leads/reactivation/${encodeURIComponent(id)}/complete`, { method: 'POST' });
 export const claimLead = (id) => req(`/leads/${id}/claim`, { method: 'POST' });
 
 // Finance

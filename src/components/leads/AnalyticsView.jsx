@@ -6,6 +6,7 @@ import { SlidingTabs } from '../SlidingTabs'
 import { Loader, InlineLoader } from '../Loader'
 import { FunnelChart as BklitFunnel } from '../../bklit/charts/funnel-chart'
 import '../../bklit/bklit.css'
+import { PaidConversion } from './GrowthWidgets'
 
 const PERIODS = [
   { id: 'week', label: 'Неделя' },
@@ -127,7 +128,7 @@ function DayCallsModal({ date, onClose }) {
   )
 }
 
-export default function AnalyticsView() {
+export default function AnalyticsView({ director = false }) {
   const [period, setPeriod] = useState('month')
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -153,6 +154,8 @@ export default function AnalyticsView() {
       <div className="leads-report-period">
         <SlidingTabs options={PERIODS.map(p => ({ key: p.id, label: p.label }))} value={period} onChange={setPeriod} />
       </div>
+
+      {director && <PaidConversion period={period} />}
 
       {/* 1. Звонки против плана */}
       <div className="card" style={{ padding: 20 }}>
