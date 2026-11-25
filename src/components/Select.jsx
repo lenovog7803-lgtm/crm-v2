@@ -142,7 +142,7 @@ export default function Select({ value, onChange, onBlur, children, style, class
     <>
       <button type="button" ref={btnRef} disabled={disabled} aria-haspopup="listbox" aria-expanded={open}
         onClick={() => (open ? close() : openMenu())} onKeyDown={onKeyDown} onBlur={onBlur}
-        className={`apple-select ${className}${open ? ' is-open' : ''}`} style={style} title={current.label} aria-label={triggerLabel ? current.label : undefined}>
+        className={`apple-select ${className}${open ? ' is-open' : ''}`} style={style} title={current.label} aria-label={rest['aria-label'] ?? (triggerLabel ? current.label : undefined)}>
         <span className="apple-select-label">{triggerLabel ?? current.label}</span>
         <Chevrons />
       </button>

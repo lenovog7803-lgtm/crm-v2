@@ -1780,98 +1780,82 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   outline-offset: 2px;
 }
 .orders-toolbar .orders-create { flex-shrink: 0; min-height: 36px; margin-inline-start: auto; }
-.carrier-filters, .carrier-filter-empty {
-  padding: 14px 16px;
-  color: var(--ink);
-  font: 14px var(--font-sys);
-}
-.carrier-filters { display: grid; gap: 12px; }
-.carrier-filter-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  min-width: 0;
-}
-.carrier-result { color: var(--text-secondary); font-weight: 500; }
-.carrier-result strong { color: var(--ink); font-weight: 700; }
-.carrier-filter-header .carrier-add { flex-shrink: 0; min-height: 36px; }
-.carrier-route-group {
-  display: grid;
-  gap: 6px;
-  padding-block: 8px 12px;
-  border-block: 1px solid var(--workspace-card-rim);
-}
-.carrier-route-group .carrier-filter-header { min-height: 28px; }
-.carrier-route-label { color: var(--ink); font: 650 13px var(--font-sys); }
-.carrier-filter-reset {
-  min-height: 28px;
-  padding: 0 4px;
-  border: 0;
-  border-radius: var(--radius-xs);
-  background: none;
-  color: var(--fg-1366f0);
-  cursor: pointer;
-  font: 600 13px var(--font-sys);
-}
-.carrier-route-choices, .carrier-criteria { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
-.app-root .carrier-filters .carrier-control {
-  --carrier-control-fill: transparent;
+.carrier-toolbar { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.app-root .carrier-toolbar .carrier-control {
   display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 7px;
+  min-width: 0;
   min-height: 36px;
-  max-width: 100%;
   padding: 0 11px;
   border: 1px solid var(--workspace-card-rim) !important;
   border-radius: var(--radius-sm) !important;
-  background: var(--carrier-control-fill) !important;
+  background: var(--surface) !important;
   box-shadow: none !important;
   color: var(--ink);
   cursor: pointer;
-  font: 550 13px var(--font-sys);
+  font: 600 13px var(--font-sys);
   white-space: nowrap;
 }
-.app-root .carrier-filters .carrier-route {
-  --carrier-control-fill: rgba(var(--ink-rgb), 0.055);
-  border-color: transparent !important;
-}
-.app-root .carrier-filters .carrier-control:is([aria-pressed="true"], .is-on, .is-open) {
-  --carrier-control-fill: rgba(var(--rgb-19-102-240), 0.14);
-  border-color: rgba(var(--rgb-19-102-240), 0.34) !important;
+.app-root .carrier-toolbar .carrier-control:is(.is-on, .is-open, [aria-expanded="true"]) {
+  background: var(--workspace-selection) !important;
+  border-color: rgba(var(--rgb-19-102-240), 0.3) !important;
   color: var(--fg-1366f0);
 }
-.carrier-filters .carrier-select > svg { display: none; }
-.carrier-filters .carrier-select::after {
+.carrier-toolbar .carrier-city > svg { display: none; }
+.carrier-toolbar .carrier-city::after {
   content: "";
   width: 6px;
   height: 6px;
   flex: none;
-  border-right: 1.4px solid currentColor;
-  border-bottom: 1.4px solid currentColor;
+  border: solid currentColor;
+  border-width: 0 1.4px 1.4px 0;
   transform: translateY(-1.5px) rotate(45deg);
-  opacity: 0.7;
 }
-.app-root .carrier-filters :is(.carrier-control, .carrier-filter-reset):focus-visible,
-.app-root .carrier-filters .carrier-select:has(select:focus-visible) {
+.app-root .carrier-toolbar .carrier-control:focus-visible,
+.app-root .carrier-toolbar .carrier-city:has(select:focus-visible) {
   outline: 2px solid var(--fg-1366f0);
   outline-offset: 2px;
 }
-@media (hover: hover) {
-  .app-root .carrier-filters .carrier-control:not([aria-pressed="true"], .is-on, .is-open):hover {
-    --carrier-control-fill: rgba(var(--ink-rgb), 0.095);
-  }
-  .carrier-filter-reset:hover { text-decoration: underline; }
+.carrier-filter-count {
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 8px;
+  background: rgba(var(--rgb-19-102-240), 0.12);
+  font-size: 11px;
 }
-@media (max-width: 480px) {
-  .carrier-filters, .carrier-filter-empty { padding-inline: 12px; }
-  .app-root .carrier-filters .carrier-control { min-height: 44px; padding-inline: 9px; }
-  .carrier-filter-header .carrier-add, .carrier-filter-header .carrier-filter-reset { min-height: 44px; }
-  .carrier-add-object { display: none; }
+.carrier-result { color: var(--text-secondary); font-size: 13px; white-space: nowrap; margin-inline: 4px; }
+.carrier-result strong { color: var(--ink); font-weight: 650; }
+.carrier-toolbar .carrier-add { margin-inline-start: auto; color: var(--fg-1366f0); }
+.carrier-filter-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.carrier-filter-fields label { display: grid; gap: 5px; font: 550 13px var(--font-sys); }
+.carrier-filter-fields select {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font: 500 14px var(--font-sys);
 }
-.carrier-filter-note, .carrier-history-status { color: var(--text-3); font-size: 13px; margin: 0; }
+.carrier-filter-phone { display: flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 8px; border-radius: var(--radius-xs); font-size: 14px; }
+.carrier-filter-actions { display: flex; justify-content: flex-end; gap: 8px; padding-top: 10px; }
+.carrier-filter-note { margin-top: 10px; }
+.carrier-filter-note, .carrier-history-status { color: var(--text-secondary); font-size: 13px; }
 .carrier-history-status { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.carrier-filter-empty { padding: 14px 16px; color: var(--ink); font-size: 14px; }
+@media (max-width: 540px) {
+  .carrier-result { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .app-root .carrier-toolbar .carrier-control { min-height: 44px; }
+  .carrier-toolbar .carrier-add { width: 44px; height: 44px; }
+}
+@media (max-width: 420px) {
+  .carrier-filter-fields { grid-template-columns: 1fr; gap: 10px; }
+}
 .carrier-trip-summary {
   display: flex;
   flex-wrap: wrap;

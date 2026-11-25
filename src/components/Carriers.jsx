@@ -3,6 +3,7 @@ import { getCarriers, getCarrierRouteActivity, deleteCarrier as apiDelete } from
 import { fmtDate, getGradient } from '../utils'
 import { SkeletonList } from './Skeleton'
 import { iosError } from './IOSAlert'
+import { ModalHeader, ModalOverlay } from './Modal'
 import Select from './Select'
 
 const ROUTES = [
@@ -11,17 +12,17 @@ const ROUTES = [
   ['other_ru', 'Другие города РФ'],
 ]
 const SELECTS = [
-  ['direction', [
+  ['direction', 'Плечо', [
     ['', 'Любое плечо'], ['by_to_ru', 'РБ → РФ'], ['ru_to_by', 'РФ → РБ'],
     ['within_by', 'Внутри РБ'], ['within_ru', 'Внутри РФ'],
   ]],
-  ['days', [['', 'За всё время'], ['30', 'За 30 дней'], ['90', 'За 90 дней'], ['180', 'За 180 дней']]],
-  ['body', [
+  ['days', 'Период', [['', 'За всё время'], ['30', 'За 30 дней'], ['90', 'За 90 дней'], ['180', 'За 180 дней']]],
+  ['body', 'Кузов', [
     ['', 'Любой кузов'], ['curtain', 'Тент / штора'], ['refrigerated', 'Рефрижератор'],
     ['insulated', 'Изотерм'], ['van', 'Фургон'], ['flatbed', 'Борт'],
     ['container', 'Контейнер'], ['lowbed', 'Трал'],
   ]],
-  ['sort', [['', 'Обычный порядок'], ['count', 'Больше рейсов'], ['latest', 'Ездили недавно']]],
+  ['sort', 'Сортировка', [['', 'Обычный порядок'], ['count', 'Больше рейсов'], ['latest', 'Ездили недавно']]],
 ]
 const EMPTY_FILTERS = { area: '', direction: '', days: '', body: '', phone: false, sort: '' }
 const FILTERS_KEY = 'crm_carrier_filters'
@@ -86,6 +87,7 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
   const [historyError, setHistoryError] = useState(false)
   const [historyRetry, setHistoryRetry] = useState(0)
   const [filters, setFilters] = useState(readFilters)
+  const [draft, setDraft] = useState(null)
 
   useEffect(() => {
     setLoading(true)
@@ -130,7 +132,9 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
   const { area, direction, days, body, phone: phoneOnly, sort } = filters
   const filtersByTrip = Boolean(area || direction || days || body)
   const usesHistory = filtersByTrip || Boolean(sort)
-  const hasFilters = usesHistory || phoneOnly
+  const extraCount = [direction, days, body, sort, phoneOnly].filter(Boolean).length
+  const hasFilters = Boolean(area || extraCount)
+  const cityLabel = ROUTES.find(([key]) => key === area)?.[1]
   const firstDate = firstTripDate(history?.today, days)
   const visible = []
   if (!usesHistory || history) {
@@ -154,54 +158,66 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div className="card carrier-filters">
-        <div className="carrier-filter-header">
-          <div className="carrier-result" aria-live="polite">
-            {pending ? 'Загрузка списка…' : usesHistory && !history ? 'Перевозчики' : hasFilters || search
-              ? <>Найдено <strong>{visible.length}</strong> из {carriers.length}</>
-              : <>Всего перевозчиков <strong>{carriers.length}</strong></>}
-          </div>
-          <button type="button" className="btn-primary carrier-add" aria-label="Добавить перевозчика" onClick={onAdd}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            <span>Добавить<span className="carrier-add-object"> перевозчика</span></span>
-          </button>
+      <div className="carrier-toolbar">
+        <Select fit className={`carrier-control carrier-city${area ? ' is-on' : ''}`}
+          value={area} onChange={e => updateFilters({ ...filters, area: e.target.value })}
+          triggerLabel={area ? undefined : 'Город'} aria-label={area ? cityLabel : 'Город'}>
+          {ROUTES.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+        </Select>
+        <button type="button" className={`carrier-control${extraCount ? ' is-on' : ''}`}
+          aria-haspopup="dialog" aria-expanded={draft !== null}
+          aria-label={extraCount ? `Фильтры, выбрано ${extraCount}` : 'Фильтры'}
+          onClick={() => setDraft(filters)}>
+          Фильтры{extraCount > 0 && <span className="carrier-filter-count" aria-hidden="true">{extraCount}</span>}
+        </button>
+        <div className="carrier-result" aria-live="polite">
+          {pending ? 'Загрузка списка…' : usesHistory && !history ? 'Перевозчики' : hasFilters || search
+            ? <>Найдено <strong>{visible.length}</strong> из {carriers.length}</>
+            : <>Всего перевозчиков <strong>{carriers.length}</strong></>}
         </div>
-        <div className="carrier-route-group" role="group" aria-labelledby="carrier-route-label">
-          <div className="carrier-filter-header">
-            <span id="carrier-route-label" className="carrier-route-label">Направления</span>
-            {hasFilters && <button type="button" className="carrier-filter-reset" onClick={() => updateFilters(EMPTY_FILTERS)}>Сбросить</button>}
-          </div>
-          <div className="carrier-route-choices">
-            {ROUTES.map(([value, label]) => (
-              <button key={value} type="button" className="carrier-control carrier-route"
-                aria-pressed={area === value} onClick={() => updateFilters({ ...filters, area: value })}>
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="carrier-criteria" role="group" aria-label="Фильтры перевозчиков">
-          {SELECTS.map(([key, options]) => (
-            <Select key={key} fit className={`carrier-control carrier-select${filters[key] ? ' is-on' : ''}`} value={filters[key]}
-              onChange={e => updateFilters({ ...filters, [key]: e.target.value })}>
-              {options.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-            </Select>
-          ))}
-          <button type="button" className="carrier-control carrier-phone"
-            aria-pressed={phoneOnly} onClick={() => updateFilters({ ...filters, phone: !phoneOnly })}>
-            С телефоном
-          </button>
-        </div>
-        {body && <p className="carrier-filter-note">Кузов из заявки или из карточки, если в заявке он не указан.</p>}
-        {historyError && (
-          <div className="carrier-history-status" role="status">
-            История рейсов не загрузилась.
-            <button type="button" className="btn-ghost" onClick={() => { setHistoryError(false); setHistoryRetry(n => n + 1) }}>Повторить</button>
-          </div>
-        )}
+        <button type="button" className="btn-icon carrier-add" aria-label="Добавить перевозчика"
+          title="Добавить перевозчика" onClick={onAdd}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
       </div>
+      {draft && (
+        <ModalOverlay onClose={() => setDraft(null)} panelStyle={{ maxWidth: 420 }}>
+          <ModalHeader title="Фильтры перевозчиков" />
+          <form onSubmit={e => {
+            e.preventDefault()
+            updateFilters(draft)
+            setDraft(null)
+          }}>
+            <div className="carrier-filter-fields">
+              {SELECTS.map(([key, label, options]) => (
+                <label key={key}>
+                  {label}
+                  <select value={draft[key]} onChange={e => setDraft({ ...draft, [key]: e.target.value })}>
+                    {options.map(([value, text]) => <option key={value} value={value}>{text}</option>)}
+                  </select>
+                </label>
+              ))}
+            </div>
+            {draft.body && <p className="carrier-filter-note">Кузов из заявки или из карточки, если в заявке он не указан.</p>}
+            <label className="filter-check carrier-filter-phone">
+              <input type="checkbox" checked={draft.phone} onChange={e => setDraft({ ...draft, phone: e.target.checked })} />
+              С телефоном
+            </label>
+            <div className="carrier-filter-actions">
+              <button type="button" className="btn-ghost" onClick={() => setDraft({ ...EMPTY_FILTERS, area })}>Сбросить</button>
+              <button type="submit" className="btn-primary">Применить</button>
+            </div>
+          </form>
+        </ModalOverlay>
+      )}
+      {historyError && (
+        <div className="carrier-history-status" role="status">
+          История рейсов не загрузилась.
+          <button type="button" className="btn-ghost" onClick={() => { setHistoryError(false); setHistoryRetry(n => n + 1) }}>Повторить</button>
+        </div>
+      )}
 
       {pending && <SkeletonList />}
       {!pending && !(usesHistory && !history) && !visible.length && (
