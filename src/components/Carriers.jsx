@@ -1,9 +1,66 @@
 import { useState, useEffect } from 'react'
-import { getCarriers, deleteCarrier as apiDelete } from '../api'
-import { getGradient } from '../utils'
+import { getCarriers, getCarrierRouteActivity, deleteCarrier as apiDelete } from '../api'
+import { fmtDate, getGradient } from '../utils'
 import { SkeletonList } from './Skeleton'
 import { iosError } from './IOSAlert'
-import { mouseOnly } from '../motion'
+import Select from './Select'
+
+const ROUTES = [
+  ['', 'Все города'], ['moscow', 'Москва и МО'], ['spb', 'Санкт-Петербург'],
+  ['ulyanovsk', 'Ульяновск'], ['smolensk', 'Смоленск'], ['belarus', 'По Беларуси'],
+  ['other_ru', 'Другие города РФ'],
+]
+const SELECTS = [
+  ['direction', [
+    ['', 'Любое плечо'], ['by_to_ru', 'РБ → РФ'], ['ru_to_by', 'РФ → РБ'],
+    ['within_by', 'Внутри РБ'], ['within_ru', 'Внутри РФ'],
+  ]],
+  ['days', [['', 'За всё время'], ['30', 'За 30 дней'], ['90', 'За 90 дней'], ['180', 'За 180 дней']]],
+  ['body', [
+    ['', 'Любой кузов'], ['curtain', 'Тент / штора'], ['refrigerated', 'Рефрижератор'],
+    ['insulated', 'Изотерм'], ['van', 'Фургон'], ['flatbed', 'Борт'],
+    ['container', 'Контейнер'], ['lowbed', 'Трал'],
+  ]],
+  ['sort', [['', 'Обычный порядок'], ['count', 'Больше рейсов'], ['latest', 'Ездили недавно']]],
+]
+const EMPTY_FILTERS = { area: '', direction: '', days: '', body: '', phone: false, sort: '' }
+const FILTERS_KEY = 'crm_carrier_filters'
+const TRIP_WORDS = { one: 'рейс', few: 'рейса', many: 'рейсов', other: 'рейса' }
+const TRIP_PLURALS = new Intl.PluralRules('ru')
+
+function readFilters() {
+  try {
+    return { ...EMPTY_FILTERS, ...JSON.parse(sessionStorage.getItem(FILTERS_KEY) || '{}') }
+  } catch {
+    return EMPTY_FILTERS
+  }
+}
+
+function firstTripDate(today, days) {
+  if (!today || !days) return ''
+  const date = new Date(today + 'T00:00:00Z')
+  date.setUTCDate(date.getUTCDate() - Number(days) + 1)
+  return date.toISOString().slice(0, 10)
+}
+
+function tripSummary(history, { area, direction, body }, firstDate, today) {
+  const cardBody = history?.card_body
+  const trips = history?.trips || []
+  let count = 0
+  let latest = ''
+  let bodyFromOrder = false
+  for (const trip of trips) {
+    if (area && !trip.areas.includes(area)) continue
+    if (direction && trip.direction !== direction) continue
+    if (firstDate && (!trip.date || trip.date < firstDate || trip.date > today)) continue
+    if (body && (trip.body || cardBody) !== body) continue
+    count += 1
+    if (trip.date && trip.date > latest) latest = trip.date
+    if (body && trip.body === body) bodyFromOrder = true
+  }
+  const cardOnly = Boolean(body && body === cardBody && !trips.length && !area && !direction && !firstDate)
+  return { count, latest, cardOnly, bodyFromCard: cardOnly || Boolean(body && count && !bodyFromOrder) }
+}
 
 // Same cleanup as Clients.jsx — imported phone fields sometimes carry
 // several numbers (and stray fragments) jammed into one comma-separated
@@ -25,6 +82,10 @@ function StarIcon() {
 export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = '' }) {
   const [carriers, setCarriers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [history, setHistory] = useState(null)
+  const [historyError, setHistoryError] = useState(false)
+  const [historyRetry, setHistoryRetry] = useState(0)
+  const [filters, setFilters] = useState(readFilters)
 
   useEffect(() => {
     setLoading(true)
@@ -34,16 +95,29 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
       .finally(() => setLoading(false))
   }, [refreshKey])
 
+  useEffect(() => {
+    let active = true
+    getCarrierRouteActivity()
+      .then(data => { if (active) setHistory(data) })
+      .catch(() => { if (active) setHistoryError(true) })
+    return () => { active = false }
+  }, [refreshKey, historyRetry])
+
+  function updateFilters(next) {
+    setFilters(next)
+    try { sessionStorage.setItem(FILTERS_KEY, JSON.stringify(next)) } catch { /* private mode */ }
+  }
+
   const handleDelete = async (e, id) => {
     e.stopPropagation()
     try { await apiDelete(id) } catch (err) { console.error(err); iosError('Перевозчик не удалён. Проверьте интернет и попробуйте ещё раз.'); return }
     setCarriers(prev => prev.filter(c => c.id !== id))
   }
 
-  let visible = carriers
+  let candidates = carriers
   if (search) {
     const q = search.toLowerCase()
-    visible = carriers.filter(c =>
+    candidates = carriers.filter(c =>
       (c.company_name && c.company_name.toLowerCase().includes(q)) ||
       (c.name && c.name.toLowerCase().includes(q)) ||
       (c.driver_name && c.driver_name.toLowerCase().includes(q)) ||
@@ -53,33 +127,87 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
     )
   }
 
+  const { area, direction, days, body, phone: phoneOnly, sort } = filters
+  const filtersByTrip = Boolean(area || direction || days || body)
+  const usesHistory = filtersByTrip || Boolean(sort)
+  const hasFilters = usesHistory || phoneOnly
+  const firstDate = firstTripDate(history?.today, days)
+  const visible = []
+  if (!usesHistory || history) {
+    for (const carrier of candidates) {
+      const phone = primaryPhone(carrier.phone)
+      if (phoneOnly && (phone.match(/\d/g) || []).length < 6) continue
+      const summary = usesHistory ? tripSummary(history.carriers[carrier.id], filters, firstDate, history.today) : null
+      if (filtersByTrip && !summary.count && !summary.cardOnly) continue
+      visible.push({ carrier, phone, summary })
+    }
+  }
+  if (usesHistory && history) {
+    visible.sort((a, b) => {
+      const count = b.summary.count - a.summary.count
+      const recent = b.summary.latest.localeCompare(a.summary.latest)
+      return sort === 'latest' ? recent || count : count || recent
+    })
+  }
+  const waitingForHistory = usesHistory && !history && !historyError
+  const pending = loading || waitingForHistory
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{ fontFamily: 'var(--font-sys)', fontWeight: 700, fontSize: 14, color: 'var(--ink)' }}>
-          {search ? `Найдено: ${visible.length}` : <>Всего перевозчиков: <span style={{ color: 'var(--fg-1366f0)' }}>{carriers.length}</span></>}
+      <div className="card carrier-filters">
+        <div className="orders-toolbar">
+          <strong aria-live="polite">{pending || (usesHistory && !history) ? 'Перевозчики' : hasFilters || search
+            ? `Найдено: ${visible.length} из ${carriers.length}`
+            : `Всего перевозчиков: ${carriers.length}`}</strong>
+          <button className="btn-primary orders-create" onClick={onAdd}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Добавить перевозчика
+          </button>
         </div>
-        <div style={{ flex: 1 }} />
-        <button className="btn-primary" onClick={onAdd}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
-          Добавить перевозчика
-        </button>
+        <div className="orders-filters" role="group" aria-label="Города по завершённым заявкам">
+          {ROUTES.map(([value, label]) => (
+            <button key={value} type="button" className={`orders-pill-btn orders-pill carrier-filter-chip${area === value ? ' is-on' : ''}`}
+              aria-pressed={area === value} onClick={() => updateFilters({ ...filters, area: value })}>
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="orders-filters" role="group" aria-label="Фильтры перевозчиков">
+          {SELECTS.map(([key, options]) => (
+            <Select key={key} fit className={`orders-pill${filters[key] ? ' is-on' : ''}`} value={filters[key]}
+              onChange={e => updateFilters({ ...filters, [key]: e.target.value })}>
+              {options.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            </Select>
+          ))}
+          <button type="button" className={`orders-pill-btn orders-pill carrier-filter-chip${phoneOnly ? ' is-on' : ''}`}
+            aria-pressed={phoneOnly} onClick={() => updateFilters({ ...filters, phone: !phoneOnly })}>
+            С телефоном
+          </button>
+          {hasFilters && <button type="button" className="btn-ghost carrier-filter-reset" onClick={() => updateFilters(EMPTY_FILTERS)}>Сбросить</button>}
+        </div>
+        {body && <p className="carrier-filter-note">Кузов из заявки или из карточки, если в заявке он не указан.</p>}
+        {historyError && (
+          <div className="carrier-history-status" role="status">
+            История рейсов не загрузилась.
+            <button type="button" className="btn-ghost" onClick={() => { setHistoryError(false); setHistoryRetry(n => n + 1) }}>Повторить</button>
+          </div>
+        )}
       </div>
 
-      {loading && (
-        <SkeletonList />
+      {pending && <SkeletonList />}
+      {!pending && !(usesHistory && !history) && !visible.length && (
+        <div className="card carrier-filters">По выбранным условиям перевозчики не найдены.</div>
       )}
-      {!loading && (
+      {!pending && visible.length > 0 && (
       // iOS 26: список как в «Контактах» — одна группа-лист, строки с разделителями и › справа
       <div className="ios-list">
-        {visible.map(carrier => {
+        {visible.map(({ carrier, phone, summary }) => {
           const name = carrier.company_name || carrier.name || '—'
           const driver = carrier.driver_name || carrier.driver || ''
           const cap = carrier.capacity_tons ? carrier.capacity_tons + ' т' : (carrier.cap || '')
           const vehicleType = carrier.vehicle_type || ''
-          const phone = primaryPhone(carrier.phone)
           const [avA, avB] = getGradient(name)
           const sub = [driver, cap, vehicleType, carrier.plate, carrier.regions].filter(Boolean).join(' · ')
           return (
@@ -92,6 +220,15 @@ export default function Carriers({ onOpenCarrier, onAdd, refreshKey, search = ''
               <div className="ios-row-text">
                 <div className="ios-row-title">{name}</div>
                 <div className="ios-row-sub">{sub || phone || 'Нет данных'}</div>
+                {summary && (summary.count > 0 || summary.cardOnly) && (
+                  <div className="carrier-trip-summary">
+                    {summary.count > 0 && <>
+                      <span>{summary.count} {TRIP_WORDS[TRIP_PLURALS.select(summary.count)]}</span>
+                      <span>{summary.latest ? `Последний ${fmtDate(summary.latest)}` : 'Дата не указана'}</span>
+                    </>}
+                    {summary.bodyFromCard && <span>Кузов из карточки</span>}
+                  </div>
+                )}
               </div>
               <span className="ios-row-badge"><StarIcon />{carrier.rating || '5.0'}</span>
                 <div className="ios-row-actions" onClick={e => e.stopPropagation()}>

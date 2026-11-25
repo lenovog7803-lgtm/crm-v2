@@ -85,6 +85,7 @@ export const deleteClient = (id) => req(`/clients/${id}`, { method: 'DELETE' });
 
 // Carriers
 export const getCarriers = (search) => req('/carriers' + (search ? `?search=${search}` : ''));
+export const getCarrierRouteActivity = () => req('/carriers/route-activity');
 export const getCarrier = (id) => req(`/carriers/${id}`);
 export const createCarrier = (data) => req('/carriers', { method: 'POST', body: JSON.stringify(data) });
 export const updateCarrier = (id, data) => req(`/carriers/${id}`, { method: 'PUT', body: JSON.stringify(data) });

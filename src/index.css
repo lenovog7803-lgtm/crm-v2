@@ -1780,6 +1780,26 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   outline-offset: 2px;
 }
 .orders-toolbar .orders-create { flex-shrink: 0; min-height: 36px; margin-inline-start: auto; }
+.carrier-filters {
+  display: grid;
+  gap: 12px;
+  padding: 14px 16px;
+  color: var(--ink);
+  font: 14px var(--font-sys);
+}
+.carrier-filters .orders-filters .carrier-filter-chip::after { content: none; }
+.carrier-filter-reset { padding-inline: 9px; min-height: 36px; }
+.carrier-filter-note, .carrier-history-status { color: var(--text-3); font-size: 13px; margin: 0; }
+.carrier-history-status { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.carrier-trip-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 9px;
+  margin-top: 4px;
+  font: 550 12px var(--font-sys);
+  color: var(--text-3);
+}
+.carrier-trip-summary > :first-child { color: var(--fg-1366f0); }
 @media (max-width: 480px) {
   .orders-toolbar { gap: 8px; }
   .app-root .orders-filters :is(.apple-select, .apple-select-native.select-fit, .orders-pill-btn).orders-pill {

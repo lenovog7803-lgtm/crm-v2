@@ -107,6 +107,7 @@ function MainApp() {
   const [page, setPage] = useState(() =>
     linkedOrder ? 'order-detail'
       : linked === 'mailing' && isDirector ? 'mailing'
+      : linked === 'carriers' && isDirector ? 'carriers'
       : ['orders', 'finance', 'tasks', 'leads'].includes(linked) && (!isManager || MANAGER_PAGES.includes(linked)) ? linked
       : isManager ? 'my-dashboard' : (fleetMode && isDirector ? 'fleet-trips' : 'dashboard')
   )
