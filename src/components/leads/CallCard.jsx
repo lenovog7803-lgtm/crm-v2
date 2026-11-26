@@ -15,6 +15,17 @@ function NoteIcon(p) {
   )
 }
 
+function companyWebsite(value) {
+  const site = value?.trim()
+  if (!site || /\s/.test(site)) return null
+  try {
+    const url = new URL(site.includes('://') ? site : `https://${site}`)
+    return ['http:', 'https:'].includes(url.protocol) && url.hostname.includes('.') && !url.username && !url.password ? url : null
+  } catch {
+    return null
+  }
+}
+
 // part: 'header' — шапка (без истории), 'history' — описание и история, по умолчанию — всё
 export default function CallCard({ lead, onEdit, onClaim, part, children }) {
   const { user } = useAuth()
@@ -51,6 +62,8 @@ export default function CallCard({ lead, onEdit, onClaim, part, children }) {
   const stage = stageById(lead.stage)
   const attempts = lead.call_attempts || 0
   const digits = (lead.phone || '').replace(/[^\d+]/g, '')
+  const email = (lead.email || '').split(/[\s;,]+/).find(value => /^[\w.+-]+@[\w.-]+\.[a-z]{2,}$/i.test(value))
+  const website = companyWebsite(lead.website)
 
   const legacyNotes = (lead.call_notes || []).map((n, i) => ({
     id: `legacy-${i}-${n.date}`,
@@ -92,6 +105,18 @@ export default function CallCard({ lead, onEdit, onClaim, part, children }) {
           ? <span className="lead-assignment">{assigned === myId ? 'В вашей работе' : 'В работе'}</span>
           : <button type="button" onClick={handleClaimLead} className="btn-ghost">Взять в работу</button>}
       </div>
+      {(website || email) && (
+        <div className="lead-contact-links">
+          {website && <div>
+            <span>Сайт</span>
+            <a href={website.href} target="_blank" rel="noreferrer">{website.hostname.replace(/^www\./i, '')} ↗</a>
+          </div>}
+          {email && <div>
+            <span>Почта</span>
+            <a href={`mailto:${email}`}>{email}</a>
+          </div>}
+        </div>
+      )}
       {(selectionReason || fact) && (
         <LeadDisclosure title="Почему взят клиент" className="lead-selection-reason">
           {fact && <p><strong>Что подтверждено</strong>{fact}</p>}

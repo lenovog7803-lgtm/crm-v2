@@ -65,7 +65,7 @@ export default function ListView({ industry, industryFilter, search, batch }) {
       if (filters.overdueOnly && !(l.next_call && l.next_call < now)) return false
     }
     if (query) {
-      const hit = [l.name, l.company, l.legal_name, l.phone, l.contact_person, l.industry].filter(Boolean).some(v => v.toLowerCase().includes(query))
+      const hit = [l.name, l.company, l.legal_name, l.phone, l.email, l.website, l.contact_person, l.industry].filter(Boolean).some(v => v.toLowerCase().includes(query))
       if (!hit) return false
     }
     return true
@@ -151,13 +151,13 @@ export default function ListView({ industry, industryFilter, search, batch }) {
       {!loading && !loadError && filtered.length > 0 && (
         <div className="lead-directory-results">
           <div className="lead-directory-columns" aria-hidden="true">
-            <span>Компания</span><span>{batch ? 'Контакт' : 'Телефон'}</span><span>Стадия</span><span>Звонок</span>
+            <span>Компания</span><span>Контакт</span><span>Стадия</span><span>Звонок</span>
           </div>
           <div ref={scrollRef} onScroll={handleScroll} style={{ maxHeight: 640, overflowY: 'auto' }}>
             {visible.map(l => {
               const st = stageById(l.stage)
               const overdue = l.next_call && l.next_call < now
-              const contact = l.phone || (batch ? l.email : '')
+              const contact = l.phone || l.email
               const name = leadLegalName(l) || l.name
               const sub = [l.contact_person, l.city, batch ? l.industry : ''].filter(Boolean).join(' · ')
               return (
