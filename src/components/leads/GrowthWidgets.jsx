@@ -8,6 +8,7 @@ const signalLabels = {
   quote_request: 'Запрос ставки',
   warehouse_supply: 'Поставки на склад',
   warehouse_opening: 'Новый склад',
+  regular_route: 'Регулярный маршрут',
   new_channel: 'Новый канал продаж',
   hiring: 'Вакансия',
 }

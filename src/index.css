@@ -2281,3 +2281,6 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   margin: 8px 0 0; color: var(--text-secondary); font-size: 13px; line-height: 1.55;
   white-space: pre-wrap; overflow-wrap: anywhere;
 }
+.lead-selection-reason p strong { display: block; color: var(--ink); font-weight: 600; }
+.lead-selection-reason .lead-selection-source { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.lead-selection-source a { color: var(--fg-1366f0); text-decoration: underline; }

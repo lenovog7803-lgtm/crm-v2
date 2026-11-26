@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getCallHistory, claimLead } from '../../api'
 import { stageById, outcomeById } from '../../constants/leads'
 import { useAuth } from '../../AuthContext'
+import { fmtDate } from '../../utils'
 import { OutcomeIcon } from './OutcomeIcon'
 
 function NoteIcon(p) {
@@ -64,6 +65,14 @@ export default function CallCard({ lead, onEdit, onClaim, part }) {
   const legacyReasonPattern = /^[ 	]*(?:💡[ 	]*)?Почему взят:[ 	]*([^\r\n]+)$/mu
   const legacyReason = lead.notes?.match(legacyReasonPattern)?.[1]?.trim()
   const selectionReason = lead.selection_reason?.trim() || legacyReason
+  const parserNotes = lead.codex_track ? (lead.notes || '').split(/\r?\n/) : []
+  const notedFact = parserNotes.includes(`Источник: ${lead.source_url}`) ? parserNotes[0]?.trim() : ''
+  const signal = lead.codex_track && lead.signal_text?.trim()
+  const fact = signal || notedFact
+  const route = notedFact && parserNotes.find(line => line.startsWith('По направлению: '))?.slice('По направлению: '.length)
+  const sourceUrl = signal ? lead.signal_url : lead.codex_track && lead.source_url
+  const sourceHref = /^https?:\/\//i.test(sourceUrl || '') ? sourceUrl : ''
+  const question = lead.codex_track && lead.pitch_script?.trim()
   const headerEl = (
     <div className="card lead-contact-card">
       <div className="lead-contact-header">
@@ -81,7 +90,7 @@ export default function CallCard({ lead, onEdit, onClaim, part }) {
           ? <span className="lead-assignment">{assigned === myId ? 'В вашей работе' : 'В работе'}</span>
           : <button type="button" onClick={handleClaimLead} className="btn-ghost">Взять в работу</button>}
       </div>
-      {selectionReason && (
+      {(selectionReason || fact) && (
         <details className="lead-selection-reason">
           <summary>
             Почему взят клиент
@@ -89,7 +98,20 @@ export default function CallCard({ lead, onEdit, onClaim, part }) {
               <path d="m4 6 4 4 4-4" />
             </svg>
           </summary>
-          <p>{selectionReason}</p>
+          {fact && <p><strong>Что подтверждено</strong>{fact}</p>}
+          {route && route !== fact && <p><strong>Данные о маршруте</strong>{route}</p>}
+          {(signal || sourceHref) && (
+            <p className="lead-selection-source">
+              {signal && (lead.signal_date
+                ? <time dateTime={lead.signal_date}>{fmtDate(lead.signal_date)}</time>
+                : <span>Дата публикации неизвестна</span>)}
+              {sourceHref && (
+                <a href={sourceUrl} target="_blank" rel="noreferrer">Открыть источник ↗</a>
+              )}
+            </p>
+          )}
+          {selectionReason && selectionReason !== fact && <p>{fact && <strong>Что может подойти A2</strong>}{selectionReason}</p>}
+          {question && <p><strong>Что спросить на звонке</strong>{question}</p>}
         </details>
       )}
       {attempts >= 3 && <div className="lead-contact-warning">
