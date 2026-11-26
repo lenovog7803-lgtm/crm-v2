@@ -2123,6 +2123,9 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 }
 .lead-directory-tools .orders-filters { max-width: 100%; }
 .lead-directory-tools .apple-select-label { max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lead-directory-tools.lead-batch-meta { justify-content: space-between; min-height: 44px; gap: 8px; font-size: 13px; }
+.lead-batch-meta span { color: var(--text-secondary); }
+.leads-tools .lead-parser-toggle.is-on { color: var(--fg-1366f0); }
 .orders-filters .lead-overdue-filter::after { display: none; }
 .lead-directory-results .ios-row + .ios-row::before { left: 16px; }
 .lead-filter-toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; background: transparent; border: 0; color: var(--text-secondary); font: 500 13px var(--font-sys); cursor: pointer; }

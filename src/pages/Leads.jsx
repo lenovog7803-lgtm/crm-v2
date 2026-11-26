@@ -19,7 +19,7 @@ const VIEWS = [
   { id: 'analytics', label: 'Отчёты' },
 ]
 
-export default function Leads({ search = '', onClearSearch }) {
+export default function Leads({ initialBatch = '', search = '', onClearSearch }) {
   const { user } = useAuth()
   const director = ['director', 'admin'].includes(user?.user?.role)
   const visibleViews = VIEWS.filter(item => director || !item.director)
@@ -28,18 +28,27 @@ export default function Leads({ search = '', onClearSearch }) {
     return VIEWS.some(v => v.id === requested) ? requested : localStorage.getItem('leads_view') || 'queue'
   })
   const [industry, setIndustry] = useState(() => localStorage.getItem('leads_industry') || '')
+  const [batch, setBatch] = useState(initialBatch)
   const [industries, setIndustries] = useState([])
   const [adding, setAdding] = useState(false)
   const [rev, setRev] = useState(0)   // новый лид — виды перечитывают данные
 
   useEffect(() => { getIndustries().then(r => setIndustries(r.industries || [])).catch(() => {}) }, [])
-  useEffect(() => { localStorage.setItem('leads_view', savedView) }, [savedView])
+  useEffect(() => { if (!batch) localStorage.setItem('leads_view', savedView) }, [savedView, batch])
   useEffect(() => { localStorage.setItem('leads_industry', industry) }, [industry])
 
-  const view = search.trim() ? 'list' : visibleViews.some(item => item.id === savedView) ? savedView : 'queue'
+  const view = search.trim() || batch ? 'list' : visibleViews.some(item => item.id === savedView) ? savedView : 'queue'
   const changeView = next => {
-    if (next !== 'list') onClearSearch?.()
+    if (next !== 'list') {
+      onClearSearch?.()
+      setBatch('')
+    }
     setView(next)
+  }
+  const toggleBatch = () => {
+    onClearSearch?.()
+    setBatch(batch ? '' : 'latest')
+    setView('list')
   }
 
   const industryFilter = (industries.length > 0 || industry) && (
@@ -57,12 +66,18 @@ export default function Leads({ search = '', onClearSearch }) {
         <div className="leads-views"><SlidingTabs fill options={visibleViews.map(v => ({ key: v.id, label: v.label }))} value={view} onChange={changeView} /></div>
         <div className="leads-tools orders-filters">
           {(view === 'queue' || view === 'kanban') && industryFilter}
+          {(view === 'queue' || view === 'list') && (
+            <button type="button" className={`btn-ghost lead-parser-toggle${batch ? ' is-on' : ''}`}
+              aria-pressed={Boolean(batch)} onClick={toggleBatch}>
+              {batch ? 'Все контакты' : 'Лиды парсера'}
+            </button>
+          )}
           <button onClick={() => setAdding(true)} className="btn-primary">Новый лид</button>
         </div>
       </div>
 
       {view === 'queue'     && <ErrorBoundary><QueueView key={rev} industry={industry} /></ErrorBoundary>}
-      {view === 'list'      && <ErrorBoundary><ListView key={rev} industry={industry} industryFilter={industryFilter} search={search} /></ErrorBoundary>}
+      {view === 'list'      && <ErrorBoundary><ListView key={rev} industry={industry} industryFilter={industryFilter} search={search} batch={batch} /></ErrorBoundary>}
       {view === 'kanban'    && <ErrorBoundary><KanbanView key={rev} industry={industry} /></ErrorBoundary>}
       {view === 'reactivation' && <ErrorBoundary><ReactivationView /></ErrorBoundary>}
       {view === 'analytics' && <ErrorBoundary><AnalyticsView director={director} /></ErrorBoundary>}

@@ -104,6 +104,8 @@ function MainApp() {
   const urlParams = new URLSearchParams(window.location.search)
   const linked = urlParams.get('p')
   const linkedOrder = urlParams.get('order')
+  const batchParam = linked === 'leads' ? urlParams.get('batch') || '' : ''
+  const linkedLeadBatch = /^(latest|\d{4}-\d{2}-\d{2})$/.test(batchParam) ? batchParam : ''
   const [page, setPage] = useState(() =>
     linkedOrder ? 'order-detail'
       : linked === 'mailing' && isDirector ? 'mailing'
@@ -137,7 +139,7 @@ function MainApp() {
   const [paymentModalKind, setPaymentModalKind] = useState('income')
   const [paletteOpen, setPaletteOpen] = useState(false)
 
-  const [search, setSearch] = useState(() => loadPageSearch(page))
+  const [search, setSearch] = useState(() => page === 'leads' && linkedLeadBatch ? '' : loadPageSearch(page))
   const [overdueItems, setOverdueItems] = useState([])
 
   // Refresh triggers — increment to tell the component to re-fetch
@@ -481,7 +483,7 @@ function MainApp() {
             {page === 'fleet-analytics' && <ErrorBoundary><FleetAnalytics onBack={() => handleNav('fleet-dashboard')} /></ErrorBoundary>}
             {page === 'fleet-plan' && <ErrorBoundary><FleetPlan /></ErrorBoundary>}
 
-            {page === 'leads' && <Leads search={search} onClearSearch={() => handleSearchChange('')} />}
+            {page === 'leads' && <Leads initialBatch={linkedLeadBatch} search={search} onClearSearch={() => handleSearchChange('')} />}
             {page === 'trash' && <Trash />}
             {page === 'backups' && <Backups />}
             {page === 'admin' && isEgorDir && <Admin />}
