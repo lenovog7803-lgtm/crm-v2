@@ -1211,6 +1211,9 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .debt-group + .debt-group { box-shadow: inset 0 0.5px 0 rgba(var(--sep-rgb), 0.18); }
 .debt-orders { padding: 0 12px 8px 66px; }
 .debt-order { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; cursor: pointer; transition: background 0.12s; }
+.debt-order-partial { margin-top: 4px; color: var(--text-secondary); font-size: 12px; }
+.debt-order-amount { flex-shrink: 0; text-align: end; color: var(--ink); font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.debt-order-amount small { display: block; color: var(--text-secondary); font-size: 11px; font-weight: 500; }
 @media (hover: hover) { .debt-order:hover { background: rgba(118,118,128,0.08); } }
 /* спидометр в карточках долгов: подпись и цифра — цветами CRM */
 .debt-gauge { flex-shrink: 0; width: 168px; margin: -8px 0; --chart-foreground: var(--ink); --chart-foreground-muted: var(--text-3); --chart-label: var(--text-3); }
@@ -2118,19 +2121,16 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .lead-name:hover { color: var(--fg-1366f0); }
 .lead-directory { padding: 0; min-width: 0; overflow: hidden; }
 .lead-directory-tools {
-  display: flex; align-items: center; justify-content: flex-end;
-  padding: 5px 12px; border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: 8px 16px; min-height: 54px; padding: 9px 16px; border-bottom: 1px solid var(--line);
 }
-.lead-directory-tools .orders-filters { max-width: 100%; }
+.lead-directory-tools .orders-filters { max-width: 100%; padding: 0; margin: 0; }
 .lead-directory-tools .apple-select-label { max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.lead-directory-tools.lead-batch-meta { justify-content: space-between; min-height: 44px; gap: 8px; font-size: 13px; }
-.lead-batch-meta span { color: var(--text-secondary); }
+.lead-directory-count { display: inline-flex; align-items: baseline; gap: 9px; font-size: 14px; }
+.lead-directory-count span { color: var(--text-secondary); font-size: 13px; font-variant-numeric: tabular-nums; }
 .leads-tools .lead-parser-toggle.is-on { color: var(--fg-1366f0); }
 .orders-filters .lead-overdue-filter::after { display: none; }
 .lead-directory-results .ios-row + .ios-row::before { left: 16px; }
-.lead-filter-toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; background: transparent; border: 0; color: var(--text-secondary); font: 500 13px var(--font-sys); cursor: pointer; }
-.lead-filter-toggle span { color: var(--fg-1366f0); font-variant-numeric: tabular-nums; }
-#lead-filter-options { padding: 9px 16px; border-bottom: 1px solid var(--line); }
 .lead-directory .lead-name { display: block; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 15px; }
 .lead-directory .ios-row { min-height: 58px; }
 .lead-due { font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--text-secondary); }
@@ -2151,11 +2151,10 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   align-items: start; gap: 14px;
 }
 .lead-desk-company { display: grid; min-width: 0; gap: 8px; }
-.lead-contact-card { display: grid; gap: 10px; padding: 14px 16px; }
+.lead-contact-card { display: grid; gap: 0; padding: 14px 16px; container-type: inline-size; }
 .lead-contact-meta { margin-top: 4px; font-size: 13px; color: var(--text-secondary); }
-.lead-contact-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.lead-contact-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-block: 10px; }
 .lead-contact-warning { font-size: 12px; color: var(--fg-ff3b30); }
-.lead-reference { min-width: 0; padding: 12px 16px; overflow-wrap: anywhere; }
 .lead-phone-action { text-decoration: none; min-height: 34px; }
 .lead-assignment { color: var(--text-secondary); font-size: 12px; }
 .lead-desk-outcome .call-outcomes { display: grid; margin-bottom: 14px; }
@@ -2188,11 +2187,10 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   .lead-compact-meta { display: none; }
 }
 @media (max-width: 1000px) {
-  .lead-desk { grid-template-columns: minmax(0,1fr); grid-template-areas: "contact" "outcome" "reference"; }
+  .lead-desk { grid-template-columns: minmax(0,1fr); grid-template-areas: "contact" "outcome"; }
   .lead-desk-company { display: contents; }
   .lead-desk-contact { grid-area: contact; }
   .lead-desk-outcome { grid-area: outcome; }
-  .lead-reference { grid-area: reference; }
 }
 
 .sidebar-brand-mark {
@@ -2231,15 +2229,15 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .mailing-summary button:hover { background: var(--workspace-selection); }
 .mailing-summary strong { font-variant-numeric: tabular-nums; }
 .mailing-disclosure { grid-column: 1 / -1; padding: 0; min-width: 0; }
-:is(.mailing-disclosure, .lead-selection-reason) > summary {
+:is(.mailing-disclosure, .lead-disclosure) > summary {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   padding: 13px 16px; list-style: none; cursor: pointer; border-radius: inherit;
   color: var(--ink); font-size: 14px; font-weight: 600;
 }
-:is(.mailing-disclosure, .lead-selection-reason) > summary::-webkit-details-marker { display: none; }
-:is(.mailing-disclosure, .lead-selection-reason) > summary svg { flex-shrink: 0; color: var(--text-secondary); transition: transform 160ms var(--ease); }
-:is(.mailing-disclosure, .lead-selection-reason)[open] > summary svg { transform: rotate(180deg); }
-:is(.mailing-disclosure, .lead-selection-reason) > summary:focus-visible { outline: 2px solid var(--fg-1366f0); outline-offset: -3px; }
+:is(.mailing-disclosure, .lead-disclosure) > summary::-webkit-details-marker { display: none; }
+:is(.mailing-disclosure, .lead-disclosure) > summary svg { flex-shrink: 0; color: var(--text-secondary); transition: transform 160ms var(--ease); }
+:is(.mailing-disclosure, .lead-disclosure)[open] > summary svg { transform: rotate(180deg); }
+:is(.mailing-disclosure, .lead-disclosure) > summary:focus-visible { outline: 2px solid var(--fg-1366f0); outline-offset: -3px; }
 .mailing-disclosure-body { padding: 0 16px 14px; }
 .mailing-health-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(245px, 100%), 1fr)); gap: 10px; }
 .mailing-health-item { padding: 13px; min-width: 0; border-radius: 13px; background: rgba(var(--ink-rgb), .04); }
@@ -2266,7 +2264,7 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
 .mailing-log-message p, .mailing-log-error { margin: 3px 0 0; }
 .mailing-log-error summary { cursor: pointer; color: var(--fg-e0473b); }
 @media (prefers-reduced-motion: reduce) {
-  :is(.mailing-disclosure, .lead-selection-reason) > summary svg { transition: none; }
+  :is(.mailing-disclosure, .lead-disclosure) > summary svg { transition: none; }
 }
 .mailing-campaign-form { display: grid; gap: 14px; }
 .mailing-contact-tools { justify-content: flex-start; }
@@ -2275,8 +2273,14 @@ button, a, [role="button"], .ios-row, .mail-row, .sidebar-nav-btn { touch-action
   .mailing-tabs { width: 100%; }
 }
 
-.lead-selection-reason { border-top: 1px solid var(--line); }
-.lead-selection-reason > summary { padding: 10px 0 2px; }
+.lead-disclosure { border-top: 1px solid var(--line); min-width: 0; }
+.lead-disclosure > summary { min-height: 38px; padding: 8px 0; }
+.lead-disclosure > summary small { margin-inline-start: 8px; color: var(--text-secondary); font-size: 12px; font-variant-numeric: tabular-nums; }
+.lead-disclosure[open] { padding-bottom: 12px; }
+.lead-history-body { padding-block: 6px 0; }
+.lead-history-notes { margin-top: 8px; }
+.lead-history-notes summary { width: fit-content; cursor: pointer; font-size: 13px; color: var(--text-secondary); }
+.lead-history-notes p { margin: 6px 0 0; color: var(--text-secondary); font-size: 13px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
 .lead-selection-reason p {
   margin: 8px 0 0; color: var(--text-secondary); font-size: 13px; line-height: 1.55;
   white-space: pre-wrap; overflow-wrap: anywhere;

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { completeLeadReactivation, getLeadPaidConversion, getLeadPriorities, getLeadReactivation, saveLeadQualification } from '../../api'
 import { Loader } from '../Loader'
+import LeadDisclosure from './LeadDisclosure'
+import { leadLegalName } from '../../utils'
 import './lead-growth.css'
 
 const tracks = { marketplace: 'WB / Ozon', lookalike: 'Аналоги клиентов' }
@@ -17,26 +19,11 @@ const fmt = value => number.format(value)
 const money = value => `${fmt(value)} BYN`
 const formatDay = date => date ? date.slice(0, 10).split('-').reverse().join('.') : ''
 const tel = phone => phone ? `tel:${phone.startsWith('+') ? '+' : ''}${phone.replace(/\D/g, '')}` : null
-const safeLink = url => /^https?:\/\//i.test(url || '') ? url : null
 
 function LoadError({ text, retry }) {
   return <div className="lead-growth-state" role="alert">
     <span>{text}</span><button type="button" onClick={retry} className="btn-ghost">Повторить</button>
   </div>
-}
-
-export function LeadSignal({ lead }) {
-  const signal = lead.signal_text
-  if (!signal) return null
-  const href = safeLink(lead.signal_url || lead.source_url)
-  return <section className="lead-signal" aria-label="Сигнал отгрузки">
-    <div className="lead-signal-meta">
-      <strong>{signalLabels[lead.signal_type] || 'Сигнал отгрузки'}</strong>
-      {lead.signal_date && <time dateTime={lead.signal_date}>{formatDay(lead.signal_date)}</time>}
-      {href && <a href={href} target="_blank" rel="noreferrer">Источник</a>}
-    </div>
-    <p>{signal}</p>
-  </section>
 }
 
 export function DailyPriorities({ industry, revision, isAvailable, onOpen, disabled, activeId }) {
@@ -68,18 +55,23 @@ export function DailyPriorities({ industry, revision, isAvailable, onOpen, disab
       : !result ? <Loader padding={18} state="searching" label="Загрузка приоритетов…" />
         : !leads.length ? <p className="lead-growth-muted">Новых приоритетных звонков нет.</p>
           : <><ul className="lead-growth-list" id="lead-priority-results">
-            {displayed.map(lead => <li key={lead.id} className="lead-growth-row">
-              <div className="lead-growth-row-copy">
-                <div className="lead-growth-row-title">
-                  <strong>{lead.company || lead.name}</strong>
-                  <span className="lead-growth-tag">{tracks[lead.codex_track]}</span>
-                  {signalLabels[lead.signal_type] && <span className="lead-growth-tag lead-growth-tag--accent">{signalLabels[lead.signal_type]}</span>}
-                </div>
-                <p>{[lead.city, lead.phone || lead.email, lead.signal_text || lead.selection_reason].filter(Boolean).join(' · ')}</p>
-              </div>
-              <button type="button" className="btn-ghost" disabled={disabled || activeId === lead.id}
-                onClick={() => onOpen(lead)}>{activeId === lead.id ? 'Открыт' : 'Открыть'}</button>
-            </li>)}
+            {displayed.map(lead => {
+              const legalName = leadLegalName(lead)
+              return (
+                <li key={lead.id} className="lead-growth-row">
+                  <div className="lead-growth-row-copy">
+                    <div className="lead-growth-row-title">
+                      <strong>{legalName || lead.company || lead.name}</strong>
+                      <span className="lead-growth-tag">{tracks[lead.codex_track]}</span>
+                      {signalLabels[lead.signal_type] && <span className="lead-growth-tag lead-growth-tag--accent">{signalLabels[lead.signal_type]}</span>}
+                    </div>
+                    <p>{[!legalName && 'Юрназвание уточнить', lead.city, lead.phone || lead.email, lead.signal_text || lead.selection_reason].filter(Boolean).join(' · ')}</p>
+                  </div>
+                  <button type="button" className="btn-ghost" disabled={disabled || activeId === lead.id}
+                    onClick={() => onOpen(lead)}>{activeId === lead.id ? 'Открыт' : 'Открыть'}</button>
+                </li>
+              )
+            })}
           </ul>{leads.length > 3 && <button type="button" className="btn-ghost lead-growth-more"
             aria-controls="lead-priority-results" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>
             {expanded ? 'Свернуть список' : `Показать все ${leads.length}`}
@@ -92,13 +84,13 @@ const fieldDefinitions = {
   scheme: ['Схема поставки', 'FBO / FBW / FBS'],
   warehouse: ['Склад или СЦ', 'Например, Коледино'],
   packaging: ['Упаковка', 'Паллеты / коробки'],
-  pickup_city: ['Город погрузки', 'Например, Москва'],
-  delivery_city: ['Город выгрузки', 'Например, Минск'],
-  cargo: ['Груз', 'Наименование товара'],
-  volume: ['Объём партии', 'Например, 3 паллеты, 600 кг'],
-  frequency: ['Частота', 'Например, 4 раза в месяц'],
+  pickup_city: ['Город погрузки', 'Москва'],
+  delivery_city: ['Город выгрузки', 'Минск'],
+  cargo: ['Груз', 'Вид товара'],
+  volume: ['Объём партии', '3 паллеты, 600 кг'],
+  frequency: ['Частота', '4 раза в месяц'],
   next_shipment: ['Ближайшая отгрузка', '', 'date'],
-  payment_terms: ['Условия оплаты', 'Например, 10 рабочих дней'],
+  payment_terms: ['Условия оплаты', '10 рабочих дней'],
   decision_maker: ['Кто выбирает перевозчика', 'Имя или должность'],
 }
 
@@ -131,33 +123,32 @@ export function LeadQualification({ lead }) {
     }
   }
 
-  return <section className="card lead-growth-card lead-qualification">
-    <details>
-      <summary>Уточнить у клиента</summary>
+  return (
+    <LeadDisclosure title="Уточнить у клиента" className="lead-qualification">
       <form onSubmit={save}>
         <fieldset disabled={status === 'busy'}>
           <div className="lead-qualification-fields">
             {fields.map(key => {
               const [label, placeholder, type] = fieldDefinitions[key]
-              return <label key={key}>
-                <span>{label}</span>
+              return <label className="form-field" key={key}>
+                <span className="form-label">{label}</span>
                 <input className="form-input" type={type || 'text'} value={form[key] ?? ''} placeholder={placeholder}
                   maxLength={type ? undefined : key === 'cargo' ? 240 : ['platform', 'scheme'].includes(key) ? 32 : 120}
                   onChange={event => change(key, event.target.value)} />
               </label>
             })}
           </div>
-          <label className="lead-qualification-check"><input type="checkbox" checked={Boolean(form.quote_requested)}
-            onChange={event => change('quote_requested', event.target.checked)} /> Клиент запросил ставку</label>
           <div className="lead-growth-actions">
+            <label className="lead-qualification-check"><input type="checkbox" checked={Boolean(form.quote_requested)}
+              onChange={event => change('quote_requested', event.target.checked)} /> Клиент запросил ставку</label>
             <button type="submit" className="btn-primary">{status === 'busy' ? 'Сохраняю…' : 'Сохранить'}</button>
             {status === 'saved' && <span role="status">Сохранено</span>}
             {status === 'error' && <span role="alert">Сохранить не удалось. Попробуйте ещё раз.</span>}
           </div>
         </fieldset>
       </form>
-    </details>
-  </section>
+    </LeadDisclosure>
+  )
 }
 
 export function ReactivationView() {

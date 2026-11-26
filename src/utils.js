@@ -1,5 +1,13 @@
 export const fmtMoney = n => (n || 0).toLocaleString('ru-RU') + ' BYN'
 
+export function clientPaymentBalance(order) {
+  const cents = value => Math.round((Number(value) || 0) * 100)
+  const rate = Math.max(0, cents(order.client_rate))
+  const recorded = (order.client_payments || []).reduce((sum, payment) => sum + cents(payment.amount), 0)
+  const paid = order.client_paid || order.client_cash ? rate : Math.min(rate, Math.max(0, recorded))
+  return { received: paid / 100, remaining: (rate - paid) / 100 }
+}
+
 // A payment can be entered (PP number/date/amount saved on the order) without
 // the paid boolean ever flipping true, if the sum of all entries for that
 // side doesn't exactly match the order's rate (bank fee, rounding, wrong
@@ -27,7 +35,25 @@ export const fmtDate = d => {
   return `${day}.${mo}.${y}`
 }
 
-const LEGAL_FORMS = new Set(['ООО','ОАО','ЗАО','ПАО','АО','ИП','ЧУП','ЧПУП','УП','РУП','СООО','ОДО','КУП','РУПП','ТОО','СП','НП','ФЛ'])
+const LEGAL_FORMS = new Set(['ООО','ОАО','ЗАО','ПАО','АО','ИП','ЧУП','ЧПУП','ЧТУП','ЧТПУП','УП','РУП','СООО','ОДО','КУП','РУПП','ТОО','СП','НП','ФЛ'])
+
+export function leadLegalName(lead) {
+  if (lead.legal_name?.trim()) return lead.legal_name.trim()
+  for (const candidate of [lead.name, lead.company]) {
+    const name = candidate?.trim() || ''
+    const prefix = name.match(/^[А-ЯЁ]+(?=\s|[«"“])/i)?.[0]?.toUpperCase()
+    if (LEGAL_FORMS.has(prefix)) return name
+    const shortened = name
+      .replace(/^Общество с ограниченной ответственностью\s+/i, 'ООО ')
+      .replace(/^Общество с дополнительной ответственностью\s+/i, 'ОДО ')
+      .replace(/^Индивидуальный предприниматель\s+/i, 'ИП ')
+      .replace(/^Закрытое акционерное общество\s+/i, 'ЗАО ')
+      .replace(/^Открытое акционерное общество\s+/i, 'ОАО ')
+    if (shortened !== name) return shortened
+    if (/^(?:Частное|Унитарное|Республиканское)\s+[^«"“]*предприятие/i.test(name)) return name
+  }
+  return ''
+}
 export const initials = name => {
   const words = (name || '').replace(/[«»"']/g, '').split(/\s+/).filter(Boolean)
   const meaningful = words.filter(w => !LEGAL_FORMS.has(w.toUpperCase()))

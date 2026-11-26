@@ -7,7 +7,7 @@ import { SwapText } from '../Transitions'
 import Select from '../Select'
 
 const FIELDS = [
-  ['name', 'Название компании'], ['phone', 'Телефон'],
+  ['name', 'Название компании'], ['legal_name', 'Юридическое наименование'], ['phone', 'Телефон'],
   ['contact_person', 'Контактное лицо'], ['contact_position', 'Должность'],
   ['email', 'Email'], ['website', 'Сайт'],
   ['industry', 'Отрасль'], ['city', 'Город'],
@@ -26,12 +26,13 @@ export default function LeadEditModal({ lead, onClose, onSaved, onDeleted }) {
 
   const handleSave = async (e) => {
     e.preventDefault()
-    if (!form.name?.trim() || !form.phone?.trim()) { setError('Укажите название и телефон'); return }
+    if (!form.name?.trim() || (isNew && !form.phone?.trim())) { setError(isNew ? 'Укажите название и телефон' : 'Укажите название'); return }
     setSaving(true)
     setError('')
     if (isNew && !(await confirmNoDuplicates(() => findDuplicates('leads', { phone: form.phone, name: form.name }), 'такой лид'))) { setSaving(false); return }
     try {
       const data = Object.fromEntries([...FIELDS.map(([k]) => k), 'stage', 'notes'].map(k => [k, form[k] ?? '']))
+      if (!isNew && (form.legal_name || '') !== (lead.legal_name || '')) data.legal_name_url = ''
       const saved = isNew ? await createLead(data) : await updateLead(lead.id, data)
       onSaved?.({ ...lead, ...form, ...(saved?.id ? saved : {}) })
       onClose()

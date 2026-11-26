@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import { getCallHistory, claimLead } from '../../api'
 import { stageById, outcomeById } from '../../constants/leads'
 import { useAuth } from '../../AuthContext'
-import { fmtDate } from '../../utils'
+import { fmtDate, leadLegalName } from '../../utils'
 import { OutcomeIcon } from './OutcomeIcon'
+import LeadDisclosure from './LeadDisclosure'
 
 function NoteIcon(p) {
   return (
@@ -15,7 +16,7 @@ function NoteIcon(p) {
 }
 
 // part: 'header' — шапка (без истории), 'history' — описание и история, по умолчанию — всё
-export default function CallCard({ lead, onEdit, onClaim, part }) {
+export default function CallCard({ lead, onEdit, onClaim, part, children }) {
   const { user } = useAuth()
   const myId = user?.user?.id
   const [history, setHistory] = useState([])
@@ -67,17 +68,18 @@ export default function CallCard({ lead, onEdit, onClaim, part }) {
   const selectionReason = lead.selection_reason?.trim() || legacyReason
   const parserNotes = lead.codex_track ? (lead.notes || '').split(/\r?\n/) : []
   const notedFact = parserNotes.includes(`Источник: ${lead.source_url}`) ? parserNotes[0]?.trim() : ''
-  const signal = lead.codex_track && lead.signal_text?.trim()
+  const signal = lead.signal_text?.trim()
   const fact = signal || notedFact
   const route = notedFact && parserNotes.find(line => line.startsWith('По направлению: '))?.slice('По направлению: '.length)
-  const sourceUrl = signal ? lead.signal_url : lead.codex_track && lead.source_url
+  const sourceUrl = signal ? lead.signal_url || lead.source_url : lead.codex_track && lead.source_url
   const sourceHref = /^https?:\/\//i.test(sourceUrl || '') ? sourceUrl : ''
   const question = lead.codex_track && lead.pitch_script?.trim()
+  const companyName = leadLegalName(lead) || lead.name
   const headerEl = (
     <div className="card lead-contact-card">
       <div className="lead-contact-header">
         <div>
-          <h2 className="lead-company-title" title={lead.name}>{lead.name?.replace(/^Индивидуальный предприниматель\s+/i, 'ИП ')}</h2>
+          <h2 className="lead-company-title" title={companyName}>{companyName}</h2>
           <div className="lead-contact-meta">{[stage.label, contact, lead.city].filter(Boolean).join(' · ')}</div>
         </div>
         <button type="button" onClick={() => onEdit(lead)} className="btn-ghost">Изменить</button>
@@ -91,13 +93,7 @@ export default function CallCard({ lead, onEdit, onClaim, part }) {
           : <button type="button" onClick={handleClaimLead} className="btn-ghost">Взять в работу</button>}
       </div>
       {(selectionReason || fact) && (
-        <details className="lead-selection-reason">
-          <summary>
-            Почему взят клиент
-            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m4 6 4 4 4-4" />
-            </svg>
-          </summary>
+        <LeadDisclosure title="Почему взят клиент" className="lead-selection-reason">
           {fact && <p><strong>Что подтверждено</strong>{fact}</p>}
           {route && route !== fact && <p><strong>Данные о маршруте</strong>{route}</p>}
           {(signal || sourceHref) && (
@@ -112,8 +108,9 @@ export default function CallCard({ lead, onEdit, onClaim, part }) {
           )}
           {selectionReason && selectionReason !== fact && <p>{fact && <strong>Что может подойти A2</strong>}{selectionReason}</p>}
           {question && <p><strong>Что спросить на звонке</strong>{question}</p>}
-        </details>
+        </LeadDisclosure>
       )}
+      {children}
       {attempts >= 3 && <div className="lead-contact-warning">
         Неудачных попыток дозвона: {attempts}. После пятой лид перейдёт в «Отказ».
       </div>}
@@ -124,17 +121,8 @@ export default function CallCard({ lead, onEdit, onClaim, part }) {
     : lead.notes
   const notes = historyNotes?.replace(/^\s*(?:🎯\s*)?Скрипт:[^\n]*$/gmu, '').replace(/[💡🎯🔥⚡🌐📦🏭👤✓]/gu, '').trim()
   const historyEl = (
-    <>
-      {notes && (
-        <div style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.55, whiteSpace: 'pre-wrap', marginBottom: 14 }}>
-          {notes}
-        </div>
-      )}
-
-      <div>
-        <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)', marginBottom: 10, letterSpacing: '-0.01em' }}>
-          История звонков {timeline.length > 0 && <span style={{ color: 'var(--text-tertiary)', fontWeight: 600 }}>{timeline.length}</span>}
-        </div>
+    <LeadDisclosure title="История звонков" count={timeline.length}>
+      <div className="lead-history-body">
         {timeline.length === 0 && <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>Звонков ещё не было</div>}
         <div className="call-timeline" style={{ display: 'flex', flexDirection: 'column', maxHeight: 240, overflowY: 'auto' }}>
           {timeline.map((h) => {
@@ -174,8 +162,12 @@ export default function CallCard({ lead, onEdit, onClaim, part }) {
             )
           })}
         </div>
+        {notes && <details className="lead-history-notes">
+          <summary>Заметки о компании</summary>
+          <p>{notes}</p>
+        </details>}
       </div>
-    </>
+    </LeadDisclosure>
   )
   return part === 'history' ? historyEl : headerEl
 }

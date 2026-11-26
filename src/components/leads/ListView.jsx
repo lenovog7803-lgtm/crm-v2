@@ -11,7 +11,7 @@ import { useCelebration } from '../Celebration'
 import { useAuth } from '../../AuthContext'
 import CallWindow from './CallWindow'
 import Select from '../Select'
-import { fmtDate } from '../../utils'
+import { fmtDate, leadLegalName } from '../../utils'
 
 const FILTERS_KEY = 'leads_list_filters'
 const PAGE = 40
@@ -33,8 +33,6 @@ export default function ListView({ industry, industryFilter, search, batch }) {
   const [loadError, setLoadError] = useState(false)
   const [retry, setRetry] = useState(0)
   const [filters, setFilters] = useState(loadFilters)
-  const [filtersOpen, setFiltersOpen] = useState(false)
-  const activeFilters = [industry, filters.stage, filters.overdueOnly].filter(Boolean).length
   const [activeLead, setActiveLead] = useState(null)
   const [editLead, setEditLead] = useState(null)
   useEscapeKey(() => setActiveLead(null), !!activeLead && !editLead)   // Esc закрывает верхнее окно, а не оба
@@ -67,7 +65,7 @@ export default function ListView({ industry, industryFilter, search, batch }) {
       if (filters.overdueOnly && !(l.next_call && l.next_call < now)) return false
     }
     if (query) {
-      const hit = [l.name, l.company, l.phone, l.contact_person, l.industry].filter(Boolean).some(v => v.toLowerCase().includes(query))
+      const hit = [l.name, l.company, l.legal_name, l.phone, l.contact_person, l.industry].filter(Boolean).some(v => v.toLowerCase().includes(query))
       if (!hit) return false
     }
     return true
@@ -117,18 +115,12 @@ export default function ListView({ industry, industryFilter, search, batch }) {
   return (
     <>
       <section className="card lead-directory" aria-label="Контакты базы обзвона">
-      {batch ? (
-        <div className="lead-directory-tools lead-batch-meta" aria-live="polite">
-          <strong>{!loading && !loadError && batchDate ? `Выпуск ${fmtDate(batchDate)}` : 'Лиды парсера'}</strong>
-          {!loading && !loadError && <span>Карточек: {filtered.length}</span>}
+      <div className="lead-directory-tools">
+        <div className="lead-directory-count" aria-live="polite">
+          <strong>{batch ? (batchDate ? `Выпуск ${fmtDate(batchDate)}` : 'Лиды парсера') : 'Лиды'}</strong>
+          {!loading && !loadError && <span>{batch ? `Карточек: ${filtered.length}` : filtered.length === leads.length ? leads.length : `${filtered.length} из ${leads.length}`}</span>}
         </div>
-      ) : <div className="lead-directory-tools">
-        <button type="button" className="lead-filter-toggle" aria-expanded={filtersOpen} aria-controls="lead-filter-options" onClick={() => setFiltersOpen(open => !open)}>
-          Фильтры{activeFilters > 0 && <span>{activeFilters}</span>}
-        </button>
-      </div>}
-      {!batch && <div id="lead-filter-options" hidden={!filtersOpen}>
-        <div className="orders-filters">
+        {!batch && <div className="orders-filters" aria-label="Фильтры лидов">
           {industryFilter}
           <Select fit value={filters.stage} onChange={e => set('stage')(e.target.value)}
             className={`orders-pill${filters.stage ? ' is-on' : ''}`} triggerLabel={filters.stage ? stageById(filters.stage).label : 'Стадия'}>
@@ -137,8 +129,8 @@ export default function ListView({ industry, industryFilter, search, batch }) {
           </Select>
           <button type="button" className={`orders-pill-btn orders-pill lead-overdue-filter${filters.overdueOnly ? ' is-on' : ''}`}
             aria-pressed={filters.overdueOnly} onClick={() => set('overdueOnly')(!filters.overdueOnly)}>Просроченные</button>
-        </div>
-      </div>}
+        </div>}
+      </div>
 
       {loading && (
         <SkeletonList />
@@ -166,11 +158,12 @@ export default function ListView({ industry, industryFilter, search, batch }) {
               const st = stageById(l.stage)
               const overdue = l.next_call && l.next_call < now
               const contact = l.phone || (batch ? l.email : '')
+              const name = leadLegalName(l) || l.name
               const sub = [l.contact_person, l.city, batch ? l.industry : ''].filter(Boolean).join(' · ')
               return (
                 <div key={l.id} className="ios-row lead-directory-row" onClick={() => setActiveLead(l)}>
                   <div className="ios-row-text">
-                    <button className="lead-name" title={l.name} onClick={e => { e.stopPropagation(); setActiveLead(l) }}>{l.name?.replace(/^Индивидуальный предприниматель\s+/i, 'ИП ')}</button>
+                    <button className="lead-name" title={name} onClick={e => { e.stopPropagation(); setActiveLead(l) }}>{name}</button>
                     {sub && <div className="ios-row-sub lead-desktop-meta">{sub}</div>}
                     <div className="ios-row-sub lead-compact-meta">{[st.label, contact, sub].filter(Boolean).join(' · ')}</div>
                   </div>

@@ -8,7 +8,7 @@ import MarginChart from './MarginChart'
 import GoalsRings from './GoalsRings'
 import { Gauge } from '../bklit/charts/gauge'
 import { mouseOnly } from '../motion'
-import { inPeriod, initials, getGradient } from '../utils'
+import { clientPaymentBalance, fmtMoney, inPeriod, initials, getGradient } from '../utils'
 import { SwapText } from './Transitions'
 
 const MONTH_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
@@ -41,7 +41,8 @@ function calcStats(orders, period, apiData) {
   const margin = revenue - cost
 
   const allDone = orders.filter(o => o.status === 'done' || o.status === 'delivered' || o.status === 'completed')
-  const clientDebt = allDone.filter(o => !o.client_paid).reduce((s, o) => s + (o.client_rate || 0), 0)
+  const debtorOrders = allDone.map(o => ({ ...o, ...clientPaymentBalance(o) })).filter(o => o.remaining > 0)
+  const clientDebt = debtorOrders.reduce((s, o) => s + o.remaining, 0)
   const carrierDebt = allDone.filter(o => !o.carrier_paid).reduce((s, o) => s + (o.carrier_rate || 0), 0)
   // доля оплаченного среди доставленных за выбранный период — для спидометров в карточках долгов
   const periodDone = filtered.filter(o => ['done', 'delivered', 'completed'].includes(o.status))
@@ -49,7 +50,9 @@ function calcStats(orders, period, apiData) {
     const all = periodDone.reduce((s, o) => s + (o[rate] || 0), 0)
     return all > 0 ? Math.round(periodDone.filter(o => o[paid]).reduce((s, o) => s + (o[rate] || 0), 0) / all * 100) : 0
   }
-  const clientPaidPct = share('client_paid', 'client_rate')
+  const clientPeriodRate = periodDone.reduce((sum, o) => sum + (Number(o.client_rate) || 0), 0)
+  const clientPeriodReceived = periodDone.reduce((sum, o) => sum + clientPaymentBalance(o).received, 0)
+  const clientPaidPct = clientPeriodRate > 0 ? Math.round(clientPeriodReceived / clientPeriodRate * 100) : 0
   const carrierPaidPct = share('carrier_paid', 'carrier_rate')
 
   const active = orders.filter(o => ['new', 'in_progress', 'loading', 'in_transit'].includes(o.status)).length
@@ -72,15 +75,15 @@ function calcStats(orders, period, apiData) {
     .sort((a, b) => b.pct - a.pct)
 
   // Debtor orders
-  const debtorOrders = allDone.filter(o => !o.client_paid && (o.client_rate || 0) > 0)
   const carrierDebtOrders = allDone.filter(o => !o.carrier_paid && (o.carrier_rate || 0) > 0)
+    .map(o => ({ ...o, remaining: o.carrier_rate }))
 
   // Group debtors by client
   const debtorMap = {}
   debtorOrders.forEach(o => {
     const key = o.client_name || `ID:${o.client_id}`
     if (!debtorMap[key]) debtorMap[key] = { name: key, amt: 0 }
-    debtorMap[key].amt += o.client_rate || 0
+    debtorMap[key].amt += o.remaining
   })
   const topDebtors = Object.values(debtorMap).sort((a, b) => b.amt - a.amt)
 
@@ -256,11 +259,11 @@ const daysWaiting = o => {
 // клик по контрагенту раскрывает его заявки.
 function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
   const [open, setOpen] = useState(null)
-  const total = orders.reduce((sum, o) => sum + (o.client_rate || 0), 0)
+  const total = orders.reduce((sum, o) => sum + o.remaining, 0)
   const groups = Object.values(orders.reduce((acc, o) => {
     const name = (party === 'carrier' ? o.carrier_name : o.client_name) || 'Без названия'
     const g = acc[name] || (acc[name] = { name, sum: 0, orders: [], oldest: 0 })
-    g.sum += o.client_rate || 0
+    g.sum += o.remaining
     g.orders.push(o)
     g.oldest = Math.max(g.oldest, daysWaiting(o) || 0)
     return acc
@@ -319,8 +322,14 @@ function DebtModal({ title, orders, party = 'client', onClose, onOpenOrder }) {
                                 <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 1 }}>
                                   {o.order_number || `#${o.id}`}{days !== null && <> · <span style={{ color: days > 30 ? 'var(--fg-c81923)' : 'inherit' }}>{days} дн.</span></>}
                                 </div>
+                                {party === 'client' && o.received > 0 && (
+                                  <div className="debt-order-partial">Часть оплачена · получено {fmtMoney(o.received)}</div>
+                                )}
                               </div>
-                              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{(o.client_rate || 0).toLocaleString('ru-RU')}</span>
+                              <span className="debt-order-amount">
+                                {party === 'client' && o.received > 0 && <small>Осталось</small>}
+                                {fmtMoney(o.remaining)}
+                              </span>
                               <svg width="7" height="12" viewBox="0 0 8 13" fill="none" stroke="var(--text-quaternary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1.5 1.5l5 5-5 5"/></svg>
                             </button>
                           )
@@ -735,7 +744,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               {topDebtors.slice(0, 6).map((c, i) => (
                 <TopRow key={i} rank={i + 1} name={c.name}
-                  value={`${Math.round(c.amt || 0).toLocaleString('ru-RU')} Br`} />
+                  value={fmtMoney(c.amt)} />
               ))}
             </div>
           ) : <div style={{ color: 'var(--text-tertiary)', fontSize: 13 }}>Нет должников</div>}
@@ -754,7 +763,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
       {showCarrierDebt && (
         <DebtModal
           title="К оплате перевозчикам"
-          orders={carrierDebtOrders.map(o => ({ ...o, client_rate: o.carrier_rate }))}
+          orders={carrierDebtOrders}
           party="carrier"
           onClose={() => setShowCarrierDebt(false)}
           onOpenOrder={onOpenOrder}
@@ -775,7 +784,7 @@ export default function Dashboard({ onNav, onOpenOrder, period = 'month', onMont
             },
             debtors: {
               title: 'Все должники', subtitle: 'неоплаченные доставки', items: topDebtors,
-              valueOf: c => `${Math.round(c.amt || 0).toLocaleString('ru-RU')} Br`,
+              valueOf: c => fmtMoney(c.amt),
               color: 'var(--fg-d97706)', bg: 'rgba(var(--rgb-217-119-6), 0.12)',
             },
           }[openModal]}

@@ -15,19 +15,16 @@
 .lead-growth-row p { color: var(--text-secondary); margin: 4px 0 0; font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; }
 .lead-growth-order { color: var(--fg-1366f0); font-size: 12px; line-height: 1.6; text-underline-offset: 2px; }
 .lead-growth-row .btn-ghost { flex-shrink: 0; text-decoration: none; min-height: 34px; }
-.lead-signal { background: rgba(var(--rgb-19-102-240), .075); border: 1px solid rgba(var(--rgb-19-102-240), .18); border-radius: 14px; padding: 10px 13px; }
-.lead-signal-meta { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 9px; color: var(--fg-1366f0); font-size: 12px; }
-.lead-signal-meta a { color: inherit; text-underline-offset: 2px; }
-.lead-signal-meta time { color: var(--text-secondary); }
-.lead-signal p { color: var(--ink); margin: 4px 0 0; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
-.lead-qualification summary { font-weight: 650; font-size: 14px; color: var(--ink); cursor: pointer; }
-.lead-qualification fieldset { margin: 0; padding: 12px 0 0; border: 0; min-width: 0; }
-.lead-qualification-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(145px, 100%), 1fr)); gap: 9px 12px; }
-.lead-qualification-fields label { display: grid; gap: 4px; min-width: 0; }
-.lead-qualification-fields label > span, .lead-qualification-check, .lead-growth-actions { color: var(--text-secondary); font-size: 12px; }
-.lead-qualification-fields .form-input { width: 100%; min-width: 0; }
-.lead-qualification-check { display: inline-flex; margin-top: 13px; gap: 6px; align-items: center; }
-.lead-growth-actions { display: flex; flex-wrap: wrap; align-items: center; margin-top: 10px; gap: 12px; }
+.lead-qualification fieldset { margin: 0; padding: 6px 0 0; border: 0; min-width: 0; }
+.lead-qualification-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; gap: 10px 12px; }
+.lead-qualification-fields .form-input { width: 100%; min-width: 0; min-height: 38px; }
+.lead-qualification-check { display: inline-flex; gap: 8px; align-items: center; }
+.lead-qualification-check input { accent-color: var(--fg-1366f0); }
+.lead-growth-actions { display: flex; flex-wrap: wrap; align-items: center; margin-top: 12px; gap: 8px 12px; color: var(--text-secondary); font-size: 13px; }
+.lead-growth-actions .btn-primary { margin-inline-start: auto; }
+@container (max-width: 380px) {
+  .lead-qualification-fields { grid-template-columns: minmax(0, 1fr); }
+}
 .lead-reactivation-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .lead-reactivation-actions strong { display: block; color: var(--ink); white-space: nowrap; font-size: 14px; }
 .lead-reactivation-actions small, .lead-growth-table small { display: block; color: var(--text-secondary); font-size: 11px; margin-top: 2px; }
